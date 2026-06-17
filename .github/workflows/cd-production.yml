@@ -1,0 +1,27 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags: [v*]
+
+concurrency:
+  group: cd-production
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_TAG: ${{ github.ref_name }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > $HOME/.kube/config
+      - name: Deploy to production
+        run: |
+          kubectl set image deployment/ipe-dpe-svc dpe-svc=${{ env.REGISTRY }}/ipe/dpe-svc:${{ env.IMAGE_TAG }} -n ipe

@@ -1,0 +1,52 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "kong"
+    static_configs:
+      - targets: ["gateway:8001"]
+
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres:5432"]
+
+  - job_name: "dpe-svc"
+    static_configs:
+      - targets: ["dpe-svc:8001"]
+
+  - job_name: "mat-svc"
+    static_configs:
+      - targets: ["mat-svc:8002"]
+
+  - job_name: "cap-svc"
+    static_configs:
+      - targets: ["cap-svc:8003"]
+
+  - job_name: "fea-svc"
+    static_configs:
+      - targets: ["fea-svc:8004"]
+
+  - job_name: "res-svc"
+    static_configs:
+      - targets: ["res-svc:8005"]
+
+  - job_name: "del-svc"
+    static_configs:
+      - targets: ["del-svc:8006"]
+
+  - job_name: "nlp-svc"
+    static_configs:
+      - targets: ["nlp-svc:8007"]
+
+  - job_name: "rec-svc"
+    static_configs:
+      - targets: ["rec-svc:8008"]
+
+  - job_name: "connector"
+    static_configs:
+      - targets: ["connector:8009"]

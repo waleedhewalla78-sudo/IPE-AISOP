@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ipe-config
+  namespace: ipe
+data:
+  IPE_ENVIRONMENT: "production"
+  IPE_LOG_LEVEL: "INFO"
+  IPE_JWT_ALGORITHM: "HS256"
+  IPE_JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+  IPE_JWT_REFRESH_TOKEN_EXPIRE_MINUTES: "1440"
+  IPE_KAFKA_BOOTSTRAP_SERVERS: "kafka-cluster:9092"
+  IPE_CORS_ORIGINS: "https://app.ipe.ai"
+  IPE_DATABASE_URL: "postgresql+asyncpg://ipe:${DB_PASSWORD}@ipe-postgres:5432/ipe_prod"
+  IPE_DATABASE_URL_SYNC: "postgresql://ipe:${DB_PASSWORD}@ipe-postgres:5432/ipe_prod"

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipe-dpe-svc
+  namespace: ipe
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ipe-dpe-svc
+  template:
+    metadata:
+      labels:
+        app: ipe-dpe-svc
+    spec:
+      containers:
+        - name: dpe-svc
+          image: ghcr.io/ipe/dpe-svc:latest
+          ports:
+            - containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: ipe-config
+            - secretRef:
+                name: ipe-secrets
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/v1/ready
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipe-dpe-svc
+  namespace: ipe
+spec:
+  selector:
+    app: ipe-dpe-svc
+  ports:
+    - port: 8001
+      targetPort: 8001

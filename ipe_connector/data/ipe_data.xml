@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <record id="default_ipe_config" model="ipe.config">
+      <field name="tenant_id">default</field>
+      <field name="api_endpoint">http://localhost:8100</field>
+      <field name="api_key">dev-api-key</field>
+      <field name="api_secret">dev-api-secret-change-in-production</field>
+      <field name="sync_interval_minutes">15</field>
+      <field name="auto_sync_enabled">True</field>
+      <field name="active">True</field>
+    </record>
+  </data>
+</odoo>

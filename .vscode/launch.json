@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "dpe-svc",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload", "--port", "8001"],
+      "cwd": "${workspaceFolder}/services/dpe-svc",
+      "env": {"IPE_ENVIRONMENT": "development"}
+    },
+    {
+      "name": "mat-svc",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload", "--port", "8002"],
+      "cwd": "${workspaceFolder}/services/mat-svc",
+      "env": {"IPE_ENVIRONMENT": "development"}
+    },
+    {
+      "name": "Frontend (web)",
+      "type": "node",
+      "request": "launch",
+      "command": "pnpm dev",
+      "cwd": "${workspaceFolder}/apps/web"
+    }
+  ]
+}

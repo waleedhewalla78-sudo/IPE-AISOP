@@ -1,0 +1,21 @@
+# Global owners
+* @ipe-core-team
+
+# Infrastructure changes
+/infrastructure/ @ipe-infra-team
+
+# Frontend
+/apps/web/ @ipe-frontend-team
+
+# AI Services
+/services/dpe-svc/ @ipe-ml-team
+/services/mat-svc/ @ipe-ml-team
+/services/cap-svc/ @ipe-ml-team
+/services/fea-svc/ @ipe-ml-team
+/services/res-svc/ @ipe-ml-team
+/services/del-svc/ @ipe-ml-team
+/services/nlp-svc/ @ipe-ml-team
+/services/shared/ @ipe-ml-team @ipe-core-team
+
+# Docs
+/docs/ @ipe-docs-team

@@ -1,0 +1,209 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ipe-postgres
+    environment:
+      POSTGRES_USER: ipe
+      POSTGRES_PASSWORD: ipe_dev_pass
+      POSTGRES_DB: ipe_dev
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ipe"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ipe-redis
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.7.0
+    container_name: ipe-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports: ["2181:2181"]
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.0
+    container_name: ipe-kafka
+    depends_on: [zookeeper]
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports: ["9092:9092"]
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.7.0
+    container_name: ipe-schema-registry
+    depends_on: [kafka]
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    ports: ["8081:8081"]
+
+  nginx:
+    image: nginx:alpine
+    container_name: ipe-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - dpe-svc
+      - mat-svc
+      - cap-svc
+      - fea-svc
+      - res-svc
+      - del-svc
+      - nlp-svc
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: ipe-kafka-ui
+    depends_on: [kafka]
+    environment:
+      KAFKA_CLUSTERS_0_NAME: ipe-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    ports: ["8080:8080"]
+
+  dpe-svc:
+    build:
+      context: ../..
+      dockerfile: services/dpe-svc/Dockerfile
+    container_name: ipe-dpe-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+      IPE_REDIS_URL: redis://redis:6379/0
+      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports: ["8012:8001"]
+    depends_on: [postgres, redis, kafka]
+
+  mat-svc:
+    build:
+      context: ../..
+      dockerfile: services/mat-svc/Dockerfile
+    container_name: ipe-mat-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+      IPE_REDIS_URL: redis://redis:6379/0
+    ports: ["8002:8002"]
+    depends_on: [postgres, redis]
+
+  cap-svc:
+    build:
+      context: ../..
+      dockerfile: services/cap-svc/Dockerfile
+    container_name: ipe-cap-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+    ports: ["8003:8003"]
+    depends_on: [postgres]
+
+  fea-svc:
+    build:
+      context: ../..
+      dockerfile: services/fea-svc/Dockerfile
+    container_name: ipe-fea-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+      IPE_REDIS_URL: redis://redis:6379/0
+      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports: ["8004:8004"]
+    depends_on: [postgres, redis, kafka]
+
+  res-svc:
+    build:
+      context: ../..
+      dockerfile: services/res-svc/Dockerfile
+    container_name: ipe-res-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+    ports: ["8005:8005"]
+    depends_on: [postgres]
+
+  del-svc:
+    build:
+      context: ../..
+      dockerfile: services/del-svc/Dockerfile
+    container_name: ipe-del-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-placeholder}
+    ports: ["8006:8006"]
+    depends_on: [postgres]
+
+  nlp-svc:
+    build:
+      context: ../..
+      dockerfile: services/nlp-svc/Dockerfile
+    container_name: ipe-nlp-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-placeholder}
+      DPE_SVC_URL: http://dpe-svc:8001
+      MAT_SVC_URL: http://mat-svc:8002
+      CAP_SVC_URL: http://cap-svc:8003
+    ports: ["8007:8007"]
+    depends_on: [postgres, dpe-svc, mat-svc, cap-svc]
+
+  rec-svc:
+    build:
+      context: ../..
+      dockerfile: services/rec-svc/Dockerfile
+    container_name: ipe-rec-svc
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports: ["8008:8008"]
+    depends_on: [postgres, redis, kafka]
+
+  connector:
+    build:
+      context: ../..
+      dockerfile: services/connector/Dockerfile
+    container_name: ipe-connector
+    environment:
+      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
+      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports: ["8009:8009"]
+    depends_on: [postgres, kafka]
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ipe-prometheus
+    volumes:
+      - prometheus_data:/prometheus
+      - ../../infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports: ["9091:9090"]
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ipe-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../../infrastructure/monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    ports: ["3002:3000"]
+    depends_on: [prometheus]
+
+volumes:
+  pgdata:
+  prometheus_data:
+  grafana_data:

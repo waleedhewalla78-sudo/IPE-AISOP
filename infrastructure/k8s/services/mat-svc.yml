@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipe-mat-svc
+  namespace: ipe
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ipe-mat-svc
+  template:
+    metadata:
+      labels:
+        app: ipe-mat-svc
+    spec:
+      containers:
+        - name: mat-svc
+          image: ghcr.io/ipe/mat-svc:latest
+          ports:
+            - containerPort: 8002
+          envFrom:
+            - configMapRef:
+                name: ipe-config
+            - secretRef:
+                name: ipe-secrets
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/v1/ready
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipe-mat-svc
+  namespace: ipe
+spec:
+  selector:
+    app: ipe-mat-svc
+  ports:
+    - port: 8002
+      targetPort: 8002

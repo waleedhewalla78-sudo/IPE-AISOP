@@ -1,0 +1,40 @@
+site_name: IPE - Intelligent Planning Engine
+site_description: Technical documentation for the IPE platform
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: teal
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+
+nav:
+  - Home: index.md
+  - Architecture:
+    - System Overview: architecture/system-overview.md
+    - Data Model: architecture/data-model.md
+    - Event Mesh: architecture/event-mesh.md
+  - API Reference:
+    - dpe-svc: api/dpe-svc.md
+    - mat-svc: api/mat-svc.md
+    - cap-svc: api/cap-svc.md
+    - fea-svc: api/fea-svc.md
+    - res-svc: api/res-svc.md
+    - del-svc: api/del-svc.md
+    - nlp-svc: api/nlp-svc.md
+  - Onboarding:
+    - Developer Setup: onboarding/developer-setup.md
+    - Architecture Decisions: onboarding/architecture-decisions.md
+  - Runbooks:
+    - Deployment: runbooks/deployment.md
+    - Incident Response: runbooks/incident-response.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.details
+  - toc:
+      permalink: true

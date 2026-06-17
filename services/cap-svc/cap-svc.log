@@ -1,0 +1,16 @@
+INFO:     Started server process [36288]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:18013 (Press CTRL+C to quit)
+Redis not available, idempotency disabled: unknown command 'HELLO'
+Redis not available, idempotency disabled: unknown command 'HELLO'
+{"asctime": "2026-06-16T06:20:33+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=19c9e228-51cf-4773-b4dd-7a6be3c781f3 method=POST path=/api/v1/capacity/schedule status=422 elapsed_ms=172.0"}
+INFO:     127.0.0.1:53805 - "POST /api/v1/capacity/schedule HTTP/1.1" 422 Unprocessable Entity
+{"asctime": "2026-06-16T06:20:43+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=f1061b62-72d7-43ad-b3e5-b8fc3afe2a71 method=POST path=/api/v1/capacity/schedule status=200 elapsed_ms=281.0"}
+INFO:     127.0.0.1:53817 - "POST /api/v1/capacity/schedule HTTP/1.1" 200 OK
+{"asctime": "2026-06-16T06:21:11+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=4a4e7910-88f0-4dc2-8c67-89b4dc2b70ab method=POST path=/api/v1/capacity/schedule status=422 elapsed_ms=15.0"}
+INFO:     127.0.0.1:59816 - "POST /api/v1/capacity/schedule HTTP/1.1" 422 Unprocessable Entity
+{"asctime": "2026-06-16T06:21:26+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=d0ea7fc2-ef0b-4d71-959c-2ad690432bbe method=POST path=/api/v1/capacity/schedule status=200 elapsed_ms=16.0"}
+INFO:     127.0.0.1:63529 - "POST /api/v1/capacity/schedule HTTP/1.1" 200 OK
+{"asctime": "2026-06-16T06:21:35+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=fc49a403-3ce0-4397-892e-64e4083c0706 method=POST path=/api/v1/capacity/schedule status=200 elapsed_ms=15.0"}
+INFO:     127.0.0.1:53786 - "POST /api/v1/capacity/schedule HTTP/1.1" 200 OK

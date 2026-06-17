@@ -1,0 +1,65 @@
+{{- if .Values.infrastructure.kong.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+  labels:
+    {{- include "ipe.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kong
+spec:
+  replicas: {{ .Values.infrastructure.kong.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: kong
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: kong
+    spec:
+      containers:
+        - name: kong
+          image: {{ .Values.infrastructure.kong.image }}
+          ports:
+            - containerPort: 8000
+              name: proxy
+            - containerPort: 8001
+              name: admin
+          env:
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_DECLARATIVE_CONFIG
+              value: "/etc/kong/kong.yml"
+            - name: KONG_PROXY_ACCESS_LOG
+              value: "/dev/stdout"
+            - name: KONG_PROXY_ERROR_LOG
+              value: "/dev/stderr"
+          resources:
+            {{- toYaml .Values.infrastructure.kong.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/kong
+      volumes:
+        - name: config
+          configMap:
+            name: kong-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-proxy
+  labels:
+    {{- include "ipe.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kong
+spec:
+  selector:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: kong
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: proxy
+      nodePort: 30080
+  type: NodePort
+{{- end }}

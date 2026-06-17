@@ -1,0 +1,115 @@
+{
+  "title": "IPE ML Drift Monitoring",
+  "uid": "ipe-ml-drift",
+  "version": 1,
+  "tags": ["ipe", "ml", "drift", "production"],
+  "schemaVersion": 38,
+  "timezone": "utc",
+  "editable": true,
+  "refresh": "5m",
+  "panels": [
+    {
+      "title": "Supplier Reliability Model MAPE",
+      "type": "graph",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "ml_supplier_reliability_mape",
+          "legendFormat": "MAPE"
+        }
+      ],
+      "yaxes": [
+        { "label": "MAPE (%)", "min": 0, "max": 100 },
+        { "show": false }
+      ],
+      "thresholds": [
+        { "colorMode": "warning", "fill": false, "line": true, "op": "gt", "value": 20 },
+        { "colorMode": "critical", "fill": true, "line": true, "op": "gt", "value": 30 }
+      ]
+    },
+    {
+      "title": "Cycle Time Prediction R² Score",
+      "type": "graph",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "ml_cycle_time_r2_score",
+          "legendFormat": "R²"
+        }
+      ],
+      "yaxes": [
+        { "label": "R² Score", "min": 0, "max": 1 },
+        { "show": false }
+      ],
+      "thresholds": [
+        { "colorMode": "critical", "fill": true, "line": true, "op": "lt", "value": 0.5 },
+        { "colorMode": "warning", "fill": false, "line": true, "op": "lt", "value": 0.7 }
+      ]
+    },
+    {
+      "title": "Rule-Based Fallback Frequency",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(ml_fallback_rule_total[24h])",
+          "legendFormat": "fallbacks / sec"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "area" }
+    },
+    {
+      "title": "Model Version in Production",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 8 },
+      "targets": [
+        {
+          "expr": "ml_model_version{stage='production'}",
+          "legendFormat": "{{ model_name }} v{{ version }}"
+        }
+      ],
+      "options": { "colorMode": "none", "graphMode": "none" }
+    },
+    {
+      "title": "Training Recency (days since last training)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "time() - ml_last_training_timestamp_seconds",
+          "legendFormat": "days since last train"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none" },
+      "thresholds": [
+        { "colorMode": "warning", "fill": true, "line": false, "op": "gt", "value": 604800 },
+        { "colorMode": "critical", "fill": true, "line": false, "op": "gt", "value": 1209600 }
+      ]
+    },
+    {
+      "title": "Feature Drift Score",
+      "type": "graph",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "targets": [
+        {
+          "expr": "ml_feature_drift_psi",
+          "legendFormat": "PSI — {{ feature }}"
+        }
+      ],
+      "yaxes": [
+        { "label": "PSI", "min": 0 },
+        { "show": false }
+      ],
+      "thresholds": [
+        { "colorMode": "warning", "fill": false, "line": true, "op": "gt", "value": 0.1 },
+        { "colorMode": "critical", "fill": true, "line": true, "op": "gt", "value": 0.25 }
+      ]
+    }
+  ]
+}

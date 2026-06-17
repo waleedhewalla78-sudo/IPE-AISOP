@@ -1,0 +1,300 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  UV_LINK_MODE: copy
+
+jobs:
+  lint-format:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Install dependencies
+        working-directory: services/shared
+        run: uv sync --frozen
+      - name: Ruff check
+        working-directory: services/shared
+        run: uv run ruff check ipe_shared
+      - name: Ruff format check
+        working-directory: services/shared
+        run: uv run ruff format --check ipe_shared
+      - name: Frontend lint
+        working-directory: apps/web
+        run: pnpm lint
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Install dependencies
+        working-directory: services/shared
+        run: uv sync --frozen
+      - name: mypy (ipe_shared)
+        working-directory: services/shared
+        run: uv run mypy ipe_shared
+      - name: Frontend typecheck
+        working-directory: apps/web
+        run: pnpm typecheck
+
+  test:
+    name: Test & Coverage
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ipe
+          POSTGRES_PASSWORD: ipe_test_pass
+          POSTGRES_DB: ipe_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      zookeeper:
+        image: confluentinc/cp-zookeeper:7.7.0
+        ports:
+          - 2181:2181
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+      kafka:
+        image: confluentinc/cp-kafka:7.7.0
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      schema-registry:
+        image: confluentinc/cp-schema-registry:7.7.0
+        ports:
+          - 8081:8081
+        env:
+          SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: localhost:9092
+          SCHEMA_REGISTRY_HOST_NAME: localhost
+          SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Install dependencies
+        working-directory: services/shared
+        run: uv sync --frozen
+      - name: Run shared package unit tests
+        working-directory: services/shared
+        run: uv run pytest tests/ -m "not integration" --cov=ipe_shared --cov-report=xml --cov-report=term
+      - name: Upload coverage
+        uses: codecov/codecov-action@v5
+        with:
+          file: services/shared/coverage.xml
+          fail_ci_if_error: false
+
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ipe
+          POSTGRES_PASSWORD: ipe_test_pass
+          POSTGRES_DB: ipe_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      zookeeper:
+        image: confluentinc/cp-zookeeper:7.7.0
+        ports:
+          - 2181:2181
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+      kafka:
+        image: confluentinc/cp-kafka:7.7.0
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Install dependencies
+        working-directory: services/shared
+        run: uv sync --frozen
+      - name: Run integration tests
+        working-directory: services/shared
+        env:
+          IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@localhost:5432/ipe_test
+          IPE_REDIS_URL: redis://localhost:6379/0
+          IPE_KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+        run: uv run pytest tests/integration/ -m integration -v
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      - name: Install dependencies
+        working-directory: apps/web
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        working-directory: apps/web
+        run: pnpm exec playwright install chromium
+      - name: Run E2E tests
+        working-directory: apps/web
+        run: pnpm test:e2e
+
+  integration-e2e:
+    name: Integration & E2E
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ipe
+          POSTGRES_PASSWORD: ipe_test_pass
+          POSTGRES_DB: ipe_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      zookeeper:
+        image: confluentinc/cp-zookeeper:7.7.0
+        ports:
+          - 2181:2181
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
+      kafka:
+        image: confluentinc/cp-kafka:7.7.0
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Install dependencies
+        working-directory: services/shared
+        run: uv sync --frozen
+      - name: Seed test data
+        run: bash scripts/seed-data.sh
+        env:
+          IPE_DATABASE_URL_SYNC: postgresql://ipe:ipe_test_pass@localhost:5432/ipe_test
+      - name: Run E2E critical path
+        run: uv run python scripts/e2e/critical_path_test.py
+        env:
+          TEST_DB_HOST: localhost
+          TEST_DB_PORT: "5432"
+          TEST_DB_USER: ipe
+          TEST_DB_PASSWORD: ipe_test_pass
+          TEST_DB_NAME: ipe_test
+      - name: Run RBAC integration tests
+        run: uv run python tests/integration/test_rbac_tenant_isolation.py
+        env:
+          TEST_DB_HOST: localhost
+          TEST_DB_PORT: "5432"
+          TEST_DB_USER: ipe
+          TEST_DB_PASSWORD: ipe_test_pass
+          TEST_DB_NAME: ipe_test
+
+  service-dependencies:
+    name: Service Dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - cap-svc
+          - del-svc
+          - dpe-svc
+          - fea-svc
+          - mat-svc
+          - nlp-svc
+          - res-svc
+          - rec-svc
+          - connector
+          - alert-svc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Install dependencies (${{ matrix.service }})
+        working-directory: services/${{ matrix.service }}
+        run: uv sync --frozen
+      - name: Verify ipe_shared import
+        working-directory: services/${{ matrix.service }}
+        run: "uv run python -c \"import ipe_shared; print('${{ matrix.service }}: OK')\""

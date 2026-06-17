@@ -1,0 +1,43 @@
+[project]
+name = "ipe-del-svc"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "ipe-shared>=0.1.0",
+    "anthropic>=0.49.0",
+]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short --strict-markers"
+markers = [ "unit", "integration", "slow" ]
+[tool.coverage.run]
+source = ["app"]
+omit = ["*/tests/*"]
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+[tool.ruff]
+target-version = "py312"
+line-length = 99
+src = ["app", "tests"]
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "S", "T20", "SIM", "TCH", "RUF"]
+ignore = ["S101"]
+[tool.ruff.lint.isort]
+known-first-party = ["ipe_shared", "app"]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.uv.sources]
+ipe-shared = { path = "./shared", editable = true }
+
+[dependency-groups]
+dev = [
+    "httpx",
+    "pytest",
+    "pytest-asyncio",
+]

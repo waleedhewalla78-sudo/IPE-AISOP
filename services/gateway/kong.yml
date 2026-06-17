@@ -1,0 +1,253 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: dpe-svc
+    host: dpe-svc
+    port: 8001
+    protocol: http
+    routes:
+      - name: dpe-route
+        paths:
+          - /api/v1/demand
+          - /api/v1/signals
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: mat-svc
+    host: mat-svc
+    port: 8002
+    protocol: http
+    routes:
+      - name: mat-route
+        paths:
+          - /api/v1/material
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: cap-svc
+    host: cap-svc
+    port: 8003
+    protocol: http
+    routes:
+      - name: cap-route
+        paths:
+          - /api/v1/capacity
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: fea-svc
+    host: fea-svc
+    port: 8004
+    protocol: http
+    routes:
+      - name: fea-route
+        paths:
+          - /api/v1/feasibility
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: res-svc
+    host: res-svc
+    port: 8005
+    protocol: http
+    routes:
+      - name: res-route
+        paths:
+          - /api/v1/resolution
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: del-svc
+    host: del-svc
+    port: 8006
+    protocol: http
+    routes:
+      - name: del-route
+        paths:
+          - /api/v1/delay
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: nlp-svc
+    host: nlp-svc
+    port: 8007
+    protocol: http
+    routes:
+      - name: nlp-route
+        paths:
+          - /api/v1/copilot
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 30
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: rec-svc
+    host: rec-svc
+    port: 8008
+    protocol: http
+    routes:
+      - name: rec-route
+        paths:
+          - /api/v1/recommendations
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 100
+              policy: local
+              limit_by: consumer
+          - name: request-transformer
+            config:
+              add:
+                headers:
+                  - "X-Tenant-ID:$(jwt.payload.tenant_id)"
+
+  - name: connector-svc
+    host: connector
+    port: 8009
+    protocol: http
+    routes:
+      - name: connector-route
+        paths:
+          - /api/v1/ipe
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+          - name: rate-limiting
+            config:
+              minute: 200
+              policy: local
+              limit_by: consumer
+
+  - name: auth-svc
+    host: dpe-svc
+    port: 8001
+    protocol: http
+    routes:
+      - name: auth-route-no-jwt
+        paths:
+          - /api/v1/auth/login
+        strip_path: false
+        plugins:
+          - name: rate-limiting
+            config:
+              minute: 30
+              policy: local
+  - name: health-svc
+    host: dpe-svc
+    port: 8001
+    protocol: http
+    routes:
+      - name: health-route
+        paths:
+          - /
+        plugins:
+          - name: request-termination
+            config:
+              status_code: 200
+              body: "OK"
+        strip_path: false

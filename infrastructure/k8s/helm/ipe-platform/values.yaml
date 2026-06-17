@@ -1,0 +1,148 @@
+global:
+  imageRegistry: "ghcr.io/anomalyco"
+  imageTag: "latest"
+  imagePullPolicy: "IfNotPresent"
+  environment: "production"
+  tenantId: ""
+  kafkaBootstrapServers: "kafka-headless:9092"
+  redisUrl: "redis://redis-headless:6379/0"
+  postgresDsn: "postgresql+asyncpg://ipe_app:${POSTGRES_PASSWORD}@postgres-headless:5432/ipe"
+
+infrastructure:
+  postgres:
+    enabled: true
+    image: "postgres:16-alpine"
+    replicas: 1
+    storage: 100Gi
+    storageClass: "gp3"
+    passwordSecret: "postgres-credentials"
+    resources:
+      requests: { cpu: "500m", memory: "1Gi" }
+      limits: { cpu: "2", memory: "4Gi" }
+
+  kafka:
+    enabled: true
+    image: "confluentinc/cp-kafka:7.6"
+    replicas: 3
+    storage: 50Gi
+    storageClass: "gp3"
+    resources:
+      requests: { cpu: "500m", memory: "1Gi" }
+      limits: { cpu: "2", memory: "4Gi" }
+
+  redis:
+    enabled: true
+    image: "redis:7-alpine"
+    replicas: 1
+    storage: 10Gi
+    storageClass: "gp3"
+    resources:
+      requests: { cpu: "100m", memory: "256Mi" }
+      limits: { cpu: "500m", memory: "1Gi" }
+
+  kong:
+    enabled: true
+    image: "kong:3.7"
+    replicas: 2
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  monitoring:
+    prometheus:
+      enabled: true
+      image: "prom/prometheus:v2.51"
+      storage: 50Gi
+    grafana:
+      enabled: true
+      image: "grafana/grafana:10.4"
+      storage: 10Gi
+
+services:
+  dpe_svc:
+    enabled: true
+    replicas: 2
+    port: 8002
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  mat_svc:
+    enabled: true
+    replicas: 2
+    port: 8003
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  cap_svc:
+    enabled: true
+    replicas: 2
+    port: 8004
+    resources:
+      requests: { cpu: "500m", memory: "1Gi" }
+      limits: { cpu: "2", memory: "4Gi" }
+
+  fea_svc:
+    enabled: true
+    replicas: 2
+    port: 8005
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  res_svc:
+    enabled: true
+    replicas: 2
+    port: 8006
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  del_svc:
+    enabled: true
+    replicas: 2
+    port: 8007
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  nlp_svc:
+    enabled: true
+    replicas: 2
+    port: 8008
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  rec_svc:
+    enabled: true
+    replicas: 2
+    port: 8009
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  alert_svc:
+    enabled: true
+    replicas: 2
+    port: 8010
+    resources:
+      requests: { cpu: "100m", memory: "256Mi" }
+      limits: { cpu: "500m", memory: "1Gi" }
+
+  connector:
+    enabled: true
+    replicas: 2
+    port: 8001
+    resources:
+      requests: { cpu: "200m", memory: "512Mi" }
+      limits: { cpu: "1", memory: "1Gi" }
+
+  frontend:
+    enabled: true
+    replicas: 2
+    port: 3000
+    resources:
+      requests: { cpu: "100m", memory: "256Mi" }
+      limits: { cpu: "500m", memory: "1Gi" }

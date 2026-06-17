@@ -1,0 +1,5 @@
+{{- range $name, $config := .Values.services }}
+{{- if $config.enabled }}
+{{ include "ipe.service.deployment" (dict "name" $name "config" $config "root" $) }}
+{{- end }}
+{{- end }}

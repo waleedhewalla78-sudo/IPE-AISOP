@@ -1,0 +1,470 @@
+INFO:     Started server process [9616]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:18012 (Press CTRL+C to quit)
+Redis not available, idempotency disabled: unknown command 'HELLO'
+Redis not available, idempotency disabled: unknown command 'HELLO'
+{"asctime": "2026-06-16T06:20:33+0300", "name": "ipe.error", "levelname": "ERROR", "message": "Unhandled exception: badly formed hexadecimal UUID string", "exc_info": "  + Exception Group Traceback (most recent call last):\n  |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_utils.py\", line 85, in create_collapsing_task_group\n  |     async with anyio.create_task_group() as tg:\n  |                ^^^^^^^^^^^^^^^^^^^^^^^^^\n  |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\anyio\\_backends\\_asyncio.py\", line 799, in __aexit__\n  |     raise BaseExceptionGroup(\n  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py\", line 164, in __call__\n    |     await self.app(scope, receive, _send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\observability\\metrics.py\", line 28, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py\", line 88, in __call__\n    |     await self.app(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\tenant_context.py\", line 22, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\request_logging.py\", line 13, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\correlation_id.py\", line 11, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py\", line 63, in __call__\n    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    |     raise exc\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    |     await app(scope, receive, sender)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py\", line 18, in __call__\n    |     await self.app(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 660, in __call__\n    |     await self.middleware_stack(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 680, in app\n    |     await route.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    |     await self.original_router.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    |     await included_router._handle_selected(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1585, in _handle_selected\n    |     await route.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    |     await self.original_router.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    |     await included_router._handle_selected(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1594, in _handle_selected\n    |     await original_route.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1183, in handle\n    |     await app(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 143, in app\n    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    |     raise exc\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    |     await app(scope, receive, sender)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 129, in app\n    |     response = await f(request)\n    |                ^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 683, in app\n    |     raw_response = await run_endpoint_function(\n    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 337, in run_endpoint_function\n    |     return await dependant.call(**values)\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\api\\v1\\material.py\", line 163, in check_probabilistic_atp\n    |     result = await probabilistic_atp(\n    |              ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\core\\atp.py\", line 215, in probabilistic_atp\n    |     inv = await get_current_inventory(session, tenant_id, UUID(comp_id))\n    |                                                           ^^^^^^^^^^^^^\n    |   File \"C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\uuid.py\", line 178, in __init__\n    |     raise ValueError('badly formed hexadecimal UUID string')\n    | ValueError: badly formed hexadecimal UUID string\n    +------------------------------------\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py\", line 164, in __call__\n    await self.app(scope, receive, _send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\observability\\metrics.py\", line 28, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py\", line 88, in __call__\n    await self.app(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\tenant_context.py\", line 22, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\request_logging.py\", line 13, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\correlation_id.py\", line 11, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py\", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py\", line 18, in __call__\n    await self.app(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 660, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 680, in app\n    await route.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    await self.original_router.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    await included_router._handle_selected(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1585, in _handle_selected\n    await route.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    await self.original_router.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    await included_router._handle_selected(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1594, in _handle_selected\n    await original_route.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1183, in handle\n    await app(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 143, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 129, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 683, in app\n    raw_response = await run_endpoint_function(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 337, in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\api\\v1\\material.py\", line 163, in check_probabilistic_atp\n    result = await probabilistic_atp(\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\core\\atp.py\", line 215, in probabilistic_atp\n    inv = await get_current_inventory(session, tenant_id, UUID(comp_id))\n                                                          ^^^^^^^^^^^^^\n  File \"C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\uuid.py\", line 178, in __init__\n    raise ValueError('badly formed hexadecimal UUID string')\nValueError: badly formed hexadecimal UUID string"}
+INFO:     127.0.0.1:53803 - "POST /api/v1/material/probabilistic-atp HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_utils.py", line 85, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 421, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 62, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\applications.py", line 1162, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 28, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 22, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\request_logging.py", line 13, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\correlation_id.py", line 11, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1585, in _handle_selected
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1594, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1183, in handle
+    |     await app(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 683, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 337, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\app\api\v1\material.py", line 163, in check_probabilistic_atp
+    |     result = await probabilistic_atp(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\app\core\atp.py", line 215, in probabilistic_atp
+    |     inv = await get_current_inventory(session, tenant_id, UUID(comp_id))
+    |                                                           ^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python312\Lib\uuid.py", line 178, in __init__
+    |     raise ValueError('badly formed hexadecimal UUID string')
+    | ValueError: badly formed hexadecimal UUID string
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 62, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\applications.py", line 1162, in __call__
+    await super().__call__(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 28, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 22, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\request_logging.py", line 13, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\correlation_id.py", line 11, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1585, in _handle_selected
+    await route.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1594, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1183, in handle
+    await app(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 683, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 337, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\app\api\v1\material.py", line 163, in check_probabilistic_atp
+    result = await probabilistic_atp(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\app\core\atp.py", line 215, in probabilistic_atp
+    inv = await get_current_inventory(session, tenant_id, UUID(comp_id))
+                                                          ^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python312\Lib\uuid.py", line 178, in __init__
+    raise ValueError('badly formed hexadecimal UUID string')
+ValueError: badly formed hexadecimal UUID string
+{"asctime": "2026-06-16T06:20:42+0300", "name": "ipe.error", "levelname": "ERROR", "message": "Unhandled exception: badly formed hexadecimal UUID string", "exc_info": "  + Exception Group Traceback (most recent call last):\n  |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_utils.py\", line 85, in create_collapsing_task_group\n  |     async with anyio.create_task_group() as tg:\n  |                ^^^^^^^^^^^^^^^^^^^^^^^^^\n  |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\anyio\\_backends\\_asyncio.py\", line 799, in __aexit__\n  |     raise BaseExceptionGroup(\n  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py\", line 164, in __call__\n    |     await self.app(scope, receive, _send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\observability\\metrics.py\", line 28, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py\", line 88, in __call__\n    |     await self.app(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\tenant_context.py\", line 22, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\request_logging.py\", line 13, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\correlation_id.py\", line 11, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py\", line 63, in __call__\n    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    |     raise exc\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    |     await app(scope, receive, sender)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py\", line 18, in __call__\n    |     await self.app(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 660, in __call__\n    |     await self.middleware_stack(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 680, in app\n    |     await route.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    |     await self.original_router.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    |     await included_router._handle_selected(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1585, in _handle_selected\n    |     await route.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    |     await self.original_router.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    |     await included_router._handle_selected(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1594, in _handle_selected\n    |     await original_route.handle(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1183, in handle\n    |     await app(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 143, in app\n    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    |     raise exc\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    |     await app(scope, receive, sender)\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 129, in app\n    |     response = await f(request)\n    |                ^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 683, in app\n    |     raw_response = await run_endpoint_function(\n    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 337, in run_endpoint_function\n    |     return await dependant.call(**values)\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\api\\v1\\material.py\", line 163, in check_probabilistic_atp\n    |     result = await probabilistic_atp(\n    |              ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\core\\atp.py\", line 215, in probabilistic_atp\n    |     inv = await get_current_inventory(session, tenant_id, UUID(comp_id))\n    |                                                           ^^^^^^^^^^^^^\n    |   File \"C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\uuid.py\", line 178, in __init__\n    |     raise ValueError('badly formed hexadecimal UUID string')\n    | ValueError: badly formed hexadecimal UUID string\n    +------------------------------------\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py\", line 164, in __call__\n    await self.app(scope, receive, _send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\observability\\metrics.py\", line 28, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py\", line 88, in __call__\n    await self.app(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\tenant_context.py\", line 22, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\request_logging.py\", line 13, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\shared\\ipe_shared\\middleware\\correlation_id.py\", line 11, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py\", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py\", line 18, in __call__\n    await self.app(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 660, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 680, in app\n    await route.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    await self.original_router.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    await included_router._handle_selected(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1585, in _handle_selected\n    await route.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1574, in handle\n    await self.original_router.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2012, in handle\n    await included_router._handle_selected(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1594, in _handle_selected\n    await original_route.handle(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1183, in handle\n    await app(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 143, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 129, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 683, in app\n    raw_response = await run_endpoint_function(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 337, in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\api\\v1\\material.py\", line 163, in check_probabilistic_atp\n    result = await probabilistic_atp(\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AP SOP\\ipe\\services\\mat-svc\\app\\core\\atp.py\", line 215, in probabilistic_atp\n    inv = await get_current_inventory(session, tenant_id, UUID(comp_id))\n                                                          ^^^^^^^^^^^^^\n  File \"C:\\Users\\admin\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\uuid.py\", line 178, in __init__\n    raise ValueError('badly formed hexadecimal UUID string')\nValueError: badly formed hexadecimal UUID string"}
+INFO:     127.0.0.1:53815 - "POST /api/v1/material/probabilistic-atp HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+  + Exception Group Traceback (most recent call last):
+  |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_utils.py", line 85, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 799, in __aexit__
+  |     raise BaseExceptionGroup(
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 421, in run_asgi
+    |     result = await app(  # type: ignore[func-returns-value]
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 62, in __call__
+    |     return await self.app(scope, receive, send)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\applications.py", line 1162, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 28, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 22, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\request_logging.py", line 13, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\correlation_id.py", line 11, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1585, in _handle_selected
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1594, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1183, in handle
+    |     await app(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 683, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 337, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\app\api\v1\material.py", line 163, in check_probabilistic_atp
+    |     result = await probabilistic_atp(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AP SOP\ipe\services\mat-svc\app\core\atp.py", line 215, in probabilistic_atp
+    |     inv = await get_current_inventory(session, tenant_id, UUID(comp_id))
+    |                                                           ^^^^^^^^^^^^^
+    |   File "C:\Users\admin\AppData\Local\Programs\Python\Python312\Lib\uuid.py", line 178, in __init__
+    |     raise ValueError('badly formed hexadecimal UUID string')
+    | ValueError: badly formed hexadecimal UUID string
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 62, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\applications.py", line 1162, in __call__
+    await super().__call__(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 28, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 22, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\request_logging.py", line 13, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\shared\ipe_shared\middleware\correlation_id.py", line 11, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1585, in _handle_selected
+    await route.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1574, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 2012, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1594, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 1183, in handle
+    await app(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 683, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\.venv\Lib\site-packages\fastapi\routing.py", line 337, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\app\api\v1\material.py", line 163, in check_probabilistic_atp
+    result = await probabilistic_atp(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AP SOP\ipe\services\mat-svc\app\core\atp.py", line 215, in probabilistic_atp
+    inv = await get_current_inventory(session, tenant_id, UUID(comp_id))
+                                                          ^^^^^^^^^^^^^
+  File "C:\Users\admin\AppData\Local\Programs\Python\Python312\Lib\uuid.py", line 178, in __init__
+    raise ValueError('badly formed hexadecimal UUID string')
+ValueError: badly formed hexadecimal UUID string
+{"asctime": "2026-06-16T06:21:11+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=a3cdb71f-0db8-4367-a861-818764bc7bf7 method=POST path=/api/v1/material/probabilistic-atp status=200 elapsed_ms=94.0"}
+INFO:     127.0.0.1:59815 - "POST /api/v1/material/probabilistic-atp HTTP/1.1" 200 OK
+{"asctime": "2026-06-16T06:21:26+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=f916012f-2de0-45d7-86e1-345a83a78836 method=POST path=/api/v1/material/probabilistic-atp status=200 elapsed_ms=32.0"}
+INFO:     127.0.0.1:63528 - "POST /api/v1/material/probabilistic-atp HTTP/1.1" 200 OK
+{"asctime": "2026-06-16T06:21:35+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=9b6a4ce5-e43c-48b9-86c5-188aef78276c method=POST path=/api/v1/material/probabilistic-atp status=200 elapsed_ms=32.0"}
+INFO:     127.0.0.1:53785 - "POST /api/v1/material/probabilistic-atp HTTP/1.1" 200 OK

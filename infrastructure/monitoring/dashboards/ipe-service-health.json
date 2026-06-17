@@ -1,0 +1,118 @@
+{
+  "title": "IPE Service Health",
+  "uid": "ipe-service-health",
+  "version": 1,
+  "tags": ["ipe", "sla", "production"],
+  "schemaVersion": 38,
+  "timezone": "utc",
+  "editable": true,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Request Rate by Service",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[5m])) by (service)",
+          "legendFormat": "{{ service }}"
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "title": "Error Rate by Service",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_errors_total[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)",
+          "legendFormat": "{{ service }}"
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "title": "P95 Latency by Service",
+      "type": "graph",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))",
+          "legendFormat": "{{ service }}"
+        }
+      ],
+      "yaxes": [{ "label": "seconds", "decimals": 3 }, { "show": false }],
+      "alert": {
+        "alertRuleTags": { "severity": "critical" },
+        "conditions": [
+          {
+            "evaluator": { "params": [2.0], "type": "gt" },
+            "query": { "params": ["A", "5m", "now"] },
+            "reducer": { "params": [], "type": "avg" },
+            "type": "query"
+          }
+        ]
+      }
+    },
+    {
+      "title": "OR-Tools Solver Execution Time (cap-svc)",
+      "type": "graph",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "or_tools_solver_duration_seconds",
+          "legendFormat": "solver duration"
+        }
+      ],
+      "yaxes": [{ "label": "seconds" }, { "show": false }],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 30
+        }
+      ]
+    },
+    {
+      "title": "OR-Tools Solver Success Rate (cap-svc)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 4, "x": 8, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(or_tools_solver_success_total[5m]) / (rate(or_tools_solver_success_total[5m]) + rate(or_tools_solver_failure_total[5m])) * 100",
+          "legendFormat": "success rate"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "title": "Monte Carlo Simulation Duration (mat-svc)",
+      "type": "graph",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "monte_carlo_simulation_duration_seconds",
+          "legendFormat": "sim duration"
+        }
+      ],
+      "yaxes": [{ "label": "seconds" }, { "show": false }]
+    }
+  ]
+}

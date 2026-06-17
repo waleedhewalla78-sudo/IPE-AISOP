@@ -1,0 +1,17 @@
+INFO:     Started server process [27712]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:18011 (Press CTRL+C to quit)
+Redis not available, idempotency disabled: unknown command 'HELLO'
+{"asctime": "2026-06-16T06:20:25+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=bb58edd4-ff1f-46e7-865b-240a469679fa method=POST path=/api/v1/demand/classify status=200 elapsed_ms=407.0"}
+INFO:     127.0.0.1:56250 - "POST /api/v1/demand/classify HTTP/1.1" 200 OK
+{"asctime": "2026-06-16T06:20:32+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=bba89586-3dac-457b-9248-533e95cb66d7 method=POST path=/api/v1/demand/classify status=422 elapsed_ms=16.0"}
+INFO:     127.0.0.1:53802 - "POST /api/v1/demand/classify HTTP/1.1" 422 Unprocessable Entity
+{"asctime": "2026-06-16T06:20:42+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=9f8b60d7-edb3-4a2d-99df-a19bf8cbdac8 method=POST path=/api/v1/demand/classify status=200 elapsed_ms=31.0"}
+INFO:     127.0.0.1:53813 - "POST /api/v1/demand/classify HTTP/1.1" 200 OK
+{"asctime": "2026-06-16T06:21:11+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=4c3feca1-d0ee-4b56-a5b7-d5ef61b2ccc7 method=POST path=/api/v1/demand/classify status=422 elapsed_ms=0.0"}
+INFO:     127.0.0.1:59814 - "POST /api/v1/demand/classify HTTP/1.1" 422 Unprocessable Entity
+{"asctime": "2026-06-16T06:21:26+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=ebb2dd6b-615d-4225-bca2-8386e69c95ae method=POST path=/api/v1/demand/classify status=200 elapsed_ms=31.0"}
+INFO:     127.0.0.1:63527 - "POST /api/v1/demand/classify HTTP/1.1" 200 OK
+{"asctime": "2026-06-16T06:21:35+0300", "name": "ipe.request", "levelname": "INFO", "message": "request_id=efb28840-9dc3-4492-82ea-a288cfcabc4e method=POST path=/api/v1/demand/classify status=200 elapsed_ms=31.0"}
+INFO:     127.0.0.1:53784 - "POST /api/v1/demand/classify HTTP/1.1" 200 OK
