@@ -1,22 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { KPICard } from './KPICard';
 import { Card } from '@/components/ui/Card';
 import { Table, TableHead, TableRow, TableHeader, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { fetchRiskQueue, getMockBottlenecks } from '../api';
-import type { MORiskItem, BottleneckItem } from '../types';
+import { fetchQueue, fetchKPIs, getMockBottlenecks } from '../api';
+import { FeasibilityWebSocket } from '@/lib/ws';
+import type { MOQueueItem, KPI, BottleneckItem } from '../types';
 
-function scoreColor(score: number): string {
+const wsClient = new FeasibilityWebSocket();
+
+function scoreColor(score: number | null): string {
+  if (score === null) return 'text-ipe-text-muted';
   if (score >= 90) return 'text-green-600';
   if (score >= 70) return 'text-yellow-600';
   return 'text-red-600';
 }
 
-function scoreBadge(score: number): 'success' | 'warning' | 'danger' {
+function scoreBadge(score: number | null): 'success' | 'warning' | 'danger' | 'default' {
+  if (score === null) return 'default';
   if (score >= 90) return 'success';
   if (score >= 70) return 'warning';
   return 'danger';
+}
+
+function scoreLabel(score: number | null): string {
+  if (score === null) return 'Pending';
+  if (score >= 90) return 'On Track';
+  if (score >= 70) return 'At Risk';
+  return 'Critical';
+}
+
+function rowBg(score: number | null): string {
+  if (score === null) return '';
+  if (score >= 90) return 'bg-green-50';
+  if (score >= 70) return 'bg-yellow-50';
+  return 'bg-red-50';
 }
 
 function constraintIcon(constraint: string | null): string {
@@ -32,17 +52,55 @@ function bottleneckColor(pct: number): string {
   return 'bg-green-500';
 }
 
+function kpiScoreColor(score: number | null): 'up' | 'down' | 'neutral' {
+  if (score === null) return 'neutral';
+  if (score >= 70) return 'up';
+  return 'down';
+}
+
+function kpiBgColor(score: number | null): string {
+  if (score === null) return 'bg-white';
+  if (score >= 90) return 'bg-green-50 border-green-200';
+  if (score >= 70) return 'bg-yellow-50 border-yellow-200';
+  return 'bg-red-50 border-red-200';
+}
+
 export function ControlTowerPage() {
-  const [riskQueue, setRiskQueue] = useState<MORiskItem[]>([]);
-  const [bottlenecks] = useState<BottleneckItem[]>(() => getMockBottlenecks());
+  const navigate = useNavigate();
+  const [queue, setQueue] = useState<MOQueueItem[]>([]);
+  const [kpis, setKPIs] = useState<KPI | null>(null);
+  const [bottlenecks, setBottlenecks] = useState<BottleneckItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchRiskQueue().then(queue => {
-      setRiskQueue(queue);
-      setLoading(false);
+  const handleWsMessage = useCallback((data: unknown) => {
+    const item = data as Partial<MOQueueItem>;
+    if (!item.mo_id) return;
+    setQueue((prev) => {
+      const idx = prev.findIndex((q) => q.mo_id === item.mo_id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...item } as MOQueueItem;
+        return next;
+      }
+      return [item as MOQueueItem, ...prev];
     });
   }, []);
+
+  useEffect(() => {
+    Promise.all([fetchQueue(), fetchKPIs(), getMockBottlenecks()]).then(([q, k, b]) => {
+      setQueue(q);
+      setKPIs(k);
+      setBottlenecks(b);
+      setLoading(false);
+    });
+
+    wsClient.onMessage(handleWsMessage);
+    wsClient.connect();
+
+    return () => {
+      wsClient.disconnect();
+    };
+  }, [handleWsMessage]);
 
   if (loading) {
     return (
@@ -52,10 +110,10 @@ export function ControlTowerPage() {
     );
   }
 
-  const onTimeDelivery = 85;
-  const feasibilityScore = 78;
-  const activeBottlenecks = 2;
-  const ordersAtRisk = riskQueue.filter(r => r.feasibility_score < 70).length;
+  const avgScore = kpis?.avg_feasibility_score ?? null;
+  const activeBottlenecks = kpis?.active_bottlenecks ?? null;
+  const ordersAtRisk = kpis?.orders_at_risk ?? null;
+  const otdPct = kpis?.otd_pct ?? null;
 
   return (
     <div className="space-y-6">
@@ -65,16 +123,48 @@ export function ControlTowerPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KPICard title="On-Time Delivery" value={`${onTimeDelivery}%`} trend={onTimeDelivery >= 80 ? 'up' : 'down'} subtitle="Last 30 days" />
-        <KPICard title="Feasibility Score" value={`${feasibilityScore}%`} trend={feasibilityScore >= 70 ? 'up' : 'down'} subtitle="Overall avg" />
-        <KPICard title="Active Bottlenecks" value={activeBottlenecks} trend={activeBottlenecks > 0 ? 'down' : 'neutral'} subtitle="WC >85% util" />
-        <KPICard title="Orders at Risk" value={ordersAtRisk} trend={ordersAtRisk > 0 ? 'down' : 'up'} subtitle="Score &lt;70" />
+        <KPICard
+          title="Avg Feasibility Score"
+          value={avgScore !== null ? `${avgScore}%` : '-'}
+          trend={kpiScoreColor(avgScore)}
+          subtitle="Overall avg"
+          className={kpiBgColor(avgScore)}
+        />
+        <KPICard
+          title="Active Bottlenecks"
+          value={activeBottlenecks !== null ? activeBottlenecks : '-'}
+          trend={activeBottlenecks !== null && activeBottlenecks > 0 ? 'down' : 'neutral'}
+          subtitle="WC >85% util"
+        />
+        <KPICard
+          title="Orders at Risk"
+          value={ordersAtRisk !== null ? ordersAtRisk : '-'}
+          trend={ordersAtRisk !== null && ordersAtRisk > 0 ? 'down' : 'neutral'}
+          subtitle="Score &lt;70"
+        />
+        {otdPct !== null ? (
+          <KPICard
+            title="On-Time Delivery"
+            value={`${otdPct}%`}
+            trend={otdPct >= 80 ? 'up' : 'down'}
+            subtitle="Last 30 days"
+          />
+        ) : (
+          <div className="rounded-lg border border-ipe-border bg-gray-50 p-5 shadow-sm opacity-60">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-ipe-text-muted">On-Time Delivery</p>
+                <p className="mt-1 text-xl font-semibold text-ipe-text-muted">Not available in Shadow Mode</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card>
-            <h3 className="mb-3 font-medium">MO Risk Queue ({riskQueue.length})</h3>
+            <h3 className="mb-3 font-medium">MO Risk Queue ({queue.length})</h3>
             <div className="overflow-x-auto">
             <Table>
               <TableHead>
@@ -83,24 +173,31 @@ export function ControlTowerPage() {
                   <TableHeader>Product</TableHeader>
                   <TableHeader>Customer</TableHeader>
                   <TableHeader>Required</TableHeader>
-                  <TableHeader>Feasibility</TableHeader>
+                  <TableHeader>Feasibility <span className="text-xs font-normal text-ipe-text-muted" title="Capacity & Labor scoring pending (Sprint 3)">*</span></TableHeader>
                   <TableHeader>Constraint</TableHeader>
                   <TableHeader />
                 </TableRow>
               </TableHead>
+              <tfoot>
+                <TableRow>
+                  <TableCell colSpan={7} className="text-xs text-ipe-text-muted italic pt-2">
+                    * Capacity &amp; Labor scoring pending (Sprint 3) &mdash; scores are material-driven only.
+                  </TableCell>
+                </TableRow>
+              </tfoot>
               <tbody>
-                {riskQueue.map((item) => (
-                  <TableRow key={item.id}>
+                {queue.map((item) => (
+                  <TableRow key={item.mo_id} className={rowBg(item.feasibility_score)}>
                     <TableCell className="font-medium">{item.mo_id}</TableCell>
                     <TableCell>{item.product_name}</TableCell>
                     <TableCell>{item.customer_name}</TableCell>
                     <TableCell>{new Date(item.required_date).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <span className={`font-semibold ${scoreColor(item.feasibility_score)}`}>
-                        {item.feasibility_score}
+                        {item.feasibility_score !== null ? item.feasibility_score : '-'}
                       </span>
                       <Badge variant={scoreBadge(item.feasibility_score)} className="ml-2">
-                        {item.feasibility_score >= 90 ? 'On Track' : item.feasibility_score >= 70 ? 'At Risk' : 'Critical'}
+                        {scoreLabel(item.feasibility_score)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -114,10 +211,17 @@ export function ControlTowerPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button size="sm" variant="secondary">Resolve</Button>
+                      <Button size="sm" variant="secondary" onClick={() => navigate(`/resolution-center?mo_id=${item.mo_id}`)}>Resolve</Button>
                     </TableCell>
                   </TableRow>
                 ))}
+                {queue.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="py-8 text-center text-sm text-ipe-text-muted">
+                      No MOs in the queue.
+                    </TableCell>
+                  </TableRow>
+                )}
               </tbody>
             </Table>
             </div>

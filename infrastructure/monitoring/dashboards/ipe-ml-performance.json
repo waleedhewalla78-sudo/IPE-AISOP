@@ -1,0 +1,94 @@
+{
+  "dashboard": {
+    "title": "IPE ML Model Performance",
+    "uid": "ipe-ml-performance",
+    "tags": ["ipe", "ml", "model-performance"],
+    "panels": [
+      {
+        "title": "Feasibility Score Distribution",
+        "type": "histogram",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(ipe_feasibility_score_bucket[5m])) by (le))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(ipe_feasibility_score_bucket[5m])) by (le))",
+            "legendFormat": "p95"
+          }
+        ]
+      },
+      {
+        "title": "Drift Detection (PSI)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "ipe_model_psi_score",
+            "legendFormat": "{{model_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 0.1 },
+                { "color": "red", "value": 0.25 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Shadow ROI Validation",
+        "type": "bargauge",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "ipe_shadow_roi_otd_delta",
+            "legendFormat": "OTD Improvement"
+          },
+          {
+            "expr": "ipe_shadow_roi_cost_savings",
+            "legendFormat": "Cost Savings %"
+          }
+        ]
+      },
+      {
+        "title": "Autonomy Decisions",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [
+          {
+            "expr": "sum by (action) (ipe_autonomy_decisions_total)",
+            "legendFormat": "{{action}}"
+          }
+        ]
+      },
+      {
+        "title": "LLM Token Usage",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "sum(rate(ipe_llm_tokens_used_total[1h])) by (tier)",
+            "legendFormat": "{{tier}}"
+          }
+        ]
+      },
+      {
+        "title": "XAI Explanation Quality",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+        "targets": [
+          {
+            "expr": "avg(ipe_xai_confidence_score)",
+            "legendFormat": "Avg Confidence"
+          }
+        ]
+      }
+    ]
+  }
+}

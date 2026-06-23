@@ -1,7 +1,10 @@
+import logging
 import os
 from datetime import date
 
 import httpx
+
+logger = logging.getLogger(__name__)
 
 WEATHER_API_BASE = os.getenv("WEATHER_API_BASE", "https://api.weather.gov")
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY", "")
@@ -45,8 +48,8 @@ class WeatherSignalClient:
                             if cond in short_forecast:
                                 return 0.7
                         return 1.0
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Weather API call failed: %s", e)
 
         return 1.0
 

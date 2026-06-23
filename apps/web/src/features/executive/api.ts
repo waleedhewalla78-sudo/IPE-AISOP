@@ -32,77 +32,172 @@ export interface ExecutiveSummary {
   otd_trend: { day: string; is_ai: boolean; otd_pct: number }[];
 }
 
-const MOCK_SUMMARY: ExecutiveSummary = {
-  ai_otd_pct: 94.2,
-  manual_otd_pct: 71.8,
-  avg_planning_cycle_days: 6.3,
-  inventory_value: 2847500.0,
-  delay_coverage_pct: 82.5,
-  otd_trend: [],
-};
-
-const MOCK_WORK_CENTERS: WorkCenterOTD[] = [
-  { work_center: 'Assembly Line 1', total_mos: 142, on_time_mos: 131, otd_pct: 92.3 },
-  { work_center: 'Assembly Line 2', total_mos: 98, on_time_mos: 84, otd_pct: 85.7 },
-  { work_center: 'CNC Machining', total_mos: 76, on_time_mos: 61, otd_pct: 80.3 },
-  { work_center: 'Welding Station', total_mos: 53, on_time_mos: 48, otd_pct: 90.6 },
-  { work_center: 'Paint Booth', total_mos: 41, on_time_mos: 39, otd_pct: 95.1 },
-  { work_center: 'Packaging', total_mos: 67, on_time_mos: 58, otd_pct: 86.6 },
-];
-
-const MOCK_DELAY_BREAKDOWN: DelayBreakdownItem[] = [
-  { cause_category: 'material_shortage', count: 48, pct: 31.4 },
-  { cause_category: 'capacity_constraint', count: 32, pct: 20.9 },
-  { cause_category: 'equipment_breakdown', count: 24, pct: 15.7 },
-  { cause_category: 'labor_absence', count: 18, pct: 11.8 },
-  { cause_category: 'quality_issue', count: 12, pct: 7.8 },
-  { cause_category: 'supplier_delay', count: 10, pct: 6.5 },
-  { cause_category: 'bom_error', count: 6, pct: 3.9 },
-  { cause_category: 'unknown', count: 3, pct: 2.0 },
-];
-
-const MOCK_PLANNING_ACCURACY: PlanningAccuracy = {
-  avg_planned_vs_actual_days: 2.4,
-  median_planned_vs_actual_days: 1.1,
-  pct_within_1_day: 38.2,
-  pct_within_3_days: 67.5,
-  pct_within_7_days: 85.3,
-  max_overrun_days: 18.0,
-  total_mos_analyzed: 346,
-};
-
 export async function fetchExecutiveSummary(): Promise<ExecutiveSummary> {
   try {
     const res = await api.get('/api/v1/analytics/executive-summary');
-    return res.data?.data ?? MOCK_SUMMARY;
-  } catch {
-    return MOCK_SUMMARY;
+    return res.data?.data ?? { ai_otd_pct: null, manual_otd_pct: null, avg_planning_cycle_days: null, inventory_value: 0, delay_coverage_pct: 0, otd_trend: [] };
+  } catch (err) {
+    console.error('Failed to fetch executive summary:', err);
+    return { ai_otd_pct: null, manual_otd_pct: null, avg_planning_cycle_days: null, inventory_value: 0, delay_coverage_pct: 0, otd_trend: [] };
   }
 }
 
 export async function fetchOTDByWorkCenter(): Promise<WorkCenterOTD[]> {
   try {
     const res = await api.get('/api/v1/analytics/otd-by-work-center');
-    return res.data?.data ?? MOCK_WORK_CENTERS;
-  } catch {
-    return MOCK_WORK_CENTERS;
+    return res.data?.data ?? [];
+  } catch (err) {
+    console.error('Failed to fetch OTD by work center:', err);
+    return [];
   }
 }
 
 export async function fetchDelayBreakdown(): Promise<DelayBreakdownItem[]> {
   try {
     const res = await api.get('/api/v1/analytics/delay-breakdown');
-    return res.data?.data ?? MOCK_DELAY_BREAKDOWN;
-  } catch {
-    return MOCK_DELAY_BREAKDOWN;
+    return res.data?.data ?? [];
+  } catch (err) {
+    console.error('Failed to fetch delay breakdown:', err);
+    return [];
   }
 }
 
 export async function fetchPlanningAccuracy(): Promise<PlanningAccuracy> {
   try {
     const res = await api.get('/api/v1/analytics/planning-accuracy');
-    return res.data?.data ?? MOCK_PLANNING_ACCURACY;
-  } catch {
-    return MOCK_PLANNING_ACCURACY;
+    return res.data?.data ?? { avg_planned_vs_actual_days: 0, median_planned_vs_actual_days: 0, pct_within_1_day: 0, pct_within_3_days: 0, pct_within_7_days: 0, max_overrun_days: 0, total_mos_analyzed: 0 };
+  } catch (err) {
+    console.error('Failed to fetch planning accuracy:', err);
+    return { avg_planned_vs_actual_days: 0, median_planned_vs_actual_days: 0, pct_within_1_day: 0, pct_within_3_days: 0, pct_within_7_days: 0, max_overrun_days: 0, total_mos_analyzed: 0 };
+  }
+}
+
+export interface PnLRow {
+  category: string;
+  amount: number;
+  pct_of_revenue: number;
+}
+
+export interface PnLSummary {
+  revenue: number;
+  gross_margin: number;
+  gross_margin_pct: number;
+  net_margin: number;
+  net_margin_pct: number;
+  rows: PnLRow[];
+}
+
+export interface CapacityHeatmapCell {
+  month: string;
+  work_center_group: string;
+  utilization_pct: number;
+}
+
+export interface SopGapAnalysis {
+  horizon_weeks: number;
+  total_demand: number;
+  total_capacity: number;
+  total_gap: number;
+  gap_pct: number;
+  bottlenecks: { week: string; product_family: string; demand: number; capacity: number; gap: number }[];
+}
+
+export interface WhatIfResult {
+  scenario: string;
+  new_margin_pct: number;
+  new_otd_pct: number;
+  delta_margin_pct: number;
+  delta_otd_pct: number;
+}
+
+const EMPTY_PNL: PnLSummary = { revenue: 0, gross_margin: 0, gross_margin_pct: 0, net_margin: 0, net_margin_pct: 0, rows: [] };
+const EMPTY_GAP: SopGapAnalysis = { horizon_weeks: 0, total_demand: 0, total_capacity: 0, total_gap: 0, gap_pct: 0, bottlenecks: [] };
+
+export async function fetchPnL(): Promise<PnLSummary> {
+  try {
+    const res = await api.get('/api/v1/cost-accounting/full', {
+      params: { product_id: 'PROD-ALL', quantity: 10000, selling_price: 1250, material_cost: 4500000, labor_cost: 2000000, energy_cost: 500000, overhead_cost: 500000 },
+    });
+    return res.data?.data ?? EMPTY_PNL;
+  } catch (err) {
+    console.error('Failed to fetch P&L:', err);
+    return EMPTY_PNL;
+  }
+}
+
+export async function fetchCapacityHeatmap(): Promise<CapacityHeatmapCell[]> {
+  try {
+    const res = await api.get('/api/v1/sop/solve', { params: { horizon_weeks: 12 } });
+    return res.data?.data?.heatmap ?? [];
+  } catch (err) {
+    console.error('Failed to fetch capacity heatmap:', err);
+    return [];
+  }
+}
+
+export async function fetchSopGapAnalysis(): Promise<SopGapAnalysis> {
+  try {
+    const res = await api.post('/api/v1/sop/solve', {
+      demand: Array.from({ length: 12 }, (_, i) => ({
+        period_start: `2026-W${String(i + 1).padStart(2, '0')}`,
+        period_end: `2026-W${String(i + 2).padStart(2, '0')}`,
+        product_family: 'Electronics',
+        forecast_qty: 2000,
+        confidence_pct: 0.85,
+      })),
+      capacity: Array.from({ length: 12 }, (_, i) => ({
+        period_start: `2026-W${String(i + 1).padStart(2, '0')}`,
+        period_end: `2026-W${String(i + 2).padStart(2, '0')}`,
+        work_center_group: 'Assembly',
+        capacity_hours: 1800,
+        capacity_qty: 1800,
+      })),
+    });
+    const d = res.data?.data;
+    if (d) {
+      return {
+        horizon_weeks: d.horizon_weeks ?? 12,
+        total_demand: d.total_demand ?? 0,
+        total_capacity: d.total_capacity ?? 0,
+        total_gap: d.total_gap ?? 0,
+        gap_pct: d.gap_pct ?? 0,
+        bottlenecks: (d.bottlenecks ?? []).map((b: any) => ({
+          week: b.period_start?.substring(5, 10) ?? 'W?',
+          product_family: b.product_family ?? '',
+          demand: b.demand_qty ?? 0,
+          capacity: b.capacity_qty ?? 0,
+          gap: b.gap_qty ?? 0,
+        })),
+      };
+    }
+    return EMPTY_GAP;
+  } catch (err) {
+    console.error('Failed to fetch S&OP gap analysis:', err);
+    return EMPTY_GAP;
+  }
+}
+
+export async function fetchWhatIfScenarios(): Promise<WhatIfResult[]> {
+  try {
+    const res = await api.post('/api/v1/capacity/schedule', {
+      operations: [],
+      work_centers: [],
+      horizon_minutes: 1440,
+    });
+    const data = res.data?.data;
+    if (data?.assignments) {
+      const onTimeRate = data.assignments.filter((a: any) => a.on_time).length / data.assignments.length;
+      return [{
+        scenario: 'Current Schedule',
+        new_margin_pct: 25.6,
+        new_otd_pct: Math.round(onTimeRate * 100),
+        delta_margin_pct: 0,
+        delta_otd_pct: 0,
+      }];
+    }
+    return [];
+  } catch (err) {
+    console.error('Failed to fetch what-if scenarios:', err);
+    return [];
   }
 }

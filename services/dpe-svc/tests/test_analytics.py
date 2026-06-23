@@ -7,6 +7,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ipe_shared.database.session import get_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
+from ipe_shared.testing.conftest_helpers import apply_auth_and_session_overrides
+
+TENANT_ID = str(uuid4())
+
+
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
+from uuid import uuid4
+
+import pytest
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ipe_shared.database.session import get_session
+from ipe_shared.middleware.tenant_context import tenant_ctx
+from ipe_shared.testing.conftest_helpers import apply_auth_and_session_overrides
 
 TENANT_ID = str(uuid4())
 
@@ -28,7 +44,12 @@ class MockResult:
         self._scalar = scalar_val
 
     def one(self):
-        return self._rows[0] if self._rows else [None]
+        if not self._rows:
+            return SimpleNamespace(on_time=0, total=0)
+        row = self._rows[0]
+        if isinstance(row, SimpleNamespace):
+            return row
+        return row
 
     def scalar(self):
         return self._scalar
@@ -39,16 +60,16 @@ class MockResult:
 
 MOCK_ROWS = list(
     [
-        MockResult([MockRow([130, 150])]),
-        MockResult([MockRow([200, 250])]),
-        MockResult([MockRow([8.5])]),
-        MockResult([MockRow([1250000.00])]),
-        MockResult([MockRow([180, 200])]),
+        MockResult([SimpleNamespace(on_time=130, total=150)]),
+        MockResult([SimpleNamespace(on_time=200, total=250)]),
+        MockResult([SimpleNamespace(avg_days=8.5)]),
+        MockResult([SimpleNamespace(total_value=1250000.00)]),
+        MockResult([SimpleNamespace(classified=180, total=200)]),
         MockResult(
             [
-                MockRow(["2026-06-01", True, 88.2]),
-                MockRow(["2026-06-01", False, 75.4]),
-                MockRow(["2026-06-02", True, 91.0]),
+                SimpleNamespace(day="2026-06-01", is_ai=True, on_time=88.2, total=100),
+                SimpleNamespace(day="2026-06-01", is_ai=False, on_time=75.4, total=100),
+                SimpleNamespace(day="2026-06-02", is_ai=True, on_time=91.0, total=100),
             ]
         ),
     ]
@@ -59,7 +80,7 @@ def _build_app():
     from app.main import create_app
 
     app = create_app()
-    app.dependency_overrides.clear()
+    apply_auth_and_session_overrides(app)
     mock_session = AsyncMock(spec=AsyncSession)
     mock_session.execute = AsyncMock(side_effect=list(MOCK_ROWS))
 

@@ -1,0 +1,15 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: kafka-pod-kill
+  namespace: ipe-platform
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - ipe-platform
+    labelSelectors:
+      app: kafka
+  scheduler:
+    cron: "@every 24h"

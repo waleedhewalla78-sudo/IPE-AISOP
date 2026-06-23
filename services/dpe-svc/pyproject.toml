@@ -3,6 +3,7 @@ name = "ipe-dpe-svc"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "fastavro>=1.12.2",
     "ipe-shared>=0.1.0",
 ]
 
@@ -43,7 +44,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.uv.sources]
-ipe-shared = { path = "../shared", editable = true }
+ipe-shared = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -52,3 +53,4 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
 ]
+

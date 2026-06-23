@@ -1,0 +1,117 @@
+version: '3.8'
+
+name: IPE AI-Augmented Testing
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  test-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -e services/shared
+      - name: Generate tests from requirements
+        run: python -m testing.ai.agents.generator --output testing/ai/results/generated_tests.json
+      - name: Upload generated tests
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-tests
+          path: testing/ai/results/generated_tests.json
+
+  regression-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect changed services
+        id: changes
+        run: |
+          CHANGED=$(git diff --name-only origin/main...HEAD | grep -oP 'services/(\w+)-svc' | sort -u | sed 's/services\///' | tr '\n' ' ')
+          echo "services=$CHANGED" >> $GITHUB_OUTPUT
+      - name: Prioritize regression suite
+        run: |
+          python -m testing.ai.agents.regression \
+            --changed-services "${{ steps.changes.outputs.services }}" \
+            --output testing/ai/results/regression_suite.json \
+            --scope pr
+      - name: Run prioritized regression
+        run: |
+          CHANGED="${{ steps.changes.outputs.services }}"
+          for svc in $CHANGED; do
+            if [ -d "services/$svc/tests" ]; then
+              echo "Running regression for $svc..."
+              cd services/$svc && python -m pytest tests/ -x -q --tb=short || true && cd ../..
+            fi
+          done
+      - name: Upload regression results
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-results
+          path: testing/ai/results/regression_suite.json
+
+  regression-nightly:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run full regression suite
+        run: python -m testing.ai.agents.regression --scope nightly --output testing/ai/results/regression_nightly.json
+      - name: Run all service tests
+        run: |
+          for svc in dpe-svc mat-svc cap-svc fea-svc res-svc del-svc nlp-svc rec-svc alert-svc sustain-svc quality-svc scn-svc network-svc; do
+            echo "Running $svc..."
+            cd services/$svc && python -m pytest tests/ -x -q --tb=short || true && cd ../..
+          done
+      - name: Upload nightly results
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-results
+          path: testing/ai/results/
+
+  visual-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Run visual comparison
+        run: python -m testing.ai.agents.visual --critical-only
+      - name: Upload visual results
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-results
+          path: testing/ai/results/
+
+  exploratory-charters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate exploratory charters
+        run: python -m testing.ai.agents.exploratory --output testing/ai/results/exploratory_charters.json
+      - name: Upload charters
+        uses: actions/upload-artifact@v4
+        with:
+          name: exploratory-charters
+          path: testing/ai/results/exploratory_charters.json
+
+  test-optimization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Analyze test suite
+        run: python -m testing.ai.agents.optimizer --output testing/ai/results/optimization_result.json
+      - name: Upload optimization report
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimization-report
+          path: testing/ai/results/optimization_result.json

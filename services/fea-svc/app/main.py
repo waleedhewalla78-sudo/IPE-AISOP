@@ -1,37 +1,84 @@
+import asyncio
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.config import settings
 from app.events.consumers import start_consumers, stop_consumers
+from app.ws import manager, ws_feasibility_broadcaster
+from ipe_shared.auth.jwt import decode_token
 from ipe_shared.database.connection import close_database, init_database
-from ipe_shared.middleware.correlation_id import CorrelationIdMiddleware
 from ipe_shared.middleware.error_handler import register_exception_handlers
-from ipe_shared.middleware.request_logging import RequestLoggingMiddleware
 from ipe_shared.middleware.tenant_context import TenantContextMiddleware
-from ipe_shared.observability.logging import setup_logging
-from ipe_shared.observability.metrics import setup_metrics
+from ipe_shared.observability import setup_observability
+
+_broadcaster_task: asyncio.Task | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    setup_logging(settings.LOG_LEVEL)
+    global _broadcaster_task
     await init_database(settings.DATABASE_URL)
     await start_consumers()
+    _broadcaster_task = asyncio.create_task(ws_feasibility_broadcaster())
     yield
+    if _broadcaster_task:
+        _broadcaster_task.cancel()
     await stop_consumers()
     await close_database()
 
+
 def create_app() -> FastAPI:
-    app = FastAPI(title="IPE - Feasibility Scorer", description="Composite gate scoring and auto-confirm logic", version="0.1.0", lifespan=lifespan, docs_url="/docs", redoc_url="/redoc")
-    app.add_middleware(CorrelationIdMiddleware)
-    app.add_middleware(RequestLoggingMiddleware)
-    app.add_middleware(TenantContextMiddleware)
-    app.add_middleware(CORSMiddleware, allow_origins=settings.CORS_ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-    register_exception_handlers(app)
-    setup_metrics(app, service_name="fea-svc")
-    app.include_router(api_router, prefix="/api/v1")
-    return app
+    _app = FastAPI(
+        title="IPE - Feasibility Scorer",
+        description="Composite gate scoring and auto-confirm logic",
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url="/docs",
+        redoc_url="/redoc",
+    )
+
+    setup_observability(_app, service_name="fea-svc")
+
+    _app.add_middleware(TenantContextMiddleware)
+    _app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "X-Tenant-ID"],
+    )
+    register_exception_handlers(_app)
+
+    @_app.websocket("/api/v1/feasibility/ws/{tenant_id}")
+    async def feasibility_ws(websocket: WebSocket, tenant_id: str):
+        token = websocket.query_params.get("token") or websocket.query_params.get("Authorization", "")
+        if not token:
+            await websocket.close(code=4401)
+            return
+        try:
+            jwt_payload = decode_token(token)
+        except Exception:
+            await websocket.close(code=4401)
+            return
+
+        if str(jwt_payload.tenant_id) != tenant_id:
+            await websocket.close(code=4403)
+            return
+
+        await manager.connect(tenant_id, websocket)
+        try:
+            while True:
+                await websocket.receive_text()
+        except WebSocketDisconnect:
+            await manager.disconnect(tenant_id, websocket)
+        except Exception:
+            await manager.disconnect(tenant_id, websocket)
+
+    _app.include_router(api_router, prefix="/api/v1")
+    return _app
+
+
 app = create_app()

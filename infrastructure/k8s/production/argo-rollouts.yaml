@@ -1,0 +1,193 @@
+# Argo Rollouts — Canary Strategy for all critical services
+# Requires Argo Rollouts controller installed in cluster
+# kubectl apply -f argo-rollouts.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: mat-svc-rollout
+  namespace: ipe-platform
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mat-svc
+  template:
+    metadata:
+      labels:
+        app: mat-svc
+    spec:
+      containers:
+        - name: mat-svc
+          image: ipe/mat-svc:latest
+          ports:
+            - containerPort: 8002
+  strategy:
+    canary:
+      canaryService: mat-svc-canary
+      stableService: mat-svc-stable
+      analysis:
+        templates:
+          - templateName: success-rate
+        args:
+          - name: service-name
+            value: mat-svc-canary.ipe-platform.svc.cluster.local
+      steps:
+        - setWeight: 5
+        - pause: { duration: 2m }
+        - setWeight: 25
+        - pause: { duration: 5m }
+        - setWeight: 100
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: cap-svc-rollout
+  namespace: ipe-platform
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cap-svc
+  template:
+    metadata:
+      labels:
+        app: cap-svc
+    spec:
+      containers:
+        - name: cap-svc
+          image: ipe/cap-svc:latest
+          ports:
+            - containerPort: 8003
+  strategy:
+    canary:
+      canaryService: cap-svc-canary
+      stableService: cap-svc-stable
+      analysis:
+        templates:
+          - templateName: success-rate
+        args:
+          - name: service-name
+            value: cap-svc-canary.ipe-platform.svc.cluster.local
+      steps:
+        - setWeight: 5
+        - pause: { duration: 2m }
+        - setWeight: 25
+        - pause: { duration: 5m }
+        - setWeight: 100
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: fea-svc-rollout
+  namespace: ipe-platform
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fea-svc
+  template:
+    metadata:
+      labels:
+        app: fea-svc
+    spec:
+      containers:
+        - name: fea-svc
+          image: ipe/fea-svc:latest
+          ports:
+            - containerPort: 8004
+  strategy:
+    canary:
+      canaryService: fea-svc-canary
+      stableService: fea-svc-stable
+      analysis:
+        templates:
+          - templateName: success-rate
+        args:
+          - name: service-name
+            value: fea-svc-canary.ipe-platform.svc.cluster.local
+      steps:
+        - setWeight: 5
+        - pause: { duration: 2m }
+        - setWeight: 25
+        - pause: { duration: 5m }
+        - setWeight: 100
+---
+# ArgoCD Multi-Environment Applications
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ipe-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/ipe.git
+    targetRevision: develop
+    path: infrastructure/k8s/helm/ipe-platform
+    helm:
+      valueFiles:
+        - values-dev.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ipe-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ipe-staging
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/ipe.git
+    targetRevision: main
+    path: infrastructure/k8s/helm/ipe-platform
+    helm:
+      valueFiles:
+        - values-staging.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ipe-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ipe-prod
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/ipe.git
+    targetRevision: release/*
+    path: infrastructure/k8s/helm/ipe-platform
+    helm:
+      valueFiles:
+        - values-prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ipe-platform
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

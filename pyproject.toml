@@ -1,0 +1,30 @@
+[project]
+name = "ipe"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = [
+    "services/dpe-svc",
+    "services/mat-svc",
+    "services/cap-svc",
+    "services/fea-svc",
+    "services/res-svc",
+    "services/del-svc",
+    "services/nlp-svc",
+    "services/rec-svc",
+    "services/alert-svc",
+    "services/connector",
+    "services/ml-svc",
+    "services/sustain-svc",
+    "services/quality-svc",
+    "services/scn-svc",
+    "services/network-svc",
+    "services/shared",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "integration: Integration tests (requires PostgreSQL/Kafka/Redis/fea-svc)",
+]

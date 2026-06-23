@@ -74,6 +74,11 @@ services:
     resources:
       requests: { cpu: "200m", memory: "512Mi" }
       limits: { cpu: "1", memory: "1Gi" }
+    hpa:
+      minReplicas: 2
+      maxReplicas: 10
+      cpuTarget: 70
+      queueDepthTarget: 50
 
   cap_svc:
     enabled: true
@@ -82,6 +87,11 @@ services:
     resources:
       requests: { cpu: "500m", memory: "1Gi" }
       limits: { cpu: "2", memory: "4Gi" }
+    hpa:
+      minReplicas: 2
+      maxReplicas: 10
+      cpuTarget: 70
+      queueDepthTarget: 30
 
   fea_svc:
     enabled: true

@@ -11,9 +11,7 @@ class TestAuthModels:
         assert req.password == "pass123"
 
     def test_login_response(self):
-        resp = LoginResponse(
-            access_token="access123", refresh_token="refresh123", expires_in=3600
-        )
+        resp = LoginResponse(access_token="access123", refresh_token="refresh123", expires_in=3600)
         assert resp.access_token == "access123"
         assert resp.refresh_token == "refresh123"
         assert resp.token_type == "bearer"

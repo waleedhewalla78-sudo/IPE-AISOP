@@ -3,18 +3,25 @@ set -euo pipefail
 
 echo "=== Loading seed data ==="
 
-PG_DSN="${IPE_DATABASE_URL_SYNC:-postgresql://ipe:ipe_dev_pass@localhost:5432/ipe_dev}"
+PG_DSN="${IPE_DATABASE_URL_SYNC:-postgresql://ipe:ipe_test_pass@localhost:5433/ipe_test}"
 
 psql "$PG_DSN" <<'SQL'
 -- Seed tenant
 INSERT INTO cdm_tenant (id, name, tier, erp_type, autonomy_mode)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Demo Manufacturing Inc', 'professional', 'odoo', 'shadow');
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Demo Manufacturing Inc', 'professional', 'odoo', 'shadow')
+ON CONFLICT (id) DO NOTHING;
 
--- Seed users
-INSERT INTO cdm_user (tenant_id, email, password_hash, full_name, role)
+-- Seed users (password: demo or admin in development)
+INSERT INTO cdm_user (id, tenant_id, email, password_hash, full_name, role, is_active, created_at)
 VALUES
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@demo.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Alice Admin', 'admin'),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'planner@demo.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Bob Planner', 'planner');
+  ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@demo.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Alice Admin', 'admin', true, NOW()),
+  ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'planner@demo.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Bob Planner', 'planner', true, NOW()),
+  ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c03', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Ahmed@nour', crypt('admin', gen_salt('bf')), 'Ahmed Nour', 'admin', true, NOW())
+ON CONFLICT (tenant_id, email) DO UPDATE SET
+  password_hash = EXCLUDED.password_hash,
+  full_name = EXCLUDED.full_name,
+  role = EXCLUDED.role,
+  is_active = EXCLUDED.is_active;
 
 -- Seed products
 INSERT INTO cdm_product (tenant_id, erp_source_id, erp_source_type, name, internal_ref, source_type, uom, standard_cost, lead_time_days, safety_stock)
@@ -23,7 +30,8 @@ VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD002', 'odoo', 'Gadget B', 'GDT-B-200', 'manufactured', 'unit', 42.00, 5, 50),
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD003', 'odoo', 'Component C', 'CMP-C-300', 'purchased', 'unit', 3.25, 10, 500),
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD004', 'odoo', 'Assembly D', 'ASM-D-400', 'manufactured', 'unit', 89.99, 7, 25),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD005', 'odoo', 'Raw Material E', 'RAW-E-500', 'purchased', 'kg', 1.10, 20, 1000);
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD005', 'odoo', 'Raw Material E', 'RAW-E-500', 'purchased', 'kg', 1.10, 20, 1000)
+ON CONFLICT (tenant_id, erp_source_id) DO NOTHING;
 
 -- Seed customers
 INSERT INTO cdm_customer (tenant_id, erp_source_id, name, tier)
@@ -44,7 +52,8 @@ INSERT INTO cdm_work_center (tenant_id, erp_source_id, name, capacity_hours_per_
 VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'WC001', 'Assembly Line 1', 16.0, 0.92, 75.00, 'operational'),
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'WC002', 'Machining Center', 8.0, 0.85, 120.00, 'operational'),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'WC003', 'Packaging Station', 8.0, 0.95, 45.00, 'operational');
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'WC003', 'Packaging Station', 8.0, 0.95, 45.00, 'operational')
+ON CONFLICT (tenant_id, erp_source_id) DO NOTHING;
 
 -- Seed operators
 INSERT INTO cdm_operator (tenant_id, erp_source_id, name, skill_tags, cost_per_hour)
@@ -52,6 +61,13 @@ VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'OP001', 'John Smith', '["assembly","qc"]', 32.00),
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'OP002', 'Jane Doe', '["machining","welding"]', 38.00),
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'OP003', 'Bob Wilson', '["packaging","logistics"]', 28.00);
+
+-- Seed locations
+INSERT INTO cdm_location (id, tenant_id, erp_source_id, erp_source_type, name, location_type)
+VALUES
+  ('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'LOC001', 'odoo', 'Main Warehouse', 'warehouse'),
+  ('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'LOC002', 'odoo', 'Satellite Storage', 'warehouse'),
+  ('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b03', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'LOC003', 'odoo', 'Dock Staging', 'dock');
 
 -- ============ 30 DEMAND LINES ============
 -- Varying customer_tier (1-3), margin_pct (5-45), required_date (3-90 days out), penalty_cost
@@ -84,7 +100,7 @@ LIMIT 30;
 INSERT INTO cdm_supply_order (tenant_id, erp_source_id, erp_source_type, product_id, supplier_id, quantity_ordered, quantity_received, expected_date, actual_date, status)
 SELECT
   'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  'PO' || LPAD(ROW_NUMBER() OVER ()::text, 3, '0' + 2),
+  'PO' || LPAD(ROW_NUMBER() OVER ()::text, 3, '0'),
   'odoo',
   p.id,
   s.id,
@@ -126,9 +142,10 @@ SELECT NOW(), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, l.id,
   (50 + RANDOM() * 500)::int,
   (0 + RANDOM() * 100)::int,
   (0 + RANDOM() * 200)::int
-FROM cdm_product p, cdm_location l
-WHERE l.erp_source_id IS NULL
-LIMIT 5;
+FROM cdm_product p
+CROSS JOIN cdm_location l
+WHERE l.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+LIMIT 15;
 
 SQL
 

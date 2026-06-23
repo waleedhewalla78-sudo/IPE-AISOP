@@ -18,8 +18,8 @@ class TestJWT:
         tenant_id = uuid4()
         token = create_access_token(user_id, tenant_id, "planner")
         payload = decode_token(token)
-        assert payload.sub == user_id
-        assert payload.tenant_id == tenant_id
+        assert payload.sub == str(user_id)
+        assert payload.tenant_id == str(tenant_id)
         assert payload.role == "planner"
         assert payload.type == "access"
 
@@ -28,5 +28,5 @@ class TestJWT:
         tenant_id = uuid4()
         token = create_refresh_token(user_id, tenant_id, "admin")
         payload = decode_token(token)
-        assert payload.sub == user_id
+        assert payload.sub == str(user_id)
         assert payload.type == "refresh"

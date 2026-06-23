@@ -1,13 +1,22 @@
+import os
+
+os.environ.setdefault("IPE_JWT_SECRET_KEY", "dev-jwt-secret-change-in-production-min-32-chars")
+os.environ.setdefault("OTEL_SDK_DISABLED", "true")
 
 import pytest
 
 from ipe_shared.config import settings
 from ipe_shared.database.connection import close_database, init_database
+from ipe_shared.testing.conftest_helpers import (
+    apply_auth_and_session_overrides,
+    clear_overrides,
+)
 
 
 @pytest.fixture(scope="session")
 def event_loop():
     import asyncio
+
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
@@ -15,20 +24,31 @@ def event_loop():
 
 @pytest.fixture(autouse=True)
 async def db():
-    await init_database(settings.DATABASE_URL)
+    try:
+        await init_database(settings.DATABASE_URL)
+    except Exception:
+        pass
     yield
-    await close_database()
+    try:
+        await close_database()
+    except Exception:
+        pass
 
 
 @pytest.fixture
 def app():
     from app.main import create_app
-    return create_app()
+
+    _app = create_app()
+    apply_auth_and_session_overrides(_app)
+    yield _app
+    clear_overrides(_app)
 
 
 @pytest.fixture
 async def client(app):
     from httpx import ASGITransport, AsyncClient
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac

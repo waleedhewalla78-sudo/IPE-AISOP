@@ -1,0 +1,15 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: redis-pod-kill
+  namespace: ipe-platform
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - ipe-platform
+    labelSelectors:
+      app: redis
+  scheduler:
+    cron: "@every 12h"

@@ -12,7 +12,9 @@ export function useAuth() {
 
   const login = async (data: LoginRequest) => {
     const response = await authService.login(data);
-    dispatch(setCredentials({ user: { id: '', email: data.email, full_name: '', role: 'planner', tenant_id: '' }, token: response.access_token }));
+    localStorage.setItem('access_token', response.access_token);
+    const profile = await authService.getCurrentUser();
+    dispatch(setCredentials({ user: profile, token: response.access_token }));
     return response;
   };
 

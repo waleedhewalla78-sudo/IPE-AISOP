@@ -1,66 +1,148 @@
-from datetime import UTC, datetime
-from uuid import uuid4
+from sqlalchemy import select as sa_select
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.core.classifier import classify_demand_type
-from app.core.priority import calculate_priority
+from app.core.priority import compute_priority_score
+from ipe_shared.database.connection import get_engine
 from ipe_shared.events.producer import kafka_producer
-from ipe_shared.events.schemas import EventEnvelope
+from ipe_shared.middleware.tenant_context import tenant_ctx
+from ipe_shared.models.bom import BillOfMaterial
+from ipe_shared.models.demand import DemandLine
+from ipe_shared.models.manufacturing_order import ManufacturingOrder
+from ipe_shared.models.product import Product
 
 
 async def handle_demand_created(event: dict):
-    value = event.value if hasattr(event, "value") else event
-    if isinstance(value, dict):
-        envelope = EventEnvelope(**value)
-    else:
+    demand_line_id = event.get("demand_line_id")
+    if not demand_line_id:
         return
 
-    data = envelope.data
+    engine = get_engine()
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        tid = tenant_ctx.get()
+        if tid:
+            await session.execute(
+                text("SELECT set_config('app.current_tenant_id', :tid, false)"),
+                {"tid": str(tid)},
+            )
 
-    product_data = {
-        "source_type": data.get("source_type", "manufactured"),
-        "lead_time_days": float(data.get("lead_time_days", 0)),
-        "safety_stock": float(data.get("safety_stock", 0)),
-        "demand_cv": float(data.get("demand_cv", 0.3)),
-    }
-    customer_tier = int(data.get("customer_tier", 3))
+        result = await session.execute(
+            sa_select(DemandLine, Product)
+            .join(Product, DemandLine.product_id == Product.id)
+            .where(DemandLine.id == demand_line_id)
+        )
+        row = result.one_or_none()
+        if not row:
+            return
 
-    demand_type = classify_demand_type(
-        product_data=product_data,
-        customer_tier=customer_tier,
-    )
+        demand_line, product = row
 
-    priority = calculate_priority({
-        "required_date": data.get("required_date", datetime.now(UTC).isoformat()),
-        "customer_tier": customer_tier,
-        "penalty_cost": float(data.get("penalty_cost", 0)),
-        "margin_pct": float(data.get("margin_pct", 25)),
-        "quantity": float(data.get("quantity", 1)),
-    })
+        dl_dict = {
+            "customer_tier": int(demand_line.customer_tier) if demand_line.customer_tier else 3,
+            "margin_pct": float(demand_line.margin_pct) if demand_line.margin_pct else 0,
+            "required_date": demand_line.required_date,
+            "penalty_cost": float(demand_line.penalty_cost) if demand_line.penalty_cost else 0,
+            "tags": product.category_tags or [],
+        }
 
-    classified = {
-        "demand_line_id": str(data.get("demand_line_id", "")),
-        "product_id": str(data.get("product_id", "")),
-        "demand_type": demand_type["demand_type"],
-        "priority_score": priority["priority_score"],
-        "is_urgent": priority["is_urgent"],
-        "composite_score": priority["composite_score"],
-        "classifier_reason": demand_type.get("reason", ""),
-    }
+        priority = compute_priority_score(dl_dict)
+        priority_score = priority["priority_score"]
 
-    await kafka_producer.send_event(
-        "demand", "classified",
-        key=str(data.get("product_id", "")),
-        value=EventEnvelope(
-            event_id=str(uuid4()),
+        demand_line.priority_score = priority_score
+
+        if demand_line.mo_id:
+            mo_id = demand_line.mo_id
+        else:
+            bom_result = await session.execute(
+                sa_select(BillOfMaterial.id)
+                .where(
+                    BillOfMaterial.product_id == demand_line.product_id,
+                    BillOfMaterial.is_active,
+                )
+                .order_by(BillOfMaterial.version.desc())
+                .limit(1)
+            )
+            bom_row = bom_result.fetchone()
+            bom_id = bom_row[0] if bom_row else None
+
+            if bom_id:
+                mo = ManufacturingOrder(
+                    product_id=demand_line.product_id,
+                    bom_id=bom_id,
+                    quantity=demand_line.quantity,
+                    status="draft",
+                )
+                session.add(mo)
+                await session.flush()
+                mo_id = mo.id
+                demand_line.mo_id = mo_id
+            else:
+                mo_id = None
+
+        await session.commit()
+
+        envelope = kafka_producer.build_envelope(
             event_type="ipe.demand.classified",
-            source="dpe-svc",
-            tenant_id=envelope.tenant_id,
-            timestamp=datetime.now(UTC),
-            data=classified,
-            correlation_id=envelope.correlation_id,
-        ).model_dump(mode="json"),
-    )
+            tenant_id=str(tid) if tid else "unknown",
+            payload={
+                "demand_line_id": str(demand_line_id),
+                "mo_id": str(mo_id) if mo_id else "",
+                "priority_score": float(priority_score),
+            },
+        )
+
+        await kafka_producer.send_avro(
+            topic="ipe.demand.classified",
+            key=str(demand_line_id),
+            envelope=envelope,
+        )
 
 
 async def handle_inventory_changed(event: dict):
-    pass
+    """Re-score demand when inventory changes.
+
+    When material availability changes, demand priorities may need
+    recalculation. This handler re-evaluates demand lines that reference
+    the affected product and emits updated priority scores.
+    """
+    product_id = event.get("product_id")
+    if not product_id:
+        return
+
+    engine = get_engine()
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        tid = tenant_ctx.get()
+        if tid:
+            from sqlalchemy import text
+            await session.execute(
+                text("SELECT set_config('app.current_tenant_id', :tid, false)"),
+                {"tid": str(tid)},
+            )
+
+        from uuid import UUID as _UUID
+        try:
+            pid = _UUID(product_id)
+        except (ValueError, TypeError):
+            return
+
+        result = await session.execute(
+            sa_select(DemandLine, Product)
+            .join(Product, DemandLine.product_id == Product.id)
+            .where(DemandLine.product_id == pid)
+        )
+        rows = result.all()
+
+        for demand_line, product in rows:
+            dl_dict = {
+                "customer_tier": int(demand_line.customer_tier) if demand_line.customer_tier else 3,
+                "margin_pct": float(demand_line.margin_pct) if demand_line.margin_pct else 0,
+                "required_date": demand_line.required_date,
+                "penalty_cost": float(demand_line.penalty_cost) if demand_line.penalty_cost else 0,
+                "tags": product.category_tags or [],
+            }
+            priority = compute_priority_score(dl_dict)
+            demand_line.priority_score = priority["priority_score"]
+
+        await session.commit()

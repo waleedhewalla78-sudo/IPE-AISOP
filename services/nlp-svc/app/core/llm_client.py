@@ -1,66 +1,80 @@
-"""LLM API client using Anthropic Claude."""
+"""LLM API client - delegates to TieredRouter or LLMTierRouter based on config."""
 
-import os
 from collections.abc import AsyncGenerator
 
 from app.config import settings
+from app.core.llm_errors import LLMUnavailableError
+from app.core.llm_router import LLMProvider, LLMTierRouter
+from app.core.tiered_router import TieredRouter
+
+_router = LLMTierRouter()
+_tiered_router = TieredRouter()
 
 
 def _get_client() -> tuple:
-    api_key = os.environ.get("IPE_ANTHROPIC_API_KEY") or settings.ANTHROPIC_API_KEY
-    if not api_key or api_key == "sk-ant-placeholder":
+    """Get Anthropic client for tool-calling (used by copilot_agent).
+
+    Returns (client, model_config) or (None, None) if unavailable.
+    PII stripping is handled separately by the caller.
+    """
+    client = _router.get_anthropic_client()
+    if client is None:
         return None, None
-    try:
-        import anthropic
-
-        return anthropic.AsyncAnthropic(api_key=api_key), settings.MODEL_CONFIG
-    except ImportError:
-        return None, None
-
-
-def _build_kwargs(prompt: str, system_prompt: str) -> dict:
-    model = settings.MODEL_CONFIG.get("model", "claude-sonnet-4-20250514")
-    max_tokens = settings.MODEL_CONFIG.get("max_tokens", 1024)
-    kwargs: dict = {
-        "model": model,
-        "max_tokens": max_tokens,
-        "messages": [{"role": "user", "content": prompt}],
-    }
-    if system_prompt:
-        kwargs["system"] = system_prompt
-    return kwargs
+    return client, settings.MODEL_CONFIG
 
 
 async def query_llm(prompt: str, system_prompt: str = "") -> str:
-    client, _ = _get_client()
-    if client is None:
-        return "LLM service not configured"
+    """Query LLM through tiered router with PII stripping."""
+    from ipe_shared.middleware.tenant_context import tenant_ctx
 
-    try:
-        import anthropic
+    if settings.LLM_ROUTING_ENABLED:
+        tenant_id = tenant_ctx.get() or ""
+        return await _tiered_router.call(tenant_id, prompt, system_prompt)
 
-        kwargs = _build_kwargs(prompt, system_prompt)
-        message = await client.messages.create(**kwargs)
-        return message.content[0].text.strip() if message.content else ""
-    except anthropic.APIStatusError as exc:
-        return f"LLM API error ({exc.status_code}): {exc.message}"
-    except Exception as exc:
-        return f"LLM error: {exc}"
+    result = await _router.route(prompt, system_prompt)
+    if isinstance(result, str) and result.startswith("LLM error:"):
+        raise LLMUnavailableError(result)
+    return result
+
+
+async def get_llm_status(tenant_id: str = "") -> dict:
+    """Return LLM tier health for admin UI."""
+    if settings.LLM_ROUTING_ENABLED:
+        return await _tiered_router.get_tier_status(tenant_id)
+    return await _router.get_tier_status()
 
 
 async def stream_llm(prompt: str, system_prompt: str = "") -> AsyncGenerator[str, None]:
-    """Stream tokens from Anthropic Claude SSE API.
+    """Stream tokens from the LLM.
 
     Falls back to a single yield of the non-streaming response if streaming fails.
+    PII is stripped before sending.
     """
-    client, _ = _get_client()
+    from ipe_shared.security.pii import strip_pii_from_prompt
+
+    clean_prompt, _ = strip_pii_from_prompt(prompt)
+    clean_system, _ = strip_pii_from_prompt(system_prompt)
+
+    if _router.provider != LLMProvider.ANTHROPIC:
+        result = await query_llm(prompt, system_prompt)
+        yield result
+        return
+
+    client = _router.get_anthropic_client()
     if client is None:
         yield "LLM service not configured"
         return
 
     try:
-        kwargs = _build_kwargs(prompt, system_prompt)
-        kwargs["stream"] = True
+        kwargs = {
+            "model": settings.MODEL_CONFIG.get("model", "claude-sonnet-4-20250514"),
+            "max_tokens": settings.MODEL_CONFIG.get("max_tokens", 1024),
+            "messages": [{"role": "user", "content": clean_prompt}],
+            "stream": True,
+        }
+        if clean_system:
+            kwargs["system"] = clean_system
+
         async with client.messages.stream(**kwargs) as stream:
             async for text in stream.text_stream:
                 yield text

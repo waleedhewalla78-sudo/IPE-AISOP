@@ -1,116 +1,59 @@
-"""SAP ERP to IPE CDM Mapper.
+"""SAP Adapter CDM Mapper.
 
-Transforms native SAP schema objects (VBAK/VBAP, AFVC/AFVV) into the
-IPE Canonical Data Model entities.
+Maps SAP IDoc/BAPI fields to IPE CDM (Canonical Data Model) format.
 """
+from __future__ import annotations
 
-from datetime import datetime
-from uuid import UUID, uuid4
-
-SALES_ORDER_STATUS_MAP = {
-    "A": "new",
-    "B": "confirmed",
-    "C": "completed",
-    "D": "cancelled",
-}
-
-PRODUCTION_ORDER_STATUS_MAP = {
-    "CRTD": "draft",
-    "REL": "planned",
-    "PCNF": "in_progress",
-    "DLV": "completed",
-    "TECO": "completed",
-    "CLSD": "completed",
-}
+from typing import Any
 
 
-def map_vbak_vbap_to_demand_line(row: dict, tenant_id: str) -> dict:
-    """Map SAP VBAK (header) + VBAP (item) to cdm_demand_line.
-
-    Expected input keys:
-        - vbeln (sales order number)
-        - posnr (item number)
-        - matnr (material number)
-        - kwmeng (order quantity)
-        - vrkme (unit of measure)
-        - edatu / bnddt (requested delivery date)
-        - kunnr (customer number)
-        - waerk / netwr (currency / net value)
-        - audat (document date)
-        - vkorg (sales organization)
-        - vtweg (distribution channel)
-        - spart (division)
-        - abgru (rejection reason — indicates cancelled)
-    Returns:
-        dict matching the IPE cdm_demand_line schema.
-    """
-    erp_id = f"{row.get('vbeln', '')}-{row.get('posnr', '')}"
-    qty = float(row.get("kwmeng", 0) or 0)
-    req_date_str = row.get("edatu") or row.get("bnddt", "")
-    req_date = datetime.strptime(req_date_str, "%Y-%m-%d") if req_date_str else datetime.utcnow()
-    status = SALES_ORDER_STATUS_MAP.get(row.get("abgru", "B"), "new")
-    if row.get("abgru"):
-        status = "cancelled"
-
+def map_sale_order_to_demand(sap_order: dict[str, Any]) -> dict[str, Any]:
+    """Map SAP SD Sales Order (VA01/VA02) to IPE demand line."""
     return {
-        "id": uuid4(),
-        "tenant_id": UUID(tenant_id),
-        "erp_source_id": erp_id,
-        "erp_source_type": "sap_sales_order",
-        "product_erp_id": row.get("matnr", ""),
-        "quantity": qty,
-        "uom": row.get("vrkme", "unit"),
-        "required_date": req_date,
-        "demand_type": "MTO",
-        "customer_erp_id": row.get("kunnr", ""),
-        "customer_tier": 3,
-        "margin_pct": None,
-        "penalty_cost": 0,
-        "priority_score": 0,
-        "status": status,
-        "created_at": datetime.utcnow(),
+        "order_id": sap_order.get("VBELN", ""),
+        "customer_id": sap_order.get("KUNNR", ""),
+        "product_id": sap_order.get("MATNR", ""),
+        "quantity": float(sap_order.get("KWMENG", 0)),
+        "due_date": sap_order.get("LFDAT", ""),
+        "revenue": float(sap_order.get("NETWR", 0)),
+        "currency": sap_order.get("WAERK", "USD"),
+        "source": "sap",
     }
 
 
-def map_afvc_afvv_to_work_order(row: dict, tenant_id: str, mo_erp_id: str) -> dict:
-    """Map SAP AFVC (operation) + AFVV (operation qty/date) to cdm_work_order.
-
-    Expected input keys:
-        - aufpl (internal order number)
-        - aplzl (internal counter for the operation)
-        - vornr (operation number)
-        - arbid (work center ID)
-        - steus (control key)
-        - ltxa1 (operation short text)
-        - arbeit (standard operation time in work unit)
-        - vge01 (basic start date)
-        - vge02 (basic end date)
-        - meinh (unit of measure for work)
-        - anzkap (number of capacity units)
-    Returns:
-        dict matching the IPE cdm_work_order schema.
-    """
-    op_id = row.get("vornr", "")
-    wc_erp_id = row.get("arbid", "")
-    work_raw = float(row.get("arbeit", 0) or 0)
-    unit = row.get("meinh", "MIN")
-    start_str = row.get("vge01", "")
-    end_str = row.get("vge02", "")
-    start_date = datetime.strptime(start_str, "%Y-%m-%d") if start_str else None
-    end_date = datetime.strptime(end_str, "%Y-%m-%d") if end_str else None
-
-    duration_minutes = work_raw if unit == "MIN" else work_raw * 60
-
+def map_purchase_order_to_supply(sap_po: dict[str, Any]) -> dict[str, Any]:
+    """Map SAP MM Purchase Order (ME21N/ME22N) to IPE supply order."""
     return {
-        "id": uuid4(),
-        "tenant_id": UUID(tenant_id),
-        "mo_erp_id": mo_erp_id,
-        "operation_erp_id": op_id,
-        "sequence": int(op_id) if op_id.isdigit() else 0,
-        "work_center_erp_id": wc_erp_id,
-        "planned_start": start_date,
-        "planned_end": end_date,
-        "duration_planned_mins": duration_minutes,
-        "status": "pending",
-        "created_at": datetime.utcnow(),
+        "order_id": sap_po.get("EBELN", ""),
+        "supplier_id": sap_po.get("LIFNR", ""),
+        "product_id": sap_po.get("MATNR", ""),
+        "quantity": float(sap_po.get("MENGE", 0)),
+        "expected_date": sap_po.get("LFDAT", ""),
+        "unit_price": float(sap_po.get("NETPR", 0)),
+        "source": "sap",
+    }
+
+
+def map_mrp_production_to_manufacturing_order(sap_mrp: dict[str, Any]) -> dict[str, Any]:
+    """Map SAP PP Production Order (CO01/CO02) to IPE manufacturing order."""
+    return {
+        "mo_id": sap_mrp.get("AUFNR", ""),
+        "product_id": sap_mrp.get("MATNR", ""),
+        "planned_quantity": float(sap_mrp.get("GAMNG", 0)),
+        "planned_start": sap_mrp.get("GSTRP", ""),
+        "planned_end": sap_mrp.get("GLTRP", ""),
+        "route_id": sap_mrp.get("PLNNR", ""),
+        "source": "sap",
+    }
+
+
+def map_material_to_product(sap_mat: dict[str, Any]) -> dict[str, Any]:
+    """Map SAP MM Material Master (MM01/MM02) to IPE product."""
+    return {
+        "product_id": sap_mat.get("MATNR", ""),
+        "name": sap_mat.get("MAKTX", ""),
+        "type": sap_mat.get("MTART", ""),
+        "unit": sap_mat.get("MEINS", ""),
+        "warehouse": sap_mat.get("LGORT", ""),
+        "source": "sap",
     }

@@ -1,12 +1,11 @@
-import { useState, useRef, useEffect, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
-interface SseChunk {
-  token?: string;
-  done?: boolean;
+interface CopilotQueryData {
   intent?: string;
+  response?: string;
   sources?: string[];
 }
 
@@ -18,81 +17,38 @@ interface Message {
 }
 
 function getApiBaseUrl(): string {
-  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+  return import.meta.env.DEV ? '' : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000');
 }
 
 export function CopilotPanel() {
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-  const [streamingText, setStreamingText] = useState('');
-  const [streamingMeta, setStreamingMeta] = useState<{ intent?: string; sources?: string[] }>({});
   const bottomRef = useRef<HTMLDivElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    return () => {
-      abortRef.current?.abort();
-    };
-  }, []);
+  const submitQuery = async (q: string): Promise<Message> => {
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/copilot/query`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ query: q, stream: false }),
+    });
 
-  const submitStreaming = async (q: string) => {
-    const controller = new AbortController();
-    abortRef.current = controller;
-    setStreamingText('');
-    setStreamingMeta({});
-
-    try {
-      const token = localStorage.getItem('access_token');
-      const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/v1/copilot/query`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ query: q, stream: true }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok || !res.body) {
-        throw new Error('Stream failed');
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          try {
-            const parsed = JSON.parse(line.slice(6)) as SseChunk;
-            if (parsed.done) {
-              setStreamingMeta({ intent: parsed.intent, sources: parsed.sources });
-              break;
-            }
-            if (parsed.token) {
-              setStreamingText(prev => prev + (parsed.token as string));
-            }
-          } catch {
-            // skip malformed chunks
-          }
-        }
-      }
-    } catch (err: unknown) {
-      if (err instanceof DOMException && err.name === 'AbortError') return;
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Copilot is offline. Please try again later.' }]);
-    } finally {
-      abortRef.current = null;
+    if (!res.ok) {
+      throw new Error(`Copilot request failed (${res.status})`);
     }
+
+    const payload = await res.json() as { success?: boolean; data?: CopilotQueryData };
+    const data = payload.data;
+    return {
+      role: 'assistant',
+      text: data?.response?.trim() || 'No response generated.',
+      intent: data?.intent,
+      sources: data?.sources,
+    };
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -105,21 +61,18 @@ export function CopilotPanel() {
     setQuery('');
     setLoading(true);
 
-    await submitStreaming(q);
-
-    if (!abortRef.current) {
+    try {
+      const assistantMsg = await submitQuery(q);
+      setMessages(prev => [...prev, assistantMsg]);
+    } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: streamingText,
-        intent: streamingMeta.intent,
-        sources: streamingMeta.sources,
+        text: 'Copilot is offline or could not reach the API. Check that Kong, nlp-svc, and mat-svc are running.',
       }]);
-      setStreamingText('');
-      setStreamingMeta({});
+    } finally {
+      setLoading(false);
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
-
-    setLoading(false);
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
   return (
@@ -154,22 +107,9 @@ export function CopilotPanel() {
             )}
           </Card>
         ))}
-        {loading && !streamingText && (
+        {loading && (
           <Card className="mr-4 sm:mr-12">
             <p className="text-sm text-ipe-text-muted">Thinking...</p>
-          </Card>
-        )}
-        {streamingText && (
-          <Card className="mr-4 sm:mr-12">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-ipe-text-muted">IPE Copilot</span>
-              {streamingMeta.intent && (
-                <span className="rounded bg-ipe-surface-alt px-2 py-0.5 text-xs text-ipe-text-muted">
-                  {streamingMeta.intent}
-                </span>
-              )}
-            </div>
-            <p className="mt-1 text-sm text-ipe-text whitespace-pre-wrap">{streamingText}<span className="animate-pulse">|</span></p>
           </Card>
         )}
         <div ref={bottomRef} />

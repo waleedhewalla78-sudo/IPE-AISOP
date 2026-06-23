@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 BOM_COMPLETENESS_THRESHOLD = 80.0
 LEAD_TIME_ACCURACY_THRESHOLD = 60.0
+COMPOSITE_THRESHOLD = 70.0
 
 
 async def calculate_mdr(session: AsyncSession, tenant_id: str | None = None) -> dict:
@@ -63,10 +64,55 @@ async def calculate_mdr(session: AsyncSession, tenant_id: str | None = None) -> 
     with_lead_time = float(lt_row[1])
     lead_time_accuracy_pct = round((with_lead_time / total_products) * 100, 2)
 
+    routing_result = await session.execute(
+        text("""
+            SELECT
+                COUNT(*) AS total_mos,
+                COUNT(*) FILTER (
+                    WHERE EXISTS (
+                        SELECT 1 FROM cdm_routing_operation r
+                        WHERE r.bom_id = mo.bom_id AND r.tenant_id = mo.tenant_id
+                    )
+                ) AS with_routing
+            FROM cdm_manufacturing_order mo
+            WHERE mo.tenant_id = :tid
+        """),
+        {"tid": UUID(tid)},
+    )
+    routing_row = routing_result.fetchone()
+    total_mos = max(float(routing_row[0]), 1)
+    with_routing = float(routing_row[1])
+    routing_accuracy_pct = round((with_routing / total_mos) * 100, 2)
+
+    inv_result = await session.execute(
+        text("""
+            SELECT
+                COUNT(DISTINCT p.id) AS total_products,
+                COUNT(DISTINCT ip.product_id) AS with_inventory
+            FROM cdm_product p
+            LEFT JOIN cdm_inventory_position ip
+                ON ip.product_id = p.id AND ip.tenant_id = p.tenant_id
+            WHERE p.tenant_id = :tid
+        """),
+        {"tid": UUID(tid)},
+    )
+    inv_row = inv_result.fetchone()
+    total_inv_products = max(float(inv_row[0]), 1)
+    with_inventory = float(inv_row[1])
+    inventory_accuracy_pct = round((with_inventory / total_inv_products) * 100, 2)
+
+    composite_score = round(
+        bom_completeness_pct * 0.40
+        + routing_accuracy_pct * 0.35
+        + inventory_accuracy_pct * 0.25,
+        2,
+    )
+
     passed = (
         bom_completeness_pct >= BOM_COMPLETENESS_THRESHOLD
         and lead_time_accuracy_pct >= LEAD_TIME_ACCURACY_THRESHOLD
     )
+    ai_scheduling_allowed = composite_score >= COMPOSITE_THRESHOLD
 
     # Persist to cdm_mdr_score
     await session.execute(
@@ -86,12 +132,29 @@ async def calculate_mdr(session: AsyncSession, tenant_id: str | None = None) -> 
     return {
         "bom_completeness_pct": bom_completeness_pct,
         "lead_time_accuracy_pct": lead_time_accuracy_pct,
+        "routing_accuracy_pct": routing_accuracy_pct,
+        "inventory_accuracy_pct": inventory_accuracy_pct,
+        "composite_score": composite_score,
+        "composite_threshold": COMPOSITE_THRESHOLD,
+        "ai_scheduling_allowed": ai_scheduling_allowed,
         "passed": passed,
+        "remediation": build_remediation({
+            "bom_completeness_pct": bom_completeness_pct,
+            "lead_time_accuracy_pct": lead_time_accuracy_pct,
+            "routing_accuracy_pct": routing_accuracy_pct,
+            "inventory_accuracy_pct": inventory_accuracy_pct,
+            "composite_score": composite_score,
+        }),
     }
 
 
 def build_remediation(mdr: dict) -> list[str]:
     steps = []
+    if mdr.get("composite_score", 100) < COMPOSITE_THRESHOLD:
+        steps.append(
+            f"Composite MDR score {mdr.get('composite_score', 0):.1f}% "
+            f"(need ≥ {COMPOSITE_THRESHOLD:.0f}%) — fix dimensions below"
+        )
     if mdr["bom_completeness_pct"] < BOM_COMPLETENESS_THRESHOLD:
         steps.append(
             f"Update BOMs: {mdr['bom_completeness_pct']:.1f}% completeness "
@@ -101,5 +164,13 @@ def build_remediation(mdr: dict) -> list[str]:
         steps.append(
             f"Verify vendor lead times: {mdr['lead_time_accuracy_pct']:.1f}% accuracy "
             f"(need ≥ {LEAD_TIME_ACCURACY_THRESHOLD:.0f}%)"
+        )
+    if mdr.get("routing_accuracy_pct", 100) < 80:
+        steps.append(
+            f"Add routing operations: {mdr.get('routing_accuracy_pct', 0):.1f}% MO coverage"
+        )
+    if mdr.get("inventory_accuracy_pct", 100) < 70:
+        steps.append(
+            f"Reconcile inventory records: {mdr.get('inventory_accuracy_pct', 0):.1f}% product coverage"
         )
     return steps

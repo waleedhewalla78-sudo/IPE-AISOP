@@ -4,9 +4,16 @@ import { ROUTES } from '@/lib/constants';
 
 const NAV_ITEMS = [
   { to: ROUTES.CONTROL_TOWER, label: 'Control Tower', icon: '📊' },
+  { to: ROUTES.SCHEDULE, label: 'Schedule', icon: '📅' },
   { to: ROUTES.RESOLUTION_CENTER, label: 'Resolution Center', icon: '🔧' },
   { to: ROUTES.COPILOT, label: 'Copilot', icon: '🤖' },
+  { to: ROUTES.EXECUTIVE, label: 'Executive', icon: '📈' },
+  { to: ROUTES.WAR_ROOM, label: 'War Room', icon: '🚨' },
+  { to: ROUTES.AI_TRUST, label: 'AI Trust', icon: '🛡️' },
   { to: ROUTES.SHOP_FLOOR, label: 'Shop Floor', icon: '🏭' },
+  { to: ROUTES.SCN_PORTAL, label: 'SCN Portal', icon: '🤝' },
+  { to: ROUTES.ML_OPS, label: 'MLOps', icon: '⚡' },
+  { to: ROUTES.ONBOARDING, label: 'Onboarding', icon: '🚀' },
   { to: ROUTES.ADMIN, label: 'Admin', icon: '⚙️' },
 ];
 
@@ -16,7 +23,7 @@ export function Sidebar() {
       <div className="flex h-14 items-center border-b border-ipe-border px-4">
         <h1 className="text-lg font-bold text-ipe-primary">IPE</h1>
       </div>
-      <nav className="flex-1 space-y-1 p-2">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-2">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}

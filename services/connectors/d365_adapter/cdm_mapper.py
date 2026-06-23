@@ -1,108 +1,60 @@
-"""D365 (Dataverse) to IPE CDM Mapper.
+"""D365 Adapter CDM Mapper.
 
-Transforms Microsoft Dataverse entities (salesorders, workorders) into the
-IPE Canonical Data Model entities.
+Maps D365 Finance & Operations fields to IPE CDM (Canonical Data Model) format.
 """
+from __future__ import annotations
 
-from datetime import datetime
-from uuid import UUID, uuid4
-
-SALES_ORDER_STATUS_MAP = {
-    1: "new",
-    2: "confirmed",
-    3: "completed",
-    4: "cancelled",
-}
-
-WORK_ORDER_STATUS_MAP = {
-    1: "draft",
-    2: "planned",
-    3: "in_progress",
-    4: "completed",
-    5: "cancelled",
-}
+from typing import Any
 
 
-def map_sales_order_to_demand_line(row: dict, tenant_id: str) -> dict:
-    """Map D365 Dataverse salesorder/salesorderdetail to cdm_demand_line.
-
-    Expected input keys:
-        - salesorderid (GUID)
-        - salesorderdetailid (GUID)
-        - name / ordernumber
-        - productid (product GUID)
-        - quantity
-        - uomname / uomid
-        - requestdeliveryby (datetime)
-        - customerid (account GUID)
-        - totalamount
-        - statecode (int: 0=Active, 1=Submitted, 2=Canceled, 3=Fulfilled)
-        - createdon (datetime)
-    Returns:
-        dict matching the IPE cdm_demand_line schema.
-    """
-    erp_id = row.get("salesorderdetailid") or row.get("salesorderid", "")
-    qty = float(row.get("quantity", 0) or 0)
-    req_date_str = row.get("requestdeliveryby", "")
-    req_date = datetime.fromisoformat(req_date_str.replace("Z", "+00:00")) if req_date_str else datetime.utcnow()
-    state = row.get("statecode", 0)
-    status = SALES_ORDER_STATUS_MAP.get(state + 1, "new")
-
+def map_sales_order_to_demand(d365_order: dict[str, Any]) -> dict[str, Any]:
+    """Map D365 Sales Order to IPE demand line."""
     return {
-        "id": uuid4(),
-        "tenant_id": UUID(tenant_id),
-        "erp_source_id": str(erp_id),
-        "erp_source_type": "d365_sales_order",
-        "product_erp_id": str(row.get("productid", "")),
-        "quantity": qty,
-        "uom": row.get("uomname", "unit"),
-        "required_date": req_date,
-        "demand_type": "MTO",
-        "customer_erp_id": str(row.get("customerid", "")),
-        "customer_tier": 3,
-        "margin_pct": None,
-        "penalty_cost": 0,
-        "priority_score": 0,
-        "status": status,
-        "created_at": datetime.utcnow(),
+        "order_id": d365_order.get("SalesOrderNumber", ""),
+        "customer_id": d365_order.get("InvoiceCustomerAccountNumber", ""),
+        "product_id": d365_order.get("ItemNumber", ""),
+        "quantity": float(d365_order.get("OrderedSalesQuantity", 0)),
+        "due_date": d365_order.get("RequestedShipDate", ""),
+        "revenue": float(d365_order.get("SalesPrice", 0)) * float(d365_order.get("OrderedSalesQuantity", 0)),
+        "currency": d365_order.get("CurrencyCode", "USD"),
+        "source": "d365",
     }
 
 
-def map_work_order_to_cdm(row: dict, tenant_id: str, mo_erp_id: str) -> dict:
-    """Map D365 Dataverse workorder to cdm_work_order.
-
-    Expected input keys:
-        - workorderid (GUID)
-        - workordertype (int)
-        - serviceaddress (string)
-        - productid (product GUID)
-        - estimateddurationminutes (int)
-        - startdatetime (datetime)
-        - enddatetime (datetime)
-        - statecode (int: 0=Scheduled, 1=InProgress, 2=Completed, 3=Canceled)
-        - msdyn_systemstatus (int)
-    Returns:
-        dict matching the IPE cdm_work_order schema.
-    """
-    op_id = str(row.get("workorderid", ""))
-    duration = float(row.get("estimateddurationminutes", 0) or 0)
-    start_str = row.get("startdatetime", "")
-    end_str = row.get("enddatetime", "")
-    start_date = datetime.fromisoformat(start_str.replace("Z", "+00:00")) if start_str else None
-    end_date = datetime.fromisoformat(end_str.replace("Z", "+00:00")) if end_str else None
-    state = row.get("statecode", 0)
-    status = WORK_ORDER_STATUS_MAP.get(state + 1, "pending")
-
+def map_purchase_order_to_supply(d365_po: dict[str, Any]) -> dict[str, Any]:
+    """Map D365 Purchase Order to IPE supply order."""
     return {
-        "id": uuid4(),
-        "tenant_id": UUID(tenant_id),
-        "mo_erp_id": mo_erp_id,
-        "operation_erp_id": op_id,
-        "sequence": 1,
-        "work_center_erp_id": str(row.get("serviceaddress", "")),
-        "planned_start": start_date,
-        "planned_end": end_date,
-        "duration_planned_mins": duration,
-        "status": status,
-        "created_at": datetime.utcnow(),
+        "order_id": d365_po.get("PurchaseOrderNumber", ""),
+        "supplier_id": d365_po.get("VendorAccountNumber", ""),
+        "product_id": d365_po.get("ItemNumber", ""),
+        "quantity": float(d365_po.get("OrderedPurchaseQuantity", 0)),
+        "expected_date": d365_po.get("RequestedDeliveryDate", ""),
+        "unit_price": float(d365_po.get("PurchasePrice", 0)),
+        "source": "d365",
+    }
+
+
+def map_production_order_to_manufacturing_order(d365_prod: dict[str, Any]) -> dict[str, Any]:
+    """Map D365 Production Order to IPE manufacturing order."""
+    return {
+        "mo_id": d365_prod.get("ProductionOrderNumber", ""),
+        "product_id": d365_prod.get("ItemNumber", ""),
+        "planned_quantity": float(d365_prod.get("ProductionQuantity", 0)),
+        "planned_start": d365_prod.get("ScheduledStartDate", ""),
+        "planned_end": d365_prod.get("ScheduledEndDate", ""),
+        "route_id": d365_prod.get("RouteId", ""),
+        "status": d365_prod.get("ProductionStatus", "").lower(),
+        "source": "d365",
+    }
+
+
+def map_product_to_cdm(d365_product: dict[str, Any]) -> dict[str, Any]:
+    """Map D365 Product to IPE product."""
+    return {
+        "product_id": d365_product.get("ItemId", ""),
+        "name": d365_product.get("ProductName", ""),
+        "type": d365_product.get("ProductType", ""),
+        "unit": d365_product.get("UnitOfMeasure", ""),
+        "warehouse": d365_product.get("DefaultWarehouse", ""),
+        "source": "d365",
     }

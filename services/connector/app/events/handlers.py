@@ -2,9 +2,10 @@ import hashlib
 import hmac
 import json
 import logging
+from uuid import UUID
 
 import httpx
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from ipe_shared.database.connection import get_engine
@@ -78,6 +79,21 @@ def _parse_event(event: dict) -> EventEnvelope | None:
             return None
     logger.warning("Unrecognized event format: %s", type(value))
     return None
+
+
+def _extract_kafka_payload(event: dict) -> tuple[str, str, dict] | None:
+    """Parse cap-svc build_envelope (payload) or standard EventEnvelope (data)."""
+    value = event.value if hasattr(event, "value") else event
+    if not isinstance(value, dict):
+        return None
+    tenant_id = str(value.get("tenant_id", ""))
+    event_id = str(value.get("event_id", ""))
+    data = value.get("data") or value.get("payload") or {}
+    if not tenant_id and data.get("tenant_id"):
+        tenant_id = str(data["tenant_id"])
+    if not tenant_id:
+        return None
+    return tenant_id, event_id, data
 
 
 async def handle_mo_auto_confirmed(event: dict):
@@ -190,3 +206,167 @@ async def handle_demand_classified(event: dict):
             "priority_score": priority_score,
         },
     )
+
+
+async def handle_resolution_approved(event: dict):
+    """Consume ipe.resolution.approved, write to cdm_export_queue."""
+    envelope = _parse_event(event)
+    if not envelope:
+        return
+
+    data = envelope.data
+    tenant_id = str(envelope.tenant_id)
+    event_id = str(envelope.event_id)
+
+    engine = get_engine()
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        try:
+            # Idempotency check on event_id
+            existing = await session.execute(
+                text("SELECT 1 FROM cdm_export_queue WHERE event_type = :et AND payload->>'event_id' = :eid LIMIT 1"),
+                {"et": "ipe.resolution.approved", "eid": event_id},
+            )
+            if existing.scalar_one_or_none():
+                logger.info("Duplicate ipe.resolution.approved event %s, skipping", event_id)
+                return
+
+            odoo_payload = {
+                "event_id": event_id,
+                "mo_id": data.get("mo_id", ""),
+                "scenario_id": data.get("scenario_id", ""),
+                "strategy": data.get("strategy", ""),
+                "approved_by": data.get("approved_by", "system"),
+                "delivery_impact_days": data.get("delivery_impact_days", 0),
+                "cost_impact": data.get("cost_impact", 0),
+            }
+
+            await session.execute(
+                text("""
+                    INSERT INTO cdm_export_queue
+                        (tenant_id, payload, event_type, status, retry_count)
+                    VALUES
+                        (:tid, :payload, :evt, 'pending', 0)
+                """),
+                {
+                    "tid": UUID(tenant_id) if isinstance(tenant_id, str) else tenant_id,
+                    "payload": odoo_payload,
+                    "evt": "ipe.resolution.approved",
+                },
+            )
+            await session.commit()
+            logger.info("Enqueued resolution.approved event %s for tenant %s", event_id, tenant_id)
+        except Exception as e:
+            logger.error("Failed to enqueue resolution.approved: %s", e)
+
+
+async def handle_schedule_approved(event: dict):
+    """Consume ipe.schedule.approved and sync activated MOs to Odoo."""
+    parsed = _extract_kafka_payload(event)
+    if not parsed:
+        envelope = _parse_event(event)
+        if not envelope:
+            return
+        tenant_id = str(envelope.tenant_id)
+        event_id = str(envelope.event_id)
+        data = envelope.data
+    else:
+        tenant_id, event_id, data = parsed
+
+    activated = data.get("activated") or []
+    approved_by = data.get("approved_by", "system")
+
+    logger.info(
+        "Processing schedule_approved: tenant=%s count=%s event=%s",
+        tenant_id, len(activated), event_id,
+    )
+
+    engine = get_engine()
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        try:
+            if event_id:
+                existing = await session.execute(
+                    text(
+                        "SELECT 1 FROM cdm_export_queue "
+                        "WHERE event_type = :et AND payload->>'event_id' = :eid LIMIT 1"
+                    ),
+                    {"et": "ipe.schedule.approved", "eid": event_id},
+                )
+                if existing.scalar_one_or_none():
+                    logger.info("Duplicate ipe.schedule.approved event %s, skipping", event_id)
+                    return
+
+            odoo_payload = {
+                "event_id": event_id,
+                "approved_by": approved_by,
+                "activated": activated,
+            }
+            await session.execute(
+                text("""
+                    INSERT INTO cdm_export_queue
+                        (tenant_id, payload, event_type, status, retry_count)
+                    VALUES
+                        (:tid, :payload, :evt, 'pending', 0)
+                """),
+                {
+                    "tid": UUID(tenant_id) if isinstance(tenant_id, str) else tenant_id,
+                    "payload": odoo_payload,
+                    "evt": "ipe.schedule.approved",
+                },
+            )
+            await session.commit()
+        except Exception as exc:
+            logger.error("Failed to enqueue schedule.approved: %s", exc)
+
+    for item in activated:
+        erp_mo_id = item.get("erp_mo_id")
+        if not erp_mo_id:
+            continue
+        await _post_to_odoo(
+            tenant_id=tenant_id,
+            action_type="reschedule_mo",
+            data={
+                "mo_id": erp_mo_id,
+                "planned_date_finished": item.get("new_planned_end"),
+                "planned_date_start": item.get("new_planned_start"),
+                "approved_by": approved_by,
+                "ipe_schedule_version": item.get("ai_schedule_version"),
+            },
+        )
+
+
+async def handle_po_suggested(event: dict):
+    """Consume ipe.po.suggested, create draft purchase orders in Odoo."""
+    envelope = _parse_event(event)
+    if not envelope:
+        return
+
+    data = envelope.data
+    tenant_id = str(envelope.tenant_id)
+    suggestions = data.get("suggestions", [])
+    total_cost = data.get("total_cost", 0)
+
+    logger.info(
+        "Processing po_suggested: tenant=%s count=%s total_cost=%s",
+        tenant_id, len(suggestions), total_cost,
+    )
+
+    for suggestion in suggestions:
+        po_payload = {
+            "product_id": suggestion.get("product_id", ""),
+            "supplier_id": suggestion.get("supplier_id", ""),
+            "supplier_name": suggestion.get("supplier_name", ""),
+            "order_quantity": suggestion.get("order_quantity", 0),
+            "unit_cost": suggestion.get("unit_cost", 0),
+            "total_cost": suggestion.get("total_cost", 0),
+            "suggested_order_date": suggestion.get("suggested_order_date", ""),
+            "expected_delivery_date": suggestion.get("expected_delivery_date", ""),
+            "priority": suggestion.get("priority", "normal"),
+        }
+
+        await _post_to_odoo(
+            tenant_id=tenant_id,
+            action_type="create_rfq",
+            data=po_payload,
+        )

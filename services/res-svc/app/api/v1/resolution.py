@@ -3,11 +3,14 @@ from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
-from sqlalchemy import select as sa_select
+from sqlalchemy import select as sa_select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.business_score import score_scenario
 from app.core.strategy import generate_strategies
+from ipe_shared.audit.service import log_audit_event
+from ipe_shared.auth.jwt import TokenPayload
+from ipe_shared.auth.rbac import require_roles
 from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.events.producer import kafka_producer
 from ipe_shared.events.schemas import EventEnvelope
@@ -15,6 +18,7 @@ from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.models.manufacturing_order import ManufacturingOrder
 from ipe_shared.models.resolution import ResolutionScenario
 from ipe_shared.schemas.common import APIResponse
+from ipe_shared.schemas.xai import XAIExplanation
 
 router = APIRouter(prefix="/resolution", tags=["resolution"])
 
@@ -67,7 +71,21 @@ async def propose_scenarios(
         if scored["business_score"] > best_score:
             best_score = scored["business_score"]
             best = s
-        scenarios.append({**s, **scored, "id": str(uuid4())})
+        scenario_id = uuid4()
+        # Persist to database
+        session.add(ResolutionScenario(
+            id=scenario_id, tenant_id=tid, mo_id=req.mo_id,
+            strategy=s["strategy"], description=s.get("description", ""),
+            business_score=scored["business_score"],
+            delivery_impact_days=scored.get("delivery_impact_days"),
+            cost_impact=scored.get("cost_impact"),
+            status="proposed",
+        ))
+        scenarios.append({
+            "id": str(scenario_id), "mo_id": str(req.mo_id),
+            **s, **scored,
+        })
+    await session.commit()
 
     await kafka_producer.send_event(
         "resolution", "proposed",
@@ -87,27 +105,69 @@ async def propose_scenarios(
         ).model_dump(mode="json"),
     )
 
-    return APIResponse(success=True, data={"mo_id": str(mo.id), "constraint": constraint, "scenarios": scenarios}, error=None)
+    return APIResponse(success=True, data={
+        "mo_id": str(mo.id),
+        "constraint": constraint,
+        "scenarios": scenarios,
+        "xai_explanation": XAIExplanation(
+            constraints=[constraint],
+            assumptions=["cost_model_base_1000", "business_score_weights_delivery_0.35_cost_0.25_risk_0.20"],
+            confidence_score=round(max(s.get("business_score", 0) for s in scenarios), 4) if scenarios else 0.0,
+            contributing_factors={"constraint_severity": round(min(1.0, len(scenarios) / 4.0), 4)},
+        ).model_dump(),
+    }, error=None)
 
 
 @router.post("/approve")
 async def approve_scenario(
     req: ApproveRequest,
     session: AsyncSession = Depends(get_db_session),
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager"])),
 ):
     tenant_id = tenant_ctx.get()
     if not tenant_id:
         return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
 
-    result = await session.execute(
+    tid = UUID(tenant_id)
+
+    # Read scenario and MO with version
+    scenario_result = await session.execute(
         sa_select(ResolutionScenario).where(
-            ResolutionScenario.tenant_id == UUID(tenant_id),
+            ResolutionScenario.tenant_id == tid,
             ResolutionScenario.id == req.scenario_id,
         )
     )
-    scenario = result.scalar_one_or_none()
+    scenario = scenario_result.scalar_one_or_none()
     if not scenario:
         return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "Scenario not found"})
+
+    mo_result = await session.execute(
+        sa_select(ManufacturingOrder).where(
+            ManufacturingOrder.tenant_id == tid,
+            ManufacturingOrder.id == scenario.mo_id,
+        )
+    )
+    mo = mo_result.scalar_one_or_none()
+    if not mo:
+        return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "MO not found"})
+
+    # Optimistic lock: UPDATE ... WHERE version = :v
+    current_version = mo.version
+    update_result = await session.execute(
+        text("""
+            UPDATE cdm_manufacturing_order
+            SET version = version + 1, status = 'approved',
+                updated_at = now()
+            WHERE id = :mo_id AND version = :v
+        """),
+        {"mo_id": scenario.mo_id, "v": current_version},
+    )
+    if update_result.rowcount == 0:
+        await session.rollback()
+        return APIResponse(success=False, data=None, error={
+            "code": "CONFLICT",
+            "message": "MO was modified by another request. Reload and retry.",
+        })
 
     scenario.status = "approved"
     scenario.approved_by = req.approved_by
@@ -115,12 +175,61 @@ async def approve_scenario(
     scenario.comment = req.comment
     await session.commit()
 
+    # Publish ipe.resolution.approved
+    envelope = kafka_producer.build_envelope(
+        event_type="ipe.resolution.approved",
+        tenant_id=tid,
+        payload={
+            "scenario_id": str(scenario.id),
+            "mo_id": str(scenario.mo_id),
+            "strategy": scenario.strategy,
+            "approved_by": req.approved_by,
+            "delivery_impact_days": float(scenario.delivery_impact_days) if scenario.delivery_impact_days else 0.0,
+            "cost_impact": float(scenario.cost_impact) if scenario.cost_impact else 0.0,
+        },
+    )
+    await kafka_producer.send_avro(
+        topic="ipe.resolution.approved",
+        key=str(scenario.mo_id),
+        envelope=envelope,
+    )
+
+    await log_audit_event(
+        tenant_id=tid,
+        actor_type="user",
+        actor_id=str(current_user.sub),
+        action="APPROVE_SCHEDULE",
+        entity_type="resolution_scenario",
+        entity_id=scenario.id,
+        before_state={
+            "mo_id": str(scenario.mo_id),
+            "status": "proposed",
+            "strategy": scenario.strategy,
+        },
+        after_state={
+            "status": "approved",
+            "approved_by": req.approved_by,
+            "delivery_impact_days": float(scenario.delivery_impact_days) if scenario.delivery_impact_days else 0.0,
+            "cost_impact": float(scenario.cost_impact) if scenario.cost_impact else 0.0,
+        },
+        rationale=req.comment or f"Approved by {current_user.sub}",
+    )
+
     return APIResponse(success=True, data={
         "scenario_id": str(scenario.id),
         "status": "approved",
         "actions_executed": [
             {"action": "approve_scenario", "target": str(scenario.id), "result": "success"},
         ],
+        "xai_explanation": XAIExplanation(
+            constraints=["optimistic_lock_version_check"],
+            assumptions=["approver_has_authority"],
+            confidence_score=round(float(scenario.business_score or 0), 4),
+            contributing_factors={
+                "delivery_impact": round(float(scenario.delivery_impact_days or 0) / 7.0, 4),
+                "cost_impact": round(min(1.0, abs(float(scenario.cost_impact or 0)) / 10000.0), 4),
+            },
+        ).model_dump(),
     }, error=None)
 
 
@@ -151,6 +260,8 @@ async def list_scenarios(
                 "strategy": s.strategy,
                 "status": s.status,
                 "business_score": float(s.business_score) if s.business_score else None,
+                "delivery_impact_days": float(s.delivery_impact_days) if s.delivery_impact_days else None,
+                "cost_impact": float(s.cost_impact) if s.cost_impact else None,
                 "created_at": s.created_at.isoformat() if s.created_at else None,
             }
             for s in scenarios

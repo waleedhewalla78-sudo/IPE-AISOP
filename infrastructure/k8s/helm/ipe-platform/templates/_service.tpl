@@ -37,13 +37,29 @@ spec:
                   key: dsn
             - name: ENVIRONMENT
               value: {{ .root.Values.global.environment }}
-          resources:
-            requests:
-              cpu: {{ .config.resources.requests.cpu }}
-              memory: {{ .config.resources.requests.memory }}
-            limits:
-              cpu: {{ .config.resources.limits.cpu }}
-              memory: {{ .config.resources.limits.memory }}
+           resources:
+             requests:
+               cpu: {{ .config.resources.requests.cpu }}
+               memory: {{ .config.resources.requests.memory }}
+             limits:
+               cpu: {{ .config.resources.limits.cpu }}
+               memory: {{ .config.resources.limits.memory }}
+           livenessProbe:
+             httpGet:
+               path: /api/v1/health
+               port: {{ .config.port }}
+             initialDelaySeconds: 15
+             periodSeconds: 30
+             timeoutSeconds: 5
+             failureThreshold: 3
+           readinessProbe:
+             httpGet:
+               path: /api/v1/health
+               port: {{ .config.port }}
+             initialDelaySeconds: 5
+             periodSeconds: 10
+             timeoutSeconds: 3
+             failureThreshold: 3
 ---
 apiVersion: v1
 kind: Service

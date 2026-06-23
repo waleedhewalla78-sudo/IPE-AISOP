@@ -7,7 +7,9 @@ import {
 } from 'recharts';
 import {
   fetchExecutiveSummary, fetchOTDByWorkCenter, fetchDelayBreakdown, fetchPlanningAccuracy,
+  fetchPnL, fetchSopGapAnalysis, fetchWhatIfScenarios,
   type ExecutiveSummary, type WorkCenterOTD, type DelayBreakdownItem, type PlanningAccuracy,
+  type PnLSummary, type SopGapAnalysis, type WhatIfResult,
 } from '../api';
 
 const PIE_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
@@ -21,21 +23,30 @@ export function ExecutiveDashboardPage() {
   const [workCenters, setWorkCenters] = useState<WorkCenterOTD[]>([]);
   const [delayBreakdown, setDelayBreakdown] = useState<DelayBreakdownItem[]>([]);
   const [planningAccuracy, setPlanningAccuracy] = useState<PlanningAccuracy | null>(null);
+  const [pnl, setPnl] = useState<PnLSummary | null>(null);
+  const [sopGap, setSopGap] = useState<SopGapAnalysis | null>(null);
+  const [whatIf, setWhatIf] = useState<WhatIfResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const [s, wc, db, pa] = await Promise.all([
+      const [s, wc, db, pa, p, sg, wi] = await Promise.all([
         fetchExecutiveSummary(),
         fetchOTDByWorkCenter(),
         fetchDelayBreakdown(),
         fetchPlanningAccuracy(),
+        fetchPnL(),
+        fetchSopGapAnalysis(),
+        fetchWhatIfScenarios(),
       ]);
       setSummary(s);
       setWorkCenters(wc);
       setDelayBreakdown(db);
       setPlanningAccuracy(pa);
+      setPnl(p);
+      setSopGap(sg);
+      setWhatIf(wi);
       setLoading(false);
     })();
   }, []);
@@ -245,6 +256,138 @@ export function ExecutiveDashboardPage() {
             )}
           </Card>
         </div>
+      </div>
+
+      {/* P&L Section */}
+      {pnl && (
+        <Card>
+          <h3 className="mb-4 font-medium">P&L Statement (S&OP View)</h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-4">
+            <div className="rounded bg-blue-50 p-3 text-center">
+              <p className="text-xs text-ipe-text-muted">Revenue</p>
+              <p className="text-xl font-bold text-blue-700">${(pnl.revenue / 1e6).toFixed(1)}M</p>
+            </div>
+            <div className="rounded bg-green-50 p-3 text-center">
+              <p className="text-xs text-ipe-text-muted">Gross Margin</p>
+              <p className="text-xl font-bold text-green-700">{pnl.gross_margin_pct}%</p>
+            </div>
+            <div className="rounded bg-purple-50 p-3 text-center">
+              <p className="text-xs text-ipe-text-muted">Net Margin</p>
+              <p className="text-xl font-bold text-purple-700">{pnl.net_margin_pct}%</p>
+            </div>
+            <div className="rounded bg-amber-50 p-3 text-center">
+              <p className="text-xs text-ipe-text-muted">COPQ Impact</p>
+              <div className="text-xl font-bold text-amber-700">
+                {((1 - pnl.net_margin_pct / Math.max(pnl.gross_margin_pct, 0.01)) * 100).toFixed(1)}%
+              </div>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-ipe-border text-xs uppercase text-ipe-text-muted">
+                  <th className="pb-2 pr-4">Category</th>
+                  <th className="pb-2 pr-4 text-right">Amount</th>
+                  <th className="pb-2 text-right">% of Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pnl.rows.map(row => (
+                  <tr key={row.category} className="border-b border-ipe-border/50">
+                    <td className={`py-1.5 pr-4 font-medium ${row.amount < 0 ? 'text-red-600' : ''}`}>
+                      {row.category}
+                    </td>
+                    <td className="py-1.5 pr-4 text-right">
+                      ${Math.abs(row.amount / 1e3).toFixed(0)}K
+                    </td>
+                    <td className="py-1.5 text-right">{row.pct_of_revenue}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+
+      {/* S&OP Gap Analysis + What-If */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {sopGap && (
+          <Card>
+            <h3 className="mb-4 font-medium">S&OP Gap Analysis ({sopGap.horizon_weeks} Weeks)</h3>
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="rounded bg-blue-50 p-2 text-center">
+                <p className="text-xs text-ipe-text-muted">Total Demand</p>
+                <p className="text-lg font-bold text-blue-700">{(sopGap.total_demand / 1e3).toFixed(1)}K</p>
+              </div>
+              <div className="rounded bg-green-50 p-2 text-center">
+                <p className="text-xs text-ipe-text-muted">Total Capacity</p>
+                <p className="text-lg font-bold text-green-700">{(sopGap.total_capacity / 1e3).toFixed(1)}K</p>
+              </div>
+              <div className={`rounded p-2 text-center ${sopGap.gap_pct > 10 ? 'bg-red-50' : sopGap.gap_pct > 0 ? 'bg-amber-50' : 'bg-green-50'}`}>
+                <p className="text-xs text-ipe-text-muted">Gap</p>
+                <p className={`text-lg font-bold ${sopGap.gap_pct > 10 ? 'text-red-700' : sopGap.gap_pct > 0 ? 'text-amber-700' : 'text-green-700'}`}>
+                  {sopGap.gap_pct}%
+                </p>
+              </div>
+            </div>
+            {sopGap.bottlenecks.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-ipe-border text-xs uppercase text-ipe-text-muted">
+                      <th className="pb-2">Week</th>
+                      <th className="pb-2">Family</th>
+                      <th className="pb-2 text-right">Demand</th>
+                      <th className="pb-2 text-right">Capacity</th>
+                      <th className="pb-2 text-right">Gap</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sopGap.bottlenecks.map((b, i) => (
+                      <tr key={i} className="border-b border-ipe-border/50">
+                        <td className="py-1.5 font-medium">{b.week}</td>
+                        <td className="py-1.5">{b.product_family}</td>
+                        <td className="py-1.5 text-right">{b.demand.toLocaleString()}</td>
+                        <td className="py-1.5 text-right">{b.capacity.toLocaleString()}</td>
+                        <td className="py-1.5 text-right font-semibold text-red-600">-{b.gap.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        )}
+
+        {whatIf.length > 0 && (
+          <Card>
+            <h3 className="mb-4 font-medium">What-If Simulation</h3>
+            <p className="mb-3 text-xs text-ipe-text-muted">
+              Compare scenarios for capacity and margin impact
+            </p>
+            <div className="space-y-3">
+              {whatIf.map((s, i) => (
+                <div key={i} className="rounded border border-ipe-border p-3">
+                  <div className="mb-2 font-medium text-sm">{s.scenario}</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-ipe-text-muted">New Margin: </span>
+                      <span className={`font-semibold ${s.delta_margin_pct > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {s.new_margin_pct}% ({s.delta_margin_pct > 0 ? '+' : ''}{s.delta_margin_pct}%)
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-ipe-text-muted">New OTD: </span>
+                      <span className={`font-semibold ${s.delta_otd_pct > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {s.new_otd_pct}% ({s.delta_otd_pct > 0 ? '+' : ''}{s.delta_otd_pct}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );

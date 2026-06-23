@@ -39,7 +39,7 @@ async def receive_odoo_action(request: Request):
     factory = async_sessionmaker(engine, expire_on_commit=False)
     async with factory() as session:
         await session.execute(
-            text("SET LOCAL app.current_tenant_id = :tid"),
+            text("SELECT set_config('app.current_tenant_id', :tid, true)"),
             {"tid": tenant_id},
         )
 

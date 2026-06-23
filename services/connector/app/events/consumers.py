@@ -4,7 +4,10 @@ from app.events.handlers import (
     handle_demand_classified,
     handle_feasibility_scored,
     handle_mo_auto_confirmed,
+    handle_po_suggested,
     handle_reconciliation_completed,
+    handle_resolution_approved,
+    handle_schedule_approved,
 )
 from ipe_shared.events.consumer import KafkaConsumer
 
@@ -35,6 +38,24 @@ async def start_consumers():
             topics=["ipe.demand.classified"],
             group_id="ipe-odoo-connector",
             handler=handle_demand_classified,
+            service_name="ipe-odoo-connector",
+        ),
+        KafkaConsumer(
+            topics=["ipe.resolution.approved"],
+            group_id="ipe-odoo-connector",
+            handler=handle_resolution_approved,
+            service_name="ipe-odoo-connector",
+        ),
+        KafkaConsumer(
+            topics=["ipe.po.suggested"],
+            group_id="ipe-odoo-connector",
+            handler=handle_po_suggested,
+            service_name="ipe-odoo-connector",
+        ),
+        KafkaConsumer(
+            topics=["ipe.schedule.approved"],
+            group_id="ipe-odoo-connector",
+            handler=handle_schedule_approved,
             service_name="ipe-odoo-connector",
         ),
     ]

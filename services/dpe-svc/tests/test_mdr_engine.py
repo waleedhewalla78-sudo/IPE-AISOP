@@ -16,20 +16,31 @@ def session():
     return s
 
 
-def _setup_mdr_mocks(session, bom_total, bom_with, lt_total, lt_with):
+def _setup_mdr_mocks(session, bom_total, bom_with, lt_total, lt_with, mos_total=10, mos_with=9, inv_total=20, inv_with=18):
     bom_fetch = MagicMock()
     bom_fetch.fetchone.return_value = (bom_total, bom_with)
     lt_fetch = MagicMock()
     lt_fetch.fetchone.return_value = (lt_total, lt_with)
+    routing_fetch = MagicMock()
+    routing_fetch.fetchone.return_value = (mos_total, mos_with)
+    inv_fetch = MagicMock()
+    inv_fetch.fetchone.return_value = (inv_total, inv_with)
+    insert_fetch = MagicMock()
 
     async def mock_execute(*args, **kwargs):
         sql = args[0]
         sql_str = str(sql) if hasattr(sql, "compile") else str(sql)
+        if "INSERT INTO cdm_mdr_score" in sql_str:
+            return insert_fetch
+        if "cdm_manufacturing_order" in sql_str and "cdm_routing_operation" in sql_str:
+            return routing_fetch
+        if "cdm_inventory_position" in sql_str:
+            return inv_fetch
         if "cdm_product" in sql_str and "cdm_bill_of_material" in sql_str:
             return bom_fetch
         if "lead_time_days" in sql_str and "FROM cdm_product" in sql_str:
             return lt_fetch
-        return AsyncMock()
+        return MagicMock()
 
     session.execute.side_effect = mock_execute
 
@@ -41,6 +52,7 @@ async def test_calculate_mdr_all_pass(session):
     assert result["bom_completeness_pct"] == 90.0
     assert result["lead_time_accuracy_pct"] == 85.0
     assert result["passed"] is True
+    assert "composite_score" in result
 
 
 @pytest.mark.asyncio

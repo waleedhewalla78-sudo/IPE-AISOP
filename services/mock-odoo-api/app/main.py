@@ -106,14 +106,17 @@ async def ipe_action(request: Request):
         )
 
     body = json.loads(body_bytes)
-    action = body.get("action", "unknown")
+    action = body.get("action_type") or body.get("action", "unknown")
 
     if action == "confirm_mo":
-        return {"status": "ok", "data": {"mo_id": body.get("mo_id"), "state": "confirmed"}}
+        return {"status": "ok", "data": {"mo_id": body.get("data", {}).get("mo_id", body.get("mo_id")), "state": "confirmed"}}
     if action == "reschedule_mo":
-        return {"status": "ok", "data": {"mo_id": body.get("mo_id"), "rescheduled_date": body.get("new_date")}}
+        return {"status": "ok", "data": {"mo_id": body.get("data", {}).get("mo_id", body.get("mo_id")), "rescheduled_date": body.get("data", {}).get("new_date")}}
     if action == "create_rfq":
-        return {"status": "ok", "data": {"rfq_id": str(uuid4())}}
+        data = body.get("data", {})
+        return {"status": "ok", "data": {"rfq_id": str(uuid4()), "product_id": data.get("product_id"), "supplier_id": data.get("supplier_id"), "quantity": data.get("order_quantity")}}
+    if action in ("sync_feasibility", "sync_reconciliation", "sync_demand_classification"):
+        return {"status": "ok", "data": {"synced": True, "action": action}}
 
     return JSONResponse(
         status_code=400,

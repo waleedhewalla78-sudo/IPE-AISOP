@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "DelayLogged",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "tenant_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "occurred_at", "type": "string"},
+    {"name": "schema_version", "type": "int", "default": 1},
+    {
+      "name": "payload",
+      "type": {
+        "type": "record",
+        "name": "DelayLoggedPayload",
+        "fields": [
+          {"name": "mo_id", "type": "string"},
+          {"name": "cause_category", "type": "string"},
+          {"name": "cause_detail", "type": "string"},
+          {"name": "delay_minutes", "type": "int"},
+          {"name": "classification_method", "type": "string"}
+        ]
+      }
+    }
+  ]
+}

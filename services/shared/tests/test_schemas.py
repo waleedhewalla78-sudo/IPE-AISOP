@@ -4,8 +4,19 @@ from datetime import datetime, timezone
 
 from ipe_shared.schemas.auth import LoginRequest, LoginResponse, UserInfo
 from ipe_shared.schemas.bom import BomLineSchema, BillOfMaterialResponse
-from ipe_shared.schemas.common import APIResponse, APIError, APIMeta, HealthResponse, PaginationParams
-from ipe_shared.schemas.demand import DemandLineCreate, DemandLineResponse, ClassifyRequest, ClassifyResponse
+from ipe_shared.schemas.common import (
+    APIResponse,
+    APIError,
+    APIMeta,
+    HealthResponse,
+    PaginationParams,
+)
+from ipe_shared.schemas.demand import (
+    DemandLineCreate,
+    DemandLineResponse,
+    ClassifyRequest,
+    ClassifyResponse,
+)
 from ipe_shared.schemas.delay import DelayClassifyRequest, DelayClassifyResponse
 from ipe_shared.schemas.feasibility import FeasibilityScoreRequest, FeasibilityScoreResponse
 from ipe_shared.schemas.inventory import InventoryPositionResponse
@@ -78,17 +89,26 @@ class TestBomSchemas:
 class TestDemandSchemas:
     def test_demand_line_create(self):
         d = DemandLineCreate(
-            erp_source_id="SRC1", erp_source_type="odoo",
-            product_id=uuid4(), quantity=100.0, uom="pcs",
-            required_date=datetime.now(timezone.utc), demand_type="MTO"
+            erp_source_id="SRC1",
+            erp_source_type="odoo",
+            product_id=uuid4(),
+            quantity=100.0,
+            uom="pcs",
+            required_date=datetime.now(timezone.utc),
+            demand_type="MTO",
         )
         assert d.quantity == 100.0
 
     def test_demand_line_response(self):
         d = DemandLineResponse(
-            id=uuid4(), product_id=uuid4(), quantity=50.0,
-            required_date=datetime.now(timezone.utc), demand_type="MTS",
-            priority_score=0.9, status="open", created_at=datetime.now(timezone.utc)
+            id=uuid4(),
+            product_id=uuid4(),
+            quantity=50.0,
+            required_date=datetime.now(timezone.utc),
+            demand_type="MTS",
+            priority_score=0.9,
+            status="open",
+            created_at=datetime.now(timezone.utc),
         )
         assert d.status == "open"
 
@@ -98,7 +118,9 @@ class TestDemandSchemas:
         assert len(r.demand_line_ids) == 2
 
     def test_classify_response(self):
-        r = ClassifyResponse(demand_line_id=uuid4(), priority_score=0.8, demand_type="MTO", confidence=0.95)
+        r = ClassifyResponse(
+            demand_line_id=uuid4(), priority_score=0.8, demand_type="MTO", confidence=0.95
+        )
         assert r.confidence == 0.95
 
 
@@ -119,9 +141,12 @@ class TestFeasibilitySchemas:
 
     def test_feasibility_response(self):
         r = FeasibilityScoreResponse(
-            mo_id=uuid4(), feasibility_score=0.85,
-            material_score=0.9, capacity_score=0.8, labor_score=None,
-            primary_constraint="capacity"
+            mo_id=uuid4(),
+            feasibility_score=0.85,
+            material_score=0.9,
+            capacity_score=0.8,
+            labor_score=None,
+            primary_constraint="capacity",
         )
         assert r.feasibility_score == 0.85
         assert r.primary_constraint == "capacity"
@@ -130,9 +155,12 @@ class TestFeasibilitySchemas:
 class TestInventorySchemas:
     def test_inventory_response(self):
         r = InventoryPositionResponse(
-            time=datetime.now(timezone.utc), product_id=uuid4(),
-            location_id=uuid4(), qty_on_hand=100.0,
-            qty_reserved=20.0, qty_in_transit=30.0
+            time=datetime.now(timezone.utc),
+            product_id=uuid4(),
+            location_id=uuid4(),
+            qty_on_hand=100.0,
+            qty_reserved=20.0,
+            qty_in_transit=30.0,
         )
         assert r.qty_on_hand == 100.0
 
@@ -140,11 +168,18 @@ class TestInventorySchemas:
 class TestMOSchemas:
     def test_mo_response(self):
         r = ManufacturingOrderResponse(
-            id=uuid4(), product_id=uuid4(), quantity=10.0, status="draft",
-            planned_start=None, planned_end=None,
-            feasibility_score=None, material_score=None,
-            capacity_score=None, labor_score=None, primary_constraint=None,
-            created_at=datetime.now(timezone.utc)
+            id=uuid4(),
+            product_id=uuid4(),
+            quantity=10.0,
+            status="draft",
+            planned_start=None,
+            planned_end=None,
+            feasibility_score=None,
+            material_score=None,
+            capacity_score=None,
+            labor_score=None,
+            primary_constraint=None,
+            created_at=datetime.now(timezone.utc),
         )
         assert r.status == "draft"
         assert r.quantity == 10.0
@@ -153,10 +188,16 @@ class TestMOSchemas:
 class TestProductSchemas:
     def test_product_response(self):
         r = ProductResponse(
-            id=uuid4(), erp_source_id="ERP1", name="Widget",
-            source_type="odoo", uom="pcs", safety_stock=10.0,
-            internal_ref=None, standard_cost=None, lead_time_days=None,
-            created_at=datetime.now(timezone.utc)
+            id=uuid4(),
+            erp_source_id="ERP1",
+            name="Widget",
+            source_type="odoo",
+            uom="pcs",
+            safety_stock=10.0,
+            internal_ref=None,
+            standard_cost=None,
+            lead_time_days=None,
+            created_at=datetime.now(timezone.utc),
         )
         assert r.name == "Widget"
         assert r.safety_stock == 10.0
@@ -169,9 +210,14 @@ class TestResolutionSchemas:
 
     def test_scenario_response(self):
         r = ScenarioResponse(
-            id=uuid4(), mo_id=uuid4(), strategy="reroute",
-            description="Reroute to Line B", status="proposed",
-            delivery_impact_days=None, cost_impact=None, business_score=None
+            id=uuid4(),
+            mo_id=uuid4(),
+            strategy="reroute",
+            description="Reroute to Line B",
+            status="proposed",
+            delivery_impact_days=None,
+            cost_impact=None,
+            business_score=None,
         )
         assert r.strategy == "reroute"
 
@@ -183,9 +229,14 @@ class TestResolutionSchemas:
 class TestSupplySchemas:
     def test_supply_order_response(self):
         r = SupplyOrderResponse(
-            id=uuid4(), product_id=uuid4(), quantity_ordered=500.0,
-            quantity_received=100.0, expected_date=datetime.now(timezone.utc),
-            status="open", supplier_id=None, reliability_adjusted_date=None
+            id=uuid4(),
+            product_id=uuid4(),
+            quantity_ordered=500.0,
+            quantity_received=100.0,
+            expected_date=datetime.now(timezone.utc),
+            status="open",
+            supplier_id=None,
+            reliability_adjusted_date=None,
         )
         assert r.quantity_ordered == 500.0
 
@@ -193,8 +244,12 @@ class TestSupplySchemas:
 class TestWorkCenterSchemas:
     def test_work_center_response(self):
         r = WorkCenterResponse(
-            id=uuid4(), name="Line 1", capacity_hours_per_day=16.0,
-            oee=0.85, status="active", cost_per_hour=None
+            id=uuid4(),
+            name="Line 1",
+            capacity_hours_per_day=16.0,
+            oee=0.85,
+            status="active",
+            cost_per_hour=None,
         )
         assert r.name == "Line 1"
         assert r.capacity_hours_per_day == 16.0

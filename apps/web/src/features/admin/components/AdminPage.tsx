@@ -2,22 +2,24 @@ import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { fetchConfig, fetchDataQuality, updateConfig } from '../api';
+import { fetchConfig, fetchDataQuality, fetchLlmStatus, updateConfig, type LlmTierStatus } from '../api';
 import type { ConfigData, DataQualityMetrics } from '../types';
 
-type Tab = 'config' | 'data-quality';
+type Tab = 'config' | 'data-quality' | 'llm';
 
 export function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>('config');
   const [config, setConfig] = useState<ConfigData | null>(null);
   const [metrics, setMetrics] = useState<DataQualityMetrics | null>(null);
+  const [llmStatus, setLlmStatus] = useState<LlmTierStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    Promise.all([fetchConfig(), fetchDataQuality()]).then(([cfg, m]) => {
+    Promise.all([fetchConfig(), fetchDataQuality(), fetchLlmStatus()]).then(([cfg, m, llm]) => {
       setConfig(cfg);
       setMetrics(m);
+      setLlmStatus(llm);
       setLoading(false);
     });
   }, []);
@@ -60,6 +62,7 @@ export function AdminPage() {
       <div className="flex gap-1 border-b border-ipe-border">
         <button className={tabClass('config')} onClick={() => setActiveTab('config')}>Configuration</button>
         <button className={tabClass('data-quality')} onClick={() => setActiveTab('data-quality')}>Data Quality</button>
+        <button className={tabClass('llm')} onClick={() => setActiveTab('llm')}>LLM Tiers</button>
       </div>
 
       {activeTab === 'config' && config && (
@@ -176,6 +179,36 @@ export function AdminPage() {
             <Badge variant={metrics.inventory_record_accuracy_pct >= 80 ? 'success' : metrics.inventory_record_accuracy_pct >= 60 ? 'warning' : 'danger'} className="mt-2">
               {metrics.inventory_record_accuracy_pct >= 80 ? 'Good' : metrics.inventory_record_accuracy_pct >= 60 ? 'Needs Review' : 'Critical'}
             </Badge>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'llm' && llmStatus && (
+        <div className="space-y-4">
+          <Card>
+            <h3 className="mb-3 font-medium">Active Provider</h3>
+            <p className="text-lg font-semibold text-ipe-text">
+              {llmStatus.active_provider ?? 'None available'}
+            </p>
+            <p className="mt-1 text-sm text-ipe-text-muted">
+              Routing {llmStatus.routing_enabled ? 'enabled' : 'disabled (structured fallback allowed)'}
+            </p>
+          </Card>
+          <Card>
+            <h3 className="mb-3 font-medium">Provider Health</h3>
+            <div className="space-y-2">
+              {Object.entries(llmStatus.providers).map(([name, info]) => (
+                <div key={name} className="flex items-center justify-between rounded border border-ipe-border px-3 py-2 text-sm">
+                  <span className="capitalize">{name.replace(/_/g, ' ')}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-ipe-text-muted">{info.detail}</span>
+                    <Badge variant={info.available ? 'success' : 'danger'}>
+                      {info.available ? 'Available' : 'Unavailable'}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
           </Card>
         </div>
       )}

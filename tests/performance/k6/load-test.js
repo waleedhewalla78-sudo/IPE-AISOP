@@ -40,9 +40,9 @@ export const options = {
   },
 };
 
-const BASE_DEMAND = __ENV.BASE_DEMAND || "http://localhost:8001";
-const BASE_MATERIAL = __ENV.BASE_MATERIAL || "http://localhost:8002";
-const BASE_CAPACITY = __ENV.BASE_CAPACITY || "http://localhost:8003";
+const BASE_DEMAND = __ENV.BASE_DEMAND || "http://localhost:8002";
+const BASE_MATERIAL = __ENV.BASE_MATERIAL || "http://localhost:8003";
+const BASE_CAPACITY = __ENV.BASE_CAPACITY || "http://localhost:8004";
 
 const DEMAND_LINES = [
   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01",

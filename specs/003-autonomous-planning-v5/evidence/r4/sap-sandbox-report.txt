@@ -1,0 +1,9 @@
+SAP Sandbox Integration Report
+Generated: 2026-06-23T03:51:28.991006+00:00
+Tenant: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+
+--- Mapper validation (offline) ---
+Mapper checks: PASS (4/4)
+--- Live sandbox: SKIPPED (SAP_ODATA_URL not set) ---
+
+OVERALL: PASS (mapper-only; live sandbox skipped)

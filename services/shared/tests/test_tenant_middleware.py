@@ -79,3 +79,6 @@ class TestTenantContextMiddleware:
         assert "/openapi.json" in TenantContextMiddleware.EXCLUDED_PATHS
         assert "/api/v1/health" in TenantContextMiddleware.EXCLUDED_PATHS
         assert "/api/v1/ready" in TenantContextMiddleware.EXCLUDED_PATHS
+        assert "/metrics" in TenantContextMiddleware.EXCLUDED_PATHS
+        assert "/health" in TenantContextMiddleware.EXCLUDED_PATHS
+        assert "/ready" in TenantContextMiddleware.EXCLUDED_PATHS

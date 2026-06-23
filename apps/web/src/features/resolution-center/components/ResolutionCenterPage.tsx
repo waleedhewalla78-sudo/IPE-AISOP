@@ -6,63 +6,14 @@ import { Table, TableHead, TableRow, TableHeader, TableCell } from '@/components
 import api from '@/lib/api';
 import type { MOWithConstraints, ResolutionScenario } from '@/types/cdm';
 
-const MOCK_MO_LIST: MOWithConstraints[] = [
-  {
-    id: 'MO-1001', product_id: 'PROD-A', quantity: 500, planned_start: '2026-07-01T08:00:00', planned_end: '2026-07-05T17:00:00',
-    feasibility_score: 45, status: 'delayed', created_at: '2026-06-20T10:00:00',
-    delay_cause: 'material_shortage', delay_confidence: 0.87,
-    constraints: [
-      { type: 'material', severity: 'critical', detail: 'Raw material X out of stock', value: 200 },
-      { type: 'capacity', severity: 'high', detail: 'Assembly line 1 at 97% utilization', value: 97 },
-    ],
-  },
-  {
-    id: 'MO-1004', product_id: 'PROD-C', quantity: 300, planned_start: '2026-06-28T08:00:00', planned_end: '2026-07-02T17:00:00',
-    feasibility_score: 33, status: 'delayed', created_at: '2026-06-18T09:00:00',
-    delay_cause: 'supplier_delay', delay_confidence: 0.92,
-    constraints: [
-      { type: 'material', severity: 'critical', detail: 'Supplier ABC missed shipment, ETA +5 days', value: 5 },
-      { type: 'labor', severity: 'medium', detail: '2 operators absent', value: 2 },
-    ],
-  },
-  {
-    id: 'MO-1008', product_id: 'PROD-D', quantity: 200, planned_start: '2026-06-30T08:00:00', planned_end: '2026-07-03T17:00:00',
-    feasibility_score: 40, status: 'at_risk', created_at: '2026-06-22T14:00:00',
-    delay_cause: 'capacity_overload', delay_confidence: 0.78,
-    constraints: [
-      { type: 'capacity', severity: 'critical', detail: 'Machining center fully booked', value: 100 },
-      { type: 'bom', severity: 'low', detail: 'Alternative BOM available', value: null },
-    ],
-  },
-];
+const SCENARIO_STATUSES: ResolutionScenario['status'][] = ['proposed', 'approved', 'rejected', 'expired'];
 
-const MOCK_SCENARIOS: ResolutionScenario[] = [
-  {
-    id: 'S-001', mo_id: 'MO-1001', strategy: 'Expedite supplier',
-    delivery_impact_days: -2, cost_impact: 1500, business_score: 0.85, status: 'proposed',
-    details: 'Pay supplier ABC expedite fee of $1,500 to deliver 3 days early',
-  },
-  {
-    id: 'S-002', mo_id: 'MO-1001', strategy: 'Substitute material',
-    delivery_impact_days: 0, cost_impact: 500, business_score: 0.72, status: 'proposed',
-    details: 'Use approved substitute material X2 with minor process adjustment',
-  },
-  {
-    id: 'S-003', mo_id: 'MO-1001', strategy: 'Reallocate capacity',
-    delivery_impact_days: 0, cost_impact: 0, business_score: 0.64, status: 'proposed',
-    details: 'Shift to Assembly line 2 with 2-day delay',
-  },
-  {
-    id: 'S-004', mo_id: 'MO-1004', strategy: 'Split order',
-    delivery_impact_days: 1, cost_impact: 800, business_score: 0.78, status: 'proposed',
-    details: 'Produce 50% now, remaining 50% when supplier material arrives',
-  },
-  {
-    id: 'S-005', mo_id: 'MO-1008', strategy: 'Overtime shift',
-    delivery_impact_days: -1, cost_impact: 2000, business_score: 0.81, status: 'proposed',
-    details: 'Add weekend overtime shift to clear machining backlog',
-  },
-];
+function parseScenarioStatus(status: unknown): ResolutionScenario['status'] {
+  const value = String(status ?? 'proposed');
+  return SCENARIO_STATUSES.includes(value as ResolutionScenario['status'])
+    ? (value as ResolutionScenario['status'])
+    : 'proposed';
+}
 
 function severityColor(severity: string): string {
   switch (severity) {
@@ -80,7 +31,86 @@ function constraintLabel(type: string): string {
 
 export function ResolutionCenterPage() {
   const [selectedMo, setSelectedMo] = useState<MOWithConstraints | null>(null);
-  const [scenarios, setScenarios] = useState<ResolutionScenario[]>(MOCK_SCENARIOS);
+  const [scenarios, setScenarios] = useState<ResolutionScenario[]>([]);
+  const [moList, setMoList] = useState<MOWithConstraints[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [financial, setFinancial] = useState<{ cogm: number; revenue: number; margin: number } | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    api.get('/api/v1/resolution/scenarios')
+      .then(res => {
+        const scenariosData = (res.data?.data?.scenarios ?? []) as Record<string, unknown>[];
+        const moMap = new Map<string, MOWithConstraints>();
+
+        scenariosData.forEach((s: Record<string, unknown>) => {
+          const moId = String(s.mo_id ?? '');
+          if (!moMap.has(moId)) {
+            moMap.set(moId, {
+              id: moId,
+              product_id: '',
+              quantity: 0,
+              planned_start: '',
+              planned_end: '',
+              feasibility_score: typeof s.business_score === 'number' ? Math.round(s.business_score * 100) : 50,
+              status: 'delayed',
+              created_at: '',
+              delay_cause: null,
+              delay_confidence: null,
+              constraints: [],
+            });
+          }
+        });
+
+        setMoList(Array.from(moMap.values()));
+        setScenarios(scenariosData.map((s: Record<string, unknown>) => ({
+          id: String(s.id ?? ''),
+          mo_id: String(s.mo_id ?? ''),
+          strategy: String(s.strategy ?? ''),
+          delivery_impact_days: typeof s.delivery_impact_days === 'number' ? s.delivery_impact_days : null,
+          cost_impact: typeof s.cost_impact === 'number' ? s.cost_impact : null,
+          business_score: typeof s.business_score === 'number' ? s.business_score : null,
+          status: parseScenarioStatus(s.status),
+          details: '',
+        })));
+      })
+      .catch(() => {
+        setMoList([]);
+        setScenarios([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedMo) {
+      setFinancial(null);
+      return;
+    }
+    api.get('/api/v1/feasibility/queue')
+      .then(async (res) => {
+        const items = (res.data?.data ?? []) as Record<string, unknown>[];
+        const match = items.find((item) => String(item.mo_id ?? item.erp_mo_id ?? '') === selectedMo.id);
+        const productId = match?.product_id;
+        if (!productId) {
+          setFinancial(null);
+          return;
+        }
+        const fin = await api.post('/api/v1/financial/project', {
+          product_id: productId,
+          quantity: Number(match?.quantity ?? 100),
+          selling_price: 500,
+        });
+        const data = fin.data?.data;
+        if (data) {
+          setFinancial({
+            cogm: Number(data.total_cost ?? 0),
+            revenue: Number(data.revenue ?? 0),
+            margin: Number(data.margin ?? 0),
+          });
+        }
+      })
+      .catch(() => setFinancial(null));
+  }, [selectedMo]);
 
   useEffect(() => {
     if (!selectedMo) return;
@@ -89,20 +119,22 @@ export function ResolutionCenterPage() {
         const fetched = res.data?.data?.scenarios;
         if (fetched && fetched.length > 0) {
           setScenarios(fetched.map((s: Record<string, unknown>) => ({
-            id: s.id, mo_id: s.mo_id, strategy: s.strategy,
-            delivery_impact_days: null, cost_impact: null,
-            business_score: s.business_score, status: s.status,
+            id: String(s.id ?? ''),
+            mo_id: String(s.mo_id ?? ''),
+            strategy: String(s.strategy ?? ''),
+            delivery_impact_days: typeof s.delivery_impact_days === 'number' ? s.delivery_impact_days : null,
+            cost_impact: typeof s.cost_impact === 'number' ? s.cost_impact : null,
+            business_score: typeof s.business_score === 'number' ? s.business_score : null,
+            status: parseScenarioStatus(s.status),
             details: '',
           })));
         }
       })
-      .catch(() => {
-        setScenarios(MOCK_SCENARIOS.filter(s => s.mo_id === selectedMo.id));
-      });
+      .catch(() => {});
   }, [selectedMo]);
 
   const filteredScenarios = scenarios.filter(s => s.mo_id === selectedMo?.id);
-  const unresolvedMos = MOCK_MO_LIST.filter(m => m.status === 'delayed' || m.status === 'at_risk');
+  const unresolvedMos = moList.filter(m => m.status === 'delayed' || m.status === 'at_risk');
 
   return (
     <div className="space-y-6">
@@ -114,7 +146,7 @@ export function ResolutionCenterPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-4">
           <Card>
-            <h3 className="mb-3 font-medium">Unresolved MOs ({unresolvedMos.length})</h3>
+            <h3 className="mb-3 font-medium">Unresolved MOs ({loading ? '...' : unresolvedMos.length})</h3>
             <div className="overflow-x-auto">
             <Table>
               <TableHead>
@@ -147,14 +179,14 @@ export function ResolutionCenterPage() {
               </tbody>
             </Table>
             </div>
-            {unresolvedMos.length === 0 && <p className="text-sm text-ipe-text-muted">No unresolved MOs.</p>}
+            {!loading && unresolvedMos.length === 0 && <p className="text-sm text-ipe-text-muted">No unresolved MOs.</p>}
           </Card>
 
           {selectedMo && (
             <Card>
               <h3 className="mb-3 font-medium">Constraints &mdash; {selectedMo.id}</h3>
               <div className="space-y-3">
-                {selectedMo.constraints.map((c, i) => (
+                {selectedMo.constraints.length > 0 ? selectedMo.constraints.map((c, i) => (
                   <div key={i} className="rounded-md border border-ipe-border p-3">
                     <div className="mb-1 flex items-center gap-2">
                       <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${severityColor(c.severity)}`}>
@@ -167,7 +199,9 @@ export function ResolutionCenterPage() {
                       <p className="mt-1 text-xs text-ipe-text-muted">Value: {c.value}</p>
                     )}
                   </div>
-                ))}
+                )) : (
+                  <p className="text-sm text-ipe-text-muted">No constraints data available for this MO.</p>
+                )}
               </div>
               {selectedMo.delay_cause && (
                 <div className="mt-3 rounded-md bg-ipe-surface-alt p-3">
@@ -189,6 +223,26 @@ export function ResolutionCenterPage() {
                   ({filteredScenarios.length} proposed)
                 </span>
               </h3>
+              {financial && (
+                <Card>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 text-sm">
+                    <div>
+                      <p className="text-xs text-ipe-text-muted">COGM (baseline)</p>
+                      <p className="font-semibold text-ipe-text">${financial.cogm.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-ipe-text-muted">Revenue at risk</p>
+                      <p className="font-semibold text-red-600">${financial.revenue.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-ipe-text-muted">Margin</p>
+                      <p className={`font-semibold ${financial.margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        ${financial.margin.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              )}
               {filteredScenarios.length === 0 ? (
                 <Card>
                   <p className="text-sm text-ipe-text-muted">No scenarios available for this MO.</p>
@@ -210,7 +264,7 @@ export function ResolutionCenterPage() {
                           )}
                         </div>
                         <p className="mb-3 text-sm text-ipe-text">{sc.details}</p>
-                        <div className="flex gap-4 text-xs text-ipe-text-muted">
+                        <div className="flex flex-wrap gap-4 text-xs text-ipe-text-muted">
                           {sc.delivery_impact_days !== null && (
                             <span className={sc.delivery_impact_days < 0 ? 'text-green-600' : 'text-red-600'}>
                               Delivery: {sc.delivery_impact_days > 0 ? '+' : ''}{sc.delivery_impact_days}d
@@ -218,8 +272,15 @@ export function ResolutionCenterPage() {
                           )}
                           {sc.cost_impact !== null && (
                             <span className={sc.cost_impact > 0 ? 'text-red-600' : 'text-green-600'}>
-                              Cost: ${sc.cost_impact.toLocaleString()}
+                              Scenario cost: ${sc.cost_impact.toLocaleString()}
                             </span>
+                          )}
+                          {financial && (
+                            <>
+                              <span>COGM: ${financial.cogm.toLocaleString()}</span>
+                              <span>Revenue: ${financial.revenue.toLocaleString()}</span>
+                              <span>Margin: ${financial.margin.toLocaleString()}</span>
+                            </>
                           )}
                         </div>
                       </div>

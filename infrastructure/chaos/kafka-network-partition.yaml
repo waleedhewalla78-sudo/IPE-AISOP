@@ -1,0 +1,25 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: kafka-network-partition
+  namespace: ipe-platform
+spec:
+  action: partition
+  mode: one
+  selector:
+    namespaces:
+      - ipe-platform
+    labelSelectors:
+      app: kafka
+  direction: both
+  target:
+    selector:
+      namespaces:
+        - ipe-platform
+      labelSelectors:
+        app: zookeeper
+    action: partition
+    mode: all
+  duration: "60s"
+  scheduler:
+    cron: "@every 6h"

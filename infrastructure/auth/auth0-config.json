@@ -1,0 +1,38 @@
+{
+  "auth": {
+    "domain": "dev-ipe.us.auth0.com",
+    "clientId": "IPE_PORTAL_CLIENT_ID",
+    "audience": "https://api.ipe.ai",
+    "scope": "openid profile email",
+    "routes": {
+      "login": "/auth/login",
+      "callback": "/auth/callback",
+      "logout": "/auth/logout"
+    }
+  },
+  "tenant_config": {
+    "allowed_orgs": ["ipe-corp", "customer-1", "customer-2"],
+    "default_role": "planner",
+    "roles": {
+      "admin": ["read:all", "write:all", "manage:users", "manage:billing"],
+      "planner": ["read:demand", "read:capacity", "write:schedule", "read:feasibility"],
+      "operator": ["read:schedule", "write:quality", "read:shop-floor"],
+      "viewer": ["read:dashboard", "read:reports"]
+    }
+  },
+  "jwt_config": {
+    "algorithm": "RS256",
+    "issuer": "https://dev-ipe.us.auth0.com/",
+    "audience": "https://api.ipe.ai",
+    "jwks_uri": "https://dev-ipe.us.auth0.com/.well-known/jwks.json"
+  },
+  "environment_variables": {
+    "AUTH0_DOMAIN": "dev-ipe.us.auth0.com",
+    "AUTH0_CLIENT_ID": "IPE_PORTAL_CLIENT_ID",
+    "AUTH0_CLIENT_SECRET": "IPE_PORTAL_CLIENT_SECRET",
+    "AUTH0_AUDIENCE": "https://api.ipe.ai",
+    "AUTH0_ISSUER": "https://dev-ipe.us.auth0.com/",
+    "JWT_USE_JWKS": "true",
+    "JWT_JWKS_URL": "https://dev-ipe.us.auth0.com/.well-known/jwks.json"
+  }
+}

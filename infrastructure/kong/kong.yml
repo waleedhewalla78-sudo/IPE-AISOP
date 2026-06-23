@@ -1,0 +1,276 @@
+_format_version: "3.0"
+_comment: "IPE Kong API Gateway declarative configuration"
+
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "http://localhost:3000"
+        - "http://localhost:5173"
+        - "http://localhost:8082"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      headers:
+        - Authorization
+        - Content-Type
+        - X-Tenant-ID
+      max_age: 3600
+      preflight_continue: false
+
+  - name: rate-limiting
+    config:
+      minute: 200
+      limit_by: consumer
+      policy: local
+      fault_tolerant: true
+      hide_client_headers: false
+
+  - name: request-size-limiting
+    config:
+      allowed_payload_size: 10
+      size_unit: megabytes
+
+services:
+  - name: dpe-svc
+    url: http://dpe-svc:8001
+    routes:
+      - name: dpe-demand-route
+        paths:
+          - /api/v1/demand
+        strip_path: false
+      - name: dpe-financial-route
+        paths:
+          - /api/v1/financial
+        strip_path: false
+      - name: dpe-health-route
+        paths:
+          - /api/v1/health
+        strip_path: false
+      - name: dpe-auth-login-route
+        paths:
+          - /api/v1/auth/login
+        strip_path: false
+      - name: dpe-auth-me-route
+        paths:
+          - /api/v1/auth/me
+        strip_path: false
+      - name: dpe-dashboard-route
+        paths:
+          - /api/v1/dashboard
+        strip_path: false
+      - name: dpe-shop-floor-route
+        paths:
+          - /api/v1/shop-floor
+        strip_path: false
+      - name: dpe-supply-chain-route
+        paths:
+          - /api/v1/supply-chain
+        strip_path: false
+      - name: dpe-admin-route
+        paths:
+          - /api/v1/admin
+        strip_path: false
+      - name: dpe-analytics-route
+        paths:
+          - /api/v1/analytics
+        strip_path: false
+      - name: dpe-ai-trust-route
+        paths:
+          - /api/v1/ai-trust
+        strip_path: false
+      - name: dpe-ctp-route
+        paths:
+          - /api/v1/ctp
+        strip_path: false
+      - name: dpe-sop-route
+        paths:
+          - /api/v1/sop
+        strip_path: false
+      - name: dpe-cost-accounting-route
+        paths:
+          - /api/v1/cost-accounting
+        strip_path: false
+      - name: dpe-dsar-route
+        paths:
+          - /api/v1/dsar
+        strip_path: false
+      - name: dpe-compliance-route
+        paths:
+          - /api/v1/compliance
+        strip_path: false
+      - name: dpe-part11-route
+        paths:
+          - /api/v1/part11
+        strip_path: false
+      - name: dpe-ml-route
+        paths:
+          - /api/v1/ml
+        strip_path: false
+      - name: dpe-kms-route
+        paths:
+          - /api/v1/kms
+        strip_path: false
+      - name: dpe-security-review-route
+        paths:
+          - /api/v1/security
+        strip_path: false
+      - name: dpe-billing-route
+        paths:
+          - /api/v1/billing
+        strip_path: false
+      - name: dpe-sla-route
+        paths:
+          - /api/v1/sla
+        strip_path: false
+      - name: dpe-notifications-route
+        paths:
+          - /api/v1/notifications
+        strip_path: false
+      - name: dpe-feature-flags-route
+        paths:
+          - /api/v1/feature-flags
+        strip_path: false
+      - name: dpe-keycloak-route
+        paths:
+          - /api/v1/keycloak
+        strip_path: false
+      - name: dpe-signals-route
+        paths:
+          - /api/v1/signals
+        strip_path: false
+
+  - name: mat-svc
+    url: http://mat-svc:8002
+    routes:
+      - name: mat-route
+        paths:
+          - /api/v1/material
+        strip_path: false
+
+  - name: cap-svc
+    url: http://cap-svc:8003
+    routes:
+      - name: cap-route
+        paths:
+          - /api/v1/capacity
+        strip_path: false
+
+  - name: res-svc
+    url: http://res-svc:8005
+    routes:
+      - name: res-route
+        paths:
+          - /api/v1/resolution
+        strip_path: false
+
+  - name: fea-svc
+    url: http://fea-svc:8004
+    routes:
+      - name: fea-route
+        paths:
+          - /api/v1/feasibility
+        strip_path: false
+      - name: fea-ws-route
+        paths:
+          - /api/v1/ws
+        strip_path: false
+
+  - name: del-svc
+    url: http://del-svc:8006
+    routes:
+      - name: del-delay-route
+        paths:
+          - /api/v1/delay
+        strip_path: false
+      - name: del-quality-route
+        paths:
+          - /api/v1/quality
+        strip_path: false
+
+  - name: rec-svc
+    url: http://rec-svc:8008
+    routes:
+      - name: rec-route
+        paths:
+          - /api/v1/reconciliation
+        strip_path: false
+
+  - name: nlp-svc
+    url: http://nlp-svc:8007
+    routes:
+      - name: nlp-copilot-route
+        paths:
+          - /api/v1/copilot
+        strip_path: false
+      - name: nlp-route
+        paths:
+          - /api/v1/nlp
+        strip_path: false
+
+  - name: alert-svc
+    url: http://alert-svc:8010
+    routes:
+      - name: alert-route
+        paths:
+          - /api/v1/alerts
+        strip_path: false
+      - name: alert-incidents-route
+        paths:
+          - /api/v1/incidents
+        strip_path: false
+
+  - name: sustain-svc
+    url: http://sustain-svc:8012
+    routes:
+      - name: sustain-route
+        paths:
+          - /api/v1/sustainability
+        strip_path: false
+
+  - name: quality-svc
+    url: http://quality-svc:8013
+    routes:
+      - name: quality-route
+        paths:
+          - /api/v1/quality-events
+        strip_path: false
+
+  - name: scn-svc
+    url: http://scn-svc:8014
+    routes:
+      - name: scn-route
+        paths:
+          - /api/v1/scn
+        strip_path: false
+
+  - name: network-svc
+    url: http://network-svc:8015
+    routes:
+      - name: network-route
+        paths:
+          - /api/v1/digital-twin
+        strip_path: false
+      - name: network-network-route
+        paths:
+          - /api/v1/network
+        strip_path: false
+
+  - name: connector
+    url: http://connector:8009
+    routes:
+      - name: connector-ipe-route
+        paths:
+          - /api/v1/ipe
+        strip_path: false
+      - name: connector-sync-route
+        paths:
+          - /api/v1/sync
+        strip_path: false
+
+consumers:
+  - username: ipe-service
+  - username: tenant-user

@@ -33,6 +33,11 @@ class RedisClient:
         await self._client.setex(key, ttl, "1")
         return False
 
+    async def check_key(self, key: str) -> bool:
+        if self._client is None:
+            return False
+        return bool(await self._client.exists(key))
+
     async def set_key(self, key: str, value: str, ttl: int = 86400):
         if self._client:
             await self._client.setex(key, ttl, value)

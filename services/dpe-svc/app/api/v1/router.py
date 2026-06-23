@@ -1,11 +1,65 @@
 from fastapi import APIRouter
 
-from app.api.v1 import admin, analytics, demand, demand_sense, health, signals
+from app.api.v1 import (
+    admin,
+    auth,
+    dashboard,
+    demo_portal,
+    ai_trust,
+    analytics,
+    billing,
+    compliance,
+    cost_accounting,
+    ctp,
+    demand,
+    demand_sense,
+    dsar,
+    financial,
+    health,
+    keycloak_config,
+    notifications,
+    feature_flags,
+    compliance_evidence,
+    part11,
+    ml_ops,
+    kms,
+    security_review,
+    signals,
+    stripe_billing,
+    sla_monitoring,
+    feature_store,
+    sop,
+    mdr,
+)
 
 api_router = APIRouter()
+api_router.include_router(auth.router)
+api_router.include_router(dashboard.router)
+api_router.include_router(demo_portal.router_shop)
+api_router.include_router(demo_portal.router_scn)
 api_router.include_router(health.router)
 api_router.include_router(demand.router)
+api_router.include_router(mdr.router)
 api_router.include_router(admin.router)
 api_router.include_router(analytics.router)
+api_router.include_router(ai_trust.router)
 api_router.include_router(demand_sense.router)
+api_router.include_router(financial.router)
+api_router.include_router(ctp.router)
+api_router.include_router(sop.router)
+api_router.include_router(cost_accounting.router)
+api_router.include_router(dsar.router)
+api_router.include_router(compliance.router)
+api_router.include_router(keycloak_config.router)
+api_router.include_router(billing.router)
+api_router.include_router(notifications.router)
 api_router.include_router(signals.router)
+api_router.include_router(feature_flags.router)
+api_router.include_router(compliance_evidence.router)
+api_router.include_router(part11.router)
+api_router.include_router(ml_ops.router)
+api_router.include_router(kms.router)
+api_router.include_router(security_review.router)
+api_router.include_router(stripe_billing.router)
+api_router.include_router(sla_monitoring.router)
+api_router.include_router(feature_store.router)

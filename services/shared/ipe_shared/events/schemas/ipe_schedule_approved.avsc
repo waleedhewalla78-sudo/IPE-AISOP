@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "ScheduleApproved",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "tenant_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "occurred_at", "type": "string"},
+    {"name": "schema_version", "type": "int", "default": 1},
+    {
+      "name": "payload",
+      "type": {
+        "type": "record",
+        "name": "ScheduleApprovedPayload",
+        "fields": [
+          {"name": "approved_by", "type": "string"},
+          {"name": "mo_ids", "type": {"type": "array", "items": "string"}},
+          {"name": "activated", "type": "string"}
+        ]
+      }
+    }
+  ]
+}

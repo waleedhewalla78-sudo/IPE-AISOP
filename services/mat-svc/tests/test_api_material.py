@@ -67,3 +67,119 @@ async def test_rule_based_atp_no_tenant(client):
     assert response.status_code == 200
     data = response.json()
     assert data["error"]["code"] == "NO_TENANT"
+
+
+@pytest.mark.asyncio
+async def test_safety_stock_no_tenant(client):
+    response = await client.post(
+        "/api/v1/material/safety-stock",
+        json={"avg_daily_demand": 100, "demand_std_dev": 20, "avg_lead_time_days": 7, "lead_time_std_dev": 2},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["error"]["code"] == "NO_TENANT"
+
+
+@pytest.mark.asyncio
+async def test_safety_stock_with_params(client):
+    response = await client.post(
+        "/api/v1/material/safety-stock",
+        json={
+            "avg_daily_demand": 100,
+            "demand_std_dev": 20,
+            "avg_lead_time_days": 7,
+            "lead_time_std_dev": 2,
+            "service_level": 0.95,
+        },
+        headers={"X-Tenant-ID": TENANT_ID},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["data"]["safety_stock_qty"] > 0
+    assert data["data"]["service_level"] == 0.95
+
+
+@pytest.mark.asyncio
+async def test_safety_stock_missing_params(client):
+    response = await client.post(
+        "/api/v1/material/safety-stock",
+        json={},
+        headers={"X-Tenant-ID": TENANT_ID},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["error"]["code"] == "MISSING_PARAMS"
+
+
+@pytest.mark.asyncio
+async def test_bulk_safety_stock_no_tenant(client):
+    response = await client.post(
+        "/api/v1/material/safety-stock/bulk",
+        json={"products": []},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["error"]["code"] == "NO_TENANT"
+
+
+@pytest.mark.asyncio
+async def test_bulk_safety_stock(client):
+    response = await client.post(
+        "/api/v1/material/safety-stock/bulk",
+        json={
+            "products": [
+                {"product_id": "P001", "avg_daily_demand": 100, "demand_std_dev": 20, "avg_lead_time_days": 7, "lead_time_std_dev": 2},
+            ],
+            "service_level": 0.95,
+        },
+        headers={"X-Tenant-ID": TENANT_ID},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert len(data["data"]["safety_stock"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_po_suggestions_no_tenant(client):
+    response = await client.post(
+        "/api/v1/material/po-suggestions",
+        json={"shortages": []},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["error"]["code"] == "NO_TENANT"
+
+
+@pytest.mark.asyncio
+async def test_po_suggestions(client):
+    response = await client.post(
+        "/api/v1/material/po-suggestions",
+        json={
+            "shortages": [
+                {
+                    "product_id": "P001",
+                    "component_name": "Widget A",
+                    "shortage_qty": 100,
+                    "avg_daily_demand": 10,
+                    "required_date": "2026-07-01",
+                }
+            ],
+            "suppliers": {
+                "P001": {
+                    "supplier_id": "S001",
+                    "supplier_name": "Acme Parts",
+                    "lead_time_days": 7,
+                    "lead_time_std_dev": 1,
+                    "unit_cost": 25.0,
+                }
+            },
+        },
+        headers={"X-Tenant-ID": TENANT_ID},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["data"]["total_suggestions"] == 1
+    assert data["data"]["total_cost"] > 0

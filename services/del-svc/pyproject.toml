@@ -3,8 +3,9 @@ name = "ipe-del-svc"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-    "ipe-shared>=0.1.0",
     "anthropic>=0.49.0",
+    "fastavro>=1.12.2",
+    "ipe-shared>=0.1.0",
 ]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -33,7 +34,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.uv.sources]
-ipe-shared = { path = "./shared", editable = true }
+ipe-shared = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -41,3 +42,5 @@ dev = [
     "pytest",
     "pytest-asyncio",
 ]
+
+

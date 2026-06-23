@@ -42,6 +42,7 @@ class TestRBACDecorator:
 
     async def test_admin_has_all_permissions(self):
         for perm in ["read", "write", "approve", "admin", "delete"]:
+
             @require_permission(perm)
             async def fake_endpoint(current_user=None):
                 return "ok"

@@ -7,5 +7,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://ipe:ipe_dev_pass@localhost:5432/ipe_dev"
     LOG_LEVEL: str = "DEBUG"
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    ML_SVC_URL: str = "http://ml-svc:8011"
+    DPE_SVC_URL: str = "http://dpe-svc:8001"
+    MAX_BOM_DEPTH: int = 5
     model_config = {"env_prefix": "IPE_", "case_sensitive": False}
 settings = Settings()

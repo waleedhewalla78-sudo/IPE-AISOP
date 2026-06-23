@@ -3,21 +3,56 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from app.core.llm_client import query_llm
-from app.core.orchestrator import _classify_intent, route_query
+from app.core.orchestrator import _classify_intent, _classify_intent_keywords, route_query
 
 
 @pytest.mark.asyncio
 async def test_query_llm_no_api_key():
     with patch("app.config.settings.ANTHROPIC_API_KEY", "sk-ant-placeholder"):
         result = await query_llm("test prompt")
-        assert result == "LLM service not configured"
+        assert "LLM" in result and ("not configured" in result or "unavailable" in result)
 
 
 @pytest.mark.asyncio
 async def test_query_llm_with_api_key_unknown_host():
     with patch("app.config.settings.ANTHROPIC_API_KEY", "sk-real-but-unknown"):
         result = await query_llm("test prompt")
-        assert "LLM error" in result
+        assert "LLM" in result
+
+
+@pytest.mark.asyncio
+async def test_classify_intent_keywords_fg_stock():
+    assert _classify_intent_keywords("What is the current FG stock?") == "material_status"
+
+
+@pytest.mark.asyncio
+async def test_route_query_uses_structured_fallback_when_llm_unavailable():
+    mock_fetcher = AsyncMock(
+        return_value={
+            "items": [
+                {
+                    "name": "Widget A",
+                    "internal_ref": "WGT-A-100",
+                    "uom": "unit",
+                    "qty_on_hand": 150,
+                    "qty_reserved": 0,
+                    "qty_available": 150,
+                }
+            ]
+        }
+    )
+    with (
+        patch("app.core.orchestrator._classify_intent", return_value="material_status"),
+        patch("app.core.orchestrator._INTENT_DATA_FETCHERS", {"material_status": mock_fetcher}),
+        patch(
+            "app.core.orchestrator.query_llm",
+            return_value="LLM error: all providers unavailable. Last error: Anthropic API key not configured",
+        ),
+    ):
+        result = await route_query("What is the current FG stock?", "tenant-1", auth_header="Bearer token")
+        assert result["intent"] == "material_status"
+        assert "Widget A" in result["response"]
+        assert "150 unit available" in result["response"]
 
 
 @pytest.mark.asyncio

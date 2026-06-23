@@ -1,0 +1,9 @@
+D365 Sandbox Integration Report
+Generated: 2026-06-23T03:51:29.256870+00:00
+IPE Tenant: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+
+--- Mapper validation (offline) ---
+Mapper + schedule payload checks: PASS (5/5)
+--- Live sandbox: SKIPPED (D365_ODATA_URL not set) ---
+
+OVERALL: PASS (mapper-only; live sandbox skipped)

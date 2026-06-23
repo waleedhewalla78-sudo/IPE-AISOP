@@ -1,14 +1,14 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class DemandType(str, Enum):
+class DemandType(StrEnum):
     MAKE_TO_ORDER = "MTO"
     MAKE_TO_STOCK = "MTS"
     CONFIGURE_TO_ORDER = "CTO"
     ENGINEER_TO_ORDER = "ETO"
 
 
-class MOStatus(str, Enum):
+class MOStatus(StrEnum):
     DRAFT = "draft"
     PLANNED = "planned"
     CONFIRMED = "confirmed"
@@ -17,7 +17,7 @@ class MOStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class WorkOrderStatus(str, Enum):
+class WorkOrderStatus(StrEnum):
     PENDING = "pending"
     SCHEDULED = "scheduled"
     IN_PROGRESS = "in_progress"
@@ -26,13 +26,13 @@ class WorkOrderStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class AutonomyMode(str, Enum):
+class AutonomyMode(StrEnum):
     SHADOW = "shadow"
     SUGGEST = "suggest"
     AUTONOMOUS = "autonomous"
 
 
-class SupplyStatus(str, Enum):
+class SupplyStatus(StrEnum):
     DRAFT = "draft"
     CONFIRMED = "confirmed"
     IN_TRANSIT = "in_transit"
@@ -41,7 +41,7 @@ class SupplyStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class DelayCategory(str, Enum):
+class DelayCategory(StrEnum):
     MATERIAL_SHORTAGE = "material_shortage"
     CAPACITY_OVERLOAD = "capacity_overload"
     LABOR_ABSENCE = "labor_absence"
@@ -52,13 +52,13 @@ class DelayCategory(str, Enum):
     OTHER = "other"
 
 
-class TenantTier(str, Enum):
+class TenantTier(StrEnum):
     STARTER = "starter"
     PROFESSIONAL = "professional"
     ENTERPRISE = "enterprise"
 
 
-class ResolutionStatus(str, Enum):
+class ResolutionStatus(StrEnum):
     PROPOSED = "proposed"
     APPROVED = "approved"
     REJECTED = "rejected"

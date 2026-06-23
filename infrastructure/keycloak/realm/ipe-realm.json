@@ -1,0 +1,142 @@
+{
+  "realm": "ipe",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": true,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 30,
+  "defaultRole": {
+    "name": "operator",
+    "description": "Default IPE operator role"
+  },
+  "roles": {
+    "realm": [
+      { "name": "admin", "description": "IPE Administrator" },
+      { "name": "planner", "description": "IPE Production Planner" },
+      { "name": "manager", "description": "IPE Manager" },
+      { "name": "supervisor", "description": "IPE Supervisor" },
+      { "name": "operator", "description": "IPE Operator" },
+      { "name": "auditor", "description": "IPE Auditor" },
+      { "name": "executive", "description": "IPE Executive" },
+      { "name": "sustainability", "description": "IPE Sustainability Analyst" },
+      { "name": "quality", "description": "IPE Quality Engineer" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "ipe-platform",
+      "name": "IPE Platform SPA",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["http://localhost:3000/*", "http://localhost:8082/*"],
+      "webOrigins": ["http://localhost:3000", "http://localhost:8082"],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "oauth2.device.authorization.grant.enabled": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "tenant-id-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "tenant_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "tenant_id",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "role-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "ipe-backend",
+      "name": "IPE Backend Services",
+      "enabled": true,
+      "publicClient": false,
+      "bearerOnly": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "attributes": {}
+    },
+    {
+      "clientId": "scim-client",
+      "name": "IPE SCIM Client",
+      "enabled": true,
+      "publicClient": false,
+      "bearerOnly": false,
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true
+    }
+  ],
+  "identityProviders": [],
+  "smtpServer": {
+    "host": "${SMTP_HOST:localhost}",
+    "port": "${SMTP_PORT:1025}",
+    "from": "ipe-noreply@example.com",
+    "starttls": false,
+    "auth": false
+  },
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@ipe.example.com",
+      "firstName": "IPE",
+      "lastName": "Admin",
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "realmRoles": ["admin"],
+      "attributes": { "tenant_id": ["a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"] }
+    },
+    {
+      "username": "planner",
+      "enabled": true,
+      "email": "planner@ipe.example.com",
+      "firstName": "Production",
+      "lastName": "Planner",
+      "credentials": [{ "type": "password", "value": "planner", "temporary": false }],
+      "realmRoles": ["planner"],
+      "attributes": { "tenant_id": ["a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"] }
+    },
+    {
+      "username": "operator",
+      "enabled": true,
+      "email": "operator@ipe.example.com",
+      "firstName": "Shop Floor",
+      "lastName": "Operator",
+      "credentials": [{ "type": "password", "value": "operator", "temporary": false }],
+      "realmRoles": ["operator"],
+      "attributes": { "tenant_id": ["a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"] }
+    }
+  ]
+}

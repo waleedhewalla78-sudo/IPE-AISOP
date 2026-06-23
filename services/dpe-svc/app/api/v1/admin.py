@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import select as sa_select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ipe_shared.auth.rbac import require_roles
 from ipe_shared.database.session import get_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.models.tenant import Tenant
@@ -23,6 +24,7 @@ class ConfigUpdate(BaseModel):
 @router.put("/config")
 async def update_config(
     req: ConfigUpdate,
+    current_user=Depends(require_roles(["admin"])),
     session: AsyncSession = Depends(get_session),
 ):
     tenant_id = tenant_ctx.get()

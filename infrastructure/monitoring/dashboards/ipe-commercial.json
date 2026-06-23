@@ -1,0 +1,64 @@
+{
+  "dashboard": {
+    "title": "IPE Commercial & Billing",
+    "uid": "ipe-commercial",
+    "tags": ["ipe", "billing", "commercial"],
+    "panels": [
+      {
+        "title": "Monthly Recurring Revenue",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(ipe_billing_mrr_cents) / 100",
+            "legendFormat": "MRR"
+          }
+        ]
+      },
+      {
+        "title": "Active Subscriptions by Tier",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+        "targets": [
+          {
+            "expr": "sum by (tier) (ipe_billing_active_subscriptions)",
+            "legendFormat": "{{tier}}"
+          }
+        ]
+      },
+      {
+        "title": "API Usage by Tenant",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+        "targets": [
+          {
+            "expr": "sum by (tenant_id) (rate(ipe_billing_api_calls_total[1h]))",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      },
+      {
+        "title": "Overage Charges",
+        "type": "bargauge",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+        "targets": [
+          {
+            "expr": "sum by (tenant_id) (ipe_billing_overage_cents) / 100",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      },
+      {
+        "title": "Notification Delivery Rate",
+        "type": "gauge",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+        "targets": [
+          {
+            "expr": "ipe_notifications_delivered / ipe_notifications_sent * 100",
+            "legendFormat": "Delivery Rate %"
+          }
+        ]
+      }
+    ]
+  }
+}

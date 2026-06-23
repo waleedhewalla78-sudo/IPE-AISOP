@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "MOCapacityScored",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "tenant_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "occurred_at", "type": "string"},
+    {"name": "schema_version", "type": "int", "default": 1},
+    {
+      "name": "payload",
+      "type": {
+        "type": "record",
+        "name": "MOCapacityScoredPayload",
+        "fields": [
+          {"name": "mo_id", "type": "string"},
+          {"name": "capacity_score", "type": "double"},
+          {"name": "solver_status", "type": "string"},
+          {"name": "bottlenecks", "type": {"type": "array", "items": "string"}, "default": []}
+        ]
+      }
+    }
+  ]
+}

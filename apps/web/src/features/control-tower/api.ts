@@ -1,22 +1,5 @@
 import api from '@/lib/api';
-import type { CapacitySummary, DashboardData, DelayAlert, DemandSummary, MORiskItem, BottleneckItem } from './types';
-
-const MOCK_RISK_QUEUE: MORiskItem[] = [
-  { id: '1', mo_id: 'MO-1001', product_name: 'Widget A', customer_name: 'Acme Corp', required_date: '2026-07-01', feasibility_score: 45, primary_constraint: 'material', status: 'new' },
-  { id: '2', mo_id: 'MO-1002', product_name: 'Gadget B', customer_name: 'Globex Inc', required_date: '2026-07-05', feasibility_score: 62, primary_constraint: 'capacity', status: 'new' },
-  { id: '3', mo_id: 'MO-1003', product_name: 'Assembly D', customer_name: 'Acme Corp', required_date: '2026-07-10', feasibility_score: 78, primary_constraint: 'labor', status: 'planned' },
-  { id: '4', mo_id: 'MO-1004', product_name: 'Component C', customer_name: 'Initech', required_date: '2026-06-28', feasibility_score: 33, primary_constraint: 'material', status: 'new' },
-  { id: '5', mo_id: 'MO-1005', product_name: 'Widget A', customer_name: 'Globex Inc', required_date: '2026-07-15', feasibility_score: 88, primary_constraint: null, status: 'confirmed' },
-  { id: '6', mo_id: 'MO-1006', product_name: 'Gadget B', customer_name: 'Initech', required_date: '2026-07-03', feasibility_score: 55, primary_constraint: 'capacity', status: 'new' },
-  { id: '7', mo_id: 'MO-1007', product_name: 'Raw Material E', customer_name: 'Acme Corp', required_date: '2026-07-20', feasibility_score: 92, primary_constraint: null, status: 'confirmed' },
-  { id: '8', mo_id: 'MO-1008', product_name: 'Assembly D', customer_name: 'Globex Inc', required_date: '2026-06-30', feasibility_score: 40, primary_constraint: 'labor', status: 'new' },
-];
-
-const MOCK_BOTTLENECKS: BottleneckItem[] = [
-  { work_center_id: 'WC001', work_center_name: 'Assembly Line 1', utilization_pct: 97, severity: 'critical' },
-  { work_center_id: 'WC002', work_center_name: 'Machining Center', utilization_pct: 89, severity: 'high' },
-  { work_center_id: 'WC003', work_center_name: 'Packaging Station', utilization_pct: 72, severity: 'medium' },
-];
+import type { CapacitySummary, DashboardData, DelayAlert, DemandSummary, MORiskItem, BottleneckItem, MOQueueItem, KPI } from './types';
 
 export async function fetchDashboardData(): Promise<DashboardData> {
   const demandsRes = { success: true, data: { demands: [] } };
@@ -32,8 +15,8 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     if (d.status === 'fulfilled') { Object.assign(demandsRes, d.value.data); }
     if (c.status === 'fulfilled') { Object.assign(capacityRes, c.value.data); }
     if (a.status === 'fulfilled') { Object.assign(alertsRes, a.value.data); }
-  } catch {
-    // fall through to empty
+  } catch (err) {
+    console.error('Failed to fetch dashboard data:', err);
   }
 
   const r = demandsRes as Record<string, unknown>;
@@ -42,11 +25,11 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   const alertData = ((alertsRes.data as Record<string, unknown>)?.alerts ?? []) as DelayAlert[];
 
   const metrics = {
-    open_demands: demands.length || 14,
-    active_mos: 8,
-    feasibility_rate: 78,
-    bottleneck_count: capData.filter(c => c.utilization_pct > 85).length || 2,
-    delay_alerts: alertData.length || 3,
+    open_demands: demands.length,
+    active_mos: 0,
+    feasibility_rate: 0,
+    bottleneck_count: capData.filter(c => c.utilization_pct > 85).length,
+    delay_alerts: alertData.length,
   };
 
   return { metrics, demands, materials: [], capacities: capData, alerts: alertData };
@@ -54,31 +37,63 @@ export async function fetchDashboardData(): Promise<DashboardData> {
 
 export async function fetchRiskQueue(): Promise<MORiskItem[]> {
   try {
-    const res = await api.get('/api/v1/resolution/scenarios');
-    const scenarios = (res.data?.data?.scenarios ?? []) as Record<string, unknown>[];
-    if (scenarios.length > 0) {
+    const res = await api.get('/api/v1/feasibility/queue');
+    const queue = (res.data?.data ?? []) as Record<string, unknown>[];
+    if (queue.length > 0) {
       const toStr = (v: unknown): string => (typeof v === 'string' ? v : '');
-      return scenarios.map((s: Record<string, unknown>) => ({
-        id: toStr(s.id),
-        mo_id: toStr(s.mo_id),
-        product_name: '',
-        customer_name: '',
-        required_date: '',
-        feasibility_score: typeof s.business_score === 'number' ? Math.round(s.business_score * 100) : 50,
-        primary_constraint: null,
-        status: toStr(s.status),
+      return queue.map((item: Record<string, unknown>, i: number) => ({
+        id: toStr(item.mo_id) || String(i),
+        mo_id: toStr(item.mo_id),
+        product_name: toStr(item.product_name),
+        customer_name: toStr(item.customer_name),
+        required_date: toStr(item.required_date),
+        feasibility_score: typeof item.feasibility_score === 'number' ? item.feasibility_score : 0,
+        primary_constraint: (item.primary_constraint as string) ?? null,
+        status: 'new',
       }));
     }
-  } catch {
-    // fall through to mock
+  } catch (err) {
+    console.error('Failed to fetch risk queue:', err);
   }
-  return getMockRiskQueue();
+  return [];
 }
 
-export function getMockRiskQueue(): MORiskItem[] {
-  return [...MOCK_RISK_QUEUE].sort((a, b) => a.feasibility_score - b.feasibility_score);
+export async function getMockBottlenecks(): Promise<BottleneckItem[]> {
+  try {
+    const res = await api.post('/api/v1/capacity/analyze');
+    const data = res.data?.data;
+    if (data?.work_centers) {
+      return data.work_centers
+        .filter((wc: any) => (wc.oee ?? 0.85) > 0.85)
+        .map((wc: any) => ({
+          work_center_id: String(wc.id),
+          work_center_name: String(wc.name),
+          utilization_pct: Math.round((wc.oee ?? 0.85) * 100),
+          severity: (wc.oee ?? 0.85) > 0.95 ? 'critical' : (wc.oee ?? 0.85) > 0.90 ? 'high' : 'medium',
+        }));
+    }
+  } catch (err) {
+    console.error('Failed to fetch bottlenecks:', err);
+  }
+  return [];
 }
 
-export function getMockBottlenecks(): BottleneckItem[] {
-  return [...MOCK_BOTTLENECKS];
+export async function fetchQueue(): Promise<MOQueueItem[]> {
+  try {
+    const res = await api.get('/api/v1/feasibility/queue');
+    return res.data?.data ?? [];
+  } catch (err) {
+    console.error('Failed to fetch feasibility queue:', err);
+    return [];
+  }
+}
+
+export async function fetchKPIs(): Promise<KPI | null> {
+  try {
+    const res = await api.get('/api/v1/feasibility/kpis');
+    return res.data?.data ?? null;
+  } catch (err) {
+    console.error('Failed to fetch KPIs:', err);
+    return null;
+  }
 }

@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     FROM_EMAIL: str = "alerts@ipe.local"
     ALERT_RECIPIENT: str = "planner@ipe.local"
+    NETWORK_SVC_URL: str = "http://network-svc:8015"
 
     model_config = {"env_prefix": "IPE_", "case_sensitive": False}
 

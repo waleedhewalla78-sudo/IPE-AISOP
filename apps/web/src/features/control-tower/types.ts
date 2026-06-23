@@ -68,3 +68,19 @@ export interface BottleneckItem {
   utilization_pct: number;
   severity: string;
 }
+
+export interface MOQueueItem {
+  mo_id: string;
+  product_name: string;
+  customer_name: string;
+  required_date: string;
+  feasibility_score: number | null;
+  primary_constraint: string | null;
+}
+
+export interface KPI {
+  avg_feasibility_score: number | null;
+  active_bottlenecks: number | null;
+  orders_at_risk: number | null;
+  otd_pct: number | null;
+}

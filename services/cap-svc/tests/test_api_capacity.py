@@ -2,6 +2,7 @@ import pytest
 
 from app.core.bottleneck import detect_bottlenecks
 from app.core.scheduler import solve_schedule
+from app.core.scheduler_cost import solve_cost_optimized
 
 INVALID_UUIDS = ["not-a-uuid", "123", "abc-def-ghi", "", "null", "None"]
 
@@ -85,3 +86,100 @@ def test_bottleneck_detection():
 
     assert len(wc2_bn) == 1
     assert wc2_bn[0]["is_bottleneck"] is False
+
+
+def test_frozen_horizon_respects_fixed_ops():
+    """Frozen operations must keep their exact start/end times."""
+    work_centers = [{"id": "WC001", "name": "Assembly", "capacity_hours_per_day": 16, "oee": 0.9}]
+    operations = [
+        {"id": "OP001", "mo_id": "MO001", "sequence": 1, "work_center_id": "WC001", "duration_planned_mins": 60, "operation_name": "Op 1", "priority_score": 0.9, "due_date_minutes": 480},
+        {"id": "OP002", "mo_id": "MO001", "sequence": 2, "work_center_id": "WC001", "duration_planned_mins": 30, "operation_name": "Op 2", "priority_score": 0.9, "due_date_minutes": 480},
+    ]
+    frozen = [
+        {"operation_id": "OP001", "fixed_start": 100, "fixed_end": 160},
+    ]
+
+    result = solve_schedule(work_centers, operations, horizon=1000, solver_timeout_seconds=10, frozen_ops=frozen)
+
+    assert result["status"] in ("OPTIMAL", "FEASIBLE")
+    op1 = [a for a in result["assignments"] if a["operation_id"] == "OP001"][0]
+    assert op1["start_minute"] == 100
+    assert op1["end_minute"] == 160
+
+
+def test_warm_start_hints_accepted():
+    """Warm start hints should not prevent a feasible solution."""
+    work_centers = [{"id": "WC001", "name": "Assembly", "capacity_hours_per_day": 16, "oee": 0.9}]
+    operations = [
+        {"id": "OP001", "mo_id": "MO001", "sequence": 1, "work_center_id": "WC001", "duration_planned_mins": 60, "operation_name": "Op 1", "priority_score": 0.9, "due_date_minutes": 480},
+        {"id": "OP002", "mo_id": "MO001", "sequence": 2, "work_center_id": "WC001", "duration_planned_mins": 30, "operation_name": "Op 2", "priority_score": 0.9, "due_date_minutes": 480},
+    ]
+
+    result = solve_schedule(work_centers, operations, horizon=1000, solver_timeout_seconds=10, warm_start={"OP001": 50, "OP002": 150})
+
+    assert result["status"] in ("OPTIMAL", "FEASIBLE")
+    assert len(result["assignments"]) == 2
+
+
+def test_frozen_and_warm_start_together():
+    """Combining frozen ops and warm start should produce a valid schedule."""
+    work_centers = [{"id": "WC001", "name": "Assembly", "capacity_hours_per_day": 16, "oee": 0.9}]
+    operations = [
+        {"id": "OP001", "mo_id": "MO001", "sequence": 1, "work_center_id": "WC001", "duration_planned_mins": 60, "operation_name": "Op 1", "priority_score": 0.9, "due_date_minutes": 480},
+        {"id": "OP002", "mo_id": "MO001", "sequence": 2, "work_center_id": "WC001", "duration_planned_mins": 30, "operation_name": "Op 2", "priority_score": 0.9, "due_date_minutes": 480},
+        {"id": "OP003", "mo_id": "MO002", "sequence": 1, "work_center_id": "WC001", "duration_planned_mins": 45, "operation_name": "Op 3", "priority_score": 0.5, "due_date_minutes": 720},
+    ]
+    frozen = [
+        {"operation_id": "OP001", "fixed_start": 0, "fixed_end": 60},
+    ]
+
+    result = solve_schedule(work_centers, operations, horizon=1000, solver_timeout_seconds=10, frozen_ops=frozen, warm_start={"OP003": 200})
+
+    assert result["status"] in ("OPTIMAL", "FEASIBLE")
+    op1 = [a for a in result["assignments"] if a["operation_id"] == "OP001"][0]
+    assert op1["start_minute"] == 0
+    assert op1["end_minute"] == 60
+
+    wc_assignments = sorted([a for a in result["assignments"] if a["work_center_id"] == "WC001"], key=lambda a: a["start_minute"])
+    for i in range(len(wc_assignments) - 1):
+        assert wc_assignments[i]["end_minute"] <= wc_assignments[i + 1]["start_minute"], "No-overlap violated with frozen ops"
+
+
+@pytest.mark.asyncio
+async def test_cost_optimized_no_tenant(client):
+    response = await client.post("/api/v1/capacity/cost-optimized", json={})
+    assert response.status_code == 200
+    assert response.json()["error"]["code"] == "NO_TENANT"
+
+
+def test_cost_optimized_solver_returns_valid():
+    work_centers = [{
+        "id": "WC001", "name": "Assembly",
+        "capacity_hours_per_day": 16, "oee": 0.9,
+        "energy_kwh_per_hour": 2.0, "cost_per_hour": 60.0,
+        "overtime_cost_multiplier": 1.5,
+    }]
+
+    operations = [
+        {"id": "OP001", "mo_id": "MO001", "sequence": 1, "work_center_id": "WC001", "duration_planned_mins": 60, "operation_name": "Op 1", "priority_score": 0.9, "due_date_minutes": 240},
+        {"id": "OP002", "mo_id": "MO001", "sequence": 2, "work_center_id": "WC001", "duration_planned_mins": 30, "operation_name": "Op 2", "priority_score": 0.9, "due_date_minutes": 240},
+    ]
+
+    tariffs = [
+        {"day_of_week": 0, "hour_start": 0, "hour_end": 23, "rate_per_kwh": 0.20},
+    ]
+
+    result = solve_cost_optimized(
+        work_centers, operations, horizon=1000,
+        solver_timeout_seconds=10, alpha=0.5, tariffs=tariffs,
+    )
+
+    assert result["status"] in ("OPTIMAL", "FEASIBLE")
+    assert len(result["assignments"]) == 2
+    assert "cost_summary" in result
+    assert "cost_breakdown" in result
+
+    wc_assignments = [a for a in result["assignments"] if a["work_center_id"] == "WC001"]
+    wc_assignments.sort(key=lambda a: a["start_minute"])
+    for i in range(len(wc_assignments) - 1):
+        assert wc_assignments[i]["end_minute"] <= wc_assignments[i + 1]["start_minute"]

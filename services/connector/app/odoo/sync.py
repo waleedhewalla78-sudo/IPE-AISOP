@@ -140,6 +140,34 @@ class SyncAdapter:
 
         return {"synced": synced, "total": len(records)}
 
+    async def sync_ai_schedule(self, mo_data: list[dict]) -> dict:
+        """Write AI schedule suggestions to Odoo shadow fields.
+
+        Args:
+            mo_data: List of dicts with keys:
+                erp_mo_id (int), ai_suggested_start (str), ai_suggested_end (str),
+                ai_schedule_version (int), ai_rationale (str, optional).
+        Returns:
+            Dict with synced count and errors.
+        """
+        synced = 0
+        errors = []
+        for entry in mo_data:
+            try:
+                erp_id = int(entry["erp_mo_id"])
+                values = {
+                    "x_ai_suggested_start": entry.get("ai_suggested_start"),
+                    "x_ai_suggested_end": entry.get("ai_suggested_end"),
+                    "x_ai_schedule_version": entry.get("ai_schedule_version", 0),
+                }
+                if entry.get("ai_rationale"):
+                    values["x_ai_rationale"] = entry["ai_rationale"]
+                self.client.write("mrp.production", [erp_id], values)
+                synced += 1
+            except Exception as e:
+                errors.append({"erp_mo_id": entry.get("erp_mo_id"), "error": str(e)})
+        return {"synced": synced, "errors": errors}
+
     async def sync_all(self) -> dict:
         products = await self.sync_products()
         demands = await self.sync_demands()

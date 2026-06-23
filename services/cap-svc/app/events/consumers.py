@@ -1,6 +1,6 @@
 import asyncio
 
-from app.events.handlers import handle_operator_absence, handle_workcenter_status_changed
+from app.events.handlers import handle_disruption_detected, handle_operator_absence, handle_workcenter_status_changed
 from ipe_shared.events.consumer import KafkaConsumer
 
 _consumer_tasks: list[asyncio.Task] = []
@@ -19,9 +19,16 @@ async def start_consumers():
         handler=handle_operator_absence,
         service_name="cap-svc",
     )
+    consumer3 = KafkaConsumer(
+        topics=["ipe.disruption.detected"],
+        group_id="cap-svc",
+        handler=handle_disruption_detected,
+        service_name="cap-svc",
+    )
     task1 = asyncio.create_task(consumer1.start())
     task2 = asyncio.create_task(consumer2.start())
-    _consumer_tasks.extend([(consumer1, task1), (consumer2, task2)])
+    task3 = asyncio.create_task(consumer3.start())
+    _consumer_tasks.extend([(consumer1, task1), (consumer2, task2), (consumer3, task3)])
 
 
 async def stop_consumers():

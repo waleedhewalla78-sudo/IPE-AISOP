@@ -52,3 +52,11 @@ class OdooClient:
         if fields:
             kwargs["fields"] = fields
         return models.execute_kw(self.db, self.uid, self.password, model, "read", [ids], kwargs)
+
+    def write(self, model: str, ids: list[int], values: dict) -> bool:
+        models = self._get_models()
+        return bool(models.execute_kw(self.db, self.uid, self.password, model, "write", [ids, values]))
+
+    def execute(self, model: str, method: str, args: list | None = None, kwargs: dict | None = None) -> Any:
+        models = self._get_models()
+        return models.execute_kw(self.db, self.uid, self.password, model, method, args or [], kwargs or {})

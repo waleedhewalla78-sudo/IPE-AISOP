@@ -1,7 +1,8 @@
 from fastapi import APIRouter
-from app.api.v1 import health, sync, action
+from app.api.v1 import activate, health, sync, action
 
 api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(sync.router)
 api_router.include_router(action.router)
+api_router.include_router(activate.router)

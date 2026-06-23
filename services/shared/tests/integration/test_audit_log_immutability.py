@@ -43,9 +43,7 @@ def test_update_on_audit_log_raises_insufficient_privilege():
 
     try:
         cur.execute("SET ROLE ipe_app")
-        cur.execute(
-            "UPDATE cdm_audit_log SET action = 'hacked' WHERE id = -1"
-        )
+        cur.execute("UPDATE cdm_audit_log SET action = 'hacked' WHERE id = -1")
         pytest.fail("UPDATE on cdm_audit_log should have been denied")
     except psycopg2.errors.InsufficientPrivilege:
         pass

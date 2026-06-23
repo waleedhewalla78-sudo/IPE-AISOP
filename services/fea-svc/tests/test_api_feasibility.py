@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock, patch
+
 from uuid import UUID
 
 import pytest
@@ -45,15 +47,30 @@ async def test_auto_confirm_no_tenant(client):
     assert response.json()["error"]["code"] == "NO_TENANT"
 
 
+@pytest.mark.asyncio
+async def test_auto_confirm_with_auth(client, auth_headers):
+    with patch("app.api.v1.feasibility.kafka_producer") as mock_kp:
+        mock_kp.send_event = AsyncMock()
+        response = await client.post(
+            "/api/v1/feasibility/auto-confirm",
+            json={"mo_id": str(UUID(int=1)), "feasibility_score": 0.9, "autonomy_mode": "suggest"},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        assert response.json()["success"] is True
+
+
 @pytest.mark.parametrize("bad_uuid", INVALID_UUIDS)
 @pytest.mark.asyncio
 async def test_auto_confirm_invalid_uuid_returns_422(bad_uuid, client):
     """Prompt 1.1: Invalid UUID in auto-confirm is rejected."""
-    response = await client.post(
-        "/api/v1/feasibility/auto-confirm",
-        json={"mo_id": bad_uuid, "feasibility_score": 0.9, "autonomy_mode": "suggest"},
-    )
-    assert response.status_code == 422
+    with patch("app.api.v1.feasibility.kafka_producer") as mock_kp:
+        mock_kp.send_event = AsyncMock()
+        response = await client.post(
+            "/api/v1/feasibility/auto-confirm",
+            json={"mo_id": bad_uuid, "feasibility_score": 0.9, "autonomy_mode": "suggest"},
+        )
+        assert response.status_code == 422
 
 
 def test_composite_score_calculation():

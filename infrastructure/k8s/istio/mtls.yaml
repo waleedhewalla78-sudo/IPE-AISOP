@@ -1,0 +1,57 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: ipe
+spec:
+  mtls:
+    mode: PERMISSIVE
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: strict-mtls
+  namespace: ipe
+spec:
+  selector:
+    matchLabels:
+      mtls-mode: strict
+  mtls:
+    mode: STRICT
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: default
+  namespace: ipe
+spec:
+  host: "*.ipe.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: ipe-ca
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ipe-mtls-cert
+  namespace: istio-system
+spec:
+  secretName: ipe-mtls-cert-secret
+  duration: 720h
+  renewBefore: 360h
+  issuerRef:
+    name: ipe-ca
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.ipe.svc.cluster.local"
+    - "ipe.local"
+  privateKey:
+    algorithm: RSA
+    size: 2048

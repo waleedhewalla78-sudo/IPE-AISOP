@@ -1,209 +1,707 @@
-version: "3.9"
-
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: ipe-postgres
+  db:
+    image: postgres:16
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_USER: ipe
-      POSTGRES_PASSWORD: ipe_dev_pass
-      POSTGRES_DB: ipe_dev
-    ports: ["5432:5432"]
+      POSTGRES_PASSWORD: ipe_test_pass
+      POSTGRES_DB: ipe_test
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
+      - ./init-airflow-db.sql:/docker-entrypoint-initdb.d/02-airflow.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ipe"]
+      test: ["CMD-SHELL", "pg_isready -U ipe -d ipe_test"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7-alpine
-    container_name: ipe-redis
-    ports: ["6379:6379"]
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.7.0
-    container_name: ipe-zookeeper
+    image: confluentinc/cp-zookeeper:7.5.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports: ["2181:2181"]
 
   kafka:
-    image: confluentinc/cp-kafka:7.7.0
-    container_name: ipe-kafka
-    depends_on: [zookeeper]
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    ports: ["9092:9092"]
-
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.7.0
-    container_name: ipe-schema-registry
-    depends_on: [kafka]
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-    ports: ["8081:8081"]
-
-  nginx:
-    image: nginx:alpine
-    container_name: ipe-nginx
-    ports:
-      - "80:80"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     depends_on:
-      - dpe-svc
-      - mat-svc
-      - cap-svc
-      - fea-svc
-      - res-svc
-      - del-svc
-      - nlp-svc
+      - zookeeper
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: ipe-kafka-ui
-    depends_on: [kafka]
-    environment:
-      KAFKA_CLUSTERS_0_NAME: ipe-local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-    ports: ["8080:8080"]
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   dpe-svc:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
+      context: ../../
       dockerfile: services/dpe-svc/Dockerfile
-    container_name: ipe-dpe-svc
+    ports:
+      - "8020:8001"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-      IPE_REDIS_URL: redis://redis:6379/0
-      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    ports: ["8012:8001"]
-    depends_on: [postgres, redis, kafka]
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   mat-svc:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
+      context: ../../
       dockerfile: services/mat-svc/Dockerfile
-    container_name: ipe-mat-svc
+    ports:
+      - "8002:8002"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-      IPE_REDIS_URL: redis://redis:6379/0
-    ports: ["8002:8002"]
-    depends_on: [postgres, redis]
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   cap-svc:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
+      context: ../../
       dockerfile: services/cap-svc/Dockerfile
-    container_name: ipe-cap-svc
+    ports:
+      - "8003:8003"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-    ports: ["8003:8003"]
-    depends_on: [postgres]
-
-  fea-svc:
-    build:
-      context: ../..
-      dockerfile: services/fea-svc/Dockerfile
-    container_name: ipe-fea-svc
-    environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-      IPE_REDIS_URL: redis://redis:6379/0
-      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    ports: ["8004:8004"]
-    depends_on: [postgres, redis, kafka]
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   res-svc:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
+      context: ../../
       dockerfile: services/res-svc/Dockerfile
-    container_name: ipe-res-svc
+    ports:
+      - "8005:8005"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-    ports: ["8005:8005"]
-    depends_on: [postgres]
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  fea-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/fea-svc/Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   del-svc:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
+      context: ../../
       dockerfile: services/del-svc/Dockerfile
-    container_name: ipe-del-svc
+    ports:
+      - "8006:8006"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-placeholder}
-    ports: ["8006:8006"]
-    depends_on: [postgres]
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+      ANTHROPIC_API_KEY: "mock_anthropic_key" # Replace with actual key for Anthropic API
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8006/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  rec-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/rec-svc/Dockerfile
+    ports:
+      - "8008:8008"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+      TENANT_ID: "default-tenant" # Placeholder, should be dynamic
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8008/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   nlp-svc:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
+      context: ../../
       dockerfile: services/nlp-svc/Dockerfile
-    container_name: ipe-nlp-svc
+    ports:
+      - "8007:8007"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-placeholder}
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+      ANTHROPIC_API_KEY: "mock_anthropic_key" # Replace with actual key for Anthropic API
+      OLLAMA_ENDPOINT_URL: http://ollama:11434
+      OLLAMA_MODEL: llama3.2
       DPE_SVC_URL: http://dpe-svc:8001
       MAT_SVC_URL: http://mat-svc:8002
       CAP_SVC_URL: http://cap-svc:8003
-    ports: ["8007:8007"]
-    depends_on: [postgres, dpe-svc, mat-svc, cap-svc]
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+      dpe-svc:
+        condition: service_started
+      mat-svc:
+        condition: service_started
+      cap-svc:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8007/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-  rec-svc:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  alert-svc:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
-      dockerfile: services/rec-svc/Dockerfile
-    container_name: ipe-rec-svc
+      context: ../../
+      dockerfile: services/alert-svc/Dockerfile
+    ports:
+      - "8010:8010"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    ports: ["8008:8008"]
-    depends_on: [postgres, redis, kafka]
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+      NETWORK_SVC_URL: http://network-svc:8015
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      network-svc:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8010/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  sustain-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/sustain-svc/Dockerfile
+    ports:
+      - "8012:8012"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8012/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  quality-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/quality-svc/Dockerfile
+    ports:
+      - "8013:8013"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8013/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  scn-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/scn-svc/Dockerfile
+    ports:
+      - "8014:8014"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8014/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ml-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/ml-svc/Dockerfile
+    ports:
+      - "8016:8016"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8016/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  network-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/network-svc/Dockerfile
+    ports:
+      - "8015:8015"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8015/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: ipe-keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/ipe_test
+      KC_DB_USERNAME: ipe
+      KC_DB_PASSWORD: ipe_test_pass
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8180:8080"
+    volumes:
+      - ../keycloak/realm/ipe-realm.json:/opt/keycloak/data/import/ipe-realm.json
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  airflow:
+    image: apache/airflow:2.9.0
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@db:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__WEBSERVER__WEB_SERVER_PORT: 8080
+      AIRFLOW__WEBSERVER__AUTHENTICATE: 'True'
+      AIRFLOW__WEBSERVER__RBAC: 'True'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+      AIRFLOW__CORE__FERNET_KEY: '81HqDtbqAywKSOumSha3BhWNOdQ26slT6K0YaZeZyPs='
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__CORE__UNIT_TEST_MODE: 'False'
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../infrastructure/airflow/dags:/opt/airflow/dags
+    command: bash -c "airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@ipe.ai 2>/dev/null || true && airflow webserver"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  airflow-scheduler:
+    image: apache/airflow:2.9.0
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@db:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: '81HqDtbqAywKSOumSha3BhWNOdQ26slT6K0YaZeZyPs='
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      IPE_DATABASE_URL_SYNC: postgresql://ipe:ipe_test_pass@db:5432/ipe_test
+    depends_on:
+      db:
+        condition: service_healthy
+      airflow:
+        condition: service_started
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../infrastructure/airflow/dags:/opt/airflow/dags
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "airflow", "jobs", "check", "--job-type", "SchedulerJob", "--hostname", "$${HOSTNAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   connector:
+    env_file:
+      - ipe-common.env
     build:
-      context: ../..
+      context: ../../
       dockerfile: services/connector/Dockerfile
-    container_name: ipe-connector
+    ports:
+      - "8011:8009"
     environment:
-      IPE_DATABASE_URL: postgresql+asyncpg://ipe:ipe_dev_pass@postgres:5432/ipe_dev
-      IPE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    ports: ["8009:8009"]
-    depends_on: [postgres, kafka]
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+      OTEL_LOGGING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8009/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: ipe-prometheus
-    volumes:
-      - prometheus_data:/prometheus
-      - ../../infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    ports: ["9091:9090"]
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: ipe-grafana
+  kong:
+    image: kong:3.7
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_INSTALL_PLUGINS: ""
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /opt/kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_PLUGINS: "bundled,ipe-tenant-strip"
+    ports:
+      - "8000:8000"
+      - "8001:8001"
     volumes:
-      - grafana_data:/var/lib/grafana
-      - ../../infrastructure/monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
-    ports: ["3002:3000"]
-    depends_on: [prometheus]
+      - ../kong/kong.yml:/opt/kong/kong.yml
+      - ../kong/plugins/ipe-tenant-strip:/usr/local/share/lua/5.1/kong/plugins/ipe-tenant-strip
+    depends_on:
+      dpe-svc:
+        condition: service_started
+      mat-svc:
+        condition: service_started
+      cap-svc:
+        condition: service_started
+      fea-svc:
+        condition: service_started
+      del-svc:
+        condition: service_started
+      res-svc:
+        condition: service_started
+      nlp-svc:
+        condition: service_started
+      rec-svc:
+        condition: service_started
+      alert-svc:
+        condition: service_started
+      connector:
+        condition: service_started
+
+  migrate:
+    build:
+      context: ../../
+      dockerfile: services/dpe-svc/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      IPE_DATABASE_URL_SYNC: postgresql://ipe:ipe_test_pass@db:5432/ipe_test
+    volumes:
+      - ../../migrations:/app/migrations
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "pip install -q alembic psycopg2-binary sqlalchemy && cd /app/migrations && alembic upgrade heads",
+      ]
+    working_dir: /app
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.96.0
+    container_name: ipe-otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ../otel/collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.54
+    container_name: ipe-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+
+  mlflow:
+    image: python:3.12-slim
+    container_name: ipe-mlflow
+    environment:
+      MLFLOW_TRACKING_URI: postgresql://ipe:ipe_test_pass@db:5432/mlflow
+      MLFLOW_DEFAULT_ARTIFACT_ROOT: /mlflow/artifacts
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow/artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["sh", "-c", "pip install mlflow psycopg2-binary && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql://ipe:ipe_test_pass@db:5432/mlflow --default-artifact-root /mlflow/artifacts"]
 
 volumes:
-  pgdata:
-  prometheus_data:
-  grafana_data:
+  db_data:
+  redis_data:
+  mlflow_data:
+  ollama_data:

@@ -1,8 +1,14 @@
 import pytest
 
 from ipe_shared.exceptions import (
-    IPEError, AuthenticationError, AuthorizationError, ValidationError,
-    NotFoundError, TenantMismatchError, DatabaseError, KafkaError,
+    IPEError,
+    AuthenticationError,
+    AuthorizationError,
+    ValidationError,
+    NotFoundError,
+    TenantMismatchError,
+    DatabaseError,
+    KafkaError,
 )
 
 

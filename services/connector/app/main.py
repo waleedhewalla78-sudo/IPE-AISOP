@@ -6,8 +6,7 @@ from ipe_shared.middleware.tenant_context import TenantContextMiddleware
 from ipe_shared.middleware.request_logging import RequestLoggingMiddleware
 from ipe_shared.middleware.error_handler import register_exception_handlers
 from ipe_shared.middleware.correlation_id import CorrelationIdMiddleware
-from ipe_shared.observability.logging import setup_logging
-from ipe_shared.observability.metrics import setup_metrics
+from ipe_shared.observability.setup import setup_observability
 from ipe_shared.database.connection import init_database, close_database
 
 from app.config import settings
@@ -17,7 +16,6 @@ from app.events.consumers import start_consumers, stop_consumers
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    setup_logging(settings.LOG_LEVEL)
     await init_database(settings.DATABASE_URL)
     await start_consumers()
     yield
@@ -41,11 +39,11 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "X-Tenant-ID"],
     )
     register_exception_handlers(app)
-    setup_metrics(app, service_name="ipe-odoo-connector")
+    setup_observability(app, service_name="connector")
     app.include_router(api_router, prefix="/api/v1")
     return app
 

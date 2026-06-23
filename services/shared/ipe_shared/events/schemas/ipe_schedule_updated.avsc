@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "ScheduleUpdated",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "tenant_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "occurred_at", "type": "string"},
+    {"name": "schema_version", "type": "int", "default": 1},
+    {
+      "name": "payload",
+      "type": {
+        "type": "record",
+        "name": "ScheduleUpdatedPayload",
+        "fields": [
+          {"name": "schedule_version", "type": "int"},
+          {"name": "affected_mo_ids", "type": {"type": "array", "items": "string"}},
+          {"name": "solver_status", "type": "string"},
+          {"name": "replan_reason", "type": ["null", "string"], "default": null}
+        ]
+      }
+    }
+  ]
+}

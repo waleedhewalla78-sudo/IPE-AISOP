@@ -1,0 +1,64 @@
+{
+  "dashboard": {
+    "title": "IPE Edge Devices",
+    "uid": "ipe-edge",
+    "tags": ["ipe", "edge", "pwa"],
+    "panels": [
+      {
+        "title": "Edge Device Status",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "count(up{job=~\"ipe-edge-.*\"})",
+            "legendFormat": "Online Devices"
+          }
+        ]
+      },
+      {
+        "title": "PWA Sync Queue",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+        "targets": [
+          {
+            "expr": "ipe_edge_sync_queue_size",
+            "legendFormat": "{{device_id}}"
+          }
+        ]
+      },
+      {
+        "title": "Offline Operation Count",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+        "targets": [
+          {
+            "expr": "ipe_edge_offline_operations_total",
+            "legendFormat": "{{device_id}}"
+          }
+        ]
+      },
+      {
+        "title": "Data Latency (edge → cloud)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(ipe_edge_sync_duration_seconds_bucket[5m])) * 1000",
+            "legendFormat": "p95 Sync Latency"
+          }
+        ]
+      },
+      {
+        "title": "Barcode Scan Success Rate",
+        "type": "gauge",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+        "targets": [
+          {
+            "expr": "ipe_edge_barcode_success_rate",
+            "legendFormat": "Success Rate"
+          }
+        ]
+      }
+    ]
+  }
+}

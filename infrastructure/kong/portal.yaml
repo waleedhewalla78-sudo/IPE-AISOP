@@ -1,0 +1,159 @@
+# Kong Developer Portal Configuration
+# Deploys Kong Portal with documentation for all IPE APIs
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: ipe-portal-ratelimit
+  namespace: kong
+plugin: rate-limiting
+config:
+  minute: 100
+  hour: 5000
+  policy: local
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: ipe-portal-cors
+  namespace: kong
+plugin: cors
+config:
+  origins:
+    - "https://portal.ipe.ai"
+    - "https://docs.ipe.ai"
+  methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+  headers:
+    - Authorization
+    - Content-Type
+    - X-Tenant-ID
+  credentials: true
+  max_age: 3600
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongService
+metadata:
+  name: ipe-portal-api
+  namespace: kong
+host: api.ipe.ai
+port: 8000
+protocol: http
+---
+# Developer Portal Content Pages
+apiVersion: configuration.konghq.com/v1beta1
+kind: PortalAuth
+metadata:
+  name: ipe-portal-auth
+  namespace: kong
+spec:
+  auth_methods:
+    - basic-auth
+    - key-auth
+  auto_approve: false
+---
+apiVersion: configuration.konghq.com/v1beta1
+kind: PortalRbacRole
+metadata:
+  name: ipe-developer
+  namespace: kong
+permissions:
+  - documents:read
+  - applications:read
+  - applications:write
+  - api_tokens:read
+  - api_tokens:write
+---
+# Portal documentation content (Markdown)
+# Create these as KongPortalDocument CRDs in production
+apiVersion: configuration.konghq.com/v1beta1
+kind: PortalDocument
+metadata:
+  name: getting-started
+  namespace: kong
+spec:
+  slug: getting-started
+  title: "Getting Started with IPE API"
+  content: |
+    # IPE API — Getting Started
+
+    ## Authentication
+    All IPE API requests require a JWT token in the `Authorization` header.
+    Obtain tokens from the `/auth/token` endpoint.
+
+    ## Base URL
+    ```
+    https://api.ipe.ai/api/v1
+    ```
+
+    ## Rate Limits
+    - **Free tier**: 100 requests/minute, 5,000/hour
+    - **Professional**: 300 requests/minute, 10,000/hour
+    - **Enterprise**: 1,000 requests/minute, 50,000/hour
+
+    ## Available Endpoints
+    | Service | Endpoint | Description |
+    |---------|----------|-------------|
+    | DPE | `POST /demand/classify` | Priority scoring |
+    | MAT | `POST /material/probabilistic-atp` | Available-to-promise |
+    | CAP | `POST /capacity/schedule` | Finite-capacity scheduling |
+    | FEA | `POST /feasibility/score` | Feasibility scoring |
+    | RES | `POST /resolution/scenarios` | Resolution workflow |
+    | NLP | `POST /copilot/chat` | AI Copilot |
+  published: true
+---
+apiVersion: configuration.konghq.com/v1beta1
+kind: PortalDocument
+metadata:
+  name: demand-planning
+  namespace: kong
+spec:
+  slug: demand-planning-api
+  title: "Demand Planning API Reference"
+  content: |
+    # Demand Planning Engine (DPE) API
+
+    ## POST /demand/classify
+    Score demand lines with priority and XAI explanation.
+
+    **Request Body:**
+    ```json
+    {
+      "demand_lines": [
+        {
+          "id": "uuid",
+          "customer_id": "uuid",
+          "product_id": "uuid",
+          "quantity": 100,
+          "due_date": "2026-07-01"
+        }
+      ]
+    }
+    ```
+
+    **Response:**
+    ```json
+    {
+      "success": true,
+      "data": {
+        "scored_lines": [...],
+        "priority_breakdown": {...}
+      }
+    }
+    ```
+  published: true
+---
+# API key management
+apiVersion: configuration.konghq.com/v1beta1
+kind: Consumer
+metadata:
+  name: portal-anonymous
+  namespace: kong
+username: anonymous
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 30
+      policy: local

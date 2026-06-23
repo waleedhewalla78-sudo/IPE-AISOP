@@ -2,7 +2,12 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from uuid import uuid4
 
-from app.core.reconciliation import analyze_mo_completion
+from app.core.reconciliation import (
+    analyze_mo_completion,
+    build_retrain_payload,
+    calculate_prediction_drift,
+    should_trigger_retrain,
+)
 
 
 def _make_mo(
@@ -32,6 +37,16 @@ def _make_wo(duration_planned_mins=60, duration_actual_mins=None, status="comple
     wo.duration_actual_mins = duration_actual_mins
     wo.status = status
     return wo
+
+
+def _make_prediction(predicted_mins, actual_mins, mae_30d=None):
+    p = type("FakePred", (), {})()
+    p.id = uuid4()
+    p.predicted_duration_mins = predicted_mins
+    p.actual_duration_mins = actual_mins
+    p.mae_30d = mae_30d
+    p.created_at = datetime.now(UTC)
+    return p
 
 
 def test_time_variance_calculated_correctly():
@@ -106,3 +121,72 @@ def test_completed_work_order_count():
     result = analyze_mo_completion(mo, wos)
     assert result["completed_work_orders"] == 2
     assert result["total_work_orders"] == 3
+
+
+def test_drift_empty_predictions():
+    result = calculate_prediction_drift([])
+    assert result["mae"] == 0.0
+    assert result["drift_detected"] is False
+    assert result["sample_count"] == 0
+
+
+def test_drift_no_baseline():
+    preds = [_make_prediction(100, 110, mae_30d=None)]
+    result = calculate_prediction_drift(preds)
+    assert result["mae"] == 10.0
+    assert result["drift_detected"] is False
+    assert result["baseline_mae"] is None
+
+
+def test_drift_within_threshold():
+    preds = [_make_prediction(100, 109, mae_30d=10.0)]
+    result = calculate_prediction_drift(preds)
+    assert result["mae"] == 9.0
+    assert result["drift_detected"] is False
+    assert result["drift_pct"] == -10.0
+
+
+def test_drift_exceeds_threshold():
+    preds = [_make_prediction(100, 125, mae_30d=10.0)]
+    result = calculate_prediction_drift(preds)
+    assert result["mae"] == 25.0
+    assert result["drift_detected"] is True
+    assert result["drift_pct"] == 150.0
+
+
+def test_drift_multiple_predictions():
+    preds = [
+        _make_prediction(100, 110, mae_30d=5.0),
+        _make_prediction(200, 220, mae_30d=5.0),
+        _make_prediction(150, 165, mae_30d=5.0),
+    ]
+    result = calculate_prediction_drift(preds)
+    assert result["sample_count"] == 3
+    assert result["mae"] == 15.0
+    assert result["drift_detected"] is True
+
+
+def test_should_trigger_retrain_drift_detected():
+    result = {"drift_detected": True, "sample_count": 50}
+    assert should_trigger_retrain(result) is True
+
+
+def test_should_trigger_retrain_insufficient_samples():
+    result = {"drift_detected": True, "sample_count": 20}
+    assert should_trigger_retrain(result) is False
+
+
+def test_should_trigger_retrain_no_drift():
+    result = {"drift_detected": False, "sample_count": 50}
+    assert should_trigger_retrain(result) is False
+
+
+def test_build_retrain_payload():
+    drift = {"mae": 15.0, "drift_pct": 200.0, "baseline_mae": 5.0}
+    records = [{"product_id": "P1", "duration_planned_mins": 60, "duration_actual_mins": 75}]
+    payload = build_retrain_payload(drift, records)
+    assert payload["trigger_reason"] == "drift_detection"
+    assert payload["drift_mae"] == 15.0
+    assert payload["drift_pct"] == 200.0
+    assert payload["baseline_mae"] == 5.0
+    assert len(payload["historical_records"]) == 1

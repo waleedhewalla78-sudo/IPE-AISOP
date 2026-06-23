@@ -1,7 +1,5 @@
 import pytest
-from ipe_shared.constants import (
-    DemandType, MOStatus, AutonomyMode, DelayCategory, TenantTier
-)
+from ipe_shared.constants import DemandType, MOStatus, AutonomyMode, DelayCategory, TenantTier
 
 
 class TestConstants:

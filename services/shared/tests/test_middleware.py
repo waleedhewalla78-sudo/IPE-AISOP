@@ -52,5 +52,3 @@ class TestErrorHandler:
         app = MagicMock()
         register_exception_handlers(app)
         assert app.exception_handler.call_count == 2
-
-

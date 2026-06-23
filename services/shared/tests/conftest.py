@@ -1,3 +1,11 @@
+import os
+
+# Must be set before ipe_shared.config/settings loads (JWT tests require non-empty secret).
+os.environ.setdefault(
+    "IPE_JWT_SECRET_KEY",
+    "dev-jwt-secret-change-in-production-min-32-chars",
+)
+
 import pytest
 from uuid import uuid4
 from httpx import AsyncClient, ASGITransport
@@ -11,6 +19,7 @@ TEST_USER_ID = uuid4()
 @pytest.fixture(scope="session")
 def event_loop():
     import asyncio
+
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()

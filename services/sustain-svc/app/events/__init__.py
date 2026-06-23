@@ -1,0 +1,6 @@
+from ipe_shared.middleware.correlation_id import CorrelationIdMiddleware
+from ipe_shared.middleware.error_handler import register_exception_handlers
+from ipe_shared.middleware.request_logging import RequestLoggingMiddleware
+from ipe_shared.middleware.tenant_context import TenantContextMiddleware
+from ipe_shared.observability.logging import setup_logging
+from ipe_shared.observability.metrics import setup_metrics

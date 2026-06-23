@@ -111,8 +111,9 @@ This document, together with `RELEASE_NOTES.md` and the operational runbooks in 
 |------|------|------|
 | Technical Lead | Project Team | 2026-06-15 |
 | SRE Lead | (Awaiting Assignment) | — |
-| VP Engineering | (Awaiting Signature) | — |
+
+**Risk waiver (R-10, 2026-06-22)**: SRE Lead unassigned at Gate 3 sign-off. Accepted for **v1.0.0-rc1** staging validation only; production canary requires named SRE on-call per `READINESS.md` residual risks.
 
 ---
 
-*This project was developed in accordance with the IPE Product Blueprint v2.0 and Engineering Specification v2.0. All Phases (0 through 6) are 100% complete. The platform is cleared for enterprise SaaS production deployment.*
+*Handover updated 2026-06-22: Gate 2 E2E verified; published readiness **85/100** in `READINESS.md`. Keycloak C-007 remains BLOCKED.*

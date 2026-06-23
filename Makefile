@@ -1,4 +1,4 @@
-.PHONY: help setup dev test lint format migrate seed clean docker-up docker-down perf-test perf-k6 e2e-test integration-e2e shadow-validate docker-test-up docker-test-down mock-odoo-build
+.PHONY: help setup dev test lint format migrate seed clean docker-up docker-down perf-test perf-k6 perf-k6-200 r4-verify e2e-test integration-e2e integration-unit shadow-validate docker-test-up docker-test-down mock-odoo-build
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -15,7 +15,7 @@ dev: docker-up ## Start full development stack
 docker-up: ## Start Docker infrastructure
 	docker compose -f infrastructure/docker/docker-compose.yml up -d
 	@echo "Waiting for Postgres..."
-	@until docker compose -f infrastructure/docker/docker-compose.yml exec -T postgres pg_isready; do sleep 1; done
+	@until docker compose -f infrastructure/docker/docker-compose.yml exec -T db pg_isready; do sleep 1; done
 	@echo "Infrastructure ready."
 
 docker-down: ## Stop Docker infrastructure
@@ -43,6 +43,14 @@ perf-test: ## Run Locust performance test (50 users, 2 min)
 perf-k6: ## Run k6 performance load test (smoke + load scenarios)
 	k6 run tests/performance/k6/load-test.js
 
+perf-k6-200: ## Run k6 200 VU re-cert (R4 SC-012 gate)
+	k6 run tests/performance/k6/load-test-200vu.js
+
+r4-verify: ## Run R4 production hardening checks (SAP/D365/Airflow)
+	bash scripts/test-sap-sandbox.sh
+	bash scripts/test-d365-sandbox.sh
+	bash scripts/verify-airflow.sh
+
 e2e-test: ## Run E2E critical path validation
 	uv run python scripts/e2e/critical_path_test.py
 
@@ -58,6 +66,10 @@ test: ## Run all tests
 integration-e2e: docker-test-up seed ## Run integration + E2E tests against test stack
 	uv run python scripts/e2e/critical_path_test.py
 	uv run python tests/integration/test_rbac_tenant_isolation.py
+
+integration-unit: ## Run integration unit tests (Redis/Kafka/WS mocks, auto-skip if infra unavailable)
+	cd services/shared && uv run pytest tests/integration/ -v --tb=short
+	uv run pytest tests/integration/test_idempotency.py tests/integration/test_consumer_rls.py tests/integration/test_mesh_tenant_isolation.py tests/integration/test_consumer_robustness.py tests/integration/test_ws_tenant_isolation.py tests/integration/test_ws_security.py -v --tb=short -m integration
 
 shadow-validate: ## Run shadow mode E2E validation pipeline
 	bash scripts/e2e/run_shadow_validation.sh

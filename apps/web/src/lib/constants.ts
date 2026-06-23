@@ -4,9 +4,16 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 export const ROUTES = {
   LOGIN: '/login',
   CONTROL_TOWER: '/control-tower',
+  SCHEDULE: '/schedule',
   RESOLUTION_CENTER: '/resolution-center',
   COPILOT: '/copilot',
+  EXECUTIVE: '/executive',
+  WAR_ROOM: '/war-room',
+  AI_TRUST: '/ai-trust',
   SHOP_FLOOR: '/shop-floor',
+  SCN_PORTAL: '/scn-portal',
+  ML_OPS: '/ml-ops',
+  ONBOARDING: '/onboarding',
   ADMIN: '/admin',
 } as const;
 
