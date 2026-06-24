@@ -1,11 +1,14 @@
 from uuid import UUID
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from sqlalchemy import select as sa_select
+from sqlalchemy import select as sa_select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.priority import compute_priority_score
+from app.core.margin_priority import compute_margin_priorities_for_mos
+from app.core.tariff_shock import get_tariff_exposure, run_tariff_shock
 from ipe_shared.auth.rbac import require_roles
 from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.events.producer import kafka_producer
@@ -21,6 +24,18 @@ router = APIRouter(prefix="/demand", tags=["demand"])
 
 class ClassifyRequest(BaseModel):
     demand_line_ids: list[UUID] | None = None
+
+
+class TariffShockRequest(BaseModel):
+    region: str
+    tariff_delta_pct: float
+    margin_threshold_pct: float = 15.0
+
+
+class SubstituteDraftRequest(BaseModel):
+    mo_id: UUID
+    from_material_id: UUID
+    to_material_id: UUID
 
 
 async def _get_tenant_config(session: AsyncSession, tenant_id: str) -> dict:
@@ -121,6 +136,157 @@ async def classify_demand(
     ).model_dump()
 
     return APIResponse(success=True, data={"results": results, "xai_explanation": xai}, error=None)
+
+
+@router.get("/priority/margin-aware")
+async def get_margin_aware_priority(
+    session: AsyncSession = Depends(get_db_session),
+    mo_ids: str | None = None,
+    current_user=Depends(require_roles(["admin", "planner", "manager"])),
+):
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(
+            success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"}
+        )
+
+    parsed_mo_ids: list[UUID] | None = None
+    if mo_ids:
+        parsed_mo_ids = [UUID(x.strip()) for x in mo_ids.split(",") if x.strip()]
+
+    priorities, warnings = await compute_margin_priorities_for_mos(
+        session, UUID(tenant_id), parsed_mo_ids
+    )
+
+    return APIResponse(
+        success=True,
+        data={
+            "priorities": [
+                {
+                    "mo_id": p.mo_id,
+                    "base_priority_score": p.base_priority_score,
+                    "margin_adjusted_score": p.margin_adjusted_score,
+                    "net_margin_usd": p.net_margin_usd,
+                    "activity_overhead_usd": p.activity_overhead_usd,
+                    "data_quality": p.data_quality,
+                }
+                for p in priorities
+            ],
+            "warnings": warnings,
+        },
+        error=None,
+    )
+
+
+@router.post("/tariff/shock")
+async def post_tariff_shock(
+    req: TariffShockRequest,
+    session: AsyncSession = Depends(get_db_session),
+    current_user=Depends(require_roles(["admin", "planner"])),
+):
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(
+            success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"}
+        )
+
+    result = await run_tariff_shock(
+        session,
+        UUID(tenant_id),
+        region=req.region,
+        tariff_delta_pct=req.tariff_delta_pct,
+        margin_threshold_pct=req.margin_threshold_pct,
+    )
+
+    envelope = kafka_producer.build_envelope(
+        event_type="ipe.tariff.shock",
+        tenant_id=tenant_id,
+        payload={
+            "region": req.region,
+            "delta_pct": req.tariff_delta_pct,
+            "affected_mo_ids": result.get("affected_mo_ids", []),
+            "timestamp": datetime.now(UTC).isoformat(),
+        },
+    )
+    await kafka_producer.send_avro(
+        topic="ipe.tariff.shock",
+        key=tenant_id,
+        envelope=envelope,
+    )
+    await session.commit()
+
+    return APIResponse(success=True, data=result, error=None)
+
+
+@router.get("/tariff/exposure")
+async def get_tariff_exposure_endpoint(
+    session: AsyncSession = Depends(get_db_session),
+    current_user=Depends(require_roles(["admin", "planner", "manager"])),
+):
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(
+            success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"}
+        )
+
+    rows = await get_tariff_exposure(session, UUID(tenant_id))
+    return APIResponse(
+        success=True,
+        data={
+            "exposure": [
+                {
+                    "region": r.region,
+                    "material_count": r.material_count,
+                    "mo_count": r.mo_count,
+                    "total_exposure_usd": r.total_exposure_usd,
+                }
+                for r in rows
+            ]
+        },
+        error=None,
+    )
+
+
+@router.post("/tariff/substitute-draft")
+async def post_substitute_draft(
+    req: SubstituteDraftRequest,
+    session: AsyncSession = Depends(get_db_session),
+    current_user=Depends(require_roles(["admin", "planner"])),
+):
+    """Enqueue BOM substitution draft for connector — no autonomous ERP write."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(
+            success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"}
+        )
+
+    payload = {
+        "mo_id": str(req.mo_id),
+        "from_material_id": str(req.from_material_id),
+        "to_material_id": str(req.to_material_id),
+        "status": "pending_approval",
+        "requested_by": getattr(current_user, "sub", "planner"),
+    }
+    await session.execute(
+        text("""
+            INSERT INTO cdm_export_queue
+                (tenant_id, payload, event_type, status, retry_count)
+            VALUES
+                (:tid, :payload, :evt, 'pending', 0)
+        """),
+        {
+            "tid": UUID(tenant_id),
+            "payload": payload,
+            "evt": "ipe.tariff.substitute_draft",
+        },
+    )
+    await session.commit()
+
+    return APIResponse(
+        success=True,
+        data={"draft": payload, "status": "pending_approval"},
+        error=None,
+    )
 
 
 @router.get("/queue")

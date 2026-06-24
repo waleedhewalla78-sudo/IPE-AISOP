@@ -14,14 +14,15 @@ from app.core.copilot_tools import (
 
 class TestToolDefinitions:
     def test_all_tools_defined(self):
-        assert len(TOOL_DEFINITIONS) == 3
+        assert len(TOOL_DEFINITIONS) == 4
         tool_names = {t["name"] for t in TOOL_DEFINITIONS}
         assert "get_order_status" in tool_names
         assert "get_resource_utilization" in tool_names
         assert "simulate_disruption" in tool_names
+        assert "get_war_room_recovery" in tool_names
 
     def test_all_handlers_registered(self):
-        assert len(TOOL_HANDLERS) == 3
+        assert len(TOOL_HANDLERS) == 4
         for tool in TOOL_DEFINITIONS:
             assert tool["name"] in TOOL_HANDLERS
 

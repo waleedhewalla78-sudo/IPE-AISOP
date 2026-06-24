@@ -8,6 +8,7 @@ from app.events.handlers import (
     handle_reconciliation_completed,
     handle_resolution_approved,
     handle_schedule_approved,
+    handle_tariff_shock,
 )
 from ipe_shared.events.consumer import KafkaConsumer
 
@@ -56,6 +57,12 @@ async def start_consumers():
             topics=["ipe.schedule.approved"],
             group_id="ipe-odoo-connector",
             handler=handle_schedule_approved,
+            service_name="ipe-odoo-connector",
+        ),
+        KafkaConsumer(
+            topics=["ipe.tariff.shock"],
+            group_id="ipe-odoo-connector",
+            handler=handle_tariff_shock,
             service_name="ipe-odoo-connector",
         ),
     ]

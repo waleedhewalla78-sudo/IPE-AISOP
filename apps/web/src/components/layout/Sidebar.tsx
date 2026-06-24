@@ -8,6 +8,8 @@ const NAV_ITEMS = [
   { to: ROUTES.RESOLUTION_CENTER, label: 'Resolution Center', icon: '🔧' },
   { to: ROUTES.COPILOT, label: 'Copilot', icon: '🤖' },
   { to: ROUTES.EXECUTIVE, label: 'Executive', icon: '📈' },
+  { to: ROUTES.COST_OF_CHAOS, label: 'Cost of Chaos', icon: '💸' },
+  { to: ROUTES.TARIFF, label: 'Tariff', icon: '🌐' },
   { to: ROUTES.WAR_ROOM, label: 'War Room', icon: '🚨' },
   { to: ROUTES.AI_TRUST, label: 'AI Trust', icon: '🛡️' },
   { to: ROUTES.SHOP_FLOOR, label: 'Shop Floor', icon: '🏭' },

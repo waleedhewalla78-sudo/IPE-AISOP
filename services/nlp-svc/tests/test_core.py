@@ -3,21 +3,28 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from app.core.llm_client import query_llm
+from app.core.llm_errors import LLMUnavailableError
 from app.core.orchestrator import _classify_intent, _classify_intent_keywords, route_query
 
 
 @pytest.mark.asyncio
 async def test_query_llm_no_api_key():
-    with patch("app.config.settings.ANTHROPIC_API_KEY", "sk-ant-placeholder"):
-        result = await query_llm("test prompt")
-        assert "LLM" in result and ("not configured" in result or "unavailable" in result)
+    with (
+        patch("app.config.settings.ANTHROPIC_API_KEY", "sk-ant-placeholder"),
+        patch("app.config.settings.LLM_ROUTING_ENABLED", False),
+    ):
+        with pytest.raises(LLMUnavailableError):
+            await query_llm("test prompt")
 
 
 @pytest.mark.asyncio
 async def test_query_llm_with_api_key_unknown_host():
-    with patch("app.config.settings.ANTHROPIC_API_KEY", "sk-real-but-unknown"):
-        result = await query_llm("test prompt")
-        assert "LLM" in result
+    with (
+        patch("app.config.settings.ANTHROPIC_API_KEY", "sk-real-but-unknown"),
+        patch("app.config.settings.LLM_ROUTING_ENABLED", False),
+    ):
+        with pytest.raises(LLMUnavailableError):
+            await query_llm("test prompt")
 
 
 @pytest.mark.asyncio

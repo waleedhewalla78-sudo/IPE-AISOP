@@ -225,3 +225,55 @@ VALUES
   ('a3eebc99-9c0b-4ef8-bb6d-6bb9bd380003', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'd1eebc99-9c0b-4ef8-bb6d-6bb9bd380005', 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c05',
    (SELECT id FROM cdm_work_center WHERE erp_source_id='WC003' AND tenant_id='a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
    (SELECT id FROM cdm_operator WHERE erp_source_id='OP003' AND tenant_id='a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'), 20, 'pending');
+
+-- V6-R1: Activity cost drivers (Widget A high margin, Gadget B lower after overhead)
+DELETE FROM cdm_activity_cost_drivers
+WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+
+INSERT INTO cdm_activity_cost_drivers (tenant_id, product_id, setup_mins, overtime_rate_usd_per_hr, expedite_cost_per_unit, overhead_pct)
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 12, 85.00, 0.50, 0.08
+FROM cdm_product p
+WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD001';
+
+INSERT INTO cdm_activity_cost_drivers (tenant_id, product_id, setup_mins, overtime_rate_usd_per_hr, expedite_cost_per_unit, overhead_pct)
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 45, 120.00, 3.50, 0.22
+FROM cdm_product p
+WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD002';
+
+INSERT INTO cdm_activity_cost_drivers (tenant_id, product_id, setup_mins, overtime_rate_usd_per_hr, expedite_cost_per_unit, overhead_pct)
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 25, 95.00, 1.25, 0.15
+FROM cdm_product p
+WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD004';
+
+-- V6-R2: Material attributes (Region_X, HS-8471), landed cost profiles, substitute mapping
+DELETE FROM cdm_material_attributes
+WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+
+DELETE FROM cdm_landed_cost_profiles
+WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+
+INSERT INTO cdm_material_attributes (tenant_id, material_id, attributes)
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id,
+  '{"origin_region": "Region_X", "tariff_code": "HS-8471", "carbon_intensity_kg": 12.4}'::jsonb
+FROM cdm_product p
+WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD003';
+
+INSERT INTO cdm_material_attributes (tenant_id, material_id, attributes)
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id,
+  '{"origin_region": "Region_X", "tariff_code": "HS-8471", "carbon_intensity_kg": 8.2, "substitute_for": "PROD003"}'::jsonb
+FROM cdm_product p
+WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD005';
+
+INSERT INTO cdm_landed_cost_profiles (tenant_id, region, base_cost_usd, freight_usd, tariff_pct, risk_premium_pct)
+VALUES
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Region_X', 10.00, 1.50, 20.0, 7.5);
+
+UPDATE cdm_tenant
+SET config = COALESCE(config, '{}'::jsonb) || jsonb_build_object(
+  'substitute_materials',
+  jsonb_build_object(
+    (SELECT id::text FROM cdm_product WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND erp_source_id = 'PROD003'),
+    (SELECT id::text FROM cdm_product WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND erp_source_id = 'PROD005')
+  )
+)
+WHERE id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';

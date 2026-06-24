@@ -77,8 +77,23 @@ async def receive_odoo_action(request: Request):
         except Exception:
             body = {"raw": body_bytes.decode("utf-8", errors="replace")}
 
-        action = body.get("action", "unknown")
+        action = body.get("action", body.get("action_type", "unknown"))
         logger.info("Odoo action received: %s for tenant %s", action, tenant_id)
+
+        if action == "sync_routing_correction":
+            payload = body.get("data") or body.get("payload") or {}
+            return APIResponse(
+                success=True,
+                data={
+                    "action": action,
+                    "status": "stub_received",
+                    "routing_id": payload.get("routing_id"),
+                    "operation_id": payload.get("operation_id"),
+                    "deviation_pct": payload.get("deviation_pct"),
+                    "approval_status": payload.get("status", "pending_approval"),
+                },
+                error=None,
+            )
 
         return APIResponse(
             success=True,

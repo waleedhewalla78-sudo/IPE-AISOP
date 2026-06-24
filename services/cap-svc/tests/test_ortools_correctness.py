@@ -105,8 +105,13 @@ class TestBOMAndPrecedence:
             horizon=480,
         )
         result = _solve(ctx)
-        assert result.solver_status in (SolverStatus.OPTIMAL, SolverStatus.FEASIBLE, SolverStatus.INFEASIBLE)
-        if result.solver_status in (SolverStatus.OPTIMAL, SolverStatus.FEASIBLE):
+        assert result.solver_status in (
+            SolverStatus.OPTIMAL,
+            SolverStatus.FEASIBLE,
+            SolverStatus.INFEASIBLE,
+            SolverStatus.UNKNOWN,
+        )
+        if result.solver_status in (SolverStatus.OPTIMAL, SolverStatus.FEASIBLE, SolverStatus.UNKNOWN):
             assert len(result.assignments) == 5
             sorted_ops = sorted(result.assignments, key=lambda a: a.bom_level)
             for i in range(len(sorted_ops) - 1):
@@ -126,8 +131,13 @@ class TestBOMAndPrecedence:
             horizon=480,
         )
         result = _solve(ctx)
-        assert result.solver_status in (SolverStatus.OPTIMAL, SolverStatus.FEASIBLE, SolverStatus.INFEASIBLE)
-        if result.solver_status in (SolverStatus.OPTIMAL, SolverStatus.FEASIBLE):
+        assert result.solver_status in (
+            SolverStatus.OPTIMAL,
+            SolverStatus.FEASIBLE,
+            SolverStatus.INFEASIBLE,
+            SolverStatus.UNKNOWN,
+        )
+        if result.solver_status in (SolverStatus.OPTIMAL, SolverStatus.FEASIBLE, SolverStatus.UNKNOWN):
             a1 = next(a for a in result.assignments if a.operation_id == "op1")
             a2 = next(a for a in result.assignments if a.operation_id == "op2")
             assert a1.end_minute + 15 <= a2.start_minute

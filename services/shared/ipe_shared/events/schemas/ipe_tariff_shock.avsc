@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "TariffShock",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "tenant_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "occurred_at", "type": "string"},
+    {"name": "schema_version", "type": "int", "default": 1},
+    {
+      "name": "payload",
+      "type": {
+        "type": "record",
+        "name": "TariffShockPayload",
+        "fields": [
+          {"name": "region", "type": "string"},
+          {"name": "delta_pct", "type": "double"},
+          {"name": "affected_mo_ids", "type": {"type": "array", "items": "string"}},
+          {"name": "timestamp", "type": "string"}
+        ]
+      }
+    }
+  ]
+}

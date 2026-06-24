@@ -1,6 +1,33 @@
 # IPE Platform — Speckit Checklist
 
-**Generated**: 2026-06-21 | **Platform**: IPE v1.0.0 | **Overall**: 38/39 tasks DONE, 1 BLOCKED
+**Generated**: 2026-06-23 | **Platform**: IPE v6.0.0-ready | **Overall**: 004 54/55 DONE, REL demo pending
+
+---
+
+## Speckit Pipeline (2026-06-23)
+
+| Phase | Artifact | Status |
+|-------|----------|--------|
+| specify | `005-ipe-program-status/spec.md` | ✅ Updated |
+| clarify | `005/clarify.md`, `004/clarify-v6.md` | ✅ |
+| analyze | `005/analyze.md`, `004/analyze-v6.md` | ✅ |
+| plan | `005/plan.md`, `004/plan.md` | ✅ |
+| tasks | `005/tasks.md`, `004/tasks-release.md` | ✅ |
+| taskstoissues | `004/GITHUB_ISSUES.md` + script | ✅ templates |
+| implement | launch-verify **10/10** | ⚠️ REL-STACK blocked (Docker Desktop) |
+
+## V6.0 Convergence (004) — ✅ 54/55
+
+| Phase | Tasks | Status | Demo CP |
+|-------|-------|--------|---------|
+| V6-R1 ABP | 15/15 | ✅ | 17 |
+| V6-R2 Tariff | 13/13 | ✅ | 18 |
+| V6-R3 CPM | 8/8 | ✅ | 19 |
+| V6-R4 Maint | 9/9 | ✅ | 20 |
+| V6-R5 Chaos | 9/10 | ✅ | 20 |
+| **Open** | T055 tag | ⬜ pending | — |
+
+**Readiness**: 96/100 — see `READINESS.md`, `specs/004-ai-first-v6/converge-v6.md`
 
 ---
 
@@ -12,7 +39,9 @@
 | Open Issues | 35 | 26 | 2 | 0 | 7 (deferred) |
 | Quality FRs | 59 | 48 | 4 | 0 | 7 |
 | Risks | 13 | 7 | 2 | 0 | 4 (open) |
-| Cross-Artifact | 29 | 0 | 0 | 0 | 29 (inconsistencies) |
+| Cross-Artifact | 29 | 7 resolved (V6) | 0 | 0 | 22 (legacy M1–M14) |
+
+**V6 drift (2026-06-21)**: Resolved in repo — 005/spec 54/55, implementation-tracker ✅, launch-verify 10/10. Live demo + T055 tag still open.
 
 ---
 

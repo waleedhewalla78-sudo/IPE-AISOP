@@ -9,11 +9,14 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ipe_shared.audit.service import log_audit_event
 from ipe_shared.events.producer import kafka_producer
 from ipe_shared.models.manufacturing_order import ManufacturingOrder
 from ipe_shared.models.routing import RoutingOperation
 from ipe_shared.models.work_center import WorkCenter
 from ipe_shared.models.work_order import WorkOrder
+
+from app.core.priority_resolver import FEASIBILITY_GUARDRAIL_THRESHOLD, passes_feasibility_guardrail
 
 
 class SchedulePersistenceError(Exception):
@@ -167,6 +170,30 @@ async def approve_schedule_mos(
             failed.append({"mo_id": str(mo_id), "reason": "NO_AI_PROPOSAL"})
             continue
 
+        if not passes_feasibility_guardrail(
+            float(mo.feasibility_score) if mo.feasibility_score is not None else None
+        ):
+            failed.append({
+                "mo_id": str(mo_id),
+                "reason": "GUARDRAIL_FEASIBILITY",
+                "feasibility_score": float(mo.feasibility_score or 0),
+                "threshold": FEASIBILITY_GUARDRAIL_THRESHOLD,
+            })
+            await log_audit_event(
+                tenant_id=tenant_id,
+                actor_type="system",
+                actor_id=approved_by,
+                action="autonomy_downgraded_to_suggest",
+                entity_type="manufacturing_order",
+                entity_id=mo_id,
+                after_state={
+                    "feasibility_score": float(mo.feasibility_score or 0),
+                    "autonomy_mode": "suggest",
+                },
+                rationale="ERP write-back blocked; feasibility below 85%",
+            )
+            continue
+
         mo.planned_start = mo.ai_suggested_start
         mo.planned_end = mo.ai_suggested_end
         mo.ai_suggested_start = None
@@ -195,6 +222,7 @@ async def approve_schedule_mos(
             "new_planned_end": mo.planned_end.isoformat() if mo.planned_end else None,
             "version": int(float(mo.version)),
             "ai_schedule_version": mo.ai_schedule_version,
+            "feasibility_score": float(mo.feasibility_score) if mo.feasibility_score is not None else None,
         })
 
     if activated:

@@ -174,3 +174,63 @@ def build_remediation(mdr: dict) -> list[str]:
             f"Reconcile inventory records: {mdr.get('inventory_accuracy_pct', 0):.1f}% product coverage"
         )
     return steps
+
+
+ROUTING_DEVIATION_THRESHOLD_PCT = 15.0
+
+
+async def detect_routing_deviation(
+    session: AsyncSession,
+    tenant_id: str | None = None,
+    *,
+    threshold_pct: float = ROUTING_DEVIATION_THRESHOLD_PCT,
+) -> list[dict]:
+    """Detect routing operations where actual/predicted time deviates ≥ threshold."""
+    tid = tenant_id or tenant_ctx.get()
+    if not tid:
+        return []
+
+    await session.execute(
+        text("SELECT set_config('app.current_tenant_id', :tid, false)"),
+        {"tid": tid},
+    )
+
+    result = await session.execute(
+        text("""
+            SELECT
+                r.id AS routing_id,
+                r.id AS operation_id,
+                r.duration_planned_mins AS standard_before,
+                COALESCE(r.duration_predicted_mins, wo.duration_actual_mins, r.duration_planned_mins) AS observed,
+                wo.mo_id
+            FROM cdm_routing_operation r
+            LEFT JOIN cdm_work_order wo
+                ON wo.routing_op_id = r.id AND wo.tenant_id = r.tenant_id
+            WHERE r.tenant_id = :tid
+              AND r.duration_planned_mins > 0
+        """),
+        {"tid": UUID(tid)},
+    )
+    rows = result.fetchall()
+    drafts: list[dict] = []
+
+    for row in rows:
+        standard_before = float(row[2] or 0)
+        observed = float(row[3] or standard_before)
+        if standard_before <= 0:
+            continue
+        deviation_pct = abs(observed - standard_before) / standard_before * 100.0
+        if deviation_pct < threshold_pct:
+            continue
+        standard_after = round(observed, 2)
+        drafts.append({
+            "routing_id": str(row[0]),
+            "operation_id": str(row[1]),
+            "standard_time_before_mins": round(standard_before, 2),
+            "standard_time_after_mins": standard_after,
+            "deviation_pct": round(deviation_pct, 2),
+            "status": "pending_approval",
+            "mo_id": str(row[4]) if row[4] else None,
+        })
+
+    return drafts

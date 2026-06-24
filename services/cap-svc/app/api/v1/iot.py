@@ -1,37 +1,74 @@
+"""IoT predictive maintenance telemetry API (V6-R4)."""
+
 from datetime import UTC, datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
-from sqlalchemy import select as sa_select
+from pydantic import BaseModel, Field
+from sqlalchemy import or_, select as sa_select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.iot_health import (
     build_maintenance_block,
     calculate_capacity_degradation,
-    calculate_operation_duration_impact,
     should_trigger_replan,
+)
+from app.core.maintenance_blocks import (
+    RUL_MAINTENANCE_THRESHOLD_HOURS,
+    compute_block_window,
+    register_maintenance_block,
 )
 from ipe_shared.cache.redis_client import redis_client
 from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.events.producer import kafka_producer
 from ipe_shared.events.schemas import EventEnvelope
 from ipe_shared.middleware.tenant_context import tenant_ctx
+from ipe_shared.models.machine_health_telemetry import MachineHealthTelemetry
 from ipe_shared.models.work_center import WorkCenter
 from ipe_shared.schemas.common import APIResponse
-
-from uuid import uuid4
 
 router = APIRouter(prefix="/iot", tags=["iot"])
 
 HEALTH_SCORE_CHANGE_THRESHOLD = 5
 
 
-class TelemetryRequest(BaseModel):
+class PredictiveTelemetryRequest(BaseModel):
+    machine_id: str
+    rul_hours: float = Field(ge=0)
+    vibration_rms: float | None = None
+    recorded_at: datetime | None = None
+
+
+class LegacyTelemetryRequest(BaseModel):
     resource_id: str
     timestamp: str | None = None
     health_score: float
     metrics: dict = {}
+
+
+async def _resolve_work_center(session: AsyncSession, tenant_id: UUID, machine_id: str) -> WorkCenter | None:
+    result = await session.execute(
+        sa_select(WorkCenter).where(
+            WorkCenter.tenant_id == tenant_id,
+            or_(
+                WorkCenter.erp_source_id == machine_id,
+                WorkCenter.name == machine_id,
+            ),
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+class TelemetryRequest(BaseModel):
+    """V6-R4 predictive (machine_id + rul_hours) or legacy (resource_id + health_score)."""
+    machine_id: str | None = None
+    rul_hours: float | None = Field(default=None, ge=0)
+    vibration_rms: float | None = None
+    recorded_at: datetime | None = None
+    resource_id: str | None = None
+    timestamp: str | None = None
+    health_score: float | None = None
+    metrics: dict = Field(default_factory=dict)
 
 
 @router.post("/telemetry")
@@ -39,16 +76,118 @@ async def ingest_telemetry(
     req: TelemetryRequest,
     session: AsyncSession = Depends(get_db_session),
 ):
-    """Ingest IoT machine health telemetry.
-
-    Idempotent: ignores updates if health_score hasn't changed by >= 5 points.
-    Triggers capacity degradation or maintenance blocks based on health.
-    """
+    """Ingest IoT machine health telemetry (V6-R4 RUL or legacy health score)."""
     tenant_id = tenant_ctx.get()
     if not tenant_id:
         return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
 
     tid = UUID(tenant_id)
+
+    if req.machine_id is not None and req.rul_hours is not None:
+        predictive = PredictiveTelemetryRequest(
+            machine_id=req.machine_id,
+            rul_hours=req.rul_hours,
+            vibration_rms=req.vibration_rms,
+            recorded_at=req.recorded_at,
+        )
+        return await _ingest_predictive_telemetry(predictive, session, tid, tenant_id)
+
+    if req.resource_id is not None and req.health_score is not None:
+        legacy = LegacyTelemetryRequest(
+            resource_id=req.resource_id,
+            timestamp=req.timestamp,
+            health_score=req.health_score,
+            metrics=req.metrics,
+        )
+        return await _ingest_legacy_telemetry(legacy, session, tid, tenant_id)
+
+    return APIResponse(
+        success=False,
+        data=None,
+        error={
+            "code": "INVALID_PAYLOAD",
+            "message": "Provide machine_id+rul_hours (V6-R4) or resource_id+health_score (legacy)",
+        },
+    )
+
+async def _ingest_predictive_telemetry(
+    req: PredictiveTelemetryRequest,
+    session: AsyncSession,
+    tid: UUID,
+    tenant_id: str,
+) -> APIResponse:
+    recorded_at = req.recorded_at or datetime.now(UTC)
+    if recorded_at.tzinfo is None:
+        recorded_at = recorded_at.replace(tzinfo=UTC)
+
+    work_center = await _resolve_work_center(session, tid, req.machine_id)
+    wc_id = work_center.id if work_center else None
+
+    row = MachineHealthTelemetry(
+        tenant_id=tid,
+        machine_id=req.machine_id,
+        work_center_id=wc_id,
+        rul_hours=req.rul_hours,
+        vibration_rms=req.vibration_rms,
+        last_seen_at=recorded_at,
+    )
+    session.add(row)
+    await session.commit()
+
+    maintenance_block_published = False
+    block_payload = None
+
+    if req.rul_hours < RUL_MAINTENANCE_THRESHOLD_HOURS and work_center:
+        block_start, block_end = compute_block_window(recorded_at, req.rul_hours)
+        register_maintenance_block(
+            tenant_id=tenant_id,
+            machine_id=req.machine_id,
+            work_center_id=str(work_center.id),
+            block_start=block_start,
+            block_end=block_end,
+            rul_hours=req.rul_hours,
+        )
+        block_payload = {
+            "machine_id": req.machine_id,
+            "work_center_id": str(work_center.id),
+            "block_start": block_start.isoformat(),
+            "block_end": block_end.isoformat(),
+            "rul_hours": float(req.rul_hours),
+        }
+        envelope = kafka_producer.build_envelope(
+            event_type="ipe.maintenance.block_required",
+            tenant_id=tenant_id,
+            payload=block_payload,
+        )
+        await kafka_producer.send_avro(
+            "ipe.maintenance.block_required",
+            key=f"{tenant_id}:{req.machine_id}",
+            envelope=envelope,
+        )
+        maintenance_block_published = True
+
+    return APIResponse(
+        success=True,
+        data={
+            "machine_id": req.machine_id,
+            "rul_hours": req.rul_hours,
+            "vibration_rms": req.vibration_rms,
+            "recorded_at": recorded_at.isoformat(),
+            "work_center_id": str(wc_id) if wc_id else None,
+            "maintenance_block_published": maintenance_block_published,
+            "maintenance_block": block_payload,
+            "telemetry_id": str(row.id),
+        },
+        error=None,
+    )
+
+
+async def _ingest_legacy_telemetry(
+    req: LegacyTelemetryRequest,
+    session: AsyncSession,
+    tid: UUID,
+    tenant_id: str,
+) -> APIResponse:
     resource_key = f"iot:health:{tenant_id}:{req.resource_id}"
 
     previous_health_str = await redis_client.get_key(resource_key)
@@ -156,9 +295,7 @@ async def ingest_telemetry(
 
 
 @router.get("/health/{resource_id}")
-async def get_resource_health(
-    resource_id: str,
-):
+async def get_resource_health(resource_id: str):
     """Get current cached health score for a resource."""
     tenant_id = tenant_ctx.get()
     if not tenant_id:

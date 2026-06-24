@@ -1,3 +1,10 @@
 {
-  "feature_directory": "specs/003-autonomous-planning-v5"
+  "feature_directory": "specs/005-ipe-program-status",
+  "active_implementation": "specs/004-ai-first-v6",
+  "active_plan": "specs/005-ipe-program-status/plan.md",
+  "readiness_score": 96,
+  "release_target": "v6.0.0",
+  "last_speckit_run": "2026-06-23",
+  "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks"],
+  "active_implementation_phase": "REL-STACK"
 }

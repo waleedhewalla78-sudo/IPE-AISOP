@@ -1,0 +1,45 @@
+﻿==============================================
+ IPE Full-Cycle Heavy Validation
+ 2026-06-23 23:27:22
+ Root: D:\AISOP\ipe
+==============================================
+
+=== Phase 1 - Backend unit tests (16 services) ===
+  [OK]   shared - ====================== 126 passed, 12 skipped in 24.33s =======================
+  [OK]   dpe-svc - ================ 145 passed, 2 skipped, 284 warnings in 5.61s =================
+  [OK]   mat-svc - ======================= 103 passed, 1 warning in 6.25s ========================
+  [OK]   cap-svc - ====================== 242 passed, 5 warnings in 44.85s =======================
+  [OK]   fea-svc - ======================== 68 passed, 1 warning in 1.76s ========================
+  [OK]   res-svc - ======================= 23 passed, 1 warning in 33.34s ========================
+  [OK]   del-svc - ======================== 53 passed, 1 warning in 1.47s ========================
+  [OK]   nlp-svc - ======================= 67 passed, 2 warnings in 16.98s =======================
+  [OK]   rec-svc - ============================= 14 passed in 0.29s ==============================
+  [OK]   alert-svc - ======================== 17 passed, 1 warning in 1.25s ========================
+  [OK]   connector - ================== 21 passed, 4 skipped, 1 warning in 1.22s ===================
+  [OK]   sustain-svc - ======================== 25 passed, 1 warning in 0.84s ========================
+  [OK]   quality-svc - ======================== 21 passed, 1 warning in 0.81s ========================
+  [OK]   scn-svc - ======================== 54 passed, 1 warning in 0.97s ========================
+  [OK]   network-svc - ======================== 20 passed, 1 warning in 1.13s ========================
+  [WARN] ml-svc optional skip - hint: `xgboost` (v3.2.0) was included because `ipe-ml-svc` (v0.1.0) depends on `xgboost`
+  Optional skipped: ml-svc
+[PASS] Phase 1 - Backend unit tests (16 services)
+
+=== Phase 2 - Frontend Vitest ===
+     Start at  23:30:21
+     Duration  5.30s (transform 1.21s, setup 1.58s, collect 5.53s, tests 1.57s, environment 12.64s, prepare 2.15s)
+  
+[PASS] Phase 2 - Frontend Vitest
+
+=== Phase 3 - Integration tests (root, infra may skip) ===
+  17 failed, 14 passed, 32 skipped, 11 errors in 68.28s (0:01:08)
+  (expected without Docker - skipped live tests)
+[PASS] Phase 3 - Integration tests (root, infra may skip)
+[SKIP] Phase 4 - Docker stack - SkipDocker flag
+[SKIP] Phase 5 - Seed data - SkipDocker flag
+[SKIP] Phase 6 - Live demo - SkipDocker flag
+[SKIP] Phase 7 - Live E2E - SkipDocker flag
+[SKIP] Phase 8 - k6 load - SkipDocker flag
+
+==============================================
+ SUMMARY: 3 passed, 0 failed, 5 skipped
+==============================================

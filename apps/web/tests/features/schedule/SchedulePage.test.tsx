@@ -4,8 +4,10 @@ import { BrowserRouter } from 'react-router-dom';
 import { SchedulePage } from '@/features/schedule/SchedulePage';
 
 vi.mock('@/features/schedule/api', () => ({
-  fetchSchedule: vi.fn().mockResolvedValue([]),
-  approveSchedule: vi.fn().mockResolvedValue({ activated: [] }),
+  fetchSchedule: vi.fn().mockResolvedValue({ rows: [], moVersions: {}, xaiExplanation: null, solverStatus: 'UNKNOWN' }),
+  fetchActiveSchedule: vi.fn().mockResolvedValue({ rows: [], moVersions: {} }),
+  approveSchedule: vi.fn().mockResolvedValue({ activated: [], failed: [] }),
+  downloadMsProjectExport: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('SchedulePage', () => {

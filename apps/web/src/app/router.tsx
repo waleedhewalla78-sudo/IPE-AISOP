@@ -18,6 +18,8 @@ import { SustainabilityPage } from '@/features/sustainability/components/Sustain
 import { ComplianceDashboardPage } from '@/features/compliance/components/ComplianceDashboardPage';
 import { CopilotPanel } from '@/features/copilot/components/CopilotPanel';
 import { MdrDashboardPage } from '@/features/mdr/components/MdrDashboardPage';
+import { TariffPage } from '@/features/tariff/TariffPage';
+import { CostOfChaosPage } from '@/features/cost-of-chaos/CostOfChaosPage';
 
 const tenantId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
@@ -45,6 +47,8 @@ export function AppRouter() {
           <Route path="/sustainability" element={<SustainabilityPage />} />
           <Route path="/compliance" element={<ComplianceDashboardPage />} />
           <Route path="/mdr" element={<MdrDashboardPage />} />
+          <Route path="/tariff" element={<TariffPage />} />
+          <Route path="/cost-of-chaos" element={<CostOfChaosPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/control-tower" replace />} />

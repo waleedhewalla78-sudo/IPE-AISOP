@@ -15,6 +15,8 @@ export const ROUTES = {
   ML_OPS: '/ml-ops',
   ONBOARDING: '/onboarding',
   ADMIN: '/admin',
+  TARIFF: '/tariff',
+  COST_OF_CHAOS: '/cost-of-chaos',
 } as const;
 
 export const DEMAND_TYPES = ['MTO', 'MTS', 'CTO', 'ETO'] as const;

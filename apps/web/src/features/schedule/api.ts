@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import type { GanttRow } from './types';
+import type { CpmCascadeResult, GanttRow } from './types';
 
 export interface ScheduleOptions {
   moIds?: string[];
@@ -34,8 +34,8 @@ function mapRowsFromAssignments(assignments: Record<string, unknown>[]): GanttRo
       sequence: (a.sequence as number) || 0,
       work_center_id: a.work_center_id as string,
       work_center_name: (a.work_center_name as string) || (a.work_center_id as string),
-      planned_start: a.planned_start ?? a.start_minute,
-      planned_end: a.planned_end ?? a.end_minute,
+      planned_start: Number(a.planned_start ?? a.start_minute ?? 0),
+      planned_end: Number(a.planned_end ?? a.end_minute ?? 0),
       duration: a.duration as number,
       status: a.on_time === false ? 'delayed' : 'on_time',
     });
@@ -68,6 +68,8 @@ export async function fetchActiveSchedule(): Promise<{ rows: GanttRow[]; moVersi
         planned_end: op.planned_end as number,
         duration: op.duration as number,
         status: op.status as string,
+        is_critical: op.is_critical as boolean | undefined,
+        slack_minutes: op.slack_minutes as number | undefined,
       })),
     })),
     moVersions,
@@ -126,4 +128,52 @@ export async function validateSchedule(moIds?: string[]): Promise<
 > {
   const res = await api.post('/api/v1/capacity/validate', moIds?.length ? { mo_ids: moIds } : {});
   return res.data?.data?.validations ?? [];
+}
+
+export interface CpmCascadeRequest {
+  mo_id: string;
+  operation_id: string;
+  delta_minutes: number;
+  mode?: 'preview' | 'apply';
+}
+
+export async function previewCpmCascade(params: CpmCascadeRequest): Promise<CpmCascadeResult> {
+  const res = await api.post('/api/v1/capacity/cpm/cascade', {
+    mo_id: params.mo_id,
+    operation_id: params.operation_id,
+    delta_minutes: params.delta_minutes,
+    mode: params.mode ?? 'preview',
+  });
+  if (res.data?.success === false) {
+    throw new Error(res.data?.error?.message ?? 'CPM cascade preview failed');
+  }
+  return res.data?.data as CpmCascadeResult;
+}
+
+export async function applyCpmCascade(payload: {
+  cascade_token?: string;
+  operations?: CpmCascadeResult['operations'];
+}): Promise<{ mo_ids: string[] }> {
+  const res = await api.post('/api/v1/capacity/cpm/apply', payload);
+  if (res.data?.success === false) {
+    throw new Error(res.data?.error?.message ?? 'CPM apply failed');
+  }
+  const data = res.data?.data;
+  return { mo_ids: data?.mo_ids ?? data?.affected_mo_ids ?? [] };
+}
+
+export async function downloadMsProjectExport(moIds?: string[]): Promise<void> {
+  const res = await api.get('/api/v1/capacity/schedule/export/msproject', {
+    params: moIds?.length ? { mo_ids: moIds.join(',') } : undefined,
+    responseType: 'blob',
+  });
+  const blob = new Blob([res.data], { type: 'application/xml' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `ipe-schedule-${new Date().toISOString().slice(0, 10)}.xml`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }

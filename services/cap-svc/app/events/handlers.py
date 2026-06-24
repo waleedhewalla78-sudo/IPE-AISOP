@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from sqlalchemy import select as sa_select
 
@@ -150,6 +150,86 @@ async def handle_disruption_detected(event: dict):
                 "affected_mo_ids": affected_mo_ids,
                 "solver_status": schedule.get("status", "UNKNOWN"),
                 "replan_reason": data.get("disruption_type", "unknown"),
+            },
+        ).model_dump(mode="json"),
+    )
+
+
+async def handle_maintenance_block_required(event: dict):
+    """Inject maintenance block and trigger partial re-solve for affected MOs."""
+    value = event.value if hasattr(event, "value") else event
+    payload = value
+    if isinstance(value, dict) and "payload" in value:
+        payload = value["payload"]
+    elif isinstance(value, dict) and "data" in value:
+        payload = value["data"]
+
+    if not isinstance(payload, dict):
+        return
+
+    tenant_id = payload.get("tenant_id") or (value.get("tenant_id") if isinstance(value, dict) else None)
+    if not tenant_id and isinstance(value, dict):
+        tenant_id = value.get("tenant_id")
+    work_center_id = payload.get("work_center_id")
+    machine_id = payload.get("machine_id", "unknown")
+
+    if not tenant_id or not work_center_id:
+        return
+
+    from datetime import datetime as dt
+
+    from app.core.maintenance_blocks import (
+        compute_block_window,
+        partial_reschedule_for_block,
+        register_maintenance_block,
+    )
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+    from ipe_shared.database.connection import get_engine
+
+    block_start_raw = payload.get("block_start")
+    block_end_raw = payload.get("block_end")
+    rul_hours = float(payload.get("rul_hours", 36))
+
+    if block_start_raw and block_end_raw:
+        block_start = dt.fromisoformat(str(block_start_raw).replace("Z", "+00:00"))
+        block_end = dt.fromisoformat(str(block_end_raw).replace("Z", "+00:00"))
+    else:
+        block_start, block_end = compute_block_window(rul_hours=rul_hours)
+
+    register_maintenance_block(
+        tenant_id=str(tenant_id),
+        machine_id=machine_id,
+        work_center_id=str(work_center_id),
+        block_start=block_start,
+        block_end=block_end,
+        rul_hours=rul_hours,
+    )
+
+    engine = get_engine()
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        result = await partial_reschedule_for_block(
+            session,
+            UUID(str(tenant_id)),
+            str(work_center_id),
+            solver_timeout_seconds=30,
+        )
+
+    await kafka_producer.send_event(
+        "schedule", "updated",
+        key=str(tenant_id),
+        value=EventEnvelope(
+            event_id=str(uuid4()),
+            event_type="ipe.schedule.updated",
+            source="cap-svc",
+            tenant_id=UUID(str(tenant_id)),
+            timestamp=datetime.now(UTC),
+            data={
+                "affected_mo_ids": result.get("affected_mo_ids", []),
+                "solver_status": result.get("solver_status", "UNKNOWN"),
+                "replan_reason": "maintenance_block_required",
+                "work_center_id": work_center_id,
+                "machine_id": machine_id,
             },
         ).model_dump(mode="json"),
     )

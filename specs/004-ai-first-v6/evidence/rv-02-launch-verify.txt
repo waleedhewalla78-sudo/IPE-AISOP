@@ -1,0 +1,23 @@
+﻿==============================================
+ IPE Launch Verification - Backend Tests
+ 2026-06-23 22:57:53
+ Root: D:\AISOP\ipe
+==============================================
+
+[PASS] shared - ====================== 126 passed, 12 skipped in 39.25s =======================
+[PASS] cap-svc - ================= 242 passed, 5 warnings in 63.19s (0:01:03) ==================
+[PASS] dpe-svc - ================ 145 passed, 2 skipped, 284 warnings in 14.90s ================
+[PASS] fea-svc - ======================== 68 passed, 1 warning in 4.17s ========================
+[PASS] connector - ================== 21 passed, 4 skipped, 1 warning in 2.76s ===================
+[PASS] nlp-svc - ======================= 67 passed, 2 warnings in 23.74s =======================
+[PASS] mat-svc - ======================= 103 passed, 1 warning in 11.54s =======================
+[PASS] res-svc - ======================= 23 passed, 1 warning in 36.20s ========================
+[PASS] del-svc - ======================== 53 passed, 1 warning in 2.43s ========================
+[PASS] alert-svc - ======================== 17 passed, 1 warning in 2.11s ========================
+
+==============================================
+ RESULT: 10 passed, 0 failed, 0 skipped of 10 services
+==============================================
+
+ Next: run-full-demo.ps1 (20 checkpoints)
+ Guide: docs\LAUNCH-CHECKLIST.md

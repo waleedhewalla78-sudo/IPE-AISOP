@@ -1,5 +1,17 @@
 # IPE Platform Constitution
 
+## Sync Impact Report (V6.0 — 2026-06-23)
+
+| Change | Version bump | Notes |
+|--------|--------------|-------|
+| V6 migrations 024–027 RLS verified | PATCH | No principle change; compliance evidence in 004 checklists |
+| JWT demo auth for staging (Keycloak BLOCKED) | — | Documented in clarify-v6 C-V6-02; not a constitution waiver |
+| New Avro topics: tariff.shock, maintenance.block_required | — | Principle IV satisfied with paired consumers |
+
+**Compliance**: 004 V6-R1–R5 implementation verified against Principles I–VI. No amendments required.
+
+---
+
 IPE (Intelligent Process Engine) is a microservices-based, event-driven platform for intelligent process automation. These principles are derived from the codebase architecture and V2 audit findings. They are binding on all changes.
 
 ## Core Principles
@@ -100,4 +112,4 @@ Every service MUST be observable in both development and production.
 - **Versioning.** MAJOR = principled removal/redefinition; MINOR = new principle or materially expanded guidance; PATCH = clarifications.
 - **Compliance review.** Every PR and review MUST verify compliance. Unjustified violations block merge.
 
-**Version**: 1.0.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-06-20
+**Version**: 1.0.1 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-06-23

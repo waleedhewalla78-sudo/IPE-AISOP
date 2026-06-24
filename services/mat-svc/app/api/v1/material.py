@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db_session
 from app.core.atp import probabilistic_atp, rule_based_atp, simulate_atp
+from app.core.landed_cost import compute_landed_cost
 from app.core.netting import cumulative_netting, priority_weighted_netting
 from app.core.po_suggestion import generate_po_suggestions, merge_po_suggestions
 from app.core.safety_stock import calculate_all_products_safety_stock, calculate_safety_stock
@@ -279,6 +280,22 @@ async def check_probabilistic_atp(
         required_start,
         num_simulations=req.num_simulations,
     )
+
+    primary_material_id = result.get("bottleneck_component_id") or (
+        req.components[0].get("component_id") if req.components else None
+    )
+    if primary_material_id:
+        tlc = await compute_landed_cost(session, UUID(tenant_id), UUID(str(primary_material_id)))
+        result["landed_cost_per_unit"] = tlc.get("landed_cost_per_unit", 0.0)
+        result["landed_cost_breakdown"] = tlc.get("landed_cost_breakdown", {})
+        result["material_attributes"] = tlc.get("material_attributes", {})
+        for cr in result.get("component_breakdown", []):
+            comp_tlc = await compute_landed_cost(
+                session, UUID(tenant_id), UUID(str(cr["component_id"]))
+            )
+            cr["landed_cost_per_unit"] = comp_tlc.get("landed_cost_per_unit", 0.0)
+            cr["landed_cost_breakdown"] = comp_tlc.get("landed_cost_breakdown", {})
+            cr["material_attributes"] = comp_tlc.get("material_attributes", {})
 
     result["xai_explanation"] = XAIExplanation(
         constraints=["monte_carlo_simulation", f"num_simulations_{req.num_simulations}"]

@@ -4,11 +4,17 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.core.activity_objective import estimate_activity_costs
+
 
 def heuristic_schedule(
     work_centers: list[dict],
     operations: list[dict],
     horizon: int,
+    *,
+    optimal_cost_reference: float | None = None,
+    setup_cost_per_change: float = 120.0,
+    expedite_cost_per_unit: float = 0.0,
 ) -> dict[str, Any]:
     """Priority-weighted earliest-due-date greedy placement per work center."""
     wc_available: dict[str, int] = {str(wc["id"]): 0 for wc in work_centers}
@@ -75,6 +81,22 @@ def heuristic_schedule(
             "on_time": tardiness == 0,
         })
 
+    activity = estimate_activity_costs(
+        assignments,
+        work_centers,
+        setup_cost_per_change=setup_cost_per_change,
+        expedite_cost_per_unit=expedite_cost_per_unit,
+    )
+
+    optimality_gap_pct = None
+    optimality_gap_exceeds_5pct = False
+    if optimal_cost_reference and optimal_cost_reference > 0:
+        optimality_gap_pct = round(
+            abs(activity["total_usd"] - optimal_cost_reference) / optimal_cost_reference * 100.0,
+            2,
+        )
+        optimality_gap_exceeds_5pct = optimality_gap_pct > 5.0
+
     return {
         "status": "HEURISTIC",
         "assignments": assignments,
@@ -82,4 +104,7 @@ def heuristic_schedule(
         "solver_status": "heuristic_fallback",
         "skill_relaxed": False,
         "requires_manual_review": True,
+        "activity_cost_estimate": activity,
+        "optimality_gap_pct": optimality_gap_pct,
+        "optimality_gap_exceeds_5pct": optimality_gap_exceeds_5pct,
     }

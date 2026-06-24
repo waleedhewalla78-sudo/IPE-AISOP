@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import case, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.chaos_cost import aggregate_chaos_cost
 from ipe_shared.auth.rbac import require_roles
 from ipe_shared.database.session import get_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
@@ -293,4 +294,26 @@ async def planning_accuracy(
     except Exception:
         data = empty_result
 
+    return APIResponse(success=True, data=data, error=None)
+
+
+@router.get("/cost-of-chaos")
+async def cost_of_chaos(
+    period: str = Query(default="7d", pattern="^(7d|30d)$"),
+    category: str | None = Query(default=None),
+    session: AsyncSession = Depends(get_session),
+    current_user=Depends(require_roles(["admin", "planner", "executive", "cfo"])),
+):
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    period_days = 7 if period == "7d" else 30
+    data = await aggregate_chaos_cost(
+        session,
+        UUID(tenant_id),
+        period_days=period_days,
+        category_filter=category,
+    )
+    data["period"] = period
     return APIResponse(success=True, data=data, error=None)

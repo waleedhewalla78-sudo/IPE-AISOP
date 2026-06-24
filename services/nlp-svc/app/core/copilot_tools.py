@@ -8,6 +8,45 @@ import httpx
 from app.config import settings
 
 
+async def get_war_room_recovery(
+    disruption_id: str | None,
+    tenant_id: str,
+) -> dict:
+    """Fetch top recovery scenarios from War Room for a disruption event."""
+    try:
+        params = {}
+        if disruption_id:
+            params["disruption_id"] = disruption_id
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{settings.ALERT_SVC_URL}/api/v1/war-room/recovery-plan",
+                params=params,
+                headers={"X-Tenant-ID": tenant_id},
+            )
+            if resp.status_code == 200:
+                data = resp.json().get("data") or {}
+                options = data.get("recovery_options") or []
+                cited = [
+                    {
+                        "rank": opt.get("rank"),
+                        "scenario_id": opt.get("scenario_id"),
+                        "business_score_usd": opt.get("business_score_usd"),
+                        "activity_cost_usd": opt.get("activity_cost_usd"),
+                        "summary": opt.get("summary"),
+                    }
+                    for opt in options
+                ]
+                return {
+                    "disruption_id": data.get("disruption_id"),
+                    "impacted_mo_count": data.get("impacted_mo_count"),
+                    "recovery_options": cited,
+                    "scenario_ids": [opt.get("scenario_id") for opt in cited if opt.get("scenario_id")],
+                }
+            return {"status": "error", "message": f"alert-svc returned {resp.status_code}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 async def get_order_status(order_id: str, tenant_id: str) -> dict:
     """Get the current status and schedule of a manufacturing order.
 
@@ -183,10 +222,25 @@ TOOL_DEFINITIONS = [
             "required": ["resource_id", "downtime_hours"],
         },
     },
+    {
+        "name": "get_war_room_recovery",
+        "description": "Get top 3 War Room recovery scenarios for a disruption, including scenario_id citations for planner approval.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "disruption_id": {
+                    "type": "string",
+                    "description": "Disruption event UUID; omit to use latest Tier-1 event",
+                },
+            },
+            "required": [],
+        },
+    },
 ]
 
 TOOL_HANDLERS = {
     "get_order_status": get_order_status,
     "get_resource_utilization": get_resource_utilization,
     "simulate_disruption": simulate_disruption,
+    "get_war_room_recovery": get_war_room_recovery,
 }

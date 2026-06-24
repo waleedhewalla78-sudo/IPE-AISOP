@@ -4,7 +4,7 @@
 
 **Created**: 2026-06-22
 
-**Status**: In Progress — R1/R2 core implemented 2026-06-22
+**Status**: Complete (v1.0.0 tagged `4efb8de`) — see [clarify.md](./clarify.md) for exit-gate vs code-complete caveats (C7, C8, C10)
 
 **Input**: IPE Platform Status Report (2026-06-22), Expert Assessment vs. V5.0 PRD Gold Standard, AI Auto Scheduling Module proposal, and `IMPLEMENTATION-TASKS.md` Phase R1–R4 roadmap.
 

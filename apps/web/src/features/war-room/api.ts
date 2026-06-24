@@ -31,6 +31,21 @@ export interface MitigationScenario {
   confidence: number;
 }
 
+export interface RecoveryOption {
+  rank: number;
+  scenario_id: string;
+  business_score_usd: number;
+  delivery_impact_days: number;
+  activity_cost_usd: number;
+  summary: string;
+}
+
+export interface RecoveryPlan {
+  disruption_id: string;
+  impacted_mo_count: number;
+  recovery_options: RecoveryOption[];
+}
+
 export async function fetchDisruptions(): Promise<DisruptionEvent[]> {
   try {
     const res = await api.get('/api/v1/war-room/aggregate', {
@@ -80,5 +95,30 @@ export async function fetchMitigationScenarios(): Promise<MitigationScenario[]> 
   } catch (err) {
     console.error('Failed to fetch mitigation scenarios:', err);
     return [];
+  }
+}
+
+export async function fetchRecoveryPlan(disruptionId?: string): Promise<RecoveryPlan | null> {
+  try {
+    const res = await api.get('/api/v1/war-room/recovery-plan', {
+      params: disruptionId ? { disruption_id: disruptionId } : undefined,
+    });
+    const data = res.data?.data;
+    if (!data?.recovery_options) return null;
+    return {
+      disruption_id: String(data.disruption_id ?? ''),
+      impacted_mo_count: Number(data.impacted_mo_count ?? 0),
+      recovery_options: (data.recovery_options as Record<string, unknown>[]).map((opt) => ({
+        rank: Number(opt.rank ?? 0),
+        scenario_id: String(opt.scenario_id ?? ''),
+        business_score_usd: Number(opt.business_score_usd ?? 0),
+        delivery_impact_days: Number(opt.delivery_impact_days ?? 0),
+        activity_cost_usd: Number(opt.activity_cost_usd ?? 0),
+        summary: String(opt.summary ?? ''),
+      })),
+    };
+  } catch (err) {
+    console.error('Failed to fetch recovery plan:', err);
+    return null;
   }
 }

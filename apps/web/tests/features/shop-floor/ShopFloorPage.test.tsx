@@ -25,13 +25,16 @@ const mockItems = [
   },
 ];
 
+const mockGet = vi.fn();
+
+vi.mock('@/lib/api', () => ({
+  default: {
+    get: (...args: unknown[]) => mockGet(...args),
+  },
+}));
+
 beforeEach(() => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn().mockResolvedValue({
-      json: async () => ({ items: mockItems }),
-    }),
-  );
+  mockGet.mockResolvedValue({ data: { items: mockItems } });
 });
 
 describe('ShopFloorPage', () => {

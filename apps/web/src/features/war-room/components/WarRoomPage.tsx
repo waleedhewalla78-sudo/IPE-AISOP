@@ -2,8 +2,12 @@ import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import {
-  fetchDisruptions, fetchMitigationScenarios,
-  type DisruptionEvent, type MitigationScenario,
+  fetchDisruptions,
+  fetchMitigationScenarios,
+  fetchRecoveryPlan,
+  type DisruptionEvent,
+  type MitigationScenario,
+  type RecoveryPlan,
 } from '../api';
 
 const SEVERITY_COLOR: Record<string, string> = {
@@ -16,6 +20,7 @@ const SEVERITY_COLOR: Record<string, string> = {
 export function WarRoomPage() {
   const [disruptions, setDisruptions] = useState<DisruptionEvent[]>([]);
   const [mitigations, setMitigations] = useState<MitigationScenario[]>([]);
+  const [recoveryPlan, setRecoveryPlan] = useState<RecoveryPlan | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,6 +29,9 @@ export function WarRoomPage() {
       const [d, m] = await Promise.all([fetchDisruptions(), fetchMitigationScenarios()]);
       setDisruptions(d);
       setMitigations(m);
+      const disruptionId = d[0]?.id;
+      const plan = await fetchRecoveryPlan(disruptionId);
+      setRecoveryPlan(plan);
       setLoading(false);
     })();
   }, []);
@@ -72,6 +80,54 @@ export function WarRoomPage() {
           <Badge variant="success" className="mt-1">Available</Badge>
         </Card>
       </div>
+
+      {/* Top 3 Recovery Options */}
+      {recoveryPlan && recoveryPlan.recovery_options.length > 0 && (
+        <Card>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-medium">Top Recovery Options</h3>
+            <Badge variant="default">
+              {recoveryPlan.impacted_mo_count} MOs impacted
+            </Badge>
+          </div>
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+            {recoveryPlan.recovery_options.slice(0, 3).map((opt) => (
+              <div
+                key={opt.scenario_id}
+                className="rounded border border-ipe-border p-4 ring-1 ring-transparent hover:ring-ipe-primary/20"
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <Badge variant={opt.rank === 1 ? 'success' : 'default'}>
+                    Rank #{opt.rank}
+                  </Badge>
+                  <span className="text-xs text-ipe-text-muted">
+                    {opt.scenario_id.slice(0, 8)}…
+                  </span>
+                </div>
+                <p className="mb-3 text-sm font-medium text-ipe-text">{opt.summary}</p>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-ipe-text-muted">Business score</span>
+                    <span className="font-semibold text-green-600">
+                      ${opt.business_score_usd.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-ipe-text-muted">Activity cost</span>
+                    <span className="font-semibold">
+                      ${opt.activity_cost_usd.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-ipe-text-muted">Delivery impact</span>
+                    <span className="font-semibold">{opt.delivery_impact_days} days</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Disruption Events */}
       <Card>

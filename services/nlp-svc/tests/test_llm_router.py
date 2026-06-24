@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from app.core.llm_errors import LLMUnavailableError
 from app.core.llm_router import LLMProvider, LLMTierRouter
 
 
@@ -52,14 +53,19 @@ class TestTierRouting:
         assert router.provider == LLMProvider.ANTHROPIC
 
     def test_tier1_fallback_is_anthropic_only(self, router_tier1):
-        assert router_tier1.fallback_chain == [LLMProvider.ANTHROPIC]
+        assert router_tier1.fallback_chain == [LLMProvider.ANTHROPIC, LLMProvider.OLLAMA]
 
     def test_tier2_fallback_includes_anthropic(self, router_tier2):
-        assert router_tier2.fallback_chain == [LLMProvider.SAGEMAKER, LLMProvider.ANTHROPIC]
+        assert router_tier2.fallback_chain == [
+            LLMProvider.SAGEMAKER,
+            LLMProvider.OLLAMA,
+            LLMProvider.ANTHROPIC,
+        ]
 
     def test_tier3_fallback_chain_full(self, router_tier3):
         assert router_tier3.fallback_chain == [
             LLMProvider.VLLM,
+            LLMProvider.OLLAMA,
             LLMProvider.SAGEMAKER,
             LLMProvider.ANTHROPIC,
         ]
@@ -109,14 +115,12 @@ class TestAnthropicProvider:
 
     @pytest.mark.asyncio
     async def test_tier1_anthropic_not_configured(self, router_tier1):
-        with patch.object(
-            router_tier1,
-            "get_anthropic_client",
-            return_value=None,
+        with (
+            patch.object(router_tier1, "get_anthropic_client", return_value=None),
+            patch.object(router_tier1, "_call_ollama", side_effect=RuntimeError("ollama down")),
         ):
-            result = await router_tier1.route("Hello")
-            assert "LLM error" in result
-            assert "all providers unavailable" in result
+            with pytest.raises(LLMUnavailableError):
+                await router_tier1.route("Hello")
 
     @pytest.mark.asyncio
     async def test_tier1_pii_stripped_before_anthropic(self, router_tier1):
@@ -286,55 +290,25 @@ class TestFallbackLogic:
         router = LLMTierRouter(tenant_tier=3)
 
         with (
-            patch.object(
-                router,
-                "_call_vllm",
-                side_effect=RuntimeError("vLLM down"),
-            ),
-            patch.object(
-                router,
-                "_call_sagemaker",
-                side_effect=RuntimeError("SM down"),
-            ),
-            patch.object(
-                router,
-                "_call_anthropic",
-                side_effect=RuntimeError("Anthropic down"),
-            ),
+            patch.object(router, "_call_vllm", side_effect=RuntimeError("vLLM down")),
+            patch.object(router, "_call_ollama", side_effect=RuntimeError("ollama down")),
+            patch.object(router, "_call_sagemaker", side_effect=RuntimeError("SM down")),
+            patch.object(router, "_call_anthropic", side_effect=RuntimeError("Anthropic down")),
         ):
-            result = await router.route("Hello")
-            assert "LLM error" in result
-            assert "all providers unavailable" in result
+            with pytest.raises(LLMUnavailableError):
+                await router.route("Hello")
 
     @pytest.mark.asyncio
     async def test_vllm_down_falls_back_to_sagemaker(self):
         router = LLMTierRouter(tenant_tier=3)
 
-        mock_sm_response = MagicMock()
-        mock_sm_response.raise_for_status = MagicMock()
-        mock_sm_response.json = MagicMock(return_value={"text": "SM ok"})
-        mock_sm_client = AsyncMock()
-        mock_sm_client.__aenter__ = AsyncMock(return_value=mock_sm_client)
-        mock_sm_client.__aexit__ = AsyncMock(return_value=False)
-        mock_sm_client.post = AsyncMock(return_value=mock_sm_response)
-
         with (
+            patch.object(router, "_call_vllm", side_effect=RuntimeError("vLLM down")),
+            patch.object(router, "_call_ollama", side_effect=RuntimeError("ollama down")),
             patch.object(
                 router,
-                "_call_vllm",
-                side_effect=RuntimeError("vLLM down"),
-            ),
-            patch.object(
-                router,
-                "get_sagemaker_config",
-                return_value={
-                    "endpoint_url": "https://sm.endpoint",
-                    "region": "us-east-1",
-                },
-            ),
-            patch(
-                "app.core.llm_router.httpx.AsyncClient",
-                return_value=mock_sm_client,
+                "_call_sagemaker",
+                new=AsyncMock(return_value="SM ok"),
             ),
         ):
             result = await router.route("Hello")

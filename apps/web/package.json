@@ -12,6 +12,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
+    "test:perf": "playwright test tests/features/schedule/cpm-cascade.perf.test.ts",
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {

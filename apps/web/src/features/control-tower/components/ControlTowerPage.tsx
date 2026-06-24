@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/Card';
 import { Table, TableHead, TableRow, TableHeader, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { TariffShockPanel } from '@/features/tariff/components/TariffShockPanel';
+import { ROUTES } from '@/lib/constants';
 import { fetchQueue, fetchKPIs, getMockBottlenecks } from '../api';
 import { FeasibilityWebSocket } from '@/lib/ws';
 import type { MOQueueItem, KPI, BottleneckItem } from '../types';
@@ -257,6 +259,16 @@ export function ControlTowerPage() {
                 <p className="text-sm text-ipe-text-muted">No bottlenecks detected.</p>
               )}
             </div>
+          </Card>
+
+          <Card>
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="font-medium">Tariff Shock</h3>
+              <Button size="sm" variant="ghost" onClick={() => navigate(ROUTES.TARIFF)}>
+                Full view →
+              </Button>
+            </div>
+            <TariffShockPanel />
           </Card>
         </div>
       </div>

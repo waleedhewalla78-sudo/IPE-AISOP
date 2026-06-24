@@ -87,18 +87,33 @@ def _solve_with_gurobi(context: SolverContext) -> ScheduleResult:
     for mo_id, mo_ops in mo_groups.items():
         mo_ops.sort(key=lambda x: x.sequence)
         for i in range(len(mo_ops) - 1):
+            transfer = mo_ops[i + 1].transfer_time_mins
             model.addConstr(
-                end_vars[mo_ops[i].id] <= start_vars[mo_ops[i + 1].id],
+                end_vars[mo_ops[i].id] + transfer <= start_vars[mo_ops[i + 1].id],
                 f"prec_{mo_ops[i].id}_{mo_ops[i + 1].id}",
             )
 
+    parent_to_children: dict[str, list] = {}
+    op_by_id = {op.id: op for op in context.operations}
     for op in context.operations:
         if op.parent_operation_id and op.parent_operation_id in start_vars:
-            transfer = op.transfer_time_mins
-            model.addConstr(
-                start_vars[op.parent_operation_id] >= end_vars[op.id] + transfer,
-                f"bom_{op.id}_{op.parent_operation_id}",
-            )
+            parent_to_children.setdefault(op.parent_operation_id, []).append(op.id)
+
+    for parent_id, child_ids in parent_to_children.items():
+        parent_op = op_by_id[parent_id]
+        for child_id in child_ids:
+            child_op = op_by_id[child_id]
+            transfer = child_op.transfer_time_mins
+            if parent_op.sequence > child_op.sequence:
+                model.addConstr(
+                    start_vars[parent_id] >= end_vars[child_id] + transfer,
+                    f"bom_{child_id}_{parent_id}",
+                )
+            else:
+                model.addConstr(
+                    start_vars[child_id] >= end_vars[parent_id] + transfer,
+                    f"bom_{child_id}_{parent_id}",
+                )
 
     for f in context.frozen_ops:
         if f.operation_id in start_vars:

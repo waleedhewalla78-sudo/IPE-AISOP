@@ -1,0 +1,64 @@
+﻿==============================================
+ IPE Full-Cycle Demo Verification
+ 2026-06-23 17:47:55
+==============================================
+
+[PASS] 0. Login (Ahmed@nour / admin)
+       UI: http://localhost:8082/login
+       -> JWT issued for tenant Demo Manufacturing Inc
+
+--- Planning and Operations Modules ---
+[PASS] 1. Control Tower - feasibility queue (10 MOs)
+       UI: http://localhost:8082/control-tower
+       -> 10 MOs; lowest score 45.0 constraint material_shortage
+[PASS] 2. Control Tower - KPIs
+       UI: http://localhost:8082/control-tower
+       -> avg feasibility 74.9, orders at risk 1
+[PASS] 3. Resolution Center - scenarios (demo MOs)
+       UI: http://localhost:8082/resolution-center
+       -> 32 scenarios loaded (includes MO-DEMO expedite/overtime/split)
+[FAIL] 4. Schedule - OR-Tools Gantt data - The operation has timed out
+[PASS] 5. Shop Floor - active work orders
+       UI: http://localhost:8082/shop-floor
+       -> 3 work orders: MO-DEMO-005 on Machining Center; MO-DEMO-001 on Assembly Line 1; MO-DEMO-005 on Packaging Station
+[PASS] 6. SCN Portal - supplier scorecards
+       UI: http://localhost:8082/scn-portal
+       -> Global Materials Ltd 88.0%, Parts R Us 95.0%, QuickShip Logistics 75.0%
+
+--- Analytics and Intelligence ---
+[PASS] 7. Executive - delay breakdown
+       UI: http://localhost:8082/executive
+       -> 6 delay categories (material, capacity, labor, supplier, quality)
+[PASS] 8. Executive - OTD summary
+       UI: http://localhost:8082/executive
+       -> OTD trend points: 2; completed MO history from MO-DEMO-009/010
+[PASS] 9. Dashboard alerts (War Room feed)
+       UI: http://localhost:8082/war-room
+       -> 8 active alerts (MO-DEMO-001 material, MO-DEMO-007 raw material, etc.)
+[PASS] 10. Copilot - FG stock query
+       UI: http://localhost:8082/copilot
+       -> intent=material_status; Widget A and Gadget B quantities returned
+[PASS] 11. Copilot - at-risk orders query
+       UI: http://localhost:8082/copilot
+       -> intent=feasibility_check; feasibility queue summarized
+[PASS] 12. AI Trust - scores
+       UI: http://localhost:8082/ai-trust
+       -> trust metrics loaded
+[PASS] 13. Admin - tenant config
+       UI: http://localhost:8082/admin
+       -> autonomy mode: shadow
+[PASS] 14. Inventory summary (master data)
+       UI: http://localhost:8082/copilot
+       -> 13 finished goods with on-hand quantities
+[FAIL] 15. Schedule - persist after approve
+[FAIL] 17. V6-R1 - margin-aware priority ordering - The remote server returned an error: (404) Not Found.
+[FAIL] 18. V6-R2 - tariff shock + substitute draft - The remote server returned an error: (404) Not Found.
+[FAIL] 19. V6-R3 - CPM cascade under 2s - The remote server returned an error: (404) Not Found.
+[FAIL] 20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room - The remote server returned an error: (404) Not Found.
+
+==============================================
+ RESULT: 14 / 20 passed, 6 failed
+==============================================
+ Fix failures, then re-run:
+   .\scripts\seed-demo-client.ps1
+   docker compose -f infrastructure\docker up -d --force-recreate kong

@@ -6,6 +6,7 @@ import { ScheduleExplainPanel } from './components/ScheduleExplainPanel';
 import { DigitalTwinPanel } from './components/DigitalTwinPanel';
 import {
   approveSchedule,
+  downloadMsProjectExport,
   fetchActiveSchedule,
   fetchSchedule,
   type MoVersionMap,
@@ -26,6 +27,7 @@ export function SchedulePage() {
   const [xaiExplanation, setXaiExplanation] = useState<Record<string, unknown> | null>(null);
   const [solverStatus, setSolverStatus] = useState<string>('');
   const [message, setMessage] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
   const [scheduleOptions, setScheduleOptions] = useState<ScheduleOptions>({});
 
   const loadSolverSchedule = useCallback(async (options?: ScheduleOptions, forceRegenerate = false) => {
@@ -155,6 +157,20 @@ export function SchedulePage() {
     await loadUploadedSchedule(planCode);
   };
 
+  const handleExportMsProject = async () => {
+    setExporting(true);
+    setMessage(null);
+    try {
+      const moIds = rows.map((r) => r.mo_id);
+      await downloadMsProjectExport(moIds.length ? moIds : undefined);
+      setMessage('MS Project XML export downloaded.');
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Export failed');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -167,7 +183,14 @@ export function SchedulePage() {
         <div className="flex flex-wrap items-center gap-2">
           <ProjectPlanUpload onUploadSuccess={handleUploadSuccess} />
           <button
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+            className="rounded border border-ipe-border bg-white px-4 py-2 text-sm font-medium text-ipe-text hover:bg-ipe-surface-alt disabled:opacity-50"
+            onClick={handleExportMsProject}
+            disabled={exporting || !rows.length}
+          >
+            {exporting ? 'Exporting...' : 'Download MS Project'}
+          </button>
+          <button
+            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             onClick={handleRefresh}
           >
             Refresh
@@ -226,7 +249,13 @@ export function SchedulePage() {
         </>
       )}
 
-      <GanttChart rows={rows} loading={loading} onApprove={source === 'solver' ? handleApprove : undefined} />
+      <GanttChart
+        rows={rows}
+        loading={loading}
+        cpmEnabled={source === 'solver'}
+        onApprove={source === 'solver' ? handleApprove : undefined}
+        onRowsChange={setRows}
+      />
     </div>
   );
 }

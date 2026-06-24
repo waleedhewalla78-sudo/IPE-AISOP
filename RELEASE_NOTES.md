@@ -1,5 +1,47 @@
 # IPE Platform — Release Notes
 
+## v6.0.0 — AI-First Strategic Reassessment (V6.0 Convergence)
+
+**Release Date**: 2026-06-23
+
+**Feature**: `004-ai-first-v6` — extends v1.0.0 with financially-aware, attribute-driven resilience.
+
+### V6-R1 — Activity-Based Planning
+- Migration 024: `cdm_activity_cost_drivers`
+- Margin-aware priority (`GET /demand/priority/margin-aware`)
+- `strategy=activity_optimized` + activity cost breakdown
+- 85% feasibility guardrail on approve
+
+### V6-R2 — Tariff & Landed Cost
+- Migrations 025: material attributes + landed cost profiles
+- pATP TLC fields (`landed_cost_per_unit`, breakdown)
+- `POST /demand/tariff/shock`, substitute drafts via connector
+- TariffShockPanel on Control Tower + `/tariff`
+
+### V6-R3 — Visual CPM
+- `visual_cpm.py` + `POST /capacity/cpm/cascade` / `/cpm/apply`
+- Gantt drag-drop with critical path styling
+- Prometheus `cap_svc_cpm_cascade_duration_seconds`
+- Demo checkpoint 19 (p95 <2s)
+
+### V6-R4 — Predictive Maintenance
+- Migration 026: machine health telemetry
+- RUL ingest on `POST /iot/telemetry` → maintenance block Kafka event
+- Partial re-solve on maintenance block consumer
+
+### V6-R5 — Cost of Chaos & Generative War Room
+- Migration 027: chaos cost snapshots
+- `GET /analytics/cost-of-chaos` + `/cost-of-chaos` route
+- `GET /war-room/recovery-plan` — top 3 ranked recovery cards
+- MS Project XML export from Schedule page
+- Copilot war-room recovery tool with scenario IDs
+
+**Readiness**: 96/100 — see `READINESS.md` and `specs/004-ai-first-v6/analyze-v6.md`
+
+**Tag** (when approved): `git tag -a v6.0.0 -m "IPE v6.0.0 — AI-First Strategic Reassessment"`
+
+---
+
 ## v1.0.0 — Autonomous Production Planning (V5.0 Convergence)
 
 **Release Date**: 2026-06-21

@@ -1,6 +1,7 @@
 import copy
-from datetime import UTC, datetime
-from uuid import UUID
+import time
+from datetime import UTC, datetime, timedelta
+from uuid import UUID, uuid4
 
 import httpx
 from fastapi import APIRouter, Depends
@@ -10,7 +11,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.core.bottleneck import detect_bottlenecks
-from app.core.priority_resolver import resolve_mo_priority
+from app.core.maintenance_blocks import inject_maintenance_block_operations
+from app.core.priority_resolver import resolve_mo_priority, resolve_mo_priority_margin_aware
+from app.core.activity_objective import estimate_activity_costs, solve_activity_optimized
+from app.core.cpm_metrics import CPM_CASCADE_DURATION
+from app.core.visual_cpm import cascade_schedule
 from app.core.schedule_persistence import (
     approve_schedule_mos,
     load_active_schedule,
@@ -40,6 +45,7 @@ from ipe_shared.models.routing import RoutingOperation
 from ipe_shared.models.worker import Worker
 from ipe_shared.models.shift import Shift
 from ipe_shared.models.work_center import WorkCenter
+from ipe_shared.models.work_order import WorkOrder
 from ipe_shared.models.plant import Plant
 from ipe_shared.models.transfer_route import TransferRoute
 from ipe_shared.models.transport_fleet import TransportFleet
@@ -109,6 +115,18 @@ class SimulationRequest(BaseModel):
     work_centers: list[dict]
     horizon_hours: int = 168
     hypothetical_changes: list[HypotheticalChange] = []
+
+
+class CpmCascadeRequest(BaseModel):
+    mo_id: UUID
+    operation_id: UUID
+    delta_minutes: int
+    mode: str = "preview"
+
+
+class CpmApplyRequest(BaseModel):
+    mo_id: UUID
+    operations: list[dict]
 
 
 @router.post("/schedule")
@@ -202,6 +220,7 @@ async def schedule_production(
 
     now = datetime.now(UTC)
     ops = []
+    ml_duration_available: bool | None = None
     for mo in mos:
         bom_result = await session.execute(
             sa_select(BillOfMaterial).where(BillOfMaterial.tenant_id == tid, BillOfMaterial.id == mo.bom_id)
@@ -216,31 +235,39 @@ async def schedule_production(
             if mo.planned_end:
                 delta = (mo.planned_end - now).total_seconds() / 60.0
                 due_date_minutes = max(0, int(delta))
-            priority = await resolve_mo_priority(session, tid, mo)
+            if req.strategy in ("activity_optimized", "margin_throughput"):
+                priority, _margin_warn = await resolve_mo_priority_margin_aware(session, tid, mo)
+            else:
+                priority = await resolve_mo_priority(session, tid, mo)
             material_score = float(mo.material_score or 1.0)
 
             duration = int(r.duration_planned_mins or 60) + int(r.setup_time_mins or 0)
 
             try:
-                async with httpx.AsyncClient(timeout=2.0) as ml_client:
-                    ml_resp = await ml_client.post(
-                        f"{settings.ML_SVC_URL}/api/v1/predict/duration",
-                        json={
-                            "product_id": str(mo.product_id),
-                            "work_center_id": str(r.work_center_id),
-                            "batch_size": float(mo.quantity or 1),
-                            "duration_planned_mins": duration,
-                            "operator_skill_tags": [],
-                        },
-                    )
-                    if ml_resp.status_code == 200:
-                        ml_data = ml_resp.json().get("data", {})
-                        if not ml_data.get("fallback_used", True):
-                            duration = int(ml_data.get("predicted_duration_mins", duration))
+                if ml_duration_available is not False:
+                    async with httpx.AsyncClient(timeout=0.25) as ml_client:
+                        ml_resp = await ml_client.post(
+                            f"{settings.ML_SVC_URL}/api/v1/predict/duration",
+                            json={
+                                "product_id": str(mo.product_id),
+                                "work_center_id": str(r.work_center_id),
+                                "batch_size": float(mo.quantity or 1),
+                                "duration_planned_mins": duration,
+                                "operator_skill_tags": [],
+                            },
+                        )
+                        if ml_resp.status_code == 200:
+                            ml_duration_available = True
+                            ml_data = ml_resp.json().get("data", {})
+                            if not ml_data.get("fallback_used", True):
+                                duration = int(ml_data.get("predicted_duration_mins", duration))
+                        else:
+                            ml_duration_available = False
             except Exception as e:
+                ml_duration_available = False
                 import logging
-                logging.getLogger(__name__).warning(
-                    "ML duration prediction failed for MO %s op %s: %s, using planned duration",
+                logging.getLogger(__name__).debug(
+                    "ML duration prediction skipped for MO %s op %s: %s",
                     mo.id, r.id, e,
                 )
 
@@ -269,11 +296,90 @@ async def schedule_production(
             "name": w.name,
             "capacity_hours_per_day": float(w.capacity_hours_per_day or 8),
             "oee": float(w.oee or 0.85),
+            "cost_per_hour": float(w.cost_per_hour) if w.cost_per_hour else 0.0,
+            "energy_kwh_per_hour": float(w.energy_kwh_per_hour) if w.energy_kwh_per_hour else 0.0,
+            "overtime_cost_multiplier": float(w.overtime_cost_multiplier) if w.overtime_cost_multiplier else 1.5,
         }
         for w in work_centers
     ]
 
     horizon = req.horizon_hours * 60
+
+    frozen_list = list(req.frozen_ops or [])
+    ops, frozen_list = inject_maintenance_block_operations(ops, frozen_list, tenant_id)
+
+    if req.strategy == "activity_optimized":
+        alpha = max(0.1, min(0.9, req.alpha))
+        schedule = solve_activity_optimized(
+            wc_list,
+            ops,
+            horizon=horizon,
+            alpha=alpha,
+            frozen_ops=frozen_list,
+        )
+        bottlenecks = detect_bottlenecks(schedule.get("assignments", []), wc_list, horizon)
+
+        for mo in mos:
+            cap_score = 100.0 if schedule.get("solver_status") == "OPTIMAL" else (
+                0.0 if schedule.get("solver_status") == "INFEASIBLE" else 50.0
+            )
+            mo_bottlenecks = [
+                b["work_center_id"] for b in bottlenecks
+                if b.get("work_center_id", "") in [op["work_center_id"] for op in ops if op["mo_id"] == str(mo.id)]
+            ]
+            envelope = kafka_producer.build_envelope(
+                event_type="ipe.mo.capacity_scored",
+                tenant_id=tid,
+                payload={
+                    "mo_id": str(mo.id),
+                    "capacity_score": cap_score,
+                    "solver_status": schedule.get("solver_status", "UNKNOWN"),
+                    "bottlenecks": mo_bottlenecks,
+                    "activity_cost_breakdown": schedule.get("activity_cost_breakdown", {}),
+                },
+            )
+            await kafka_producer.send_avro(
+                topic="ipe.mo.capacity_scored",
+                key=str(mo.id),
+                envelope=envelope,
+            )
+
+        persist_stats = await persist_schedule_proposal(
+            session,
+            tid,
+            schedule.get("assignments", []),
+        )
+
+        return APIResponse(success=True, data={
+            "schedule": schedule,
+            "bottlenecks": bottlenecks,
+            "total_operations": len(ops),
+            "persisted": persist_stats,
+            "mo_versions": {str(mo.id): int(float(mo.version or 1)) for mo in mos},
+            "strategy": req.strategy,
+            "activity_cost_breakdown": schedule.get("activity_cost_breakdown", {}),
+            "optimality_gap_pct": schedule.get("optimality_gap_pct"),
+            "xai_explanation": XAIExplanation(
+                constraints=["no_overlap", "precedence", f"alpha_{alpha}_activity_cost"],
+                assumptions=["activity_cost_objective", "margin_aware_priority"],
+                confidence_score=round(
+                    1.0 if schedule.get("solver_status") == "OPTIMAL" else (
+                        0.5 if schedule.get("solver_status") == "FEASIBLE" else 0.0
+                    ),
+                    4,
+                ),
+                contributing_factors={
+                    "setup_usd": round(
+                        float((schedule.get("activity_cost_breakdown") or {}).get("setup_usd", 0)) / 10000.0,
+                        4,
+                    ),
+                    "overtime_usd": round(
+                        float((schedule.get("activity_cost_breakdown") or {}).get("overtime_usd", 0)) / 10000.0,
+                        4,
+                    ),
+                },
+            ).model_dump(),
+        }, error=None)
 
     factory = SolverFactory.get_instance()
     solver = factory.create_solver("ortools")
@@ -317,13 +423,13 @@ async def schedule_production(
         ))
 
     frozen_objs = None
-    if req.frozen_ops:
+    if frozen_list:
         from ipe_shared.solver.interface import FrozenOp
         frozen_objs = [FrozenOp(
             operation_id=f.get("operation_id", ""),
             fixed_start=f.get("fixed_start", 0),
             fixed_end=f.get("fixed_end", 0),
-        ) for f in req.frozen_ops]
+        ) for f in frozen_list]
 
     context = SolverContext(
         work_centers=wc_inputs,
@@ -1390,3 +1496,218 @@ async def validate_schedule_inputs(
         })
 
     return APIResponse(success=True, data={"validations": results}, error=None)
+
+
+def _build_msproject_xml(rows: list[dict], tenant_id: str) -> str:
+    """Minimal MS Project XML export from active schedule rows."""
+    from xml.sax.saxutils import escape
+
+    tasks_xml = []
+    for idx, row in enumerate(rows, start=1):
+        name = escape(str(row.get("operation_name") or row.get("mo_id") or f"Task {idx}"))
+        start = escape(str(row.get("planned_start") or row.get("start") or ""))
+        finish = escape(str(row.get("planned_end") or row.get("end") or ""))
+        duration_mins = int(row.get("duration_planned_mins") or row.get("duration") or 60)
+        duration = f"PT{duration_mins}M"
+        tasks_xml.append(
+            f'<Task><UID>{idx}</UID><ID>{idx}</ID><Name>{name}</Name>'
+            f"<Start>{start}</Start><Finish>{finish}</Finish><Duration>{duration}</Duration></Task>"
+        )
+
+    body = "".join(tasks_xml) or '<Task><UID>1</UID><ID>1</ID><Name>Empty Schedule</Name></Task>'
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<Project xmlns="http://schemas.microsoft.com/project">'
+        f"<Name>IPE Schedule {escape(tenant_id)}</Name>"
+        f"<Tasks>{body}</Tasks>"
+        "</Project>"
+    )
+
+
+@router.get("/schedule/export/msproject")
+async def export_schedule_msproject(
+    session: AsyncSession = Depends(get_db_session),
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager"])),
+):
+    """Export active production schedule as MS Project XML."""
+    from fastapi.responses import Response
+
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    rows = await load_active_schedule(session, UUID(tenant_id))
+    xml_content = _build_msproject_xml(rows, tenant_id)
+    filename = f"ipe_schedule_{tenant_id[:8]}.xml"
+    return Response(
+        content=xml_content,
+        media_type="application/xml",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+async def _load_cpm_operations(
+    session: AsyncSession,
+    tenant_id: UUID,
+    mo_id: UUID | None = None,
+) -> tuple[list[dict], list[dict]]:
+    """Load work orders + work centers for CPM cascade."""
+    wo_query = sa_select(WorkOrder, RoutingOperation, WorkCenter).join(
+        RoutingOperation, WorkOrder.routing_op_id == RoutingOperation.id
+    ).join(
+        WorkCenter, WorkOrder.work_center_id == WorkCenter.id
+    ).where(WorkOrder.tenant_id == tenant_id)
+    if mo_id:
+        wo_query = wo_query.where(WorkOrder.mo_id == mo_id)
+    rows = (await session.execute(wo_query)).all()
+
+    operations: list[dict] = []
+    wc_map: dict[str, dict] = {}
+    for wo, rop, wc in rows:
+        start = wo.planned_start or datetime.now(UTC)
+        duration = float(wo.duration_planned_mins or rop.duration_planned_mins or 60)
+        end = wo.planned_end or (start + timedelta(minutes=duration))
+        operations.append({
+            "operation_id": str(wo.id),
+            "mo_id": str(wo.mo_id),
+            "sequence": int(wo.sequence or rop.sequence or 0),
+            "work_center_id": str(wc.id),
+            "planned_start": start.isoformat(),
+            "planned_end": end.isoformat(),
+            "duration_minutes": duration,
+        })
+        wc_map[str(wc.id)] = {
+            "id": str(wc.id),
+            "name": wc.name,
+            "cost_per_hour": float(wc.cost_per_hour or 0),
+            "overtime_cost_multiplier": 1.5,
+        }
+    return operations, list(wc_map.values())
+
+
+@router.post("/cpm/cascade")
+async def cpm_cascade(
+    req: CpmCascadeRequest,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin"])),
+):
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    start_ts = time.monotonic()
+    tid = UUID(tenant_id)
+    operations, work_centers = await _load_cpm_operations(session, tid)
+
+    before_ops = copy.deepcopy(operations)
+    result = cascade_schedule(
+        operations,
+        mo_id=str(req.mo_id),
+        operation_id=str(req.operation_id),
+        delta_minutes=req.delta_minutes,
+    )
+
+    before_cost = estimate_activity_costs(
+        [
+            {
+                "work_center_id": o["work_center_id"],
+                "duration": o.get("duration_minutes", 60),
+                "mo_id": o["mo_id"],
+            }
+            for o in before_ops
+        ],
+        work_centers,
+    )
+    after_cost = estimate_activity_costs(
+        [
+            {
+                "work_center_id": o["work_center_id"],
+                "duration": o.get("duration_minutes", 60),
+                "mo_id": o["mo_id"],
+            }
+            for o in result["operations"]
+        ],
+        work_centers,
+    )
+    activity_delta = round(after_cost["total_usd"] - before_cost["total_usd"], 2)
+    overtime_delta = round(after_cost["overtime_usd"] - before_cost["overtime_usd"], 2)
+
+    cascade_ms = int((time.monotonic() - start_ts) * 1000)
+    CPM_CASCADE_DURATION.observe(cascade_ms / 1000.0)
+
+    return APIResponse(
+        success=True,
+        data={
+            "operations": result["operations"],
+            "critical_path_ids": result["critical_path_ids"],
+            "financial_delta": {
+                "overtime_usd": overtime_delta,
+                "tardiness_penalty_usd": 0.0,
+                "activity_cost_delta_usd": activity_delta,
+            },
+            "conflicts": result["conflicts"],
+            "cascade_ms": cascade_ms,
+            "cascade_token": str(uuid4()),
+        },
+        error=None,
+    )
+
+
+@router.post("/cpm/apply")
+async def cpm_apply(
+    req: CpmApplyRequest,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin"])),
+):
+    """Set ai_suggested_* only — user must call /schedule/approve for ERP write."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    tid = UUID(tenant_id)
+    mo_result = await session.execute(
+        sa_select(ManufacturingOrder).where(
+            ManufacturingOrder.tenant_id == tid,
+            ManufacturingOrder.id == req.mo_id,
+        )
+    )
+    mo = mo_result.scalar_one_or_none()
+    if not mo:
+        return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "MO not found"})
+
+    updated = 0
+    starts: list[datetime] = []
+    ends: list[datetime] = []
+    for op in req.operations:
+        wo_result = await session.execute(
+            sa_select(WorkOrder).where(
+                WorkOrder.tenant_id == tid,
+                WorkOrder.id == UUID(str(op["operation_id"])),
+            )
+        )
+        wo = wo_result.scalar_one_or_none()
+        if not wo:
+            continue
+        start = datetime.fromisoformat(str(op["planned_start"]).replace("Z", "+00:00"))
+        end = datetime.fromisoformat(str(op["planned_end"]).replace("Z", "+00:00"))
+        wo.planned_start = start
+        wo.planned_end = end
+        starts.append(start)
+        ends.append(end)
+        updated += 1
+
+    if starts and ends:
+        mo.ai_suggested_start = min(starts)
+        mo.ai_suggested_end = max(ends)
+
+    await session.commit()
+    return APIResponse(
+        success=True,
+        data={
+            "mo_id": str(req.mo_id),
+            "updated_work_orders": updated,
+            "ai_suggested_start": mo.ai_suggested_start.isoformat() if mo.ai_suggested_start else None,
+            "ai_suggested_end": mo.ai_suggested_end.isoformat() if mo.ai_suggested_end else None,
+        },
+        error=None,
+    )

@@ -320,6 +320,14 @@ async def handle_schedule_approved(event: dict):
             logger.error("Failed to enqueue schedule.approved: %s", exc)
 
     for item in activated:
+        feasibility = item.get("feasibility_score")
+        if feasibility is not None and float(feasibility) < 85.0:
+            logger.warning(
+                "Skipping Odoo sync for MO %s: feasibility %.1f below guardrail",
+                item.get("erp_mo_id"), float(feasibility),
+            )
+            continue
+
         erp_mo_id = item.get("erp_mo_id")
         if not erp_mo_id:
             continue
@@ -370,3 +378,136 @@ async def handle_po_suggested(event: dict):
             action_type="create_rfq",
             data=po_payload,
         )
+
+
+async def sync_bom_substitution(tenant_id: str, data: dict) -> None:
+    """Stub: enqueue BOM substitution for Odoo sync (no autonomous ERP write)."""
+    engine = get_engine()
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        await session.execute(
+            text("""
+                INSERT INTO cdm_export_queue
+                    (tenant_id, payload, event_type, status, retry_count)
+                VALUES
+                    (:tid, :payload, :evt, 'pending', 0)
+            """),
+            {
+                "tid": UUID(tenant_id) if isinstance(tenant_id, str) else tenant_id,
+                "payload": data,
+                "evt": "ipe.tariff.substitute_draft",
+            },
+        )
+        await session.commit()
+    logger.info(
+        "Enqueued BOM substitution draft mo=%s from=%s to=%s",
+        data.get("mo_id"),
+        data.get("from_material_id"),
+        data.get("to_material_id"),
+    )
+
+
+async def handle_tariff_shock(event: dict):
+    """Consume ipe.tariff.shock — audit log + optional substitute notification stub."""
+    parsed = _extract_kafka_payload(event)
+    if not parsed:
+        envelope = _parse_event(event)
+        if not envelope:
+            return
+        tenant_id = str(envelope.tenant_id)
+        event_id = str(envelope.event_id)
+        data = envelope.data or envelope.payload if hasattr(envelope, "payload") else envelope.data
+    else:
+        tenant_id, event_id, data = parsed
+
+    region = data.get("region", "")
+    delta_pct = data.get("delta_pct", 0)
+    affected = data.get("affected_mo_ids") or []
+
+    logger.info(
+        "Processing tariff_shock: tenant=%s region=%s delta=%s affected=%s event=%s",
+        tenant_id, region, delta_pct, len(affected), event_id,
+    )
+
+    engine = get_engine()
+    factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with factory() as session:
+        try:
+            if event_id:
+                existing = await session.execute(
+                    text(
+                        "SELECT 1 FROM cdm_export_queue "
+                        "WHERE event_type = :et AND payload->>'event_id' = :eid LIMIT 1"
+                    ),
+                    {"et": "ipe.tariff.shock", "eid": event_id},
+                )
+                if existing.scalar_one_or_none():
+                    logger.info("Duplicate ipe.tariff.shock event %s, skipping", event_id)
+                    return
+
+            await session.execute(
+                text("""
+                    INSERT INTO cdm_export_queue
+                        (tenant_id, payload, event_type, status, retry_count)
+                    VALUES
+                        (:tid, :payload, :evt, 'pending', 0)
+                """),
+                {
+                    "tid": UUID(tenant_id) if isinstance(tenant_id, str) else tenant_id,
+                    "payload": {
+                        "event_id": event_id,
+                        "region": region,
+                        "delta_pct": delta_pct,
+                        "affected_mo_ids": affected,
+                    },
+                    "evt": "ipe.tariff.shock",
+                },
+            )
+            await session.commit()
+        except Exception as exc:
+            logger.error("Failed to enqueue tariff.shock: %s", exc)
+
+    for mo_id in affected[:5]:
+        await sync_bom_substitution(
+            tenant_id,
+            {
+                "mo_id": mo_id,
+                "from_material_id": data.get("from_material_id", ""),
+                "to_material_id": data.get("to_material_id", ""),
+                "status": "pending_approval",
+                "source": "tariff_shock",
+            },
+        )
+
+
+async def sync_routing_correction(tenant_id: str, draft: dict) -> None:
+    """Push routing correction draft to Odoo for planner approval (stub)."""
+    payload = {
+        "routing_id": draft.get("routing_id"),
+        "operation_id": draft.get("operation_id"),
+        "standard_time_before_mins": draft.get("standard_time_before_mins"),
+        "standard_time_after_mins": draft.get("standard_time_after_mins"),
+        "deviation_pct": draft.get("deviation_pct"),
+        "status": draft.get("status", "pending_approval"),
+    }
+    await _post_to_odoo(
+        tenant_id=tenant_id,
+        action_type="sync_routing_correction",
+        data=payload,
+    )
+
+
+async def handle_routing_correction_draft(event: dict):
+    """Consume routing deviation draft events and forward to Odoo."""
+    envelope = _parse_event(event)
+    if not envelope:
+        return
+
+    data = envelope.data
+    tenant_id = str(envelope.tenant_id)
+    draft = data.get("draft") or data
+    if not draft.get("routing_id"):
+        logger.warning("routing correction draft missing routing_id")
+        return
+
+    await sync_routing_correction(tenant_id, draft)

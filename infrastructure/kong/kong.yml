@@ -158,6 +158,10 @@ services:
         paths:
           - /api/v1/capacity
         strip_path: false
+      - name: cap-iot-route
+        paths:
+          - /api/v1/iot
+        strip_path: false
 
   - name: res-svc
     url: http://res-svc:8005
@@ -221,6 +225,10 @@ services:
       - name: alert-incidents-route
         paths:
           - /api/v1/incidents
+        strip_path: false
+      - name: alert-war-room-route
+        paths:
+          - /api/v1/war-room
         strip_path: false
 
   - name: sustain-svc

@@ -136,7 +136,8 @@ def _build_cost_model(
         for i in range(len(seq_ops) - 1):
             _, prev_id = seq_ops[i]
             _, curr_id = seq_ops[i + 1]
-            model.add(all_ends[prev_id] <= all_starts[curr_id])
+            transfer_time = int(all_ops[curr_id].get("transfer_time_mins", 0) or 0)
+            model.add(all_ends[prev_id] + transfer_time <= all_starts[curr_id])
 
     # --- Parent/child BOM precedence with transfer time ---
     parent_to_children: dict[str, list[str]] = {}
@@ -146,9 +147,14 @@ def _build_cost_model(
             parent_to_children.setdefault(parent_id, []).append(op_id)
 
     for parent_id, child_ids in parent_to_children.items():
+        parent_seq = int(all_ops[parent_id].get("sequence", 0))
         for child_id in child_ids:
             transfer_time = int(all_ops[child_id].get("transfer_time_mins", 0) or 0)
-            model.add(all_starts[parent_id] >= all_ends[child_id] + transfer_time)
+            child_seq = int(all_ops[child_id].get("sequence", 0))
+            if parent_seq > child_seq:
+                model.add(all_starts[parent_id] >= all_ends[child_id] + transfer_time)
+            else:
+                model.add(all_starts[child_id] >= all_ends[parent_id] + transfer_time)
 
     # --- Worker constraints (optional) ---
     if workers and enforce_skills:

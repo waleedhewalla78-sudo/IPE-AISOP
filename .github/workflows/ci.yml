@@ -113,6 +113,15 @@ jobs:
       - name: Run shared package unit tests
         working-directory: services/shared
         run: uv run pytest tests/ -m "not integration" --cov=ipe_shared --cov-report=xml --cov-report=term
+      - name: Run cap-svc unit tests
+        working-directory: services/cap-svc
+        run: uv sync --frozen && uv run pytest tests/ -q --tb=no
+      - name: Run dpe-svc unit tests
+        working-directory: services/dpe-svc
+        run: uv sync --frozen && uv run pytest tests/ -q --tb=no
+      - name: Run nlp-svc unit tests
+        working-directory: services/nlp-svc
+        run: uv sync --frozen && uv run pytest tests/ -q --tb=no
       - name: Upload coverage
         uses: codecov/codecov-action@v5
         with:

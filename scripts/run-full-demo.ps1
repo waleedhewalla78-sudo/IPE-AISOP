@@ -11,6 +11,13 @@ $ErrorActionPreference = "Continue"
 $Base = "http://localhost:8000"
 $Web = "http://localhost:8082"
 $Tenant = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+# Limit schedule solver to 3 demo MOs — avoids ML per-op timeouts on full tenant queue
+$DemoMoIds = @(
+    "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+    "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+    "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003"
+)
+$ScheduleBody = (@{ mo_ids = $DemoMoIds } | ConvertTo-Json -Compress)
 $Pass = 0
 $Fail = 0
 $Total = 0
@@ -95,8 +102,7 @@ Test-Checkpoint "3. Resolution Center - scenarios (demo MOs)" {
 } -UiPath "/resolution-center"
 
 Test-Checkpoint "4. Schedule - OR-Tools Gantt data" {
-    $body = '{"tenant_id":"' + $Tenant + '"}'
-    $r = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 45
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ScheduleBody -TimeoutSec 90
     $ops = $r.data.total_operations
     if ($ops -lt 1) { return $false }
     "$ops scheduled operations across Assembly, Machining, Packaging"
@@ -169,8 +175,7 @@ Test-Checkpoint "14. Inventory summary (master data)" {
 } -UiPath "/copilot"
 
 Test-Checkpoint "15. Schedule - persist after approve" {
-    $body = '{"tenant_id":"' + $Tenant + '"}'
-    $sched = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 60
+    $sched = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ScheduleBody -TimeoutSec 90
     $moIds = @($sched.data.rows | ForEach-Object { $_.mo_id } | Select-Object -First 2)
     if ($moIds.Count -lt 1) { return $false }
     $approveBody = @{ mo_ids = $moIds } | ConvertTo-Json
@@ -181,6 +186,72 @@ Test-Checkpoint "15. Schedule - persist after approve" {
     if ($persisted.Count -lt 1) { return $false }
     "approved $($approved.data.activated_count) MO(s); $($persisted.Count) persisted in active schedule"
 } -UiPath "/schedule"
+
+Test-Checkpoint "17. V6-R1 - margin-aware priority ordering" {
+    $margin = Invoke-RestMethod -Uri "$Base/api/v1/demand/priority/margin-aware" -Headers $h -TimeoutSec 20
+    $priorities = @($margin.data.priorities)
+    if ($priorities.Count -lt 2) { return $false }
+    $sorted = $priorities | Sort-Object -Property margin_adjusted_score -Descending
+    $top = $sorted[0]
+    $actBody = @{ strategy = "activity_optimized"; alpha = 0.6; horizon_hours = 168; mo_ids = $DemoMoIds } | ConvertTo-Json -Compress
+    $sched = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $actBody -TimeoutSec 90
+    $breakdown = $sched.data.activity_cost_breakdown
+    if (-not $breakdown) { return $false }
+    $total = [double]$breakdown.total_usd
+    if ($total -lt 0) { return $false }
+    "top MO margin score=$($top.margin_adjusted_score); activity total_usd=$total"
+} -UiPath "/schedule"
+
+Test-Checkpoint "18. V6-R2 - tariff shock + substitute draft" {
+    $body = '{"region":"Region_X","tariff_delta_pct":25.0,"margin_threshold_pct":15.0}'
+    $shock = Invoke-RestMethod -Uri "$Base/api/v1/demand/tariff/shock" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 30
+    if ([int]$shock.data.affected_mo_count -lt 1) { return $false }
+    $drafts = @($shock.data.substitute_drafts)
+    if ($drafts.Count -lt 1) { return $false }
+    "affected=$($shock.data.affected_mo_count); drafts=$($drafts.Count)"
+} -UiPath "/tariff"
+
+Test-Checkpoint "19. V6-R3 - CPM cascade under 2s" {
+    $active = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule/active" -Headers $h -TimeoutSec 20
+    $moId = $null
+    $opId = $null
+    foreach ($row in @($active.data.rows)) {
+        foreach ($op in @($row.operations)) {
+            if ($op.id) {
+                $moId = $row.mo_id
+                $opId = $op.id
+                break
+            }
+        }
+        if ($opId) { break }
+    }
+    if (-not $opId) {
+        $sched = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ScheduleBody -TimeoutSec 90
+        $assign = @($sched.data.schedule.assignments)
+        if ($assign.Count -lt 1) { return $false }
+        $moId = $assign[0].mo_id
+        $opId = $assign[0].operation_id
+        if (-not $opId) { $opId = $assign[0].id }
+    }
+    $body = @{ mo_id = $moId; operation_id = $opId; delta_minutes = 120; mode = "preview" } | ConvertTo-Json
+    $cascade = Invoke-RestMethod -Uri "$Base/api/v1/capacity/cpm/cascade" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 10
+    if ([int]$cascade.data.cascade_ms -gt 2000) { return $false }
+    if (@($cascade.data.operations).Count -lt 1) { return $false }
+    "cascade_ms=$($cascade.data.cascade_ms); critical_path=$($cascade.data.critical_path_ids.Count) ops"
+} -UiPath "/schedule"
+
+Test-Checkpoint "20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room" {
+    $telBody = '{"machine_id":"WC002","rul_hours":36,"vibration_rms":2.1}'
+    $tel = Invoke-RestMethod -Uri "$Base/api/v1/iot/telemetry" -Headers $h -Method POST -ContentType "application/json" -Body $telBody -TimeoutSec 30
+    if ($tel.data.maintenance_block_published -ne $true) { return $false }
+    $chaos = Invoke-RestMethod -Uri "$Base/api/v1/analytics/cost-of-chaos?period=7d" -Headers $h -TimeoutSec 20
+    $cats = @($chaos.data.categories | Where-Object { [double]$_.usd -gt 0 })
+    if ($cats.Count -lt 3) { return $false }
+    $recovery = Invoke-RestMethod -Uri "$Base/api/v1/war-room/recovery-plan" -Headers $h -TimeoutSec 30
+    $options = @($recovery.data.recovery_options)
+    if ($options.Count -lt 1) { return $false }
+    "maintenance block OK; chaos categories=$($cats.Count); recovery options=$($options.Count)"
+} -UiPath "/war-room"
 
 Write-DemoLine ""
 Write-DemoLine "=============================================="

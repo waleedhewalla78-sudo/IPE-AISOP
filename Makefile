@@ -1,4 +1,4 @@
-.PHONY: help setup dev test lint format migrate seed clean docker-up docker-down perf-test perf-k6 perf-k6-200 r4-verify e2e-test integration-e2e integration-unit shadow-validate docker-test-up docker-test-down mock-odoo-build
+.PHONY: help setup dev test lint format migrate seed clean docker-up docker-down perf-test perf-k6 perf-k6-200 r4-verify e2e-test integration-e2e integration-unit shadow-validate docker-test-up docker-test-down mock-odoo-build launch-verify
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -53,6 +53,12 @@ r4-verify: ## Run R4 production hardening checks (SAP/D365/Airflow)
 
 e2e-test: ## Run E2E critical path validation
 	uv run python scripts/e2e/critical_path_test.py
+
+launch-verify: ## Run backend test suites across all services (Windows: .\scripts\launch-verify.ps1)
+	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/launch-verify.ps1
+
+full-cycle-heavy: ## Full product validation: unit tests + demo + mass data (Windows)
+	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-full-cycle-heavy.ps1
 
 test: ## Run all tests
 	cd services/shared && uv run pytest -v --cov=ipe_shared --cov-report=term-missing
