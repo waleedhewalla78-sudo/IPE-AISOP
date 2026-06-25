@@ -173,7 +173,7 @@ async def check_material_availability(
         required_date = datetime.fromisoformat(req.required_date)
     except ValueError:
         return APIResponse(success=False, data=None, error={"code": "INVALID_DATE", "message": "Invalid date format"})
-    result = await simulate_atp(
+    result = await rule_based_atp(
         session, UUID(tenant_id), req.product_id, req.quantity, required_date
     )
 
@@ -190,7 +190,7 @@ async def check_material_availability(
                 "product_id": str(req.product_id),
                 "quantity": req.quantity,
                 "required_date": req.required_date,
-                "availability_p90": result.get("availability_p90"),
+                "availability_p90": 1.0 if result.get("is_available") else 0.0,
                 "is_available": result.get("is_available", False),
             },
         ).model_dump(mode="json"),

@@ -117,6 +117,37 @@ async def test_load_active_schedule_empty():
 
 
 @pytest.mark.asyncio
+async def test_approve_schedule_mos_update_rowcount_zero():
+    """Concurrent approve loses optimistic lock when version changes between read and update."""
+    session = AsyncMock()
+    mo_id = uuid4()
+    tenant_id = uuid4()
+
+    mo = MagicMock()
+    mo.version = 1
+    mo.feasibility_score = 90.0
+    mo.ai_suggested_start = datetime.now(UTC)
+    mo.ai_suggested_end = datetime.now(UTC)
+    mo.ai_schedule_version = 0
+    mo.status = "draft"
+    mo.erp_mo_id = "MO-001"
+    mo.feasibility_score = 90.0
+
+    mo_result = MagicMock()
+    mo_result.scalar_one_or_none.return_value = mo
+    update_result = MagicMock()
+    update_result.rowcount = 0
+    session.execute = AsyncMock(side_effect=[mo_result, update_result])
+
+    result = await approve_schedule_mos(session, tenant_id, [mo_id])
+
+    assert result["activated_count"] == 0
+    assert result["failed_count"] == 1
+    assert result["failed"][0]["reason"] == "VERSION_CONFLICT"
+    session.commit.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_approve_schedule_mos_kafka_publish_failure():
     """CDM commit succeeds but API must surface ERP sync failure when Kafka is down."""
     from unittest.mock import patch
@@ -141,7 +172,9 @@ async def test_approve_schedule_mos_kafka_publish_failure():
     mo_result.scalar_one_or_none.return_value = mo
     wo_result = MagicMock()
     wo_result.scalars.return_value.all.return_value = []
-    session.execute = AsyncMock(side_effect=[mo_result, wo_result])
+    update_result = MagicMock()
+    update_result.rowcount = 1
+    session.execute = AsyncMock(side_effect=[mo_result, update_result, wo_result])
 
     with patch(
         "app.core.schedule_persistence.kafka_producer.send_avro",

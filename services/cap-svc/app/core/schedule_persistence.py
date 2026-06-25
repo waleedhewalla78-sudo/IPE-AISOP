@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ipe_shared.audit.service import log_audit_event
@@ -202,14 +202,40 @@ async def approve_schedule_mos(
             )
             continue
 
-        mo.planned_start = mo.ai_suggested_start
-        mo.planned_end = mo.ai_suggested_end
-        mo.ai_suggested_start = None
-        mo.ai_suggested_end = None
-        mo.version = current_version + 1
-        mo.ai_schedule_version = (mo.ai_schedule_version or 0) + 1
-        mo.status = "planned" if mo.status == "draft" else mo.status
-        mo.updated_at = datetime.now(UTC)
+        planned_start = mo.ai_suggested_start
+        planned_end = mo.ai_suggested_end
+        new_status = "planned" if mo.status == "draft" else mo.status
+        new_ai_schedule_version = (mo.ai_schedule_version or 0) + 1
+        new_version = current_version + 1
+
+        update_result = await session.execute(
+            update(ManufacturingOrder)
+            .where(
+                ManufacturingOrder.tenant_id == tenant_id,
+                ManufacturingOrder.id == mo_id,
+                ManufacturingOrder.version == current_version,
+                ManufacturingOrder.ai_suggested_start.isnot(None),
+                ManufacturingOrder.ai_suggested_end.isnot(None),
+            )
+            .values(
+                planned_start=planned_start,
+                planned_end=planned_end,
+                ai_suggested_start=None,
+                ai_suggested_end=None,
+                version=new_version,
+                ai_schedule_version=new_ai_schedule_version,
+                status=new_status,
+                updated_at=datetime.now(UTC),
+            )
+        )
+        if update_result.rowcount == 0:
+            failed.append({
+                "mo_id": str(mo_id),
+                "reason": "VERSION_CONFLICT",
+                "expected_version": current_version,
+                "current_version": current_version,
+            })
+            continue
 
         wo_result = await session.execute(
             select(WorkOrder).where(
@@ -226,10 +252,10 @@ async def approve_schedule_mos(
         activated.append({
             "mo_id": str(mo_id),
             "erp_mo_id": mo.erp_mo_id,
-            "new_planned_start": mo.planned_start.isoformat() if mo.planned_start else None,
-            "new_planned_end": mo.planned_end.isoformat() if mo.planned_end else None,
-            "version": int(float(mo.version)),
-            "ai_schedule_version": mo.ai_schedule_version,
+            "new_planned_start": planned_start.isoformat() if planned_start else None,
+            "new_planned_end": planned_end.isoformat() if planned_end else None,
+            "version": new_version,
+            "ai_schedule_version": new_ai_schedule_version,
             "feasibility_score": float(mo.feasibility_score) if mo.feasibility_score is not None else None,
         })
 

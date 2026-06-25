@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 
 import httpx
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy import select as sa_select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -167,6 +168,7 @@ async def schedule_production(
     if not tenant_id:
         return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
 
+    mdr_quality_threshold = 70
     try:
         async with httpx.AsyncClient(timeout=3.0) as mdr_client:
             mdr_resp = await mdr_client.get(
@@ -175,18 +177,63 @@ async def schedule_production(
             )
             if mdr_resp.status_code == 200:
                 mdr_data = mdr_resp.json().get("data", {})
+                quality_score = mdr_data.get("overall_score", mdr_data.get("readiness_score"))
                 if mdr_data and not mdr_data.get("ai_scheduling_allowed", True):
-                    return APIResponse(
-                        success=False,
-                        data={"mdr": mdr_data},
-                        error={
-                            "code": "MDR_GATE_BLOCKED",
-                            "message": "Master Data Readiness below 70%. Complete remediation before scheduling.",
-                            "remediation": mdr_data.get("remediation", []),
-                        },
+                    logger.warning(
+                        "MDR quality gate failed: score=%s threshold=%s",
+                        quality_score,
+                        mdr_quality_threshold,
                     )
+                    return JSONResponse(
+                        status_code=503,
+                        content=APIResponse(
+                            success=False,
+                            data={"mdr": mdr_data, "quality_score": quality_score},
+                            error={
+                                "code": "MDR_QUALITY_GATE_FAILED",
+                                "message": (
+                                    f"Master Data Readiness below {mdr_quality_threshold}%. "
+                                    "Complete remediation before scheduling."
+                                ),
+                                "details": {
+                                    "quality_score": quality_score,
+                                    "threshold": mdr_quality_threshold,
+                                    "remediation": mdr_data.get("remediation", []),
+                                },
+                            },
+                        ).model_dump(mode="json"),
+                    )
+            else:
+                logger.warning(
+                    "MDR dashboard unavailable (HTTP %s); blocking schedule (fail-closed)",
+                    mdr_resp.status_code,
+                )
+                return JSONResponse(
+                    status_code=503,
+                    content=APIResponse(
+                        success=False,
+                        data=None,
+                        error={
+                            "code": "MDR_QUALITY_GATE_FAILED",
+                            "message": "Unable to verify master data readiness. Scheduling blocked.",
+                            "details": {"threshold": mdr_quality_threshold},
+                        },
+                    ).model_dump(mode="json"),
+                )
     except Exception:
-        pass
+        logger.exception("MDR quality gate check failed; blocking schedule (fail-closed)")
+        return JSONResponse(
+            status_code=503,
+            content=APIResponse(
+                success=False,
+                data=None,
+                error={
+                    "code": "MDR_QUALITY_GATE_FAILED",
+                    "message": "Unable to verify master data readiness. Scheduling blocked.",
+                    "details": {"threshold": mdr_quality_threshold},
+                },
+            ).model_dump(mode="json"),
+        )
 
     tid = UUID(tenant_id)
 
@@ -1461,10 +1508,16 @@ async def approve_production_schedule(
 
     has_conflict = any(f.get("reason") == "VERSION_CONFLICT" for f in result["failed"])
     if has_conflict and not result["activated"]:
-        return APIResponse(
-            success=False,
-            data=result,
-            error={"code": "VERSION_CONFLICT", "message": "Schedule changed since last load. Refresh and retry."},
+        return JSONResponse(
+            status_code=409,
+            content=APIResponse(
+                success=False,
+                data=result,
+                error={
+                    "code": "VERSION_CONFLICT",
+                    "message": "Schedule changed since last load. Refresh and retry.",
+                },
+            ).model_dump(mode="json"),
         )
 
     if result["activated"] and result.get("erp_event_published") is False:
