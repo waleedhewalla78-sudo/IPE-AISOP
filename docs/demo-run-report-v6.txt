@@ -1,6 +1,6 @@
 ﻿==============================================
  IPE Full-Cycle Demo Verification
- 2026-06-23 17:47:55
+ 2026-06-26 00:31:32
 ==============================================
 
 [PASS] 0. Login (Ahmed@nour / admin)
@@ -16,11 +16,13 @@
        -> avg feasibility 74.9, orders at risk 1
 [PASS] 3. Resolution Center - scenarios (demo MOs)
        UI: http://localhost:8082/resolution-center
-       -> 32 scenarios loaded (includes MO-DEMO expedite/overtime/split)
-[FAIL] 4. Schedule - OR-Tools Gantt data - The operation has timed out
+       -> 16 scenarios loaded (includes MO-DEMO expedite/overtime/split)
+[PASS] 4. Schedule - OR-Tools Gantt data
+       UI: http://localhost:8082/schedule
+       -> 7 scheduled operations across Assembly, Machining, Packaging
 [PASS] 5. Shop Floor - active work orders
        UI: http://localhost:8082/shop-floor
-       -> 3 work orders: MO-DEMO-005 on Machining Center; MO-DEMO-001 on Assembly Line 1; MO-DEMO-005 on Packaging Station
+       -> 6 work orders: MO-DEMO-001 on Machining Center; MO-DEMO-002 on Machining Center; MO-DEMO-003 on Assembly Line 1; MO-DEMO-001 on Assembly Line 1; MO-DEMO-002 on Packaging Station; MO-DEMO-001 on Packaging Station
 [PASS] 6. SCN Portal - supplier scorecards
        UI: http://localhost:8082/scn-portal
        -> Global Materials Ltd 88.0%, Parts R Us 95.0%, QuickShip Logistics 75.0%
@@ -49,16 +51,26 @@
        -> autonomy mode: shadow
 [PASS] 14. Inventory summary (master data)
        UI: http://localhost:8082/copilot
-       -> 13 finished goods with on-hand quantities
-[FAIL] 15. Schedule - persist after approve
-[FAIL] 17. V6-R1 - margin-aware priority ordering - The remote server returned an error: (404) Not Found.
-[FAIL] 18. V6-R2 - tariff shock + substitute draft - The remote server returned an error: (404) Not Found.
-[FAIL] 19. V6-R3 - CPM cascade under 2s - The remote server returned an error: (404) Not Found.
-[FAIL] 20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room - The remote server returned an error: (404) Not Found.
+       -> 4 finished goods with on-hand quantities
+[PASS] 15. Schedule - persist after approve
+       UI: http://localhost:8082/schedule
+       -> approved 2 MO(s); 2 persisted in active schedule; ERP sync deferred
+[PASS] 17. V6-R1 - margin-aware priority ordering
+       UI: http://localhost:8082/schedule
+       -> top MO margin score=56.16; activity total_usd=7191.25
+[PASS] 18. V6-R2 - tariff shock + substitute draft
+       UI: http://localhost:8082/tariff
+       -> affected=6; drafts=6
+[PASS] 19. V6-R3 - CPM cascade under 2s
+       UI: http://localhost:8082/schedule
+       -> cascade_ms=3; critical_path=3 ops
+[PASS] 20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room
+       UI: http://localhost:8082/war-room
+       -> maintenance block OK; chaos categories=3; recovery options=3
 
 ==============================================
- RESULT: 14 / 20 passed, 6 failed
+ RESULT: 20 / 20 passed, 0 failed
 ==============================================
- Fix failures, then re-run:
-   .\scripts\seed-demo-client.ps1
-   docker compose -f infrastructure\docker up -d --force-recreate kong
+ Demo ready for client walkthrough.
+ Guide: docs/FULL-DEMO-GUIDE.md
+ Open: http://localhost:8082/login

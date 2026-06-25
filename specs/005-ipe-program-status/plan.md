@@ -1,26 +1,39 @@
 # Implementation Plan: IPE Program — Release & Post-V6 Roadmap
 
-**Feature**: `005-ipe-program-status` | **Date**: 2026-06-21  
-**Spec**: [spec.md](./spec.md) | **Analysis**: [../004-ai-first-v6/analyze-v6.md](../004-ai-first-v6/analyze-v6.md)  
-**Clarify**: [../004-ai-first-v6/clarify-v6.md](../004-ai-first-v6/clarify-v6.md)
+**Feature**: `005-ipe-program-status` | **Date**: 2026-06-26  
+**Spec**: [spec.md](./spec.md) | **Clarify**: [clarify.md](./clarify.md) | **Analyze**: [analyze.md](./analyze.md) | **Converge**: [converge.md](./converge.md)  
+**Quickstart**: [quickstart.md](./quickstart.md)
 
 ---
 
 ## Summary
 
-IPE program delivery is **97% complete** (157/162 speckit tasks). V6 product code is **54/55** done; the remaining work is **release verification**, **documentation sync**, optional **production hardening (100/100)**, and a **post-v6.0.0 backlog**.
-
-This plan covers everything identified in `/speckit.analyze`, `/speckit.clarify`, and `/speckit.specify` — not re-implementing V6-R1–R5 (already shipped in monorepo).
+IPE program delivery is **97% complete** (157/162 speckit tasks + demo fixes T016–T019). V6 product code is **54/55** done; live demo is **19/20** with **CP15** remaining (T021 cap-svc rebuild). Release path: **T021 → 20/20 → git commit (Phase 0) → v6.0.0 tag**.
 
 | Milestone | Readiness | Trigger |
 |-----------|-----------|---------|
-| **Now** | 96/100 | Code + unit tests + docs |
-| **v6.0.0 tag** | 96/100 | RV-01–RV-03 + T055 approval |
-| **Production claim** | 100/100 | RV-05 k6 + Chaos evidence |
+| **Now** | 97/100 | Code + 19/20 demo + uncommitted fixes |
+| **v6.0.0 tag** | 97/100 | T022 20/20 + T023 git + T024 approval |
+| **Production claim** | 100/100 | RV-05 k6 + Chaos + audit P1 (T025–T026) |
 | **Enterprise IdP** | +security | Keycloak sandbox (BLOCKED) |
 
-**Estimated effort to tag**: **1–2 days** (ops + doc sync)  
-**Estimated effort to 100/100**: **+3–5 days** (load/chaos + evidence)
+**Estimated effort to tag**: **2–4 hours** (cap-svc rebuild + git + evidence)  
+**Estimated effort to 100/100**: **+3–5 days** (load/chaos + audit fixes)
+
+---
+
+## Phase 0: Git Foundation (binding — Master Plan §5)
+
+| Step | Action | Verification |
+|------|--------|--------------|
+| 0.1 | `git init` + initial commit (T023) | `git log -1` |
+| 0.2 | Optional `v1.0.0` baseline tag on pre-fix snapshot | N/A if first commit includes all fixes |
+| 0.3–0.6 | Audit fixes C-01, C-02, BUG-02, BUG-03 (T025–T026) | Post-tag |
+| 0.7 | `git tag v6.0.0` after T022 20/20 (T024) | User approval required |
+
+---
+
+## Summary (original scope)
 
 ---
 
@@ -122,33 +135,48 @@ flowchart TB
 
 **Goal**: Reproducible live environment for demo and verification.
 
+**Primary path**: Lean demo overlay via `rel-demo-stack.ps1` (see [quickstart.md](./quickstart.md) Path A).
+
 ### Prerequisites
 
-- Docker Desktop running
-- `ipe/.env` from `.env.template`
-- Ports 8000 (API), 8082 (web), 5432, 9092 free
+- Docker Desktop running (≥8 GB RAM)
+- `E:\AISOP\ipe\.env` from `.env.template`
+- Ports 8000 (API), 8082 (web), 5432, 6380, 9092 free
+- **Scope**: IPE stack only — ignore unrelated containers on host
 
-### Steps
+### Steps (lean path — recommended)
 
 | Step | Action | Verification |
 |------|--------|--------------|
-| 1 | `cd ipe/infrastructure/docker` | — |
-| 2 | Validate `docker-compose.yml` — single `ollama:` service | `docker compose config` exits 0 |
-| 3 | `docker compose up -d` | All healthchecks green within 5 min |
+| 1 | `cd E:\AISOP\ipe` | — |
+| 2 | `.\scripts\rel-demo-stack.ps1` | Infra → build → migrate → services → seed → demo |
+| 3 | Or `-SkipBuild` if images exist | Faster retry |
 | 4 | `curl http://localhost:8000/health` | 200 |
-| 5 | Apply migrations if fresh DB | Alembic head = 027 |
-| 6 | `.\scripts\seed-demo-client.ps1` | Demo tenant + V6 seed data |
+| 5 | Alembic head on demo DB | Migration **027** |
+| 6 | Demo report | `docs/demo-run-report-v6.txt` |
+
+Compose files: `docker-compose.yml` + **`docker-compose.demo.yml`** (no Ollama/Airflow/Keycloak gate).
+
+### Steps (full path — optional)
+
+| Step | Action | Verification |
+|------|--------|--------------|
+| 1 | `cd E:\AISOP\ipe\infrastructure\docker` | — |
+| 2 | `docker compose config` | exit 0 |
+| 3 | `docker compose up -d` | All healthchecks green (may pull Ollama ~500MB) |
+| 4 | `..\..\scripts\seed-demo-client.ps1` | V6 seed data |
 
 ### Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| Compose duplicate key | Remove duplicate service blocks |
-| API unreachable | Check Kong/gateway container logs |
-| Migration fail | `docker compose logs db`; rerun alembic |
-| Empty tariff/CPM demo | Re-run seed script |
+| Ollama pull timeout | Use demo overlay (Path A) |
+| V6 routes 404 | Rebuild app images; confirm Kong up |
+| CP4/15 timeout | Rebuild cap-svc; demo uses 3 MOs |
+| Docker daemon hang | Restart Docker Desktop |
+| Build context slow | First run 10–20 min; use `-SkipBuild` on retry |
 
-**Exit gate**: API + web reachable; seed complete.
+**Exit gate**: API + Kong healthy; seed complete; ready for RV-02/03.
 
 ---
 
@@ -159,7 +187,7 @@ flowchart TB
 ### Command
 
 ```powershell
-cd D:\AISOP\ipe
+cd E:\AISOP\ipe
 .\scripts\launch-verify.ps1
 ```
 
@@ -195,7 +223,7 @@ cd D:\AISOP\ipe
 ### Command
 
 ```powershell
-cd D:\AISOP\ipe
+cd E:\AISOP\ipe
 .\scripts\run-full-demo.ps1 -ReportPath docs\demo-run-report-v6.txt
 ```
 

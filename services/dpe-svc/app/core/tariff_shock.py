@@ -59,8 +59,9 @@ async def _mos_using_materials(
 
     bom_ids_result = await session.execute(
         select(BomLine.bom_id)
+        .join(BillOfMaterial, BomLine.bom_id == BillOfMaterial.id)
         .where(
-            BomLine.tenant_id == tenant_id,
+            BillOfMaterial.tenant_id == tenant_id,
             BomLine.component_id.in_(material_ids),
         )
         .distinct()
@@ -125,8 +126,10 @@ async def get_tariff_exposure(
             tariff_pct = float(profile.tariff_pct or 0)
             for mo in mos:
                 bom_line_result = await session.execute(
-                    select(BomLine).where(
-                        BomLine.tenant_id == tenant_id,
+                    select(BomLine)
+                    .join(BillOfMaterial, BomLine.bom_id == BillOfMaterial.id)
+                    .where(
+                        BillOfMaterial.tenant_id == tenant_id,
                         BomLine.bom_id == mo.bom_id,
                         BomLine.component_id.in_(material_ids),
                     )

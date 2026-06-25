@@ -1,4 +1,5 @@
 import copy
+import logging
 import time
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
@@ -73,6 +74,33 @@ except Exception as e:
     logging.getLogger(__name__).warning("Failed to register cap-svc solvers: %s", e)
 
 router = APIRouter(prefix="/capacity", tags=["capacity"])
+logger = logging.getLogger(__name__)
+
+
+async def _publish_capacity_scored(
+    *,
+    tenant_id: UUID,
+    mo_id: UUID,
+    payload: dict,
+) -> None:
+    """Best-effort Kafka publish — schedule must succeed even if ERP event bus is down."""
+    envelope = kafka_producer.build_envelope(
+        event_type="ipe.mo.capacity_scored",
+        tenant_id=str(tenant_id),
+        payload=payload,
+    )
+    try:
+        await kafka_producer.send_avro(
+            topic="ipe.mo.capacity_scored",
+            key=str(mo_id),
+            envelope=envelope,
+        )
+    except Exception:
+        logger.exception(
+            "Failed to publish ipe.mo.capacity_scored for tenant %s mo %s",
+            tenant_id,
+            mo_id,
+        )
 
 
 class ScheduleRequest(BaseModel):
@@ -327,9 +355,9 @@ async def schedule_production(
                 b["work_center_id"] for b in bottlenecks
                 if b.get("work_center_id", "") in [op["work_center_id"] for op in ops if op["mo_id"] == str(mo.id)]
             ]
-            envelope = kafka_producer.build_envelope(
-                event_type="ipe.mo.capacity_scored",
+            await _publish_capacity_scored(
                 tenant_id=tid,
+                mo_id=mo.id,
                 payload={
                     "mo_id": str(mo.id),
                     "capacity_score": cap_score,
@@ -337,11 +365,6 @@ async def schedule_production(
                     "bottlenecks": mo_bottlenecks,
                     "activity_cost_breakdown": schedule.get("activity_cost_breakdown", {}),
                 },
-            )
-            await kafka_producer.send_avro(
-                topic="ipe.mo.capacity_scored",
-                key=str(mo.id),
-                envelope=envelope,
             )
 
         persist_stats = await persist_schedule_proposal(
@@ -509,20 +532,15 @@ async def schedule_production(
         cap_score = 100.0 if schedule.get("solver_status") == "OPTIMAL" else (
             0.0 if schedule.get("solver_status") == "INFEASIBLE" else 50.0
         )
-        envelope = kafka_producer.build_envelope(
-            event_type="ipe.mo.capacity_scored",
+        await _publish_capacity_scored(
             tenant_id=tid,
+            mo_id=mo.id,
             payload={
                 "mo_id": str(mo.id),
                 "capacity_score": cap_score,
                 "solver_status": schedule.get("solver_status", "UNKNOWN"),
                 "bottlenecks": mo_bottlenecks,
             },
-        )
-        await kafka_producer.send_avro(
-            topic="ipe.mo.capacity_scored",
-            key=str(mo.id),
-            envelope=envelope,
         )
 
     persist_stats = await persist_schedule_proposal(
@@ -696,9 +714,9 @@ async def schedule_cost_optimized(
             b["work_center_id"] for b in bottlenecks
             if b.get("work_center_id", "") in [op["work_center_id"] for op in ops if op["mo_id"] == str(mo.id)]
         ]
-        envelope = kafka_producer.build_envelope(
-            event_type="ipe.mo.capacity_scored",
+        await _publish_capacity_scored(
             tenant_id=tid,
+            mo_id=mo.id,
             payload={
                 "mo_id": str(mo.id),
                 "capacity_score": cap_score,
@@ -706,11 +724,6 @@ async def schedule_cost_optimized(
                 "bottlenecks": mo_bottlenecks,
                 "cost_summary": schedule.get("cost_summary", {}),
             },
-        )
-        await kafka_producer.send_avro(
-            topic="ipe.mo.capacity_scored",
-            key=str(mo.id),
-            envelope=envelope,
         )
 
     await log_audit_event(
@@ -1452,6 +1465,16 @@ async def approve_production_schedule(
             success=False,
             data=result,
             error={"code": "VERSION_CONFLICT", "message": "Schedule changed since last load. Refresh and retry."},
+        )
+
+    if result["activated"] and result.get("erp_event_published") is False:
+        return APIResponse(
+            success=False,
+            data=result,
+            error={
+                "code": "ERP_EVENT_PUBLISH_FAILED",
+                "message": "Schedule saved in IPE but ERP sync event failed to publish. Retry or contact ops.",
+            },
         )
 
     return APIResponse(success=True, data=result, error=None)

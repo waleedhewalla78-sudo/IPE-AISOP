@@ -10,6 +10,9 @@ WHERE mo_id IN (SELECT id FROM cdm_manufacturing_order WHERE tenant_id = 'a0eebc
 DELETE FROM cdm_delay_event
 WHERE mo_id IN (SELECT id FROM cdm_manufacturing_order WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND erp_mo_id LIKE 'MO-DEMO-%');
 
+DELETE FROM cdm_disruption_event
+WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+
 DELETE FROM cdm_work_order
 WHERE mo_id IN (SELECT id FROM cdm_manufacturing_order WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND erp_mo_id LIKE 'MO-DEMO-%');
 
@@ -195,6 +198,19 @@ INSERT INTO cdm_resolution_scenario (id, tenant_id, mo_id, strategy, description
   ('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380006', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'd1eebc99-9c0b-4ef8-bb6d-6bb9bd380007', 'expedite_po', 'Emergency PO for Raw Material E', 0.0, 8900.00, 0.85, 'proposed'),
   ('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380007', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'd1eebc99-9c0b-4ef8-bb6d-6bb9bd380007', 'defer_mo', 'Defer MO-DEMO-007 by 5 days (customer Tier 1 penalty)', 5.0, 12000.00, 0.55, 'proposed'),
   ('c1eebc99-9c0b-4ef8-bb6d-6bb9bd380008', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'd1eebc99-9c0b-4ef8-bb6d-6bb9bd380008', 'overtime', 'Weekend shift on Assembly Line 1', 1.0, 4800.00, 0.76, 'proposed');
+
+-- Active disruption events (War Room recovery plan — V6-R5)
+INSERT INTO cdm_disruption_event (id, tenant_id, mo_id, work_center_id, event_type, severity, description, detected_at, metadata)
+VALUES
+  ('f2eebc99-9c0b-4ef8-bb6d-6bb9bd380001', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+   'd1eebc99-9c0b-4ef8-bb6d-6bb9bd380001',
+   (SELECT id FROM cdm_work_center WHERE erp_source_id='WC002' AND tenant_id='a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
+   'maintenance', 'high', 'Predictive maintenance block on Machining Center (RUL 36h)',
+   NOW() - INTERVAL '2 hours', '{"impacted_mo_count": 1, "source": "iot_telemetry"}'::jsonb),
+  ('f2eebc99-9c0b-4ef8-bb6d-6bb9bd380002', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+   'd1eebc99-9c0b-4ef8-bb6d-6bb9bd380007',
+   NULL, 'material', 'critical', 'Raw Material E below safety stock — supplier delay',
+   NOW() - INTERVAL '6 hours', '{"impacted_mo_count": 1, "source": "delay_feed"}'::jsonb);
 
 -- Delay events (Executive + War Room + dashboard alerts)
 INSERT INTO cdm_delay_event (id, tenant_id, mo_id, cause_category, cause_detail, classification_method, classification_confidence, delay_minutes, cost_impact, linked_wc_id) VALUES

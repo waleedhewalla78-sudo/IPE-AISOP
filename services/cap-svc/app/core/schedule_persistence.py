@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -17,6 +18,8 @@ from ipe_shared.models.work_center import WorkCenter
 from ipe_shared.models.work_order import WorkOrder
 
 from app.core.priority_resolver import FEASIBILITY_GUARDRAIL_THRESHOLD, passes_feasibility_guardrail
+
+logger = logging.getLogger(__name__)
 
 
 class SchedulePersistenceError(Exception):
@@ -81,9 +84,14 @@ async def persist_schedule_proposal(
     updated_wos = 0
 
     for item in assignments:
-        mo_id = UUID(str(item["mo_id"]))
-        routing_op_id = UUID(str(item["operation_id"]))
-        wc_id = UUID(str(item["work_center_id"]))
+        try:
+            mo_id = UUID(str(item["mo_id"]))
+            routing_op_id = UUID(str(item["operation_id"]))
+            wc_id = UUID(str(item["work_center_id"]))
+        except ValueError:
+            # Skip synthetic solver ops (e.g. predictive maintenance blocks)
+            continue
+
         start_dt = _minute_to_dt(base, item["start_minute"])
         end_dt = _minute_to_dt(base, item["end_minute"])
         duration = float(item.get("duration") or (item["end_minute"] - item["start_minute"]))
@@ -236,6 +244,7 @@ async def approve_schedule_mos(
                 "activated": activated,
             },
         )
+        erp_event_published = True
         try:
             await kafka_producer.send_avro(
                 topic="ipe.schedule.approved",
@@ -243,7 +252,19 @@ async def approve_schedule_mos(
                 envelope=envelope,
             )
         except Exception:
-            pass
+            erp_event_published = False
+            logger.exception(
+                "Failed to publish ipe.schedule.approved for tenant %s after CDM commit",
+                tenant_id,
+            )
+        return {
+            "activated": activated,
+            "failed": failed,
+            "total": len(mo_ids),
+            "activated_count": len(activated),
+            "failed_count": len(failed),
+            "erp_event_published": erp_event_published,
+        }
     elif failed:
         await session.rollback()
     else:
@@ -255,6 +276,7 @@ async def approve_schedule_mos(
         "total": len(mo_ids),
         "activated_count": len(activated),
         "failed_count": len(failed),
+        "erp_event_published": bool(activated),
     }
 
 

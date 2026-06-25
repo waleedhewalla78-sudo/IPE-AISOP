@@ -4,13 +4,166 @@
 
 **Created**: 2026-06-23
 
-**Status**: Active — updated 2026-06-23 (`/speckit.specify` full pipeline run)
+**Status**: Active — updated 2026-06-25 (`/speckit.specify` · `/speckit.clarify` · `/speckit.analyze` · `/speckit.plan` · `/speckit.tasks`)
 
-**Live demo**: ⚠️ 14/20 last run — REL-DEMO in progress (schedule scope + stack rebuild)
+**Live demo**: **15/20** (2026-06-25 live stack) — V6 CP17/19 pass; 5 failures remain (see demo table)
+
+**Product scope**: **IPE AISOP only** — Nexus Social / external scaffolds out of scope for this program
+
+**Workspace root**: `E:\AISOP` — canonical monorepo `ipe/`; Spec Kit at repo root (`.specify/`)
 
 **Input**: Consolidated rollup from `002-release-stabilization-gates`, `003-autonomous-planning-v5`, `004-ai-first-v6`, `READINESS.md`, and Notion [IPE Task Tracker v2](https://app.notion.com/p/788f0c170abe4648b482587d41745625).
 
 **Purpose**: Single authoritative view of **every speckit phase and task** — what is done, in progress, blocked, or planned — for executives, PM, and engineering.
+
+---
+
+## What We Build (Delivered — IPE Platform)
+
+**IPE (Intelligent Planning Engine)** is an ERP-agnostic, event-driven **AI production planning platform** (Odoo-first) for discrete manufacturers (100–1,000 employees, 1–2 sites).
+
+### Shipped product surface (v1.0.0 + V6 code complete)
+
+| Domain | Capability | Primary UX / API |
+|--------|------------|------------------|
+| **Visibility** | Control Tower, feasibility queue, KPI cards, WebSocket updates | `/control-tower` |
+| **Resolution** | Scenario generation, ranked trade-offs, financial columns | `/resolution-center` |
+| **Scheduling** | OR-Tools CP-SAT, Gantt, approve → Kafka → ERP sync | `/schedule` |
+| **Materials** | Netting, rule + probabilistic ATP, landed cost (V6) | mat-svc APIs |
+| **Demand** | Multi-factor priority, margin-aware + tariff shock (V6) | `/tariff`, demand APIs |
+| **Capacity** | Visual CPM cascade, maintenance blocks (V6) | CPM on `/schedule` |
+| **Copilot** | NLP intent router, tool calls, tiered LLM | `/copilot` |
+| **Executive** | OTD, delay breakdown, S&OP gap, what-if | `/executive` |
+| **War Room** | Disruption feed, recovery plan, Cost of Chaos (V6) | `/war-room`, `/cost-of-chaos` |
+| **Governance** | MDR gate, AI Trust, Admin autonomy modes | `/mdr`, `/ai-trust`, `/admin` |
+| **Supply chain** | Supplier scorecards, SCN portal | `/scn-portal` |
+| **Shop floor** | Active work orders, delay reporting | `/shop-floor` |
+
+### Shipped technical foundation
+
+- **14+ microservices** (dpe, mat, cap, fea, res, del, nlp, rec, alert, connector, scn, network, sustain, quality, ml)
+- **870+ backend tests**; launch-verify **10/10** services (2026-06-23)
+- **Kafka** event mesh (24 topics, Avro schemas, DLQ, idempotency)
+- **PostgreSQL 16** CDM with RLS; migrations **001–027**
+- **Kong** API gateway @ `:8000`; React web @ `:8082`
+- **Docker Compose** full stack + **demo overlay** (`docker-compose.demo.yml`) for lean REL-STACK
+
+---
+
+## What We Want to Build (Target State)
+
+### Immediate release (v6.0.0 — P0)
+
+| Goal | Exit evidence | Status |
+|------|---------------|--------|
+| **Live demo 20/20** | `docs/demo-run-report-v6.txt` | ⬜ 14/20 last run |
+| **REL-STACK green** | Kong :8000, migrations 027, seed | ⬜ in progress |
+| **Git tag v6.0.0** | T055 + stakeholder approval | ⬜ pending demo |
+| **Readiness 96/100** | `READINESS.md` | ✅ code complete |
+
+### Post-v6.0.0 (POST-* backlog — see `tasks.md`)
+
+| Horizon | Themes | Examples |
+|---------|--------|----------|
+| **POST-A Scale** | Performance, CPM at scale | Async cascade >50 MOs, visual-cpm-svc |
+| **POST-B Enterprise** | Live IdP, multi-ERP | Keycloak/Azure AD, SAP/D365 live connectors |
+| **POST-C Data** | Immutable history, twin workflows | `cdm_schedule_version`, twin promote/clone |
+| **POST-D Commercial** | Monetization, accessibility | Stripe, mobile app, WCAG 2.1 AA |
+| **100/100 readiness** | Production hardening | k6 200 VU, Chaos Mesh evidence |
+
+### Long-term vision (BRD/PRD — partial)
+
+Full **autonomous planning loop** with progressive autonomy (Shadow → Suggest → Autonomous), SOC 2 evidence, K8s canary, federated learning at scale, and multi-plant network optimization — see `000-project-completion/spec.md` for gap analysis vs 24-month roadmap.
+
+---
+
+## Program User Stories
+
+Stories below are **program-level**; feature specs (003, 004) contain module detail.
+
+### US-P1 — Release-ready demo (P0)
+
+As a **product owner**, I need a **20/20 live demo** on a reproducible stack so we can tag **v6.0.0** and onboard pilot customers.
+
+**Acceptance**: `run-full-demo.ps1` passes all checkpoints including V6 CP17–20; report saved to `docs/demo-run-report-v6.txt`.
+
+### US-P2 — Planner closed loop (P0 — delivered in 003)
+
+As a **planner**, I need to **approve a schedule** and see it **persist and sync to ERP** so execution matches the plan.
+
+**Acceptance**: Demo CP15 (003 checkpoint 16) — approve → active schedule → connector event.
+
+### US-P3 — CFO margin-aware planning (P0 — delivered in 004)
+
+As a **CFO**, I need schedules and priorities to reflect **net margin and activity costs** so profit is protected under constraints.
+
+**Acceptance**: Demo CP17 — margin-aware ordering + `activity_cost_breakdown`.
+
+### US-P4 — Tariff resilience (P0 — delivered in 004)
+
+As a **supply chain manager**, I need **tariff shock simulation** and substitute drafts so I can respond to geopolitical cost changes.
+
+**Acceptance**: Demo CP18 — `affected_mo_count ≥ 1` + substitute drafts.
+
+### US-P5 — Visual critical path (P0 — delivered in 004)
+
+As a **planner**, I need **CPM cascade under 2 seconds** when I change an operation so I can negotiate dates interactively.
+
+**Acceptance**: Demo CP19 — `cascade_ms ≤ 2000`.
+
+### US-P6 — Predictive maintenance + chaos cost (P0 — delivered in 004)
+
+As an **operations director**, I need **maintenance blocks from telemetry** and a **Cost of Chaos dashboard** with recovery options.
+
+**Acceptance**: Demo CP20 — block published + ≥3 chaos $ categories + recovery options.
+
+### US-P7 — Enterprise identity (P1 — blocked)
+
+As a **security admin**, I need **OAuth/SAML/SCIM** against a live IdP so enterprise tenants can onboard.
+
+**Acceptance**: Keycloak tested against Azure AD/Okta — **BLOCKED** (C-007).
+
+### US-P8 — Production scale proof (P2 — post-tag)
+
+As an **SRE**, I need **k6 200 VU** and **Chaos Mesh** evidence so readiness reaches **100/100**.
+
+**Acceptance**: Evidence files under `specs/003-autonomous-planning-v5/evidence/r4/`.
+
+---
+
+## Program Functional Requirements
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| FR-P-01 | Platform exposes planning APIs via Kong @ `:8000` with JWT + tenant isolation | P0 | ✅ |
+| FR-P-02 | All tenant-scoped tables enforce RLS (constitution I) | P0 | ✅ (027 verified in repo) |
+| FR-P-03 | Schedule approve persists with optimistic lock + Kafka publish | P0 | ✅ code; ⬜ live CP15 |
+| FR-P-04 | V6 margin-aware priority and activity-optimized schedule | P0 | ✅ code; ⬜ live CP17 |
+| FR-P-05 | V6 tariff shock + substitute draft workflow | P0 | ✅ code; ⬜ live CP18 |
+| FR-P-06 | V6 CPM cascade p95 < 2s on demo MO set | P0 | ✅ code; ⬜ live CP19 |
+| FR-P-07 | V6 IoT telemetry → maintenance block + chaos analytics | P0 | ✅ code; ⬜ live CP20 |
+| FR-P-08 | Full demo script 20/20 on seeded demo tenant | P0 | ⬜ |
+| FR-P-09 | launch-verify 10/10 backend services | P0 | ✅ |
+| FR-P-10 | Annotated git tag `v6.0.0` after FR-P-08 + approval | P0 | ⬜ T055 |
+| FR-P-11 | Lean demo stack script without ollama/airflow gate | P1 | ✅ `rel-demo-stack.ps1` |
+| FR-P-12 | k6 200 VU + Chaos evidence for 100/100 | P2 | ⬜ |
+| FR-P-13 | Live Keycloak SAML/SCIM validation | P1 | 🔴 BLOCKED |
+| FR-P-14 | Stripe billing + mobile app | P3 | Out of scope v6 |
+
+---
+
+## Clarifications
+
+### Session 2026-06-25
+
+- Q: What is the canonical workspace layout? → A: **`E:\AISOP`** root with Spec Kit; **`ipe/`** monorepo; ignore root **`services/`** orphan.
+- Q: What blocks v6.0.0 tag today? → A: **Live demo 20/20** + **REL-STACK** + **explicit user approval** for T055 (not code).
+- Q: Best REL-STACK approach? → A: **`docker-compose.demo.yml`** + **`rel-demo-stack.ps1`** (skip ollama/airflow/keycloak for demo path).
+- Q: Authoritative readiness score? → A: **96/100** in `READINESS.md`; 100/100 requires FR-P-12.
+- Q: Source of truth on task completion? → A: **`specs/*/tasks.md`** checkboxes; this spec aggregates.
+- Q: Include Nexus Social in program scope? → A: **No** — IPE product only; `nexus-social/` and `E:\nexus-social-platform\` are separate.
+- Q: Demo login credential? → A: **`Ahmed@nour` / `admin`** for demo script; **`admin@demo.com` / `demo`** also seeded for UI guide.
+- Q: Why V6 CP17–20 return 404 live? → A: **Stale stack** — Kong + V6 service images not running; routes exist in code + `kong.yml`.
 
 ---
 
@@ -22,10 +175,10 @@
 | **Speckit tasks total** | **162** (002: 62 · 003: 45 · 004: 55) |
 | **Complete** | **157 / 162 (97%)** |
 | **Open** | **5** (002 git hygiene: 4 · 004 T055 tag: 1 · REL demo pending) |
-| **Release track (REL-*)** | **11/30** — launch-verify ✅; stack + demo open |
+| **Release track (REL-*)** | **18/30** — REL-STACK ✅ API+seed; REL-DEMO ⬜ 15/20 |
 | **Current release tag** | `v1.0.0` (`4efb8de`) |
-| **Next release target** | `v6.0.0` (004 exit gate — ready to tag) |
-| **Active workstream** | **004 T055** — git tag v6.0.0 after demo verify |
+| **Next release target** | `v6.0.0` (004 exit gate — code ready; live proof pending) |
+| **Active workstream** | **REL-STACK → REL-DEMO → T055** |
 
 ### Program Timeline
 
@@ -203,15 +356,18 @@ flowchart LR
 
 ## Demo Checkpoint Status
 
-| Checkpoint | Feature | Status |
-|------------|---------|--------|
-| 1–15 | Pre-003 baseline | ✅ |
-| 16 | 003 R1 persist-after-approve | ✅ |
-| 17 | 004 V6-R1 margin-aware | ✅ |
-| 18 | 004 V6-R2 tariff shock | ✅ |
-| 19 | 004 V6-R3 CPM cascade | ✅ |
-| 20 | 004 V6-R4/R5 maint + chaos + war room | ✅ |
-| **Target** | **20/20** at v6.0.0 | **20/20 implemented** |
+| Checkpoint | Feature | Code | Last live run (2026-06-23) |
+|------------|---------|------|----------------------------|
+| 0–13 | Baseline modules | ✅ | ✅ PASS |
+| 4 | Schedule Gantt (OR-Tools) | ✅ | ❌ FAIL — timeout |
+| 15 | Persist after approve (003 R1) | ✅ | ❌ FAIL — timeout |
+| 17 | 004 V6-R1 margin-aware | ✅ | ❌ FAIL — 404 |
+| 18 | 004 V6-R2 tariff shock | ✅ | ❌ FAIL — 404 |
+| 19 | 004 V6-R3 CPM cascade | ✅ | ❌ FAIL — 404 |
+| 20 | 004 V6-R4/R5 maint + chaos | ✅ | ❌ FAIL — 404 |
+| **Target** | **20/20** at v6.0.0 | **20/20 implemented** | **15/20 proven** (2026-06-25) |
+
+**Open demo failures (live, 2026-06-25)**: CP10/11 Copilot 503 · CP15 persist-after-approve · CP18 tariff 500 · CP20 chaos 500
 
 ---
 
@@ -253,7 +409,8 @@ flowchart LR
 | Goal | Command |
 |------|---------|
 | Tag v6.0.0 | Approve T055 → `git tag -a v6.0.0` |
-| Verify demo | `.\scripts\run-full-demo.ps1` (20 checkpoints) |
+| Lean REL-STACK | `.\scripts\rel-demo-stack.ps1` |
+| Verify demo | `.\scripts\run-full-demo.ps1 -ReportPath docs\demo-run-report-v6.txt` |
 | Verify tests | `.\scripts\launch-verify.ps1` |
 | Production 100/100 | Run k6 200 VU + Chaos evidence |
 | Refresh status | `/speckit.specify` after tag |

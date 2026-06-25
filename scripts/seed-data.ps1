@@ -20,7 +20,7 @@ if ($content -notmatch "(?s)<<'SQL'\r?\n(.*)\r?\nSQL") {
     throw "Could not extract SQL from seed-data.sh"
 }
 
-$sql = $Matches[1]
+$sql = "CREATE EXTENSION IF NOT EXISTS pgcrypto;`n" + $Matches[1]
 $sql | docker exec -i $Container psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

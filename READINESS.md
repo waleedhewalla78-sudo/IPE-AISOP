@@ -77,8 +77,9 @@ See `specs/004-ai-first-v6/clarify-v6.md` and `specs/003-autonomous-planning-v5/
 
 | Path | Role |
 |------|------|
-| `D:/AISOP/ipe/` | **Canonical monorepo** |
-| `D:/AISOP/services/` | Orphan duplicate — do not deploy |
+| `E:/AISOP/ipe/` | **Canonical monorepo** |
+| `E:/AISOP/services/` | Orphan duplicate — do not deploy |
+| `E:/AISOP/.specify/` | Spec Kit config (program feature: 005) |
 
 ---
 

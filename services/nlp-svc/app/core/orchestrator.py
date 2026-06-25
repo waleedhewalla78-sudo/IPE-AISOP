@@ -217,13 +217,23 @@ async def route_query(query: str, tenant_id: str, auth_header: str | None = None
         "If the data is insufficient, explain what specific information the user should provide."
     )
 
-    response = await query_llm(query, system_prompt=system_msg)
-    if is_llm_error(response):
+    response: str
+    try:
+        response = await query_llm(query, system_prompt=system_msg)
+    except LLMUnavailableError:
         if settings.LLM_ROUTING_ENABLED:
-            raise LLMUnavailableError(response)
+            raise
         formatted = format_structured_response(intent, structured_data)
-        if formatted:
-            response = formatted
+        if not formatted:
+            raise
+        response = formatted
+    else:
+        if is_llm_error(response):
+            if settings.LLM_ROUTING_ENABLED:
+                raise LLMUnavailableError(response)
+            formatted = format_structured_response(intent, structured_data)
+            if formatted:
+                response = formatted
 
     return {
         "intent": intent,

@@ -119,12 +119,33 @@ async def recovery_plan(
         disruption = result.scalar_one_or_none()
 
     if not disruption:
+        scenarios = (
+            await session.execute(
+                select(ResolutionScenario)
+                .where(
+                    ResolutionScenario.tenant_id == tid,
+                    ResolutionScenario.status == "proposed",
+                )
+                .order_by(ResolutionScenario.business_score.desc())
+                .limit(3)
+            )
+        ).scalars().all()
+        recovery_options = []
+        for rank, scenario in enumerate(scenarios, start=1):
+            recovery_options.append({
+                "rank": rank,
+                "scenario_id": str(scenario.id),
+                "business_score_usd": round(float(scenario.business_score or 0) * 1000, 2),
+                "delivery_impact_days": float(scenario.delivery_impact_days or 0),
+                "activity_cost_usd": float(scenario.cost_impact or 0),
+                "summary": scenario.description or scenario.strategy,
+            })
         return APIResponse(
             success=True,
             data={
                 "disruption_id": disruption_id,
-                "impacted_mo_count": 0,
-                "recovery_options": [],
+                "impacted_mo_count": len({str(s.mo_id) for s in scenarios if s.mo_id}),
+                "recovery_options": recovery_options,
             },
             error=None,
         )

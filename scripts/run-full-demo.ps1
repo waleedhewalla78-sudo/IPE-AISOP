@@ -17,7 +17,13 @@ $DemoMoIds = @(
     "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
     "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003"
 )
+# Approve guardrail requires feasibility >= 85% (MO-DEMO-005/006 in seed-demo-client.sql)
+$ApproveMoIds = @(
+    "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
+    "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006"
+)
 $ScheduleBody = (@{ mo_ids = $DemoMoIds } | ConvertTo-Json -Compress)
+$ApproveScheduleBody = (@{ mo_ids = $ApproveMoIds } | ConvertTo-Json -Compress)
 $Pass = 0
 $Fail = 0
 $Total = 0
@@ -175,16 +181,15 @@ Test-Checkpoint "14. Inventory summary (master data)" {
 } -UiPath "/copilot"
 
 Test-Checkpoint "15. Schedule - persist after approve" {
-    $sched = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ScheduleBody -TimeoutSec 90
-    $moIds = @($sched.data.rows | ForEach-Object { $_.mo_id } | Select-Object -First 2)
-    if ($moIds.Count -lt 1) { return $false }
-    $approveBody = @{ mo_ids = $moIds } | ConvertTo-Json
+    $sched = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ApproveScheduleBody -TimeoutSec 90
+    if ($sched.data.total_operations -lt 1) { return $false }
+    $approveBody = @{ mo_ids = $ApproveMoIds } | ConvertTo-Json
     $approved = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule/approve" -Headers $h -Method POST -ContentType "application/json" -Body $approveBody -TimeoutSec 30
     if ($approved.data.activated_count -lt 1) { return $false }
     $active = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule/active" -Headers $h -TimeoutSec 20
     $persisted = @($active.data.rows | Where-Object { $_.approved -eq $true })
     if ($persisted.Count -lt 1) { return $false }
-    "approved $($approved.data.activated_count) MO(s); $($persisted.Count) persisted in active schedule"
+    "approved $($approved.data.activated_count) MO(s); $($persisted.Count) persisted in active schedule$(if ($approved.data.erp_event_published -eq $false) { '; ERP sync deferred' } else { '' })"
 } -UiPath "/schedule"
 
 Test-Checkpoint "17. V6-R1 - margin-aware priority ordering" {

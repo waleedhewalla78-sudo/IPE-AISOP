@@ -1,10 +1,10 @@
 # Tasks: IPE Program — Release Execution & Post-V6 Backlog
 
-**Input**: [plan.md](./plan.md), [spec.md](./spec.md), [../004-ai-first-v6/tasks-release.md](../004-ai-first-v6/tasks-release.md)
+**Input**: [plan.md](./plan.md), [spec.md](./spec.md), [converge.md](./converge.md), [../004-ai-first-v6/tasks-release.md](../004-ai-first-v6/tasks-release.md)
 
-**Branch**: `005-ipe-program-status`
+**Branch**: `005-ipe-program-status` | **Updated**: 2026-06-26
 
-**Purpose**: Program-level task rollup — maps features 002–004 release work and POST backlog.
+**Live evidence**: `docs/demo-run-report-v6.txt` **20/20** ✅ (2026-06-26)
 
 ---
 
@@ -18,110 +18,136 @@
 
 ## Phase P2: Documentation Sync (maps P-DOC-*)
 
-**Owner**: Any agent before or parallel to release  
-**Detail**: [../004-ai-first-v6/tasks-release.md](../004-ai-first-v6/tasks-release.md) P-DOC-01–08
-
-- [x] T004 [P1] Execute P-DOC-01–03, P-DOC-08 — fix HIGH analyze drift in `005/spec.md` + `implementation-tracker.md`
-- [x] T005 [P2] Execute P-DOC-04–07 — Notion note, quickstart CP, SPECKIT footnote
-- [ ] T006 [P1] After REL-11, execute P-DOC-04 — mark SC-V6 live proven in analyze + tracker
+- [x] T004 [P1] Execute P-DOC-01–03, P-DOC-08
+- [x] T005 [P2] Execute P-DOC-04–07
+- [ ] T006 [P1] After REL-11 (20/20), mark SC-V6 live proven in analyze + tracker
 
 ---
 
 ## Phase P3: Release Verification (maps REL-*)
 
-**Owner**: Release engineer / `/speckit.implement`  
-**Detail**: [../004-ai-first-v6/tasks-release.md](../004-ai-first-v6/tasks-release.md)
+| Program task | Release tasks | Exit gate | Status |
+|--------------|---------------|-----------|--------|
+| T007 [P0] Stack | REL-01–05 | API :8000 + seed | ✅ 2026-06-25 |
+| T008 [P0] Tests | REL-06–08 | launch-verify 10/10 | ✅ 2026-06-23 |
+| T009 [P0] Demo | REL-09–11 | demo 20/20 | ✅ **20/20** 2026-06-26 |
+| T010 [P0] Tag | REL-12–17 | v6.0.0 + T055 | ⬜ pending demo + git |
+| T011 [P2] 100/100 | REL-18–20 | k6 + Chaos | ⬜ optional |
 
-| Program task | Release tasks | Exit gate |
-|--------------|---------------|-----------|
-| T007 [P0] Stack | REL-01–05 | API :8000 + seed |
-| T008 [P0] Tests | REL-06–08 | launch-verify 10/10 |
-| T009 [P0] Demo | REL-09–11 | demo 20/20 |
-| T010 [P0] Tag | REL-12–17 | v6.0.0 + T055 ✅ |
-| T011 [P2] 100/100 | REL-18–20 | k6 + Chaos evidence |
-
-- [x] T008 [P0] [P3] Complete REL-TEST (REL-06–08) — 10/10 2026-06-23
-- [ ] T007 [P0] [P3] Complete REL-STACK (REL-01–05)
-- [ ] T009 [P0] [P3] Complete REL-DEMO (REL-09–11)
-- [ ] T010 [P0] [P3] Complete REL-TAG (REL-12–17) — **closes 004 T055**
-- [ ] T011 [P2] [P3] Complete REL-PROD (REL-18–20) — optional 100/100
+- [x] T007 [P0] REL-STACK
+- [x] T008 [P0] REL-TEST
+- [x] T009 [P0] REL-DEMO — **20/20** 2026-06-26
+- [ ] T010 [P0] REL-TAG — user approval + T055 + **T023 git commit**
+- [ ] T011 [P2] REL-PROD
 
 ---
 
-## Phase P4: Ongoing Sync (recurring)
+## Phase P3-FIX: Demo 20/20 — Live failures
 
-- [ ] T012 [P] After T010, update `005/spec.md` program table to **55/55**, readiness **96/100**
-- [ ] T013 [P] Sync Notion IPE Task Tracker v2 after each REL phase completes
-- [ ] T014 [P] Close 002 T049–T053 or mark superseded in `005/spec.md` (see G-002-*)
-- [ ] T015 [P] Archive superseded `IMPLEMENTATION-TASKS.md` pointers → 005 spec
+**Evidence**: `docs/demo-run-report-v6.txt` 2026-06-26
+
+| Task | CP | Issue | Fix | Status |
+|------|-----|-------|-----|--------|
+| T016 | 10–11 | Copilot 503 | nlp-svc catch LLMUnavailableError + demo env | ✅ |
+| T017 | 15 | Guardrail / wrong MOs | `$ApproveMoIds` 005/006 in demo script | ✅ |
+| T018 | 18 | Tariff 500 | BomLine→BillOfMaterial join | ✅ |
+| T019 | 20 | recovery-plan 500 | alert-svc init_database + seed/fallback | ✅ |
+| T021 | 15 | MAINT_* UUID parse 500 | Skip synthetic ops in persist | ✅ |
+| T022 | all | Stable 20/20 | Rebuild cap-svc + demo script CP15 gate | ✅ 2026-06-26 |
+
+- [x] T016 [P0] Fix nlp-svc Copilot 503
+- [x] T017 [P0] Fix CP15 approve guardrail + demo script
+- [x] T018 [P0] Fix CP18 tariff shock
+- [x] T019 [P0] Fix CP20 chaos/maintenance + War Room recovery
+- [x] T021 [P0] Skip synthetic maintenance assignments
+- [x] T022 [P0] Demo **20/20** verified
+
+**Validation**:
+
+```powershell
+cd E:\AISOP\ipe
+docker compose -f infrastructure/docker/docker-compose.yml -f infrastructure/docker/docker-compose.demo.yml build cap-svc
+docker compose -f infrastructure/docker/docker-compose.yml -f infrastructure/docker/docker-compose.demo.yml up -d cap-svc
+.\scripts\run-full-demo.ps1 -ReportPath docs\demo-run-report-v6.txt
+```
 
 ---
 
-## Phase POST-A — Scale & Performance (post-v6.0.0)
+## Phase P0-GIT: Foundation (Master Plan §5)
 
-- [ ] POST-A1 [P1] Implement async CPM cascade for >50 MOs in `services/cap-svc/app/core/visual_cpm.py`
-- [ ] POST-A2 [P1] Extract `visual-cpm-svc` microservice per AD-007 follow-on
-- [ ] POST-A3 [P2] Wire `ipe.chaos.metric` real-time tail to Cost of Chaos UI
-
-**Effort**: 2–4 weeks · **Trigger**: Customer plant >20 MOs on Gantt
+- [ ] T023 [P0] `git init` + initial commit (all T016–T021 + BUG-01 fixes)
+- [ ] T024 [P0] User approval → `git tag -a v6.0.0` (T055)
 
 ---
 
-## Phase POST-B — Enterprise Integrations
+## Phase P1-AUDIT: Post-tag production blockers
 
-- [ ] POST-B1 [P1] Keycloak OIDC/SAML/SCIM live test — **BLOCKED** C-007 (Azure AD sandbox)
-- [ ] POST-B2 [P1] SAP sandbox connector validation beyond mapper scripts
-- [ ] POST-B3 [P1] D365 sandbox connector validation beyond mapper scripts
-- [ ] POST-B4 [P2] Production Odoo handler for `sync_routing_correction` (extends V6-R4 stub)
+- [ ] T025 [P1] C-01 mat-svc check-availability → `rule_based_atp()`
+- [ ] T026 [P1] C-02 dpe-svc double route prefix; BUG-02 MDR fail-closed; BUG-03 version guard
 
-**Effort**: 4–8 weeks · **Blocker**: Customer IdP / ERP sandbox
+---
+
+## Phase P4: Ongoing Sync
+
+- [ ] T012 [P] After T024, update spec program table **55/55**
+- [ ] T013 [P] Sync Notion after REL phases
+- [ ] T014 [P] Close 002 T049–T053 hygiene
+- [ ] T015 [P] Archive superseded IMPLEMENTATION-TASKS pointers
+
+---
+
+## Phase POST-A — Scale (post-v6.0.0)
+
+- [ ] POST-A1 Async CPM >50 MOs
+- [ ] POST-A2 `visual-cpm-svc` split
+- [ ] POST-A3 Chaos metric real-time UI
+
+---
+
+## Phase POST-B — Enterprise
+
+- [ ] POST-B1 Keycloak — **BLOCKED** C-007
+- [ ] POST-B2 SAP sandbox
+- [ ] POST-B3 D365 sandbox
+- [ ] POST-B4 Odoo routing correction handler
 
 ---
 
 ## Phase POST-C — Governance & Data
 
-- [ ] POST-C1 [P2] Migration `cdm_schedule_version` immutable snapshots (003 C2)
-- [ ] POST-C2 [P2] Digital Twin promote/clone workflow (003 C7)
-- [ ] POST-C3 [P2] RLS policies on legacy migrations 002–012 tables (constitution I debt)
+- [ ] POST-C1 `cdm_schedule_version`
+- [ ] POST-C2 Digital Twin promote/clone
+- [ ] POST-C3 Legacy RLS 002–012
 
 ---
 
-## Phase POST-D — Commercial & UX (out of scope unless requested)
+## Phase POST-D — Commercial & UX
 
-- [ ] POST-D1 [P3] FR-603 Stripe billing integration
-- [ ] POST-D2 [P3] FR-505 React Native mobile app
-- [ ] POST-D3 [P2] FR-506 WCAG 2.1 AA audit
-- [ ] POST-D4 [P3] FR-405 MLflow feature store
-- [ ] POST-D5 [P3] Project Phoenix commerce stack (Engine A)
+- [ ] POST-D1–D5 (out of scope v6)
 
 ---
 
-## Program Task Rollup
+## Program Rollup
 
 | Feature | Tasks | Done | Open |
 |---------|-------|------|------|
-| 002 Release gates | 62 | 58 | 4 (hygiene) |
+| 002 Gates | 62 | 58 | 4 |
 | 003 V5 | 45 | 45 | 0 |
-| 004 V6 build | 55 | 54 | 1 (T055) |
-| 004 Release (REL-*) | 25 | 0 | 25 |
-| 005 Program meta | 15 | 5 | 10 |
-| **Speckit total** | **202** | **162** | **40** |
-
-*Release tasks (REL-*) overlap T055; after T010 program counts 004 @ 55/55.*
+| 004 V6 | 55 | 54 | 1 (T055) |
+| 005 Program | 27 | 12 | 15 |
+| **Critical path** | T021–T024 | 4 done (T016–T019) | **T021–T024** |
 
 ---
 
-## Critical Path (Next 48h)
+## Critical Path
 
 ```text
-T007 (REL-01–05) → T008 (REL-06–08) → T009 (REL-09–11) → T010 (REL-12–17)
+T021 (CP15 rebuild) → T022 (20/20) → T023 (git commit) → T024 (v6.0.0 tag)
 ```
 
-**Start command**:
+**Stack command**:
 
 ```powershell
-cd D:\AISOP\ipe\infrastructure\docker
-docker compose up -d
+cd E:\AISOP\ipe
+.\scripts\rel-demo-stack.ps1 -SkipBuild
 ```
-
-**Next speckit command**: `/speckit.implement` on REL-01

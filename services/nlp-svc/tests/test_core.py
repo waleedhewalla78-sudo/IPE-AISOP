@@ -33,6 +33,36 @@ async def test_classify_intent_keywords_fg_stock():
 
 
 @pytest.mark.asyncio
+async def test_route_query_uses_structured_fallback_when_llm_raises():
+    mock_fetcher = AsyncMock(
+        return_value={
+            "items": [
+                {
+                    "name": "Widget A",
+                    "internal_ref": "WGT-A-100",
+                    "uom": "unit",
+                    "qty_on_hand": 150,
+                    "qty_reserved": 0,
+                    "qty_available": 150,
+                }
+            ]
+        }
+    )
+    with (
+        patch("app.config.settings.LLM_ROUTING_ENABLED", False),
+        patch("app.core.orchestrator._classify_intent", return_value="material_status"),
+        patch("app.core.orchestrator._INTENT_DATA_FETCHERS", {"material_status": mock_fetcher}),
+        patch(
+            "app.core.orchestrator.query_llm",
+            side_effect=LLMUnavailableError("LLM error: all providers unavailable"),
+        ),
+    ):
+        result = await route_query("What is the current FG stock?", "tenant-1", auth_header="Bearer token")
+        assert result["intent"] == "material_status"
+        assert "Widget A" in result["response"]
+
+
+@pytest.mark.asyncio
 async def test_route_query_uses_structured_fallback_when_llm_unavailable():
     mock_fetcher = AsyncMock(
         return_value={

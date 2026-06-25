@@ -1,0 +1,101 @@
+# Demo / REL-STACK overlay — minimal services for run-full-demo.ps1 (20 checkpoints).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.demo.yml up -d ...
+#
+# Skips: ollama, airflow, keycloak, mlflow, jaeger, otel-collector, sustain, quality, ml-svc
+
+x-demo-otel-off: &demo-otel-off
+  OTEL_TRACING_ENABLED: "false"
+  OTEL_LOGGING_ENABLED: "false"
+
+services:
+  dpe-svc:
+    environment:
+      <<: *demo-otel-off
+
+  mat-svc:
+    environment:
+      <<: *demo-otel-off
+
+  cap-svc:
+    environment:
+      <<: *demo-otel-off
+
+  fea-svc:
+    environment:
+      <<: *demo-otel-off
+
+  res-svc:
+    environment:
+      <<: *demo-otel-off
+
+  del-svc:
+    environment:
+      <<: *demo-otel-off
+
+  rec-svc:
+    environment:
+      <<: *demo-otel-off
+
+  nlp-svc:
+    environment:
+      <<: *demo-otel-off
+      OLLAMA_ENDPOINT_URL: ""
+      IPE_LLM_ROUTING_ENABLED: "false"
+    depends_on: !reset
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      dpe-svc:
+        condition: service_started
+      mat-svc:
+        condition: service_started
+      cap-svc:
+        condition: service_started
+
+  # Heavy optional services — excluded from demo profile
+  ollama:
+    profiles: ["full"]
+
+  alert-svc:
+    environment:
+      <<: *demo-otel-off
+
+  connector:
+    environment:
+      <<: *demo-otel-off
+
+  scn-svc:
+    environment:
+      <<: *demo-otel-off
+
+  network-svc:
+    environment:
+      <<: *demo-otel-off
+
+  kong:
+    depends_on:
+      dpe-svc:
+        condition: service_started
+      mat-svc:
+        condition: service_started
+      cap-svc:
+        condition: service_started
+      fea-svc:
+        condition: service_started
+      del-svc:
+        condition: service_started
+      res-svc:
+        condition: service_started
+      nlp-svc:
+        condition: service_started
+      alert-svc:
+        condition: service_started
+      connector:
+        condition: service_started
+      scn-svc:
+        condition: service_started
+      network-svc:
+        condition: service_started

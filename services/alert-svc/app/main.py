@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.config import settings
 from app.events.consumers import start_consumers, stop_consumers
+from ipe_shared.database.connection import close_database, init_database
 from ipe_shared.middleware.error_handler import register_exception_handlers
 from ipe_shared.middleware.tenant_context import TenantContextMiddleware
 from ipe_shared.observability import setup_observability
@@ -13,9 +14,11 @@ from ipe_shared.observability import setup_observability
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await init_database(settings.DATABASE_URL)
     await start_consumers()
     yield
     await stop_consumers()
+    await close_database()
 
 
 def create_app() -> FastAPI:

@@ -198,21 +198,31 @@ async def post_tariff_shock(
         margin_threshold_pct=req.margin_threshold_pct,
     )
 
-    envelope = kafka_producer.build_envelope(
-        event_type="ipe.tariff.shock",
-        tenant_id=tenant_id,
-        payload={
-            "region": req.region,
-            "delta_pct": req.tariff_delta_pct,
-            "affected_mo_ids": result.get("affected_mo_ids", []),
-            "timestamp": datetime.now(UTC).isoformat(),
-        },
-    )
-    await kafka_producer.send_avro(
-        topic="ipe.tariff.shock",
-        key=tenant_id,
-        envelope=envelope,
-    )
+    try:
+        envelope = kafka_producer.build_envelope(
+            event_type="ipe.tariff.shock",
+            tenant_id=tenant_id,
+            payload={
+                "region": req.region,
+                "delta_pct": req.tariff_delta_pct,
+                "affected_mo_ids": result.get("affected_mo_ids", []),
+                "timestamp": datetime.now(UTC).isoformat(),
+            },
+        )
+        await kafka_producer.send_avro(
+            topic="ipe.tariff.shock",
+            key=tenant_id,
+            envelope=envelope,
+        )
+    except Exception:
+        import logging
+
+        logging.getLogger(__name__).exception(
+            "Failed to publish ipe.tariff.shock for tenant %s", tenant_id
+        )
+        result["event_published"] = False
+    else:
+        result["event_published"] = True
     await session.commit()
 
     return APIResponse(success=True, data=result, error=None)
