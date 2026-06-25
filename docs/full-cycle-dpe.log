@@ -1,0 +1,517 @@
+﻿docker : DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+At C:\Users\HP\AppData\Local\Temp\ps-script-bad60706-c3b0-48d6-914e-4312bdc92610.ps1:113 char:213
++ ... l-cycle-cap.log; docker logs docker-dpe-svc-1 --tail 200 2>&1 | Out-F ...
++                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (DEBUG:aiokafka....=0) at offset 0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+DEBUG:aiokafka.conn:Request to kafka:9092 6396: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1082: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1082: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6396: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6397: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6397: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6398: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6398: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6399: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6399: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6400: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6400: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6401: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6401: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6402: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1083: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1083: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6402: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6403: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6403: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6404: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6404: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6405: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6405: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6406: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6406: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+INFO:     172.20.0.18:41130 - "GET /api/v1/ai-trust/scores HTTP/1.1" 200 OK
+DEBUG:aiokafka.conn:Request to kafka:9092 6407: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6407: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6408: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1084: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1084: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6408: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6409: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/ai-trust/scores status=200 elapsed_ms=8.1
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/admin/config status=200 elapsed_ms=3.4
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/demand/mdr/dashboard status=401 elapsed_ms=3.8
+DEBUG:aiokafka.conn:Response from kafka:9092 6409: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6410: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/demand/priority/margin-aware status=200 elapsed_ms=52.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.0
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/demand/mdr/dashboard status=401 elapsed_ms=2.7
+DEBUG:aiokafka.conn:Response from kafka:9092 6410: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6411: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+DEBUG:aiokafka.producer.producer:Sending (key=b'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' 
+value=b'Obj\x01\x04\x14avro.codec\x08null\x16avro.schema\xe4\x08{"type": "record", "name": "TariffShock", "fields": 
+[{"name": "event_id", "type": "string"}, {"name": "tenant_id", "type": "string"}, {"name": "event_type", "type": 
+"string"}, {"name": "occurred_at", "type": "string"}, {"default": 1, "name": "schema_version", "type": "int"}, 
+{"name": "payload", "type": {"type": "record", "name": "TariffShockPayload", "fields": [{"name": "region", "type": 
+"string"}, {"name": "delta_pct", "type": "double"}, {"name": "affected_mo_ids", "type": {"type": "array", "items": 
+"string"}}, {"name": "timestamp", "type": "string"}]}}]}\x00\xa6\xbf\x8f\xeb\xbd5lRp@\xb8\xa6\xaeoe\xf3\x02\x9e\x06H39a
+54c68-b758-43bd-9963-70fa11c56b48Ha0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11 ipe.tariff.shock@2026-06-25T21:44:47.503886+00:0
+0\x02\x10Region_X\x00\x00\x00\x00\x00\x009@\x0cHd1eebc99-9c0b-4ef8-bb6d-6bb9bd380004Hd1eebc99-9c0b-4ef8-bb6d-6bb9bd3800
+07Hd1eebc99-9c0b-4ef8-bb6d-6bb9bd380008Hd1eebc99-9c0b-4ef8-bb6d-6bb9bd380001Hd1eebc99-9c0b-4ef8-bb6d-6bb9bd380002Hd1eeb
+c99-9c0b-4ef8-bb6d-6bb9bd380005\x00@2026-06-25T21:44:47.503845+00:00\xa6\xbf\x8f\xeb\xbd5lRp@\xb8\xa6\xaeoe\xf3') to 
+TopicPartition(topic='ipe.tariff.shock', partition=0)
+DEBUG:aiokafka.conn:Request to kafka:9092 18: ProduceRequest_v7(transactional_id=None, required_acks=1, timeout=40000, 
+topics=[(topic='ipe.tariff.shock', partitions=[(partition=0, messages=bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\
+x00\x04f\xff\xff\xff\xff\x02\x01\xbc\x15\x07\x00\x00\x00\x00\x00\x00\x00\x00\x01\x9f\x00\xbe\x1e\x90\x00\x00\x01\x9f\x0
+0\xbe\x1e\x90\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x01\xe6\x10\x00\x00\x00Ha0eebc99-9c0b
+-4ef8-bb6d-6bb9bd380...'))])])
+INFO:     172.20.0.18:41130 - "GET /api/v1/admin/config HTTP/1.1" 200 OK
+INFO:     172.20.0.15:56822 - "GET /api/v1/demand/mdr/dashboard HTTP/1.1" 401 Unauthorized
+INFO:     172.20.0.18:41130 - "GET /api/v1/demand/priority/margin-aware HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47292 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     172.20.0.15:56830 - "GET /api/v1/demand/mdr/dashboard HTTP/1.1" 401 Unauthorized
+INFO:     172.20.0.18:41130 - "POST /api/v1/demand/tariff/shock HTTP/1.1" 200 OK
+INFO:     172.20.0.18:41130 - "GET /api/v1/analytics/cost-of-chaos?period=7d HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=POST path=/api/v1/demand/tariff/shock status=200 elapsed_ms=90.1
+DEBUG:aiokafka.conn:Response from kafka:9092 18: ProduceResponse_v7(topics=[(topic='ipe.tariff.shock', 
+partitions=[(partition=0, error_code=0, offset=5, timestamp=-1, log_start_offset=0)])], throttle_time_ms=0)
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/analytics/cost-of-chaos status=200 elapsed_ms=15.1
+DEBUG:aiokafka.conn:Response from kafka:9092 6411: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6412: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6412: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6413: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6413: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6414: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1085: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1085: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6414: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6415: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6415: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6416: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6416: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6417: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6417: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6418: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6418: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6419: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6419: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6420: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1086: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1086: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6420: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6421: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6421: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6422: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6422: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6423: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6423: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6424: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6424: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6425: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6425: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6426: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1087: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1087: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6426: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6427: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6427: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6428: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6428: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6429: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6429: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6430: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6430: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6431: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6431: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6432: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1088: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1088: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6432: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6433: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6433: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6434: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6434: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6435: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6435: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6436: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6436: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6437: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6437: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6438: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.consumer.group_coordinator:Heartbeat: dpe-svc[3] aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0
+DEBUG:aiokafka.conn:Request to kafka:9092 1089: HeartbeatRequest_v1(group='dpe-svc', generation_id=3, 
+member_id='aiokafka-0.14.0-71f113dd-0dd2-491d-b447-b30e7f8796e0')
+DEBUG:aiokafka.conn:Response from kafka:9092 1089: HeartbeatResponse_v1(throttle_time_ms=0, error_code=0)
+DEBUG:aiokafka.consumer.group_coordinator:Received successful heartbeat response for group dpe-svc
+DEBUG:aiokafka.conn:Response from kafka:9092 6438: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+INFO:     127.0.0.1:38722 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:aiokafka.conn:Request to kafka:9092 6439: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6439: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6440: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6440: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6441: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+DEBUG:aiokafka.conn:Response from kafka:9092 6441: FetchResponse_v11(throttle_time_ms=0, error_code=0, session_id=0, 
+topics=[(topics='ipe.demand.created', partitions=[(partition=0, error_code=0, highwater_offset=0, 
+last_stable_offset=0, log_start_offset=0, aborted_transactions=NULL, preferred_read_replica=-1, message_set=b'')])])
+DEBUG:aiokafka.consumer.fetcher:Adding fetch request for partition TopicPartition(topic='ipe.demand.created', 
+partition=0) at offset 0
+DEBUG:aiokafka.conn:Request to kafka:9092 6442: FetchRequest_v11(replica_id=-1, max_wait_time=500, min_bytes=1, 
+max_bytes=52428800, isolation_level=0, session_id=0, session_epoch=-1, topics=[(topic='ipe.demand.created', 
+partitions=[(partition=0, current_leader_epoch=-1, fetch_offset=0, log_start_offset=-1, max_bytes=1048576)])], 
+forgotten_topics_data=[], rack_id='')
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.0

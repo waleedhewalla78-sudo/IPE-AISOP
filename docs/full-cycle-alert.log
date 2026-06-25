@@ -1,0 +1,209 @@
+﻿INFO:     127.0.0.1:46762 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52948 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47296 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55042 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59308 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49238 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50200 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44726 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53620 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50022 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56252 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54232 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57914 - "GET /api/v1/health HTTP/1.1" 200 OK
+docker : INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+At C:\Users\HP\AppData\Local\Temp\ps-script-bad60706-c3b0-48d6-914e-4312bdc92610.ps1:113 char:304
++ ... cycle-dpe.log; docker logs docker-alert-svc-1 --tail 200 2>&1 | Out-F ...
++                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO:ipe.reques... elapsed_ms=1.7:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.3
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.6
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=4.4
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.4
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:35320 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:57720 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.8
+INFO:     127.0.0.1:39372 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:52342 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:43510 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:59744 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.6
+INFO:     127.0.0.1:33102 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.4
+INFO:     127.0.0.1:40812 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:33842 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:     127.0.0.1:53370 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:     127.0.0.1:40896 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:     127.0.0.1:47172 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.6
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+INFO:     127.0.0.1:52434 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47666 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32980 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=5.2
+INFO:     127.0.0.1:49728 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60496 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36694 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53306 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52842 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42026 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39966 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45434 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37794 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43230 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38684 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51096 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43310 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     172.20.0.18:45662 - "GET /api/v1/war-room/recovery-plan HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38904 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33686 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39008 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56516 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37630 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     172.20.0.18:41908 - "GET /api/v1/war-room/recovery-plan HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55460 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43312 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34416 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54892 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35670 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56080 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44206 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39098 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43998 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52970 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34012 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39964 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57052 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45060 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46640 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40874 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50634 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41498 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40434 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55056 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46250 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36994 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45064 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51812 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38298 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44020 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=8.0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.4
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.6
+INFO:     127.0.0.1:57730 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53852 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58258 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50830 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44386 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41680 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48400 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53632 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35680 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39492 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60020 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34462 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56792 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54916 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51694 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48850 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.6
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.1
+INFO:     127.0.0.1:37100 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33840 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46570 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48236 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39788 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51790 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34100 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     172.20.0.18:57616 - "GET /api/v1/war-room/recovery-plan HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38786 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.9
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/war-room/recovery-plan status=200 elapsed_ms=20.0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.6
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.6
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/war-room/recovery-plan status=200 elapsed_ms=6.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.6
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.3
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.4
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.3
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=13.3
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.1
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.2
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.6
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.4
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.3
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.4
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.2
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.9
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.1
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.6
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=2.3
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.1
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.5
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.1
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=1.7
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' 
+object has no attribute 'execute'
+INFO:ipe.request:request_id= method=GET path=/api/v1/war-room/recovery-plan status=200 elapsed_ms=17.8
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=0.7

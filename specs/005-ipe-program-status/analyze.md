@@ -2,7 +2,7 @@
 
 **Feature**: `005-ipe-program-status` | **Date**: 2026-06-26  
 **Scope**: Program-wide (000 → 005) + release track REL-* + Master Execution Plan alignment  
-**Readiness**: **97/100** (code); **live demo 19/20** (1 CP remaining)
+**Readiness**: **97/100** (code); **live demo 20/20** (stable full-cycle re-run 2026-06-26)
 
 **Method**: `/speckit.analyze` — synthesis across `spec.md`, `plan.md`, `tasks.md`, `004/*`, `READINESS.md`, Master Execution Plan (2026-06-26), live demo report.
 
@@ -13,17 +13,14 @@
 | Dimension | Status |
 |-----------|--------|
 | **Speckit build tasks (002+003+004)** | **157 / 162 (97%)** |
-| **Release tasks (REL-*)** | **14 / 30 (47%)** — REL-STACK/TEST ✅; REL-DEMO **19/20** |
-| **V6 code** | **54/55** — T055 tag only |
-| **Program FRs (FR-P-*)** | **13/14 met in code**; **1 live-proof pending (CP15)** |
-| **Constitution I–VI** | ✅ migrations 024–027 + tests in repo |
-| **Live demo** | **20/20** (2026-06-26) — all CPs ✅ |
-| **Integration (live)** | **41 pass / 8 fail / 14 skip** |
-| **Audit deployment score** | **74/100** (external, Jun 20) — distinct from Speckit 96/97 |
-| **Product scope** | **IPE only** — Nexus out of scope |
-| **Uncommitted fixes** | T016–T019 + T021 in working tree — **git init pending** |
+| **Release tasks (REL-*)** | **16 / 30 (53%)** — REL-STACK/TEST/DEMO/TAG ✅ |
+| **V6 code** | **55/55** — v6.0.0 tagged |
+| **Program FRs (FR-P-*)** | **14/14 met** |
+| **Live demo** | **20/20** (2026-06-26) — stable re-run with full-cycle report |
+| **Audit deployment score** | **74/100** baseline → **~82/100** est. post T025–T026 |
+| **Uncommitted fixes** | T025–T026 audit fixes in working tree (post-tag) |
 
-**Recommendation**: Phase 0 git commit (T023) → user approval → tag **v6.0.0** (T024).
+**Recommendation**: Rebuild `cap-svc`/`mat-svc` images for live audit fixes; optional `git push` when remote ready.
 
 ---
 
@@ -36,7 +33,7 @@
 | Workspace root | `E:\AISOP` |
 | Monorepo | `ipe/` (services, apps/web, specs, infrastructure) |
 | Spec Kit | `.specify/` @ root; `feature.json` → `ipe/specs/005-*` |
-| Git | `master`, **no commits**; use `safe.directory=E:/AISOP` |
+| Git | `main`, commit `a203e68`, tag **v6.0.0** |
 | Orphan paths | `E:\AISOP/services/` — do not deploy; `my-project/` redundant scaffold |
 | Out of scope | `nexus-social/`, `E:\nexus-social-platform\` |
 

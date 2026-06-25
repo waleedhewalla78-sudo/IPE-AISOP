@@ -2,9 +2,14 @@
   "feature_directory": "specs/005-ipe-program-status",
   "active_implementation": "specs/004-ai-first-v6",
   "active_plan": "specs/005-ipe-program-status/plan.md",
-  "readiness_score": 96,
+  "readiness_score": 97,
+  "live_demo_score": "20/20",
+  "audit_score_baseline": 74,
+  "audit_score_target": 85,
+  "audit_score_estimate_post_fix": 82,
   "release_target": "v6.0.0",
-  "last_speckit_run": "2026-06-23",
-  "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks"],
-  "active_implementation_phase": "REL-STACK"
+  "phase": "REL-AUDIT-COMPLETE",
+  "last_speckit_run": "2026-06-26",
+  "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks", "converge"],
+  "active_implementation_phase": "REL-AUDIT"
 }

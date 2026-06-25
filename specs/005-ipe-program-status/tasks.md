@@ -37,7 +37,7 @@
 - [x] T007 [P0] REL-STACK
 - [x] T008 [P0] REL-TEST
 - [x] T009 [P0] REL-DEMO — **20/20** 2026-06-26
-- [ ] T010 [P0] REL-TAG — user approval + T055 + **T023 git commit**
+- [x] T010 [P0] REL-TAG — **v6.0.0** tagged 2026-06-26 (commit `a203e68`)
 - [ ] T011 [P2] REL-PROD
 
 ---
@@ -75,15 +75,15 @@ docker compose -f infrastructure/docker/docker-compose.yml -f infrastructure/doc
 
 ## Phase P0-GIT: Foundation (Master Plan §5)
 
-- [ ] T023 [P0] `git init` + initial commit (all T016–T021 + BUG-01 fixes)
-- [ ] T024 [P0] User approval → `git tag -a v6.0.0` (T055)
+- [x] T023 [P0] Git commit with all demo fixes (a203e68)
+- [x] T024 [P0] User approval → `git tag v6.0.0` (T055)
 
 ---
 
 ## Phase P1-AUDIT: Post-tag production blockers
 
-- [ ] T025 [P1] C-01 mat-svc check-availability → `rule_based_atp()`
-- [ ] T026 [P1] C-02 dpe-svc double route prefix; BUG-02 MDR fail-closed; BUG-03 version guard
+- [x] T025 [P1] C-01 mat-svc check-availability → `rule_based_atp()`
+- [x] T026 [P1] C-02 verified (no double prefix); BUG-02 MDR fail-closed; BUG-03 atomic version UPDATE
 
 ---
 
