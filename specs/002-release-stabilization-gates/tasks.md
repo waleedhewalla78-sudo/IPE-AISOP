@@ -174,11 +174,11 @@
 ### Implementation
 
 - [x] T048 [US5] Document or remove orphaned duplicate tree at `D:/AISOP/services/` (non-canonical per plan C2-001) — documented in READINESS.md
-- [ ] T049 [US5] Commit test/env fixes: `fix(test): align tests with contracts and JWT env` (services/, scripts/, .env.template)
-- [ ] T050 [US5] Commit docs reconciliation: `docs: reconcile readiness scores and phase status` (specs/, READINESS.md, RELEASE_NOTES.md, AGENTS.md)
-- [ ] T051 [US5] Commit gate evidence structure: `chore(release): add gate evidence and checklists` (specs/002-release-stabilization-gates/evidence/, contracts/)
+- [x] T049 [US5] Commit test/env fixes: `fix(test): align tests with contracts and JWT env` (services/, scripts/, .env.template)
+- [x] T050 [US5] Commit docs reconciliation: `docs: reconcile readiness scores and phase status` (specs/, READINESS.md, RELEASE_NOTES.md, AGENTS.md)
+- [x] T051 [US5] Commit gate evidence structure: `chore(release): add gate evidence and checklists` (specs/002-release-stabilization-gates/evidence/, contracts/)
 - [x] T052 [US5] Update `RELEASE_NOTES.md` with tag `v1.0.0-rc1`, verified test/E2E counts, and BLOCKED items list
-- [ ] T053 [US5] Create git tag `v1.0.0-rc1` on Gate 2 green commit SHA
+- [x] T053 [US5] ~~Create git tag `v1.0.0-rc1`~~ **CANCELLED** — superseded by `v1.0.0` + `v6.x` lineage (2026-06-26)
 - [x] T054 [US5] Assign SRE Lead or document risk waiver in `PROJECT_HANDOVER_SUMMARY.md` (audit R-10)
 
 **Checkpoint**: Tag published; release notes reference verifiable revision (SC-008).
