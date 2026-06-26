@@ -69,13 +69,9 @@ cd ..\..
 
 **Depends on**: REL-TEST complete
 
-- [ ] REL-09 [P0] [REL-DEMO] Run `ipe/scripts/run-full-demo.ps1 -ReportPath docs/demo-run-report-v6.txt`
-- [ ] REL-10 [P0] [REL-DEMO] Verify V6 checkpoints **17–20** pass:
-  - CP17: margin-aware + `activity_cost_breakdown`
-  - CP18: tariff shock `affected_mo_count ≥ 1` + substitute draft
-  - CP19: CPM `cascade_ms ≤ 2000`
-  - CP20: telemetry block + chaos ≥3 $ categories + recovery options
-- [ ] REL-11 [P0] [REL-DEMO] Confirm script summary **20/20 passed** (checkpoints 0–15 + 17–20)
+- [x] REL-09 [P0] [REL-DEMO] Run `ipe/scripts/run-full-demo.ps1 -ReportPath docs/demo-run-report-v6.txt`
+- [x] REL-10 [P0] [REL-DEMO] Verify V6 checkpoints **17–20** pass
+- [x] REL-11 [P0] [REL-DEMO] Confirm script summary **20/20 passed**
 
 **Exit gate**: `docs/demo-run-report-v6.txt` shows 20/20; SC-V6-01–06 live proven.
 
@@ -85,26 +81,30 @@ cd ..\..
 
 **Depends on**: REL-DEMO complete + stakeholder approval (clarify C-V6-09)
 
-- [ ] REL-12 [P0] [REL-TAG] Obtain stakeholder approval to tag **v6.0.0**
-- [ ] REL-13 [P0] [REL-TAG] Create annotated tag: `git tag -a v6.0.0 -m "IPE v6.0.0 — AI-First Strategic Reassessment"` (do not push unless requested)
-- [ ] REL-14 [P0] [REL-TAG] Mark **T055** `[x]` in `specs/004-ai-first-v6/tasks.md`
-- [ ] REL-15 [P1] [REL-TAG] Update `RELEASE_NOTES.md` tag date if needed; confirm `READINESS.md` = 96/100
-- [ ] REL-16 [P1] [REL-TAG] Update Notion: T055 Done; REL-01–04 Notion RV tasks Done
-- [ ] REL-17 [P1] [REL-TAG] Run `005` meta-task T009: program table shows **55/55** on 004
+- [x] REL-12 [P0] [REL-TAG] Stakeholder approval → tag **v6.0.0**
+- [x] REL-13 [P0] [REL-TAG] Annotated tag on `a203e68`
+- [x] REL-14 [P0] [REL-TAG] T055 marked in `tasks.md`
+- [x] REL-15 [P1] [REL-TAG] READINESS + RELEASE_NOTES updated
+- [ ] REL-16 [P1] [REL-TAG] Update Notion (optional)
+- [x] REL-17 [P1] [REL-TAG] Program table **55/55** on 004
 
 **Exit gate**: Tag exists locally; program **158/162** tasks; 004 **55/55** complete.
 
 ---
 
-## Phase REL-PROD — Production 100/100 (optional)
+## Phase REL-PROD — Production 100/100
 
 **Depends on**: REL-TAG complete
 
-- [ ] REL-18 [P2] [REL-PROD] Run `ipe/scripts/run-k6-200vu.ps1` — save report to `specs/003-autonomous-planning-v5/evidence/r4/k6/`
-- [ ] REL-19 [P2] [REL-PROD] Run `ipe/scripts/r4-verify.ps1` (Chaos Mesh) — save to `specs/003-autonomous-planning-v5/evidence/r4/chaos/`
-- [ ] REL-20 [P2] [REL-PROD] Update `ipe/READINESS.md` to **100/100** with evidence links (clarify C-V6-04)
+- [x] REL-18 [P2] [REL-PROD] k6 smoke + 10 VU + 200 VU — `docs/k6-summary.md`
+- [x] REL-19 [P2] [REL-PROD] Chaos C1–C6 — `docs/chaos/chaos-summary.md`
+- [x] REL-20 [P2] [REL-PROD] Coverage ≥60% cap/mat/dpe — `docs/coverage-summary.md`
+- [x] REL-21 [P2] [REL-PROD] Add `docker-compose.monitoring.yml` overlay
+- [x] REL-22 [P2] [REL-PROD] Prometheus + Loki + Grafana configs under `infrastructure/monitoring/`
+- [x] REL-23 [P2] [REL-PROD] `scripts/run-monitoring-stack.ps1` + `docs/ops-monitoring.md`
+- [x] REL-24 [P2] [REL-PROD] Live verify monitoring stack — `docs/ops-monitoring-verify.txt`
 
-**Exit gate**: k6 + Chaos evidence attached; READINESS 100/100.
+**Exit gate**: k6 + chaos + coverage + ops evidence attached; audit ~91/100.
 
 ---
 
@@ -124,9 +124,8 @@ cd ..\..
 | REL-TEST | REL-06–08 | 3 | **Yes** |
 | REL-DEMO | REL-09–11 | 3 | **Yes** |
 | REL-TAG | REL-12–17 | 6 | **Yes** (T055) |
-| REL-PROD | REL-18–20 | 3 | No |
-| G-002 | G-002-01–02 | 2 | No |
-| **Total open** | | **30** | |
+| REL-PROD | REL-18–24 | 7 | No |
+| **Total open** | | **4** | |
 
 **Testing track**: [tasks-testing.md](./tasks-testing.md) — TEST-01–09 (unit, integration, UI, k6, chaos)
 

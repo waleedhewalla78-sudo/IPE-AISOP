@@ -1,153 +1,269 @@
 # Tasks: IPE Program — Release Execution & Post-V6 Backlog
 
-**Input**: [plan.md](./plan.md), [spec.md](./spec.md), [converge.md](./converge.md), [../004-ai-first-v6/tasks-release.md](../004-ai-first-v6/tasks-release.md)
+
+
+**Input**: [plan.md](./plan.md), [spec.md](./spec.md), [converge.md](./converge.md), [analyze.md](./analyze.md), [../004-ai-first-v6/tasks-release.md](../004-ai-first-v6/tasks-release.md)
+
+
 
 **Branch**: `005-ipe-program-status` | **Updated**: 2026-06-26
 
-**Live evidence**: `docs/demo-run-report-v6.txt` **20/20** ✅ (2026-06-26)
+
+
+**Live evidence**: Demo **20/20** · k6 · chaos **6/6** · coverage **68/65/66%** · ops MVP
+
+
 
 ---
+
+
 
 ## Phase P1: Status Spec Creation ✅
 
+
+
 - [x] T001 Create `specs/005-ipe-program-status/spec.md`
+
 - [x] T002 Create `checklists/requirements.md`
+
 - [x] T003 Point `.specify/feature.json` to this feature + `active_plan`
 
+
+
 ---
+
+
 
 ## Phase P2: Documentation Sync (maps P-DOC-*)
 
+
+
 - [x] T004 [P1] Execute P-DOC-01–03, P-DOC-08
+
 - [x] T005 [P2] Execute P-DOC-04–07
-- [ ] T006 [P1] After REL-11 (20/20), mark SC-V6 live proven in analyze + tracker
+
+- [x] T006 [P1] SC-V6 live proven in analyze + tracker (20/20 + CP17–20)
+
+
 
 ---
+
+
 
 ## Phase P3: Release Verification (maps REL-*)
 
+
+
 | Program task | Release tasks | Exit gate | Status |
+
 |--------------|---------------|-----------|--------|
-| T007 [P0] Stack | REL-01–05 | API :8000 + seed | ✅ 2026-06-25 |
-| T008 [P0] Tests | REL-06–08 | launch-verify 10/10 | ✅ 2026-06-23 |
-| T009 [P0] Demo | REL-09–11 | demo 20/20 | ✅ **20/20** 2026-06-26 |
-| T010 [P0] Tag | REL-12–17 | v6.0.0 + T055 | ⬜ pending demo + git |
-| T011 [P2] 100/100 | REL-18–20 | k6 + Chaos | ⬜ optional |
+
+| T007 [P0] Stack | REL-01–05 | API :8000 + seed | ✅ |
+
+| T008 [P0] Tests | REL-06–08 | launch-verify 10/10 | ✅ |
+
+| T009 [P0] Demo | REL-09–11 | demo 20/20 | ✅ |
+
+| T010 [P0] Tag | REL-12–17 | v6.0.0 + T055 | ✅ |
+
+| T011 [P2] REL-PROD | REL-18–24 | k6 + chaos + coverage + ops | ✅ code |
+
+
 
 - [x] T007 [P0] REL-STACK
+
 - [x] T008 [P0] REL-TEST
-- [x] T009 [P0] REL-DEMO — **20/20** 2026-06-26
-- [x] T010 [P0] REL-TAG — **v6.0.0** tagged 2026-06-26 (commit `a203e68`)
-- [ ] T011 [P2] REL-PROD
+
+- [x] T009 [P0] REL-DEMO — **20/20**
+
+- [x] T010 [P0] REL-TAG — **v6.0.0** + **v6.0.1**
+
+- [x] T011 [P2] REL-PROD — Waves 2A–2D
+
+
 
 ---
 
-## Phase P3-FIX: Demo 20/20 — Live failures
 
-**Evidence**: `docs/demo-run-report-v6.txt` 2026-06-26
 
-| Task | CP | Issue | Fix | Status |
-|------|-----|-------|-----|--------|
-| T016 | 10–11 | Copilot 503 | nlp-svc catch LLMUnavailableError + demo env | ✅ |
-| T017 | 15 | Guardrail / wrong MOs | `$ApproveMoIds` 005/006 in demo script | ✅ |
-| T018 | 18 | Tariff 500 | BomLine→BillOfMaterial join | ✅ |
-| T019 | 20 | recovery-plan 500 | alert-svc init_database + seed/fallback | ✅ |
-| T021 | 15 | MAINT_* UUID parse 500 | Skip synthetic ops in persist | ✅ |
-| T022 | all | Stable 20/20 | Rebuild cap-svc + demo script CP15 gate | ✅ 2026-06-26 |
+## Phase P3-FIX: Demo 20/20 ✅
 
-- [x] T016 [P0] Fix nlp-svc Copilot 503
-- [x] T017 [P0] Fix CP15 approve guardrail + demo script
-- [x] T018 [P0] Fix CP18 tariff shock
-- [x] T019 [P0] Fix CP20 chaos/maintenance + War Room recovery
-- [x] T021 [P0] Skip synthetic maintenance assignments
-- [x] T022 [P0] Demo **20/20** verified
 
-**Validation**:
 
-```powershell
-cd E:\AISOP\ipe
-docker compose -f infrastructure/docker/docker-compose.yml -f infrastructure/docker/docker-compose.demo.yml build cap-svc
-docker compose -f infrastructure/docker/docker-compose.yml -f infrastructure/docker/docker-compose.demo.yml up -d cap-svc
-.\scripts\run-full-demo.ps1 -ReportPath docs\demo-run-report-v6.txt
-```
+- [x] T016–T022 Demo fixes + stable 20/20
+
+- [x] T023–T024 Git + v6.0.0 tag
+
+- [x] T025–T026 Audit fixes (C-01, BUG-02, BUG-03)
+
+
 
 ---
 
-## Phase P0-GIT: Foundation (Master Plan §5)
 
-- [x] T023 [P0] Git commit with all demo fixes (a203e68)
-- [x] T024 [P0] User approval → `git tag v6.0.0` (T055)
+
+## Phase REL-PROD — Waves (maps REL-18–24)
+
+
+
+| Wave | Task | Description | Status |
+
+|------|------|-------------|--------|
+
+| 2A | REL-18 | k6 smoke + 10 VU + 200 VU | ✅ `docs/k6-summary.md` |
+
+| 2B | REL-19 | Chaos C1–C6 | ✅ `docs/chaos/chaos-summary.md` |
+
+| 2C | REL-20 | Coverage ≥60% cap/mat/dpe | ✅ `docs/coverage-summary.md` |
+
+| 2D | REL-21 | `docker-compose.monitoring.yml` | ✅ |
+
+| 2D | REL-22 | Prometheus + Loki + Grafana configs | ✅ |
+
+| 2D | REL-23 | `run-monitoring-stack.ps1` + verify | ✅ script |
+
+| 2D | REL-24 | Live verify on demo stack | ✅ containers up |
+
+
 
 ---
 
-## Phase P1-AUDIT: Post-tag production blockers
 
-- [x] T025 [P1] C-01 mat-svc check-availability → `rule_based_atp()`
-- [x] T026 [P1] C-02 verified (no double prefix); BUG-02 MDR fail-closed; BUG-03 atomic version UPDATE
+
+## Phase W3 — v6.1.0 Hardening (OPEN)
+
+
+
+- [ ] W3-01 [P1] C-03 TLS internal services runbook — `docs/runbooks/tls-internal.md`
+
+- [ ] W3-02 [P1] C-04 JWT rotation runbook — `docs/runbooks/jwt-rotation.md`
+
+- [ ] W3-03 [P1] SEC-05 `password_hash` Alembic migration + seed update
+
+- [ ] W3-04 [P2] Post-W3 chaos C6 + demo 20/20 regression
+
+- [ ] W3-05 [P0] Tag **v6.1.0** + update READINESS (~95/100 audit)
+
+
 
 ---
+
+
 
 ## Phase P4: Ongoing Sync
 
-- [ ] T012 [P] After T024, update spec program table **55/55**
-- [ ] T013 [P] Sync Notion after REL phases
+
+
+- [ ] T012 [P] Program table **55/55** on 004 (verify synced)
+
+- [ ] T013 [P] Notion sync after W3
+
 - [ ] T014 [P] Close 002 T049–T053 hygiene
+
 - [ ] T015 [P] Archive superseded IMPLEMENTATION-TASKS pointers
 
+
+
 ---
 
-## Phase POST-A — Scale (post-v6.0.0)
+
+
+## Phase POST-A — Scale (post-v6.1.0)
+
+
 
 - [ ] POST-A1 Async CPM >50 MOs
+
 - [ ] POST-A2 `visual-cpm-svc` split
+
 - [ ] POST-A3 Chaos metric real-time UI
 
+
+
 ---
+
+
 
 ## Phase POST-B — Enterprise
 
+
+
 - [ ] POST-B1 Keycloak — **BLOCKED** C-007
-- [ ] POST-B2 SAP sandbox
-- [ ] POST-B3 D365 sandbox
-- [ ] POST-B4 Odoo routing correction handler
+
+- [ ] POST-B2–B4 SAP/D365/Odoo live
+
+
 
 ---
 
-## Phase POST-C — Governance & Data
 
-- [ ] POST-C1 `cdm_schedule_version`
-- [ ] POST-C2 Digital Twin promote/clone
-- [ ] POST-C3 Legacy RLS 002–012
+
+## Phase POST-C / POST-D
+
+
+
+- [ ] POST-C1–C3 Governance & RLS debt
+
+- [ ] POST-D1–D5 Commercial (out of scope v6)
+
+
 
 ---
 
-## Phase POST-D — Commercial & UX
 
-- [ ] POST-D1–D5 (out of scope v6)
-
----
 
 ## Program Rollup
 
+
+
 | Feature | Tasks | Done | Open |
+
 |---------|-------|------|------|
+
 | 002 Gates | 62 | 58 | 4 |
+
 | 003 V5 | 45 | 45 | 0 |
-| 004 V6 | 55 | 54 | 1 (T055) |
-| 005 Program | 27 | 12 | 15 |
-| **Critical path** | T021–T024 | 4 done (T016–T019) | **T021–T024** |
+
+| 004 V6 | 55 | **55** | 0 |
+
+| 005 Program | 35 | 22 | 13 |
+
+| REL-PROD | 24 | 23 | 1 (live verify) |
+
+| **Wave 3** | 5 | 0 | 5 |
+
+
 
 ---
 
+
+
 ## Critical Path
 
+
+
 ```text
-T021 (CP15 rebuild) → T022 (20/20) → T023 (git commit) → T024 (v6.0.0 tag)
+
+REL-24 (monitoring verify) → W3-01..03 (hardening) → W3-04 (regression) → W3-05 (v6.1.0)
+
 ```
 
-**Stack command**:
+
+
+**Commands**:
+
+
 
 ```powershell
+
 cd E:\AISOP\ipe
+
 .\scripts\rel-demo-stack.ps1 -SkipBuild
+
+.\scripts\run-monitoring-stack.ps1
+
+.\scripts\run-monitoring-stack.ps1 -VerifyOnly
+
 ```
+
+

@@ -8,16 +8,18 @@
 
 ## Summary
 
-IPE program delivery is **97% complete** (157/162 speckit tasks + demo fixes T016–T026). V6 product code is **55/55** done; live demo is **20/20** stable. Release path: **v6.0.0 tagged** → **REL-PROD** (k6, Chaos, coverage, ops) → **v6.1.0**.
+IPE program delivery is **98% complete** (158/162 speckit tasks). V6 **55/55** done; live demo **20/20** stable. Release path: **v6.0.0/v6.0.1 tagged** → **REL-PROD** (k6 ✅, Chaos ✅, coverage ✅, ops ✅) → **v6.1.0**.
 
 | Milestone | Readiness | Trigger |
 |-----------|-----------|---------|
-| **v6.0.0 tag** | 97/100 | ✅ T022 20/20 + T023 git + T024 approval |
-| **v6.0.1** | 97/100 | Audit fixes live-verified post-rebuild |
-| **Production claim** | 100/100 | REL-PROD: k6 + Chaos + coverage 60% + ops |
+| **v6.0.0 tag** | 97/100 | ✅ T022 20/20 + T024 tag |
+| **v6.0.1** | 97/100 | ✅ Audit fixes live-verified |
+| **REL-PROD 2A–2C** | ~89/100 audit | ✅ k6 + chaos + coverage 60% |
+| **REL-PROD 2D** | ~91/100 audit | ✅ Monitoring MVP (verify live) |
+| **Production claim** | 100/100 | Wave 3: C-03, C-04, SEC-05 → v6.1.0 |
 | **Enterprise IdP** | +security | Keycloak sandbox (BLOCKED C-007) |
 
-**Estimated effort to 100/100**: **~4 days** (REL-PROD Wave 2)
+**Estimated effort to 100/100**: **~2 days** (Wave 3 hardening)
 
 ---
 
@@ -28,20 +30,23 @@ IPE program delivery is **97% complete** (157/162 speckit tasks + demo fixes T01
 | 0 — Git foundation | ✅ | 5 commits; tags v1.0.0, v6.0.0 |
 | 1 — Demo 20/20 + tag | ✅ | `docs/demo-run-report-v6.txt` |
 | 2 — Audit code fixes | ✅ | `fea0705` C-01, BUG-02, BUG-03 |
-| 2 — Audit remainder | ⬜ | C-03, C-04, SEC-05 |
+| 2 — Audit remainder | ⬜ | C-03, C-04, SEC-05 (Wave 3) |
+| 3 — REL-PROD 2A–2C | ✅ | k6, chaos, coverage — see `docs/k6-summary.md`, `docs/chaos/`, `docs/coverage-summary.md` |
+| 3 — REL-PROD 2D | ✅ code | Loki + Grafana — `docs/ops-monitoring.md` |
 
 ---
 
-## Current Critical Path → Phase 3 REL-PROD
+## Current Critical Path → Wave 3 (v6.1.0)
 
-§15 execution order (git init → demo fixes → tag) is **COMPLETE**. Active work:
+REL-PROD Waves 2A–2D are **COMPLETE** (code + evidence). Active work:
 
-1. Rebuild cap-svc/mat-svc; verify 20/20 post-audit fixes
-2. k6 smoke + 10 VU + 200 VU baselines
-3. Chaos scenarios C1–C6
-4. Coverage 40% → 60%
-5. Loki + Grafana MVP
-6. Tag **v6.1.0** after evidence package
+1. ~~Rebuild cap-svc/mat-svc; verify 20/20~~ ✅
+2. ~~k6 smoke + 10 VU + 200 VU~~ ✅
+3. ~~Chaos C1–C6~~ ✅
+4. ~~Coverage 60% gate~~ ✅
+5. ~~Loki + Grafana MVP~~ ✅ — verify: `.\scripts\run-monitoring-stack.ps1`
+6. C-03 TLS runbook + C-04 JWT rotation + SEC-05 migration
+7. Tag **v6.1.0** after Wave 3 + optional chaos re-run
 
 ---
 
@@ -296,18 +301,43 @@ cd E:\AISOP\ipe
 
 ---
 
-## Phase RV-05 — Production Hardening 100/100 (3–5 days)
+## Phase RV-05 — Production Hardening (REL-PROD)
 
-**Goal**: Attach live evidence; raise READINESS to **100/100**.
+**Goal**: Raise audit score to **~91/100** (Speckit 97/100 maintained).
+
+| Wave | Step | Script / path | Evidence | Status |
+|------|------|---------------|----------|--------|
+| 2A | k6 smoke + 10 + 200 VU | `tests/performance/k6/` | `docs/k6-summary.md` | ✅ |
+| 2B | Chaos C1–C6 | `scripts/run-chaos-scenarios.ps1` | `docs/chaos/chaos-summary.md` | ✅ |
+| 2C | Coverage ≥60% | pytest-cov cap/mat/dpe | `docs/coverage-summary.md` | ✅ |
+| 2D | Loki + Grafana MVP | `scripts/run-monitoring-stack.ps1` | `docs/ops-monitoring.md` | ✅ code |
+
+**Exit gate (REL-PROD)**: k6 + chaos + coverage + ops evidence attached.
+
+---
+
+## Phase W3 — v6.1.0 Hardening (~2 days)
+
+| Step | Deliverable | Files |
+|------|-------------|-------|
+| W3-01 | TLS termination runbook | `docs/runbooks/tls-internal.md` |
+| W3-02 | JWT rotation procedure | `docs/runbooks/jwt-rotation.md` |
+| W3-03 | SEC-05 `password_hash` migration | `migrations/versions/028_*` |
+| W3-04 | Re-run chaos C6 regression | `docs/demo-run-report-post-v6.1.txt` |
+| W3-05 | Tag v6.1.0 | `READINESS.md` → ~95/100 audit |
+
+**Exit gate**: C-03, C-04, SEC-05 closed; READINESS updated for v6.1.0.
+
+---
+
+## Phase RV-05 (legacy reference)
 
 | Step | Script / path | Evidence folder |
 |------|---------------|-----------------|
-| 1 | `.\scripts\run-k6-200vu.ps1` | `specs/003-autonomous-planning-v5/evidence/r4/k6/` |
-| 2 | `.\scripts\r4-verify.ps1` (Chaos) | `specs/003-autonomous-planning-v5/evidence/r4/chaos/` |
-| 3 | Update READINESS.md | Score 100/100 with evidence links |
-| 4 | Optional: raise coverage fail_under | Audit R-01 follow-on |
-
-**Exit gate**: SC-V6-07 extended + clarify C-V6-04 satisfied.
+| 1 | k6 suite | `docs/k6-*` |
+| 2 | Chaos | `docs/chaos/` |
+| 3 | Coverage | `docs/coverage-*` |
+| 4 | Monitoring | `docs/ops-monitoring*` |
 
 ---
 
@@ -425,4 +455,4 @@ G-002 (optional, parallel)
 | READINESS.md | Score authority |
 | Notion RV-01–RV-05 | External tracker mirror |
 
-**Next command**: `/speckit.tasks` on `tasks-release.md` or `/speckit.implement` RV-01.
+**Next command**: `/speckit.implement` Wave 3 (W3-01–W3-05) or verify `run-monitoring-stack.ps1` on live stack.

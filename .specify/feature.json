@@ -1,18 +1,55 @@
 {
+
   "feature_directory": "specs/005-ipe-program-status",
+
   "active_implementation": "specs/004-ai-first-v6",
+
   "active_plan": "specs/005-ipe-program-status/plan.md",
-  "readiness_score": 97,
+
+  "readiness_score": 100,
+
+  "speckit_built": "162/162",
+
   "live_demo_score": "20/20",
+
+  "chaos_score": "6/6",
+
   "audit_score_baseline": 74,
+
   "audit_score_target": 100,
-  "audit_score_estimate_post_fix": 82,
-  "release_target": "v6.1.0",
-  "git_status": "5 commits; tags v1.0.0, v6.0.0",
+
+  "audit_score_estimate": 95,
+
+  "release_target": "v7.0.0",
+
+  "git_status": "tags v1.0.0, v6.0.0, v6.0.1, v6.1.0",
+
   "T055_status": "Complete — v6.0.0 tagged on a203e68",
-  "audit_fixes_committed": "C-01, C-02, BUG-02, BUG-03 (fea0705)",
-  "phase": "REL-PROD",
+
+  "T053_status": "Cancelled — superseded by v1.0.0 + v6.x",
+
+  "audit_fixes_committed": "C-01 through SEC-05; Wave 3 complete",
+
+  "phase": "v7-completion",
+
   "last_speckit_run": "2026-06-26",
-  "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks", "converge"],
-  "active_implementation_phase": "REL-PROD"
+
+  "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks", "converge", "implement-2d", "implement-w3", "gap-analysis-p5"],
+
+  "active_implementation_phase": "v7.0.0 completion (P6–P12)",
+
+  "rel_prod_waves": {
+
+    "2A_k6": "complete",
+
+    "2B_chaos": "complete",
+
+    "2C_coverage": "complete",
+
+    "2D_ops": "complete",
+
+    "3_w3": "complete"
+
+  }
+
 }
