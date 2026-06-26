@@ -1,0 +1,72 @@
+{
+  "title": "IPE REL-PROD Overview",
+  "uid": "ipe-rel-prod-overview",
+  "version": 1,
+  "tags": ["ipe", "rel-prod"],
+  "schemaVersion": 38,
+  "timezone": "utc",
+  "editable": true,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "HTTP Request Rate (ipe_http_requests_total)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(ipe_http_requests_total[5m])) by (job)",
+          "legendFormat": "{{ job }}"
+        }
+      ]
+    },
+    {
+      "title": "P95 Latency by Service",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(ipe_http_request_duration_seconds_bucket[5m])) by (le, job))",
+          "legendFormat": "{{ job }}"
+        }
+      ]
+    },
+    {
+      "title": "5xx Error Rate",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(ipe_http_requests_total{status=~\"5..\"}[5m])) / sum(rate(ipe_http_requests_total[5m]))",
+          "legendFormat": "5xx ratio"
+        }
+      ]
+    },
+    {
+      "title": "Scrape Targets Up",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(up)",
+          "legendFormat": "up"
+        }
+      ]
+    },
+    {
+      "title": "Recent Container Logs (Loki)",
+      "type": "logs",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 14 },
+      "targets": [
+        {
+          "expr": "{container=~\".*(cap-svc|dpe-svc|mat-svc|kong).*\"}",
+          "legendFormat": ""
+        }
+      ]
+    }
+  ]
+}

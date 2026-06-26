@@ -1,0 +1,76 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: kong
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["kong:8001"]
+
+  - job_name: dpe-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dpe-svc:8001"]
+
+  - job_name: mat-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["mat-svc:8002"]
+
+  - job_name: cap-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["cap-svc:8003"]
+
+  - job_name: fea-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["fea-svc:8004"]
+
+  - job_name: res-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["res-svc:8005"]
+
+  - job_name: del-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["del-svc:8006"]
+
+  - job_name: nlp-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["nlp-svc:8007"]
+
+  - job_name: rec-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["rec-svc:8008"]
+
+  - job_name: connector
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["connector:8009"]
+
+  - job_name: alert-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["alert-svc:8010"]
+
+  - job_name: scn-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["scn-svc:8014"]
+
+  - job_name: network-svc
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["network-svc:8015"]
