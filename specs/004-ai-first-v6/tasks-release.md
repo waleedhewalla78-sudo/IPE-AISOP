@@ -17,7 +17,7 @@
 - [x] P-DOC-01 [P1] [P-DOC] Fix stale **15/55** header in `specs/005-ipe-program-status/spec.md` L139 — table shows **54/55**, V6-R2–R5 ✅
 - [x] P-DOC-02 [P1] [P-DOC] Fix mermaid `F004[004 V6 15/55]` → `54/55` in `specs/005-ipe-program-status/spec.md` L180
 - [x] P-DOC-03 [P1] [P-DOC] Refresh V6-R2–R5 rows in `specs/004-ai-first-v6/implementation-tracker.md` — all ✅ Done, not ⬜ To Do
-- [ ] P-DOC-04 [P1] [P-DOC] After REL-10 passes, mark SC-V6-01–08 **Proven (live)** in `implementation-tracker.md` + `analyze-v6.md`
+- [x] P-DOC-04 [P1] [P-DOC] After REL-10 passes, mark SC-V6-01–08 **Proven (live)** in `implementation-tracker.md` + `analyze-v6.md`
 - [x] P-DOC-05 [P2] [P-DOC] Mark Notion sync ✅ in `specs/005-ipe-program-status/spec.md` Notion table
 - [x] P-DOC-06 [P2] [P-DOC] Add note in `specs/004-ai-first-v6/quickstart.md`: demo **CP15** = 003 **checkpoint 16** (persist-after-approve)
 - [x] P-DOC-07 [P2] [P-DOC] Add V6 drift footnote to `specs/SPECKIT-CHECKLIST.md` summary dashboard
@@ -32,10 +32,10 @@
 **Depends on**: Docker Desktop, `ipe/.env` from `.env.template`
 
 - [x] REL-01 [P0] [REL-STACK] Run `docker compose config` in `ipe/infrastructure/docker/docker-compose.yml` — exit 0, no duplicate service keys
-- [ ] REL-02 [P0] [REL-STACK] Run `docker compose up -d` — all dependent services healthy within 5 min
-- [ ] REL-03 [P0] [REL-STACK] Verify `GET http://localhost:8000/health` returns 200 and web UI @ `:8082` loads login
-- [ ] REL-04 [P0] [REL-STACK] Confirm Alembic head includes migration **027** (`027_add_chaos_cost_snapshots.py`) on demo DB
-- [ ] REL-05 [P0] [REL-STACK] Run `ipe/scripts/seed-demo-client.ps1` — demo tenant + V6 tariff/activity/telemetry seed present
+- [x] REL-02 [P0] [REL-STACK] Run `docker compose up -d` — all dependent services healthy within 5 min
+- [x] REL-03 [P0] [REL-STACK] Verify `GET http://localhost:8000/health` returns 200 and web UI @ `:8082` loads login
+- [x] REL-04 [P0] [REL-STACK] Confirm Alembic head includes migration **028** on demo DB
+- [x] REL-05 [P0] [REL-STACK] Run `ipe/scripts/seed-demo-client.ps1` — demo tenant + V6 tariff/activity/telemetry seed present
 
 **Exit gate**: API reachable; seed complete; migrations 024–027 applied.
 

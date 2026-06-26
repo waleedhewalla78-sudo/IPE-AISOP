@@ -143,7 +143,7 @@
 
 - [x] T053 [V6-R5] MS Project XML export endpoint or download from Schedule page
 - [x] T054 [V6-R5] Update `READINESS.md` to ≥96/100; `RELEASE_NOTES.md` v6.0.0 section
-- [ ] T055 [V6-R5] Tag `v6.0.0` after SC-V6-05–08 verified — **see [tasks-release.md](./tasks-release.md) REL-12–REL-14** (requires REL-STACK → REL-DEMO green + approval)
+- [x] T055 [V6-R5] Tag `v6.0.0` after SC-V6-05–08 verified — tagged on `a203e68`
 
 **V6-R5 Exit Gate**: Cost of Chaos live; War Room top-3; demo 20/20; tag v6.0.0
 

@@ -134,15 +134,15 @@
 
 
 
-- [ ] W3-01 [P1] C-03 TLS internal services runbook — `docs/runbooks/tls-internal.md`
+- [x] W3-01 [P1] C-03 TLS internal services runbook — `docs/runbooks/tls-internal.md`
 
-- [ ] W3-02 [P1] C-04 JWT rotation runbook — `docs/runbooks/jwt-rotation.md`
+- [x] W3-02 [P1] C-04 JWT rotation runbook — `docs/runbooks/jwt-rotation.md`
 
-- [ ] W3-03 [P1] SEC-05 `password_hash` Alembic migration + seed update
+- [x] W3-03 [P1] SEC-05 `password_hash` Alembic migration + seed update
 
-- [ ] W3-04 [P2] Post-W3 chaos C6 + demo 20/20 regression
+- [x] W3-04 [P2] Post-W3 chaos C6 + demo 20/20 regression
 
-- [ ] W3-05 [P0] Tag **v6.1.0** + update READINESS (~95/100 audit)
+- [x] W3-05 [P0] Tag **v6.1.0** + update READINESS (~95/100 audit)
 
 
 
