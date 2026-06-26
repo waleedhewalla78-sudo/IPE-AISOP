@@ -4,9 +4,9 @@
 
 **Created**: 2026-06-23
 
-**Status**: Active — updated 2026-06-25 (`/speckit.specify` · `/speckit.clarify` · `/speckit.analyze` · `/speckit.plan` · `/speckit.tasks`)
+**Status**: Active — updated 2026-06-26 (`REL-PROD` phase)
 
-**Live demo**: **15/20** (2026-06-25 live stack) — V6 CP17/19 pass; 5 failures remain (see demo table)
+**Live demo**: **20/20** stable (2026-06-26) — post-rebuild verify in `docs/demo-run-report-v6-post-rebuild.txt`
 
 **Product scope**: **IPE AISOP only** — Nexus Social / external scaffolds out of scope for this program
 
@@ -137,14 +137,14 @@ As an **SRE**, I need **k6 200 VU** and **Chaos Mesh** evidence so readiness rea
 |----|-------------|----------|--------|
 | FR-P-01 | Platform exposes planning APIs via Kong @ `:8000` with JWT + tenant isolation | P0 | ✅ |
 | FR-P-02 | All tenant-scoped tables enforce RLS (constitution I) | P0 | ✅ (027 verified in repo) |
-| FR-P-03 | Schedule approve persists with optimistic lock + Kafka publish | P0 | ✅ code; ⬜ live CP15 |
-| FR-P-04 | V6 margin-aware priority and activity-optimized schedule | P0 | ✅ code; ⬜ live CP17 |
-| FR-P-05 | V6 tariff shock + substitute draft workflow | P0 | ✅ code; ⬜ live CP18 |
-| FR-P-06 | V6 CPM cascade p95 < 2s on demo MO set | P0 | ✅ code; ⬜ live CP19 |
-| FR-P-07 | V6 IoT telemetry → maintenance block + chaos analytics | P0 | ✅ code; ⬜ live CP20 |
-| FR-P-08 | Full demo script 20/20 on seeded demo tenant | P0 | ⬜ |
+| FR-P-03 | Schedule approve persists with optimistic lock + Kafka publish | P0 | ✅ live CP15 |
+| FR-P-04 | V6 margin-aware priority and activity-optimized schedule | P0 | ✅ live CP17 |
+| FR-P-05 | V6 tariff shock + substitute draft workflow | P0 | ✅ live CP18 |
+| FR-P-06 | V6 CPM cascade p95 < 2s on demo MO set | P0 | ✅ live CP19 |
+| FR-P-07 | V6 IoT telemetry → maintenance block + chaos analytics | P0 | ✅ live CP20 |
+| FR-P-08 | Full demo script 20/20 on seeded demo tenant | P0 | ✅ |
 | FR-P-09 | launch-verify 10/10 backend services | P0 | ✅ |
-| FR-P-10 | Annotated git tag `v6.0.0` after FR-P-08 + approval | P0 | ⬜ T055 |
+| FR-P-10 | Annotated git tag `v6.0.0` after FR-P-08 + approval | P0 | ✅ T055 / `a203e68` |
 | FR-P-11 | Lean demo stack script without ollama/airflow gate | P1 | ✅ `rel-demo-stack.ps1` |
 | FR-P-12 | k6 200 VU + Chaos evidence for 100/100 | P2 | ⬜ |
 | FR-P-13 | Live Keycloak SAML/SCIM validation | P1 | 🔴 BLOCKED |
@@ -175,7 +175,7 @@ As an **SRE**, I need **k6 200 VU** and **Chaos Mesh** evidence so readiness rea
 | **Speckit tasks total** | **162** (002: 62 · 003: 45 · 004: 55) |
 | **Complete** | **157 / 162 (97%)** |
 | **Open** | **5** (002 git hygiene: 4 · 004 T055 tag: 1 · REL demo pending) |
-| **Release track (REL-*)** | **18/30** — REL-STACK ✅ API+seed; REL-DEMO ⬜ 15/20 |
+| **Release track (REL-*)** | **20/30** — REL-STACK/DEMO/TAG ✅; REL-PROD ⬜ active |
 | **Current release tag** | `v1.0.0` (`4efb8de`) |
 | **Next release target** | `v6.0.0` (004 exit gate — code ready; live proof pending) |
 | **Active workstream** | **REL-STACK → REL-DEMO → T055** |
@@ -365,7 +365,7 @@ flowchart LR
 | 18 | 004 V6-R2 tariff shock | ✅ | ❌ FAIL — 404 |
 | 19 | 004 V6-R3 CPM cascade | ✅ | ❌ FAIL — 404 |
 | 20 | 004 V6-R4/R5 maint + chaos | ✅ | ❌ FAIL — 404 |
-| **Target** | **20/20** at v6.0.0 | **20/20 implemented** | **15/20 proven** (2026-06-25) |
+| **Target** | **20/20** at v6.0.0 | **20/20 implemented** | **20/20 proven** (2026-06-26) |
 
 **Open demo failures (live, 2026-06-25)**: CP10/11 Copilot 503 · CP15 persist-after-approve · CP18 tariff 500 · CP20 chaos 500
 

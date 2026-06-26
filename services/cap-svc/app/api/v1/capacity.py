@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import httpx
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy import select as sa_select
@@ -161,6 +161,7 @@ class CpmApplyRequest(BaseModel):
 @router.post("/schedule")
 async def schedule_production(
     req: ScheduleRequest,
+    request: Request,
     session: AsyncSession = Depends(get_db_session),
     current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager"])),
 ):
@@ -169,11 +170,14 @@ async def schedule_production(
         return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
 
     mdr_quality_threshold = 70
+    mdr_headers = {"X-Tenant-ID": tenant_id}
+    if auth := request.headers.get("Authorization"):
+        mdr_headers["Authorization"] = auth
     try:
         async with httpx.AsyncClient(timeout=3.0) as mdr_client:
             mdr_resp = await mdr_client.get(
                 f"{settings.DPE_SVC_URL}/api/v1/demand/mdr/dashboard",
-                headers={"X-Tenant-ID": tenant_id},
+                headers=mdr_headers,
             )
             if mdr_resp.status_code == 200:
                 mdr_data = mdr_resp.json().get("data", {})

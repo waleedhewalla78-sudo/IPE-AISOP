@@ -5,11 +5,14 @@
   "readiness_score": 97,
   "live_demo_score": "20/20",
   "audit_score_baseline": 74,
-  "audit_score_target": 85,
+  "audit_score_target": 100,
   "audit_score_estimate_post_fix": 82,
-  "release_target": "v6.0.0",
-  "phase": "REL-AUDIT-COMPLETE",
+  "release_target": "v6.1.0",
+  "git_status": "5 commits; tags v1.0.0, v6.0.0",
+  "T055_status": "Complete — v6.0.0 tagged on a203e68",
+  "audit_fixes_committed": "C-01, C-02, BUG-02, BUG-03 (fea0705)",
+  "phase": "REL-PROD",
   "last_speckit_run": "2026-06-26",
   "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks", "converge"],
-  "active_implementation_phase": "REL-AUDIT"
+  "active_implementation_phase": "REL-PROD"
 }

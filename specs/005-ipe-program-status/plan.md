@@ -8,17 +8,40 @@
 
 ## Summary
 
-IPE program delivery is **97% complete** (157/162 speckit tasks + demo fixes T016–T019). V6 product code is **54/55** done; live demo is **19/20** with **CP15** remaining (T021 cap-svc rebuild). Release path: **T021 → 20/20 → git commit (Phase 0) → v6.0.0 tag**.
+IPE program delivery is **97% complete** (157/162 speckit tasks + demo fixes T016–T026). V6 product code is **55/55** done; live demo is **20/20** stable. Release path: **v6.0.0 tagged** → **REL-PROD** (k6, Chaos, coverage, ops) → **v6.1.0**.
 
 | Milestone | Readiness | Trigger |
 |-----------|-----------|---------|
-| **Now** | 97/100 | Code + 19/20 demo + uncommitted fixes |
-| **v6.0.0 tag** | 97/100 | T022 20/20 + T023 git + T024 approval |
-| **Production claim** | 100/100 | RV-05 k6 + Chaos + audit P1 (T025–T026) |
-| **Enterprise IdP** | +security | Keycloak sandbox (BLOCKED) |
+| **v6.0.0 tag** | 97/100 | ✅ T022 20/20 + T023 git + T024 approval |
+| **v6.0.1** | 97/100 | Audit fixes live-verified post-rebuild |
+| **Production claim** | 100/100 | REL-PROD: k6 + Chaos + coverage 60% + ops |
+| **Enterprise IdP** | +security | Keycloak sandbox (BLOCKED C-007) |
 
-**Estimated effort to tag**: **2–4 hours** (cap-svc rebuild + git + evidence)  
-**Estimated effort to 100/100**: **+3–5 days** (load/chaos + audit fixes)
+**Estimated effort to 100/100**: **~4 days** (REL-PROD Wave 2)
+
+---
+
+## Phase 0–2 Status (COMPLETE)
+
+| Phase | Status | Evidence |
+|-------|--------|----------|
+| 0 — Git foundation | ✅ | 5 commits; tags v1.0.0, v6.0.0 |
+| 1 — Demo 20/20 + tag | ✅ | `docs/demo-run-report-v6.txt` |
+| 2 — Audit code fixes | ✅ | `fea0705` C-01, BUG-02, BUG-03 |
+| 2 — Audit remainder | ⬜ | C-03, C-04, SEC-05 |
+
+---
+
+## Current Critical Path → Phase 3 REL-PROD
+
+§15 execution order (git init → demo fixes → tag) is **COMPLETE**. Active work:
+
+1. Rebuild cap-svc/mat-svc; verify 20/20 post-audit fixes
+2. k6 smoke + 10 VU + 200 VU baselines
+3. Chaos scenarios C1–C6
+4. Coverage 40% → 60%
+5. Loki + Grafana MVP
+6. Tag **v6.1.0** after evidence package
 
 ---
 

@@ -1,6 +1,6 @@
 ﻿==============================================
  IPE Full-Cycle Demo Verification
- 2026-06-26 09:06:25
+ 2026-06-26 09:09:53
 ==============================================
 
 [PASS] 0. Login (Ahmed@nour / admin)
@@ -17,7 +17,9 @@
 [PASS] 3. Resolution Center - scenarios (demo MOs)
        UI: http://localhost:8082/resolution-center
        -> 16 scenarios loaded (includes MO-DEMO expedite/overtime/split)
-[FAIL] 4. Schedule - OR-Tools Gantt data - The remote server returned an error: (503) Server Unavailable.
+[PASS] 4. Schedule - OR-Tools Gantt data
+       UI: http://localhost:8082/schedule
+       -> 6 scheduled operations across Assembly, Machining, Packaging
 [PASS] 5. Shop Floor - active work orders
        UI: http://localhost:8082/shop-floor
        -> 6 work orders: MO-DEMO-001 on Machining Center; MO-DEMO-002 on Machining Center; MO-DEMO-003 on Assembly Line 1; MO-DEMO-001 on Assembly Line 1; MO-DEMO-002 on Packaging Station; MO-DEMO-001 on Packaging Station
@@ -50,21 +52,25 @@
 [PASS] 14. Inventory summary (master data)
        UI: http://localhost:8082/copilot
        -> 4 finished goods with on-hand quantities
-[FAIL] 15. Schedule - persist after approve - The remote server returned an error: (503) Server Unavailable.
-[FAIL] 17. V6-R1 - margin-aware priority ordering - The remote server returned an error: (503) Server Unavailable.
+[PASS] 15. Schedule - persist after approve
+       UI: http://localhost:8082/schedule
+       -> approved 2 MO(s); 2 persisted in active schedule; ERP sync deferred
+[PASS] 17. V6-R1 - margin-aware priority ordering
+       UI: http://localhost:8082/schedule
+       -> top MO margin score=56.16; activity total_usd=1991.25
 [PASS] 18. V6-R2 - tariff shock + substitute draft
        UI: http://localhost:8082/tariff
        -> affected=6; drafts=6
 [PASS] 19. V6-R3 - CPM cascade under 2s
        UI: http://localhost:8082/schedule
-       -> cascade_ms=47; critical_path=3 ops
+       -> cascade_ms=20; critical_path=3 ops
 [PASS] 20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room
        UI: http://localhost:8082/war-room
        -> maintenance block OK; chaos categories=3; recovery options=3
 
 ==============================================
- RESULT: 17 / 20 passed, 3 failed
+ RESULT: 20 / 20 passed, 0 failed
 ==============================================
- Fix failures, then re-run:
-   .\scripts\seed-demo-client.ps1
-   docker compose -f infrastructure\docker up -d --force-recreate kong
+ Demo ready for client walkthrough.
+ Guide: docs/FULL-DEMO-GUIDE.md
+ Open: http://localhost:8082/login
