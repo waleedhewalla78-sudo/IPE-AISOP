@@ -1,8 +1,12 @@
+from unittest.mock import AsyncMock, patch
 from uuid import UUID
 
 import pytest
 
+from ipe_shared.testing.conftest_helpers import make_auth_headers
+
 TENANT_ID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+TENANT_UUID = UUID(TENANT_ID)
 
 
 @pytest.mark.asyncio
@@ -23,6 +27,50 @@ async def test_check_availability_no_tenant(client):
     assert response.status_code == 200
     data = response.json()
     assert data["error"]["code"] == "NO_TENANT"
+
+
+@pytest.mark.asyncio
+async def test_check_availability_rule_based_with_tenant(client):
+    """C-01: check-availability delegates to rule_based_atp when tenant is present."""
+    product_id = UUID(int=1)
+    headers = make_auth_headers(role="planner", tenant_id=TENANT_UUID)
+    atp_result = {"is_available": True, "available_qty": 100.0, "shortfall": 0.0}
+
+    with (
+        patch("app.api.v1.material.rule_based_atp", AsyncMock(return_value=atp_result)),
+        patch("app.api.v1.material.kafka_producer.send_event", AsyncMock()) as mock_send,
+    ):
+        response = await client.post(
+            "/api/v1/material/check-availability",
+            json={
+                "product_id": str(product_id),
+                "quantity": 10,
+                "required_date": "2026-07-01T00:00:00",
+            },
+            headers=headers,
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["data"]["is_available"] is True
+    mock_send.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_check_availability_invalid_date(client):
+    headers = make_auth_headers(role="planner", tenant_id=TENANT_UUID)
+    response = await client.post(
+        "/api/v1/material/check-availability",
+        json={
+            "product_id": str(UUID(int=1)),
+            "quantity": 10,
+            "required_date": "not-a-date",
+        },
+        headers=headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["error"]["code"] == "INVALID_DATE"
 
 
 @pytest.mark.asyncio

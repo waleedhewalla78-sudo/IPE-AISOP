@@ -34,6 +34,68 @@ async def test_get_tariff_exposure_empty():
 
 
 @pytest.mark.asyncio
+async def test_get_tariff_exposure_with_region_data(monkeypatch):
+    session = AsyncMock()
+    tenant_id = uuid4()
+    mat_id = uuid4()
+    bom_id = uuid4()
+
+    attr = MagicMock(spec=MaterialAttribute)
+    attr.material_id = mat_id
+    attr.attributes = {"origin_region": "US"}
+
+    attr_result = MagicMock()
+    attr_result.scalars.return_value.all.return_value = [attr]
+
+    profile = LandedCostProfile(
+        region="US",
+        base_cost_usd=Decimal("100"),
+        freight_usd=Decimal("0"),
+        tariff_pct=Decimal("10"),
+        risk_premium_pct=Decimal("0"),
+    )
+    profile_result = MagicMock()
+    profile_result.scalar_one_or_none.return_value = profile
+
+    mo = MagicMock()
+    mo.bom_id = bom_id
+    mo.quantity = 5
+
+    bom_line = MagicMock()
+    bom_line.quantity_per = 2.0
+    bom_result = MagicMock()
+    bom_result.scalars.return_value.all.return_value = [bom_line]
+
+    async def fake_mos(*args, **kwargs):
+        return [mo]
+
+    monkeypatch.setattr("app.core.tariff_shock._mos_using_materials", fake_mos)
+    session.execute = AsyncMock(side_effect=[attr_result, profile_result, bom_result])
+
+    rows = await get_tariff_exposure(session, tenant_id)
+    assert len(rows) == 1
+    assert rows[0].region == "US"
+    assert rows[0].material_count == 1
+    assert rows[0].mo_count == 1
+    assert rows[0].total_exposure_usd == 100.0
+
+
+@pytest.mark.asyncio
+async def test_get_tariff_exposure_skips_attrs_without_region():
+    session = AsyncMock()
+    attr = MagicMock(spec=MaterialAttribute)
+    attr.material_id = uuid4()
+    attr.attributes = {}
+
+    attr_result = MagicMock()
+    attr_result.scalars.return_value.all.return_value = [attr]
+    session.execute = AsyncMock(return_value=attr_result)
+
+    rows = await get_tariff_exposure(session, uuid4())
+    assert rows == []
+
+
+@pytest.mark.asyncio
 async def test_run_tariff_shock_flags_mos_and_substitutes(monkeypatch):
     session = AsyncMock()
     tenant_id = uuid4()
