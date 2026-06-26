@@ -1,0 +1,13 @@
+IPE v7.0.0 — P11 Chaos Regression
+Date: 2026-06-26 16:54:29 – 16:57:33
+
+=== Summary: 6/6 PASS ===
+
+C1 nlp-svc kill during non-NLP API calls     PASS
+C2 alert-svc kill during schedule            PASS
+C3 Kafka pause during schedule approve       PASS
+C4 Kafka pause 60s + schedule drain          PASS
+C5 PG connection count under smoke load      PASS
+C6 post-chaos 20/20 regression               PASS
+
+Evidence: docs/chaos/C1-nlp-kill.md … C6-post-chaos-regression.md

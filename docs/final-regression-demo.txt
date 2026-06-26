@@ -1,6 +1,6 @@
 ﻿==============================================
  IPE Full-Cycle Demo Verification
- 2026-06-26 16:57:23
+ 2026-06-26 16:54:05
 ==============================================
 
 [PASS] 0. Login (Ahmed@nour / admin)
@@ -63,7 +63,7 @@
        -> affected=6; drafts=6
 [PASS] 19. V6-R3 - CPM cascade under 2s
        UI: http://localhost:8082/schedule
-       -> cascade_ms=4; critical_path=3 ops
+       -> cascade_ms=5; critical_path=3 ops
 [PASS] 20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room
        UI: http://localhost:8082/war-room
        -> maintenance block OK; chaos categories=3; recovery options=3
