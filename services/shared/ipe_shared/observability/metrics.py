@@ -24,7 +24,7 @@ ACTIVE_REQUESTS = Gauge(
     "Number of active HTTP requests",
 )
 
-EXCLUDED_METRICS_PATHS = {"/metrics", "/health", "/ready"}
+EXCLUDED_METRICS_PATHS = {"/metrics", "/health", "/healthz", "/ready"}
 
 
 class MetricsMiddleware(BaseHTTPMiddleware):
@@ -68,6 +68,7 @@ def setup_metrics(app: FastAPI, service_name: str = "unknown"):
     app.add_middleware(MetricsMiddleware)
     app.add_api_route("/metrics", metrics_endpoint, methods=["GET"])
     app.add_api_route("/health", health_endpoint, methods=["GET"])
+    app.add_api_route("/healthz", health_endpoint, methods=["GET"])
     app.add_api_route("/ready", ready_endpoint, methods=["GET"])
 
     try:
