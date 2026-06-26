@@ -153,3 +153,57 @@ class TestGetResourceUtilization:
             mock_client.return_value.__aexit__ = AsyncMock(return_value=False)
             result = await get_resource_utilization("WC1", "tenant1")
             assert result["status"] == "error"
+
+
+class TestGetWarRoomRecovery:
+    @pytest.mark.asyncio
+    async def test_success(self):
+        from app.core.copilot_tools import get_war_room_recovery
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "data": {
+                "disruption_id": "d1",
+                "impacted_mo_count": 2,
+                "recovery_options": [
+                    {
+                        "rank": 1,
+                        "scenario_id": "s1",
+                        "business_score_usd": 1000,
+                        "activity_cost_usd": 200,
+                        "summary": "Expedite",
+                    }
+                ],
+            }
+        }
+        with patch("app.core.copilot_tools.httpx.AsyncClient") as mock_client:
+            mock_client.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client.return_value.__aexit__ = AsyncMock(return_value=False)
+            mock_client.get = AsyncMock(return_value=mock_resp)
+            result = await get_war_room_recovery("d1", "tenant1")
+            assert result["disruption_id"] == "d1"
+            assert result["scenario_ids"] == ["s1"]
+
+    @pytest.mark.asyncio
+    async def test_non_200(self):
+        from app.core.copilot_tools import get_war_room_recovery
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        with patch("app.core.copilot_tools.httpx.AsyncClient") as mock_client:
+            mock_client.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client.return_value.__aexit__ = AsyncMock(return_value=False)
+            mock_client.get = AsyncMock(return_value=mock_resp)
+            result = await get_war_room_recovery(None, "tenant1")
+            assert result["status"] == "error"
+
+    @pytest.mark.asyncio
+    async def test_exception(self):
+        from app.core.copilot_tools import get_war_room_recovery
+
+        with patch("app.core.copilot_tools.httpx.AsyncClient") as mock_client:
+            mock_client.return_value.__aenter__ = AsyncMock(side_effect=Exception("timeout"))
+            mock_client.return_value.__aexit__ = AsyncMock(return_value=False)
+            result = await get_war_room_recovery("d1", "tenant1")
+            assert result["status"] == "error"
