@@ -91,3 +91,44 @@ def test_margin_priority_result_dataclass():
         data_quality="complete",
     )
     assert item.margin_adjusted_score >= item.base_priority_score
+
+
+@pytest.mark.asyncio
+async def test_margin_adjusted_priority_complete_path():
+    session = AsyncMock()
+    tenant_id = uuid4()
+    mo = MagicMock()
+    mo.id = uuid4()
+    mo.product_id = uuid4()
+    mo.bom_id = uuid4()
+    mo.quantity = 10
+    mo.feasibility_score = 60
+
+    driver = MagicMock(
+        setup_mins=20,
+        overtime_rate_usd_per_hr=40,
+        overhead_pct=0.05,
+        expedite_cost_per_unit=2,
+    )
+    product = MagicMock(standard_cost=50.0)
+    routing = MagicMock()
+
+    session.execute = AsyncMock(
+        side_effect=[
+            MagicMock(scalar=MagicMock(return_value=None)),
+            MagicMock(scalar_one_or_none=MagicMock(return_value=product)),
+            MagicMock(scalar_one_or_none=MagicMock(return_value=driver)),
+            MagicMock(scalars=MagicMock(return_value=MagicMock(all=MagicMock(return_value=[routing])))),
+        ]
+    )
+
+    result = await compute_margin_adjusted_priority(session, tenant_id, mo)
+    assert result.data_quality == "complete"
+    assert result.warning is None
+    assert result.net_margin_usd != 0
+
+
+def test_normalize_margin_to_score_zero_max():
+    from app.core.margin_priority import _normalize_margin_to_score
+
+    assert _normalize_margin_to_score(100, 0) == 50.0
