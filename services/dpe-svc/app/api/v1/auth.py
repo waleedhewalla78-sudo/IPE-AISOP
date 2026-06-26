@@ -1,3 +1,5 @@
+import hashlib
+
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -17,7 +19,10 @@ DEMO_TENANT_ID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
 DEV_PASSWORDS = frozenset({"demo", "admin"})
 
 
-def _verify_password(password: str, _password_hash: str | None) -> bool:
+def _verify_password(password: str, password_hash: str | None) -> bool:
+    if password_hash and password_hash.startswith("{SHA-256}"):
+        digest = hashlib.sha256(password.encode()).hexdigest()
+        return password_hash == f"{{SHA-256}}{digest}"
     if settings.ENVIRONMENT != "production" and password in DEV_PASSWORDS:
         return True
     return False
