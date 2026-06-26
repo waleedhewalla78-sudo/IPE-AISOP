@@ -65,10 +65,10 @@ For HS256 demo stack, preferred order:
 
 | Order | Component | Why |
 |-------|-----------|-----|
-| 1 | **PostgreSQL / Redis / Kafka** | No restart unless config references JWT |
-| 2 | **dpe-svc** (auth issuer) | Must sign with new key first |
-| 3 | **Downstream services** | cap, mat, fea, nlp, alert, connector, … |
-| 4 | **Kong last** | Validates inbound tokens; update after issuers ready |
+| 1 | **Kong (gateway)** | Update JWT plugin / consumer credentials first |
+| 2 | **dpe-svc** (auth issuer) | Re-sign tokens with new key |
+| 3 | **Downstream services** | cap, mat, fea, nlp, alert, connector, mdr, … |
+| 4 | **Verify** | Login + protected routes before revoking legacy key |
 
 ```powershell
 cd E:\AISOP\ipe\infrastructure\docker
