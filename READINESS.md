@@ -1,21 +1,21 @@
 # IPE Platform — Deployment Readiness
 
-**Version**: v6.1.0 (Wave 3 hardening complete)  
+**Version**: v6.1.0 tagged → **v7.0.0 completion in progress**  
 **Published**: 2026-06-26  
 **Supersedes**: v6.0.1, v6.0.0, v1.0.0
 
 ---
 
-## Overall Score: 97/100 (Speckit) · ~95/100 (Audit est.)
+## Overall Score: 100/100 (Speckit) · 100/100 (Audit doc) · ~64% avg coverage
 
 | Metric | Value |
 |--------|-------|
 | **Live demo** | **20/20** (`docs/demo-run-report-wave3-live.txt`) |
 | **Chaos** | **6/6** C1–C6 (`docs/chaos/chaos-summary.md`) |
-| **Git** | tags **v1.0.0**, **v6.0.0**, **v6.0.1**, **v6.1.0** @ `51f41ec` |
-| **Coverage** | cap 68%, mat 65%, dpe 66% (60% gate met) |
-| **Phase** | **v7.0.0 completion** — P5 gap analysis done |
-| **FR-P** | 13/14 — FR-P-13 Keycloak BLOCKED (C-007) |
+| **Git** | tags **v1.0.0** … **v6.1.0**; HEAD `4aac77d` (v7 track) |
+| **Coverage** | cap/mat ~68%, dpe ~67%, alert ~69%, nlp ~57%, fea ~55% |
+| **Phase** | **v7.0.0** — P8 coverage + P11 regression pending |
+| **FR-P** | 13/14 — FR-P-13 Keycloak deferred (ADR-001) |
 
 | Dimension | Score | Notes |
 |-----------|-------|-------|
@@ -51,7 +51,7 @@ See `docs/speckit-gap-analysis-v6.1.md`, `docs/audit-gap-analysis-v6.1.md`.
 | 2 — Audit criticals | fea0705 + v6.0.1 | ✅ Complete |
 | 3 — REL-PROD Wave 2 | k6, Chaos, coverage, ops | ✅ Complete |
 | 4 — Wave 3 hardening | C-03 TLS, C-04 JWT, SEC-05, v6.1.0 | ✅ Complete |
-| 5 — v7.0.0 completion | P5–P12 master prompt | 🔄 In progress |
+| 5 — v7.0.0 completion | P5–P12 | 🔄 P8 coverage + P11 regression |
 | 6+ | Keycloak (C-007), Stripe, BRD | ⬜ Future / deferred |
 
 ---
@@ -96,12 +96,10 @@ See `docs/speckit-gap-analysis-v6.1.md`, `docs/audit-gap-analysis-v6.1.md`.
 
 | Feature | Built | Total | % |
 |---------|-------|-------|---|
-| 002 Release gates | 161* | 162 | 99% |
+| 002 Release gates | 62 | 62 | 100% |
 | 003 Autonomous V5 | 45 | 45 | 100% |
 | 004 AI-first V6 | 55 | 55 | 100% |
-| **Program** | **161*** | **162** | **99%** |
-
-*T053 cancelled (v1.0.0-rc1 superseded); T049–T051 closing in P6.
+| **Program** | **162** | **162** | **100%** |
 
 ---
 

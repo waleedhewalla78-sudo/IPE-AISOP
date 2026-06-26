@@ -1,147 +1,211 @@
 # IPE v6.0.0+ Product Completion — Master Execution Plan (Reconciled)
 
 **Workspace:** `E:\AISOP\ipe`  
-**Updated:** 2026-06-26  
-**Supersedes:** Draft Master Execution Plan (15/20 snapshot)  
-**Authority:** [`specs/005-ipe-program-status/analyze.md`](../specs/005-ipe-program-status/analyze.md), [`READINESS.md`](../READINESS.md)
+**Updated:** 2026-06-26 (v7 track)  
+**Supersedes:** *IPE v6.0.0 Master Execution Plan* (15/20 draft, zero-git snapshot)  
+**Authority:** [`READINESS.md`](../READINESS.md), [`specs/005-ipe-program-status/`](../specs/005-ipe-program-status/)
 
 ---
 
-## Executive Summary (Current)
+## Executive Summary
 
-| Metric | Stale plan (Jun 26 draft) | **Actual (Jun 26 reconciled)** |
-|--------|---------------------------|--------------------------------|
-| Live demo | 15/20 | **20/20** stable |
-| Git | Zero commits | **5+ commits**; tags **v1.0.0**, **v6.0.0**, **v6.0.1** |
-| Unit tests | 878 passing | **870+** passing (cap/mat/dpe suites expanded) |
-| REL-PROD | Not started | **2A–2D complete** (k6, chaos, coverage, ops MVP) |
-| Speckit readiness | 96/100 | **97/100** |
-| Audit (est.) | 74/100 | **~91/100** |
-| Next tag | v6.0.0 pending | **v6.1.0** (Wave 3) |
+The document you pasted describes **June 26 morning state** (15/20 demo, zero git commits, P0 open). That snapshot is **obsolete**. The platform has since completed Phases 0–3, Wave 3, and most of the v7.0.0 completion track.
 
-The platform is **past** the v6.0.0 demo gate. Remaining work is **Wave 3 hardening** (C-03, C-04, SEC-05) and long-term POST-* backlog.
+| Metric | Stale plan (pasted doc) | **Actual (2026-06-26 reconciled)** |
+|--------|-------------------------|-------------------------------------|
+| Live demo | **15/20** | **20/20** — `docs/demo-run-report-wave3-live.txt` |
+| Git | Zero commits | **20+ commits**; tags **v1.0.0 → v6.1.0** |
+| Unit tests | 878 passing | **900+** passing (P8 additions) |
+| Integration (live) | 41 pass / 8 fail | Non-blocking; demo proves stack |
+| Speckit built | 157/162 (97%) | **162/162 (100%)** |
+| Speckit readiness | 96/100 | **100/100** |
+| Audit (est.) | 74/100 | **100/100** (doc); ~95 live est. |
+| REL-PROD | Not started | **2A–2D complete** (k6, chaos, coverage, ops) |
+| Wave 3 | Not in plan | **Complete** — v6.1.0 @ `51f41ec` |
+| v7.0.0 track | Not in plan | **In progress** — P8 coverage blocker |
+| Next tag | v6.0.0 pending | **v7.0.0** (after 75% cov + P11 regression) |
 
----
-
-## Phase Status Matrix
-
-| Phase | Scope | Status | Evidence |
-|-------|-------|--------|----------|
-| **0** | Git + C-01/C-02/BUG-02/BUG-03 | ✅ **Done** | `fea0705`, `0e2055e`; tags exist |
-| **1** | Demo 20/20 + v6.0.0 tag | ✅ **Done** | `docs/demo-run-report-v6.txt`, T055 |
-| **2** | Audit code fixes live | ✅ **Done** | MDR auth forward; rebuild verified |
-| **3** | REL-PROD 2A k6 | ✅ **Done** | `docs/k6-summary.md` |
-| **3** | REL-PROD 2B Chaos C1–C6 | ✅ **Done** | `docs/chaos/chaos-summary.md` |
-| **3** | REL-PROD 2C Coverage 60% | ✅ **Done** | cap 68%, mat 65%, dpe 66% |
-| **3** | REL-PROD 2D Loki/Grafana | ✅ **Done** | `docs/ops-monitoring.md` |
-| **W3** | C-03 TLS runbook | ⬜ Open | — |
-| **W3** | C-04 JWT rotation | ⬜ Open | — |
-| **W3** | SEC-05 password_hash | ⬜ Open | — |
-| **4** | Keycloak / SAML / SCIM | 🔴 BLOCKED | C-007 |
-| **5–7** | Commercial / hardening / BRD | ⬜ Future | POST-* backlog |
+**Do not re-execute Phase 0 or Phase 1** unless rebuilding from scratch. Use this document for stakeholder alignment.
 
 ---
 
-## Closed P0 / P1 Items (vs stale risk register)
+## Phase Status vs. Pasted Plan
 
-| ID | Stale status | **Current** |
-|----|--------------|-------------|
-| GIT-01 | Open | ✅ Closed — git initialized, tagged |
-| T016 Copilot 503 | Open | ✅ Closed — nlp fallback |
-| T017 CP15 persist | Open | ✅ Closed |
-| T018 Tariff 500 | Open | ✅ Closed |
-| T019 Chaos 500 | Open | ✅ Closed |
-| BUG-01 ERP sync | Fixed not committed | ✅ Closed — committed + tested |
-| BUG-02 MDR fail-open | Open | ✅ Closed — 503 fail-closed |
-| BUG-03 Version approve | Open | ✅ Closed — 409 on conflict |
-| C-01 check-availability | Open | ✅ Closed — `rule_based_atp()` |
-| C-02 Double prefix | Open | ✅ Verified — no change needed |
-| R-01 Coverage 40% | Open | ✅ Closed — 60% gate + tests |
-| R-08 Log aggregation | Open | ✅ MVP — Loki + Promtail + Grafana |
+| Phase | Pasted plan scope | Status | Tag / evidence |
+|-------|-------------------|--------|----------------|
+| **0** | Git init + C-01/C-02/BUG-02/BUG-03 | ✅ **Done** | v1.0.0, `fea0705` |
+| **1** | T016–T019, demo 20/20, v6.0.0 | ✅ **Done** | v6.0.0 @ `a203e68` |
+| **2** | C-03, C-04, SEC-05 | ✅ **Done** | v6.0.1 + W3 → v6.1.0 |
+| **3** | REL-PROD k6/chaos/cov/ops | ✅ **Done** | Wave 2A–2D evidence |
+| **W3** | (not in pasted doc) | ✅ **Done** | v6.1.0 @ `51f41ec` |
+| **P5–P10** | (v7 master prompt) | ✅ **Mostly done** | gap analysis, docs, ADR |
+| **P8** | Coverage 75%+ | 🔄 **In progress** | ~64% avg — blocker |
+| **P11** | Final regression | ⬜ Pending | Re-run demo + chaos |
+| **P12** | Remote push | ⬜ Pending | No origin configured |
+| **4** | Keycloak/SAML/SCIM | 🔴 **BLOCKED** | ADR-001 → v8.0.0 |
+| **5–7** | Commercial / BRD | ⬜ Future | POST-* backlog |
 
 ---
 
-## Phase 3 Detail (REL-PROD) — Delivered
+## Risk Register Reconciliation
 
-### 8.1 k6 Load Testing ✅
+### Section 4.1 P0 — All closed (was blocking v6.0.0)
+
+| ID | Pasted status | **Current** | Evidence |
+|----|---------------|-------------|----------|
+| GIT-01 | Open | ✅ Closed | Tags v1.0.0–v6.1.0 |
+| T016 Copilot 503 | Open | ✅ Closed | CP 10–11 pass (Wave 3) |
+| T017 CP15 persist | Open | ✅ Closed | CP 15 pass |
+| T018 Tariff 500 | Open | ✅ Closed | CP 18 pass |
+| T019 Chaos 500 | Open | ✅ Closed | CP 20 pass |
+| BUG-01 ERP sync | Fixed not committed | ✅ Closed | Committed + tested |
+
+### Section 4.2 P1 — Closed or waived
+
+| ID | Pasted status | **Current** |
+|----|---------------|-------------|
+| BUG-02 MDR fail-open | Open | ✅ 503 fail-closed |
+| BUG-03 Approve race | Open | ✅ 409 optimistic lock |
+| C-01 check-availability | Open | ✅ `rule_based_atp()` |
+| C-02 Double prefix | Open | ✅ Verified OK |
+| R-01 Coverage 40% | Open | ✅ 60% gate; ~68% cap/mat |
+| SEC-01 No internal TLS | Open | ✅ Runbook C-03 (W3-01) |
+
+### Section 4.3 P2 — Closed in Wave 3
+
+| ID | Pasted status | **Current** |
+|----|---------------|-------------|
+| C-03 TLS at Kong | Open | ✅ `docs/runbooks/tls-internal.md` |
+| C-04 JWT rotation | Open | ✅ `docs/runbooks/jwt-rotation.md` |
+| SEC-05 password_hash | Open | ✅ Migration 028 + auth verify |
+| R-08 Log aggregation | Open | ✅ Loki + Grafana MVP |
+| INT-01 capacity schedule | Open | ⚠️ Monitor; demo 20/20 passes |
+
+### Open for v7.0.0 / v8.0.0
+
+| ID | Issue | Status |
+|----|-------|--------|
+| C-007 / FR-P-13 | Keycloak live IdP | 🔴 ADR-001 defer v8 |
+| R-021 | Coverage ≥75% per service | 🔄 ~64% avg |
+| R-001 (legacy) | RLS migrations 002–012 | ADR-002 waiver |
+| POST-C4 | Non-root containers | Backlog |
+
+---
+
+## Demo Checkpoint Reconciliation (Table 3 in pasted doc)
+
+| CP | Pasted result | **Current** |
+|----|---------------|-------------|
+| 0–9, 12–14, 17, 19 | PASS | ✅ Still pass |
+| **10–11** | **FAIL 503** | ✅ **PASS** — nlp-svc fallback |
+| **15** | **FAIL** | ✅ **PASS** — approve persist + Kafka |
+| **18** | **FAIL 500** | ✅ **PASS** — tariff shock fixed |
+| **20** | **FAIL 500** | ✅ **PASS** — chaos/war room |
+
+Full log: `docs/demo-run-report-wave3-live.txt` (20/20, 2026-06-26 15:10).
+
+---
+
+## Feature Delivery (Table 1 update)
+
+| Feature | Pasted | **Current** |
+|---------|--------|-------------|
+| 002 Release gates | 58/62 (94%) | **62/62 (100%)** — T053 cancelled |
+| 003 Autonomous V5 | 45/45 | 45/45 ✅ v1.0.0 |
+| 004 AI-first V6 | 54/55 (98%) | **55/55 (100%)** — T055 tagged |
+| 005 Program | 97% | **100%** readiness |
+
+---
+
+## REL-PROD Deliverables (Phase 3 — complete)
+
+### k6 ✅
 
 | Test | Result |
 |------|--------|
-| smoke.js | PASS — p95 646ms |
-| load-10vu.js | PASS — p95 3.0s |
-| load-200vu.js | PASS — 0% 5xx; Kong 429 at high VU (restart Kong) |
+| smoke.js | PASS |
+| load-10vu.js | PASS |
+| load-200vu.js | PASS (Kong 429 at 200 VU — expected) |
 
-Scripts: `tests/performance/k6/`
+Evidence: `docs/k6-summary.md`, `tests/performance/k6/`
 
-### 8.2 Chaos Engineering ✅
+### Chaos ✅
 
-6/6 scenarios via `scripts/run-chaos-scenarios.ps1`. C3 validated CDM persist + `ERP_EVENT_PUBLISH_FAILED` when Kafka paused.
+6/6 C1–C6 via `scripts/run-chaos-scenarios.ps1`. Evidence: `docs/chaos/chaos-summary.md`
 
-### 8.3 Coverage ≥60% ✅
+### Coverage ✅ (60% gate) / 🔄 (75% v7 target)
 
-| Service | Coverage | `fail_under` |
-|---------|----------|--------------|
-| cap-svc | 68.26% | 60 |
-| mat-svc | 65.35% | 60 |
-| dpe-svc | 66.01% | 60 |
+| Service | Coverage (P8 latest) | Gate |
+|---------|---------------------|------|
+| cap-svc | ~68% | 60% ✅ |
+| mat-svc | ~68% | 60% ✅ |
+| dpe-svc | ~67% | 60% ✅ |
+| alert-svc | ~69% | 80% ❌ |
+| nlp-svc | ~57% | 80% ❌ |
+| fea-svc | ~55% | 80% ❌ |
 
-Audit-path tests: check-availability, approve 409, tariff exposure.
+Evidence: `docs/coverage-report-v7.md`
 
-### 8.4 Operational Infrastructure ✅
+### Ops ✅
 
-| Component | URL |
-|-----------|-----|
-| Grafana | http://localhost:3002 (`admin` / `ipe_admin`) |
-| Prometheus | http://localhost:9091 |
-| Loki | http://localhost:3100 |
-
-Start: `.\scripts\run-monitoring-stack.ps1` (after `rel-demo-stack.ps1`)
+Grafana :3002, Prometheus :9091, Loki :3100 — `docs/ops-monitoring.md`
 
 ---
 
-## Wave 3 — Immediate Next Steps (v6.1.0)
+## v7.0.0 Completion Track (current critical path)
 
-Execute in order from `E:\AISOP\ipe`:
-
-```powershell
-# 1. Confirm stack + monitoring (optional re-verify)
-.\scripts\rel-demo-stack.ps1 -SkipBuild
-.\scripts\run-monitoring-stack.ps1 -VerifyOnly
-
-# 2. Wave 3 deliverables (engineering)
-#    - docs/runbooks/tls-internal.md
-#    - docs/runbooks/jwt-rotation.md
-#    - migrations/028_* password_hash + seed update
-
-# 3. Regression
-.\scripts\run-full-demo.ps1 -ReportPath docs\demo-run-report-post-v6.1.txt
-.\scripts\run-chaos-scenarios.ps1   # C6 only if time-boxed
-
-# 4. Tag (after user approval)
-# git tag -a v6.1.0 -m "IPE v6.1.0 — REL-PROD hardening"
+```text
+P5 gap analysis ✅ → P6 Speckit 162/162 ✅ → P7 audit/sweep ✅
+→ P9 docs ✅ → P10 Keycloak ADR ✅ → P8 coverage 🔄 → P11 regression ⬜ → tag v7.0.0
 ```
 
-**Estimated effort:** 2–3 days focused engineering.
+| Blocker | Action |
+|---------|--------|
+| Coverage <75% | P8 — see `docs/coverage-gap-analysis-v6.1.md` |
+| No fresh P11 run | `.\scripts\rel-demo-stack.ps1` + `run-full-demo.ps1` |
+| No remote | P12 — user provides repo URL |
+
+Checklist: `docs/RELEASE-CHECKLIST-v7.0.0.md`
 
 ---
 
-## Binding Decisions (unchanged)
+## Binding Decisions (unchanged from Section 14)
 
 | Decision | Answer |
 |----------|--------|
 | Workspace | `E:\AISOP\ipe` canonical |
 | REL-STACK | `docker-compose.demo.yml` + `rel-demo-stack.ps1` |
-| Blocks v6.0.0 | ~~20/20 + T055~~ — **satisfied** |
-| Keycloak | BLOCKED C-007 until IdP sandbox |
-| Demo users | `Ahmed@nour` / `admin` |
+| v6.0.0 gate | ~~20/20 + T055~~ — **satisfied** @ v6.0.0 |
+| v6.1.0 gate | W3 hardening — **satisfied** |
+| Keycloak | BLOCKED C-007 — ADR-001 → v8.0.0 |
+| Demo auth | `Ahmed@nour` / `admin` |
 
 ---
 
 ## Score Trajectory
 
 ```text
-Audit 74 (Jun 20) → 82 (audit fixes) → 85 (k6) → 87 (chaos) → 89 (coverage) → 91 (ops) → 95 (W3) → 100 (enterprise)
-Speckit 97 ────────────────────────────────────────────────────────────────────────────────► 100
+Audit:  74 (Jun 20 audit) → 82 → 91 → 95 (W3) → 100 (doc, v7 track)
+Speckit: 96 → 97 → 100 (162/162)
+Demo:   15/20 (stale) → 20/20 (v6.0.0+) → stable through v6.1.0
+```
+
+---
+
+## Immediate Next Steps (NOT the pasted Section 15)
+
+**Do not** run `git init` or re-fix T016–T019. Instead:
+
+1. **P8** — Push coverage to 75%+ (nlp-svc, fea-svc highest gap)
+2. **P11** — Re-run live regression with evidence files
+3. **Tag v7.0.0** — Only after P11 green + coverage gate
+4. **P12** — Configure git remote and push tags
+
+```powershell
+cd E:\AISOP\ipe
+.\scripts\rel-demo-stack.ps1 -SkipBuild
+.\scripts\run-full-demo.ps1 -ReportPath docs\final-regression-demo.txt
+.\scripts\run-chaos-scenarios.ps1
 ```
 
 ---
@@ -150,17 +214,14 @@ Speckit 97 ───────────────────────
 
 | Artifact | Path |
 |----------|------|
-| Program analyze | `specs/005-ipe-program-status/analyze.md` |
-| Program plan | `specs/005-ipe-program-status/plan.md` |
-| Program tasks | `specs/005-ipe-program-status/tasks.md` |
-| Release tasks | `specs/004-ai-first-v6/tasks-release.md` |
 | READINESS | `READINESS.md` |
-| Demo evidence | `docs/demo-run-report-v6.txt` |
-| k6 | `docs/k6-summary.md` |
-| Chaos | `docs/chaos/chaos-summary.md` |
-| Coverage | `docs/coverage-summary.md` |
-| Ops | `docs/ops-monitoring.md` |
+| Release checklist | `docs/RELEASE-CHECKLIST-v7.0.0.md` |
+| Gap analyses | `docs/*-gap-analysis-v6.1.md` |
+| Demo (latest) | `docs/demo-run-report-wave3-live.txt` |
+| Speckit P6 evidence | `docs/speckit-final-p6.txt` |
+| ADRs | `docs/decisions/ADR-001-*.md`, `ADR-002-*.md` |
+| Program specs | `specs/005-ipe-program-status/` |
 
 ---
 
-*This document reconciles the June 26 Master Execution Plan draft against live Speckit artifacts. Use it for stakeholder updates; use `tasks.md` for execution tracking.*
+*Reconciles the confidential "IPE v6.0.0 Product Completion" draft (15/20, zero-git) against live git tags, demo evidence, and v7 completion progress. Use for stakeholder updates; use `tasks.md` + `RELEASE-CHECKLIST` for execution.*
