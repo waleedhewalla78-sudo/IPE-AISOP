@@ -19,9 +19,11 @@ make migrate
 make dev
 ```
 
-## Architecture
-
-See [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
+**Version**: v6.1.0 → v7.0.0 completion  
+**Published**: 2026-06-26  
+**Architecture**: [docs/architecture.md](docs/architecture.md)  
+**API**: [docs/api-reference.md](docs/api-reference.md)  
+**Deploy**: [docs/deployment.md](docs/deployment.md)
 
 ## Services
 
