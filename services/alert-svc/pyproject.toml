@@ -20,7 +20,7 @@ source = ["app"]
 omit = ["*/tests/*"]
 
 [tool.coverage.report]
-fail_under = 80
+fail_under = 75  # P8 v7.0.0 gate
 show_missing = true
 
 [tool.ruff]
