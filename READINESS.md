@@ -14,7 +14,7 @@
 | **Chaos** | **6/6** C1–C6 — `docs/final-regression-chaos.txt` |
 | **Git** | tags **v1.0.0 … v7.0.0**; HEAD `ccbedfe` |
 | **Coverage** | **75%+** all six core services — `docs/coverage-report-v7.md` |
-| **Phase** | **v7.0.0 complete locally** — P12 remote push pending |
+| **Phase** | **v7.0.0 complete** — human UAT via `docs/testing-handoff/` |
 | **FR-P** | 13/14 — FR-P-13 Keycloak deferred (ADR-001 → v8.0.0) |
 
 | Dimension | Score | Notes |
@@ -55,8 +55,9 @@ Latest release commit: `ccbedfe`
 | 3 — REL-PROD | k6, chaos, coverage 60%, ops | ✅ Complete |
 | 4 — Wave 3 hardening | W3-01–04 / v6.1.0 | ✅ Complete |
 | 5 — v7.0.0 completion | P5–P11, tag v7.0.0 | ✅ Complete |
-| 6 — P12 remote push | `git push origin master --tags` | ⬜ Pending (no origin) |
-| 7+ | Keycloak (C-007), POST-* backlog | ⬜ v8.0.0+ |
+| 6 — P12 remote push | `git push origin master --tags` | ✅ Complete |
+| 7 — Human UAT | `docs/testing-handoff/` | ⬜ Tester execution |
+| 8+ | Keycloak (C-007), POST-* backlog | ⬜ v8.0.0+ |
 
 ---
 
@@ -107,6 +108,6 @@ Latest release commit: `ccbedfe`
 
 ## Next Steps
 
-1. **P12** — Add remote and push: `git remote add origin <URL>` → `git push -u origin master --tags`
+1. **Human UAT** — `docs/testing-handoff/HUMAN-TEST-PLAN.md` (20 scenarios)
 2. **v8 planning** — Keycloak (C-007), full RLS, non-root images, ERP live connectors
 3. **Tracker hygiene** — T012–T015 program sync (optional)

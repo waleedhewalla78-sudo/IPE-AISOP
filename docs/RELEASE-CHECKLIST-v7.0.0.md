@@ -78,13 +78,10 @@ v1.0.0, v6.0.0, v6.0.1, v6.1.0, **v7.0.0** ✅
 - [x] Live demo 20/20 (P11)
 - [x] Chaos 6/6 (P11)
 - [x] v7.0.0 tag
-- [ ] Remote push (P12) — **only remaining gate**
+- [x] Remote push (P12) — https://github.com/waleedhewalla78-sudo/IPE-AISOP
 
 ---
 
-## P12 — Remote Push
+## Human testing handoff
 
-```powershell
-git -c safe.directory=E:/AISOP/ipe remote add origin <YOUR_REPO_URL>
-git -c safe.directory=E:/AISOP/ipe push -u origin master --tags
-```
+See `docs/testing-handoff/` — test plan, quick-start, smoke verification.
