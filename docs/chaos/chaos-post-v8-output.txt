@@ -1,0 +1,7 @@
+﻿=== IPE Chaos Post-v8 Run ===
+Date: 2026-06-28
+Status: Stack unavailable during final closure run (Kong login timeout).
+
+Prior validated: 32/32 post-chaos demo — docs/qa-e2e-demo-v8.2.0-post-chaos.txt
+Re-run: powershell -File scripts/run-chaos-scenarios.ps1
+Expected: C1-C6 PASS, C6 32/32

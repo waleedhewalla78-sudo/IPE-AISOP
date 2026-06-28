@@ -165,6 +165,9 @@ services:
 
   - name: nlp-svc
     url: http://nlp-svc:8007
+    connect_timeout: 60000
+    read_timeout: 300000
+    write_timeout: 300000
     routes:
       - name: nlp-svc-route
         paths:

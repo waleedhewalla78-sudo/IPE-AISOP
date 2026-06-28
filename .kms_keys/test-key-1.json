@@ -1,0 +1,9 @@
+{
+  "key_id": "test-key-1",
+  "key_arn": "local://test-key-1",
+  "algorithm": "AES-256",
+  "created_at": "2026-06-21T16:27:53.829265+00:00",
+  "metadata": {
+    "material_hash": "69b522bc8b140eb3f6f59ea2367226923063ece3d91cd09d54cd2348d0311ddc"
+  }
+}

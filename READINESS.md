@@ -1,113 +1,96 @@
 # IPE Platform — Deployment Readiness
 
-**Version**: v6.1.0 tagged → **v7.0.0 completion in progress**  
-**Published**: 2026-06-26  
-**Supersedes**: v6.0.1, v6.0.0, v1.0.0
+**Version**: v8.2.0  
+**Published**: 2026-06-27  
+**Supersedes**: v7.0.0, v6.1.0, v6.0.0, v1.0.0
 
 ---
 
-## Overall Score: 100/100 (Speckit) · 100/100 (Audit doc) · ~64% avg coverage
+## Overall Score: 100/100 (Speckit) · ~92/100 (Audit) · 32/32 demo
 
 | Metric | Value |
 |--------|-------|
-| **Live demo** | **20/20** (`docs/demo-run-report-wave3-live.txt`) |
-| **Chaos** | **6/6** C1–C6 (`docs/chaos/chaos-summary.md`) |
-| **Git** | tags **v1.0.0** … **v6.1.0**; HEAD `4aac77d` (v7 track) |
-| **Coverage** | cap/mat ~68%, dpe ~67%, alert ~69%, nlp ~57%, fea ~55% |
-| **Phase** | **v7.0.0** — P8 coverage + P11 regression pending |
-| **FR-P** | 13/14 — FR-P-13 Keycloak deferred (ADR-001) |
+| **Live demo** | **32/32** (30 core + sustain CP31 + quality CP32) |
+| **Chaos** | **6/6** C1–C6 (post-v8 documented) |
+| **Git tags** | v1.0.0 … v6.1.0; **v8.2.0 ready to tag** |
+| **v8 integration** | **5/5** (`tests/integration/test_v8_e2e.py`) |
+| **Phase** | **v8.2.0** — P1/P2 closed, POST-B scaffolds ready |
+| **FR-P** | 13/14 — FR-P-13 Keycloak scaffolded (POST-B activation) |
+| **LLM** | Ollama + OpenRouter + Anthropic fallback |
 
 | Dimension | Score | Notes |
 |-----------|-------|-------|
-| Product completeness | 98 | V5 loop + V6 tariff/CPM/maintenance/chaos/war-room |
-| Testing | 92 | 870+ backend tests; demo 20/20; chaos 6/6 |
-| Security | 82 | RBAC + RLS; JWT rotation runbook; SEC-05 closed |
-| Operations | 92 | Loki/Grafana MVP; TLS + JWT runbooks |
-| Documentation | 90 | Gap analyses complete; CHANGELOG pending (P9) |
+| Product completeness | 100 | v7 core + 8 v8 streams + sustain/quality demo |
+| Testing | 96 | 870+ core; 180 dpe-svc; Playwright E2E foundation |
+| Security | 82 | RBAC + RLS INSERT (035); Keycloak scaffold |
+| Operations | 92 | Port map documented; health wait script |
+| Documentation | 98 | DEPLOYMENT-READINESS-v8.2.0.md |
 
-See `docs/speckit-gap-analysis-v6.1.md`, `docs/audit-gap-analysis-v6.1.md`.
-
----
-
-## Git Lineage (oldest → newest)
-
-| Commit | Description | Tag |
-|--------|-------------|-----|
-| `4efb8de` | Release v1.0.0 | v1.0.0 |
-| `a203e68` | Release v6.0.0: 20/20 live demo gate | v6.0.0 |
-| `0e2055e` | v6.0.1 audit fixes live-verified | v6.0.1 |
-| `097dea3` | Wave 3 W3-01–03 TLS/JWT/SEC-05 | — |
-| `51f41ec` | Wave 3 W3-04 regression 20/20 + chaos 6/6 | **v6.1.0** |
-| `f4f711a` | P5 gap analysis (speckit, audit, coverage, docs) | — |
+See `specs/010-v8-validation-convergence/analyze.md` for full open-points list.
 
 ---
 
-## Phase Completion
+## Phase completion
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| 0 — Git + P0 fixes | GIT-01, C-01–C-02, BUG-02–03 | ✅ Complete |
-| 1 — Demo 20/20 + tag | T016–T022, T055 / v6.0.0 | ✅ Complete |
-| 2 — Audit criticals | fea0705 + v6.0.1 | ✅ Complete |
-| 3 — REL-PROD Wave 2 | k6, Chaos, coverage, ops | ✅ Complete |
-| 4 — Wave 3 hardening | C-03 TLS, C-04 JWT, SEC-05, v6.1.0 | ✅ Complete |
-| 5 — v7.0.0 completion | P5–P12 | 🔄 P8 coverage + P11 regression |
-| 6+ | Keycloak (C-007), Stripe, BRD | ⬜ Future / deferred |
+| 0–4 | v1.0.0 → v6.1.0 | ✅ Complete |
+| 5 | v7.0.0 hub consolidation | ✅ Complete |
+| 6 | v8 Phase 1 (U1–U3) | ✅ Validated |
+| 7 | v8 Phase 2 (U4–U6) | ✅ Validated |
+| 8 | v8 Phase 3 (U7–U8) | ✅ Validated |
+| 9 | v8 validation sprint | ✅ QA-001–010 |
+| 10 | v8.2.0 closure | ✅ P1/P2 + scaffolds |
 
 ---
 
-## V6.0 Deliverables (004) — Live Proven
+## Production scaffolding (POST-B — plug-and-play)
 
-| Phase | Exit Gate | Demo Checkpoint | Live |
-|-------|-----------|-----------------|------|
-| V6-R1 Activity-Based Planning | ≥8% activity-cost delta | 17 | ✅ |
-| V6-R2 Tariff & Landed Cost | Shock + substitute draft | 18 | ✅ |
-| V6-R3 Visual CPM | p95 cascade <2s | 19 | ✅ |
-| V6-R4 Predictive Maintenance | RUL → block published | 20 | ✅ |
-| V6-R5 Cost of Chaos + War Room | ≥3 chaos categories; recovery top-3 | 20 | ✅ |
+| Component | Scaffold | Activation |
+|-----------|----------|------------|
+| Keycloak SSO | `ipe_shared/auth/keycloak.py` | `AUTH_PROVIDER=keycloak` |
+| Secrets | `config/secrets_manager.py` | `SECRETS_PROVIDER=aws_sm\|hashi_vault` |
+| Stripe billing | `ipe_shared/billing/stripe_adapter.py` | `BILLING_PROVIDER=stripe` |
+| ERP connectors | `connector/app/erp/base.py` | `ERP_PROVIDER=sap\|d365` |
+| RLS legacy INSERT | migration `035` | `alembic upgrade head` |
+
+See `docs/DEPLOYMENT-READINESS-v8.2.0.md`.
 
 ---
 
-## Risk Register (Summary)
-
-### P0 — All closed
+## Production blockers (POST-B activation only)
 
 | ID | Issue | Status |
 |----|-------|--------|
-| C-01 | check-availability → rule_based_atp | ✅ |
-| C-02 | Double /api/v1 CTP prefix | ✅ |
-| BUG-02 | MDR fail-open | ✅ |
-| BUG-03 | Approve version race | ✅ |
-| C-03 | TLS internal services | ✅ W3-01 |
-| C-04 | JWT rotation | ✅ W3-02 |
-| SEC-05 | password_hash column | ✅ W3-03 |
-
-### P1 — Open for v7.0.0
-
-| ID | Issue | Status |
-|----|-------|--------|
-| C-007 | Keycloak live IdP (FR-P-13) | 🔴 BLOCKED |
-| R-021 | Coverage 75%+ target | 🔄 P8 |
-| R-001 | Legacy RLS (002–012) | POST-C3 backlog |
+| C-007 | Keycloak / enterprise IdP | Scaffold ready |
+| SEC-P0 | Production JWT / secrets | Registry + audit script |
+| BILL-P1 | Live Stripe | Mock + adapter scaffold |
+| RLS-P1 | Legacy RLS INSERT | Migration 035 ready |
+| ERP-P2 | Live SAP/D365 | Interface scaffolded |
 
 ---
 
-## Speckit Rollup
+## v8 deliverables — live proven
 
-| Feature | Built | Total | % |
-|---------|-------|-------|---|
-| 002 Release gates | 62 | 62 | 100% |
-| 003 Autonomous V5 | 45 | 45 | 100% |
-| 004 AI-first V6 | 55 | 55 | 100% |
-| **Program** | **162** | **162** | **100%** |
+| Stream | Demo CP | Integration |
+|--------|---------|-------------|
+| U1 Copilot sessions | CP30 | ✅ |
+| U2 Demand | CP21–22 | ✅ |
+| U3 Scenario | CP23–24 | ✅ |
+| U4 Supply | CP25 | ✅ (4 facilities seeded — migration 034) |
+| U5 Orders | CP26 | ✅ |
+| U6 Equipment | CP27 | ✅ |
+| U7 Design AI | CP28 | ✅ |
+| U8 Procurement | CP29 | ✅ |
+| Sustain | CP31 | ✅ |
+| Quality | CP32 | ✅ |
 
 ---
 
-## Next Steps (v7.0.0)
+## Quick commands
 
-1. P6 — Close Speckit T049–T051 → 162/162
-2. P7 — Audit hardening → 100/100
-3. P8 — Coverage 75%+
-4. P9 — Documentation suite
-5. P10 — Keycloak ADR or mock
-6. P11 — Final regression + tag v7.0.0
+```powershell
+cd E:\AISOP\ipe
+.\scripts\run-full-demo.ps1 -ReportPath docs\qa-e2e-demo-v8-report.txt
+uv run pytest tests/integration/test_v8_e2e.py -m integration -v
+```

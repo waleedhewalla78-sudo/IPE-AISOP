@@ -193,19 +193,19 @@ Write-Evidence "C5-pg-connections.md" @(
     "End: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 )
 
-Write-Host "=== C6: post-chaos 20/20 regression ===" -ForegroundColor Cyan
+Write-Host "=== C6: post-chaos 32/32 regression ===" -ForegroundColor Cyan
 $start = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$report = Join-Path (Split-Path -Parent $PSScriptRoot) "docs\demo-run-report-post-chaos.txt"
+$report = Join-Path (Split-Path -Parent $PSScriptRoot) "docs\qa-e2e-demo-v8.2.0-post-chaos.txt"
 & (Join-Path $PSScriptRoot "run-full-demo.ps1") -ReportPath $report
-$tail = Get-Content $report -Tail 5 -ErrorAction SilentlyContinue
-$c6Pass = ($tail -join "`n") -match "20 / 20"
+$tail = Get-Content $report -Tail 8 -ErrorAction SilentlyContinue
+$c6Pass = ($tail -join "`n") -match "32 / 32"
 Write-Evidence "C6-post-chaos-regression.md" @(
-    "### C6: Full demo regression post-chaos",
+    "### C6: Full demo regression post-chaos (v8.2.0)",
     "Start: $start",
     "",
     ($tail | ForEach-Object { "- $_" }),
     "",
-    "Result: $(if ($c6Pass) { 'PASS - 20/20 post-chaos' } else { 'FAIL - see demo-run-report-post-chaos.txt' })",
+    "Result: $(if ($c6Pass) { 'PASS - 32/32 post-chaos' } else { 'FAIL - see qa-e2e-demo-v8.2.0-post-chaos.txt' })",
     "End: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 )
 

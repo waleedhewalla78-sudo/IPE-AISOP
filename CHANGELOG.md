@@ -6,20 +6,35 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [v7.0.0] — 2026-06-26 (in progress)
+## [v7.0.0] — 2026-06-27
 
 ### Added
 
+- **Ollama local LLM backbone** — query orchestrator + tool-calling copilot (`ollama_tool_client.py`)
+- Docker overlays: `docker-compose.ollama.yml`, `docker-compose.ollama-host.yml`
+- `scripts/start-ollama-stack.ps1` with `-UseHostOllama` flag
+- `docs/PRODUCT-STATUS.md`, `docs/PRODUCTION-BLOCKERS.md`, `docs/END-USER-GUIDE.md`
+- `docs/AI-AGENTS-ARCHITECTURE.md` — full agent roles + Ollama deployment
+- OpenRouter LLM provider for cloud fallback
 - Phase 5 gap analysis reports (speckit, audit, coverage, documentation)
 - Speckit 162/162 completion (T049–T051 closed; T053 cancelled)
 - ADR-001 Keycloak deferral to v8.0.0
-- Documentation suite: CHANGELOG, CONTRIBUTING, runbooks, architecture index, API reference
-- Security hardening sweep documentation
+- Documentation suite: CONTRIBUTING, runbooks, architecture index, API reference
 
 ### Changed
 
-- Coverage gate target raised toward 75% per service
-- READINESS.md updated for v7.0.0 completion track
+- Kong nlp-svc upstream timeout → 300s (local LLM cold-start)
+- `IPE_LLM_PRIMARY_PROVIDER` — auto | ollama | openrouter | anthropic
+- Coverage gate ≥75% per service — all six core services pass
+- READINESS.md and release checklist updated for v7.0.0 RC
+
+### Fixed
+
+- Copilot 503 — OpenRouter + Ollama integration; `IPE_*` env prefix
+- Intent classifier fallback on LLM unavailable
+- Tool-calling copilot Anthropic-only gap — Ollama tools supported
+- CopilotPanel missing `X-Tenant-ID` header
+- del-svc spurious `mock_anthropic_key` env var
 
 ---
 

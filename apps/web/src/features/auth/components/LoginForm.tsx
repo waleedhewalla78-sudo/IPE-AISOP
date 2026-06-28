@@ -17,7 +17,7 @@ export function LoginForm() {
     setError('');
     try {
       await login({ email, password });
-      navigate('/control-tower');
+      navigate('/planning/dashboard');
     } catch {
       setError('Invalid credentials. Try admin@demo.com / demo');
     }

@@ -1,0 +1,23 @@
+﻿NAME                       CPU %     MEM USAGE / LIMIT
+docker-cap-svc-1           120.18%   246.1MiB / 7.677GiB
+docker-mat-svc-1           0.92%     110.1MiB / 7.677GiB
+naughty_swanson            0.33%     101MiB / 7.677GiB
+docker-alert-svc-1         0.36%     120MiB / 7.677GiB
+docker-dpe-svc-1           89.46%    125MiB / 7.677GiB
+docker-nlp-svc-1           1.06%     110.7MiB / 7.677GiB
+docker-kong-1              123.09%   925.1MiB / 7.677GiB
+docker-scn-svc-1           110.37%   103.8MiB / 7.677GiB
+docker-res-svc-1           118.99%   123.7MiB / 7.677GiB
+docker-network-svc-1       0.23%     113.7MiB / 7.677GiB
+docker-connector-1         9.68%     112.9MiB / 7.677GiB
+docker-fea-svc-1           4.03%     112.2MiB / 7.677GiB
+docker-del-svc-1           0.93%     113.8MiB / 7.677GiB
+docker-rec-svc-1           0.92%     112.2MiB / 7.677GiB
+docker-kafka-1             13.29%    490.7MiB / 7.677GiB
+docker-db-1                26.74%    271.2MiB / 7.677GiB
+docker-redis-1             0.27%     8.148MiB / 7.677GiB
+docker-zookeeper-1         1.03%     166MiB / 7.677GiB
+nexus-web                  10.96%    104.7MiB / 7.677GiB
+nexus-worker               0.00%     0B / 0B
+nexus-redis                2.29%     12.2MiB / 7.677GiB
+nexus-social-app-redis-1   0.46%     14.98MiB / 7.677GiB

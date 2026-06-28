@@ -1,0 +1,10 @@
+{
+  "key_id": "rotate-test-key",
+  "key_arn": "local://rotate-test-key",
+  "algorithm": "AES-256",
+  "created_at": "2026-06-21T16:27:54.075057+00:00",
+  "metadata": {
+    "rotated_at": "2026-06-21T16:27:54.075018+00:00",
+    "material_hash": "323087593252a388b888bd307fc00799c90a4c4728b73d5db62ee47febfa20f9"
+  }
+}

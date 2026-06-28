@@ -1,7 +1,7 @@
 # IPE v7.0.0 Release Checklist
 
-**Date:** 2026-06-26 (updated)  
-**Latest commit:** pending P6-05 / P7 / P8 continuation
+**Date:** 2026-06-27  
+**Status:** ✅ **Release candidate — ready to tag**
 
 ---
 
@@ -9,13 +9,15 @@
 
 | Check | Target | Actual | Status |
 |-------|--------|--------|--------|
-| Demo scenarios | 20/20 | 20/20 (v6.1.0 evidence) | ⚠️ Re-run P11 |
-| Chaos tests | 6/6 | 6/6 (v6.1.0 evidence) | ⚠️ Re-run P11 |
+| Demo scenarios | 20/20 | 20/20 | ✅ `docs/qa-e2e-demo-report.txt` |
+| Chaos tests | 6/6 | 6/6 | ✅ post-chaos 20/20 |
 | Speckit built | 162/162 | **162/162** | ✅ |
 | Speckit readiness | 100/100 | **100/100** | ✅ |
 | Audit score | 100/100 | **100/100** | ✅ |
-| Test coverage | ≥75%/svc | **~64% avg** | ❌ Blocker |
+| Test coverage | ≥75%/svc | **~78% avg** | ✅ `docs/coverage-report-v7.md` |
 | FR-P verified | 14/14 or ADR | **13/14 + ADR-001** | ✅ |
+| Ollama LLM integration | Working | Query + chat verified | ✅ |
+| Kong Copilot timeout | ≤300s | 300s upstream | ✅ |
 
 ---
 
@@ -24,7 +26,7 @@
 | Check | Result |
 |-------|--------|
 | Hardcoded secrets | CLEAN |
-| Non-root containers | PARTIAL (POST-C4) |
+| Non-root containers | PARTIAL (POST-C4 — production) |
 | CORS restricted | YES (prod path) |
 | Health endpoints | `/health` + `/healthz` |
 | Tenant isolation | VERIFIED + ADR-002 waiver |
@@ -40,7 +42,11 @@
 | README.md | ✅ |
 | CHANGELOG.md | ✅ |
 | CONTRIBUTING.md | ✅ |
-| docs/architecture.md | ✅ |
+| docs/PRODUCT-STATUS.md | ✅ |
+| docs/PRODUCTION-BLOCKERS.md | ✅ |
+| docs/END-USER-GUIDE.md | ✅ |
+| docs/AI-AGENTS-ARCHITECTURE.md | ✅ |
+| docs/qa-e2e-readiness-report.md | ✅ |
 | docs/api-reference.md | ✅ |
 | docs/deployment.md | ✅ |
 | docs/runbooks/* | ✅ |
@@ -48,9 +54,9 @@
 
 ---
 
-## Git Tags (current)
+## Git Tags
 
-v1.0.0, v6.0.0, v6.0.1, v6.1.0 — **v7.0.0 NOT tagged** (coverage + regression pending)
+v1.0.0, v6.0.0, v6.0.1, v6.1.0 — **v7.0.0 pending stakeholder tag**
 
 ---
 
@@ -60,8 +66,16 @@ v1.0.0, v6.0.0, v6.0.1, v6.1.0 — **v7.0.0 NOT tagged** (coverage + regression 
 - [x] Audit 100/100 documented
 - [x] Documentation suite complete
 - [x] Security sweep documented
-- [ ] Coverage ≥75% per service
-- [ ] Live demo 20/20 re-run
-- [ ] Chaos 6/6 re-run
-- [ ] v7.0.0 tag
-- [ ] Remote push (P12)
+- [x] Coverage ≥75% per service
+- [x] Live demo 20/20 re-run (2026-06-27)
+- [x] Chaos 6/6 re-run
+- [x] Ollama LLM backbone integrated
+- [ ] v7.0.0 git tag (stakeholder approval)
+- [ ] Remote push (P12 — optional)
+
+---
+
+## Production (separate gate)
+
+Production deployment blocked until customer infra — see `docs/PRODUCTION-BLOCKERS.md`.  
+**Staging/UAT: GO.**

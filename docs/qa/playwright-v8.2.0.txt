@@ -1,0 +1,6 @@
+﻿=== Playwright E2E v8.2.0 ===
+Date: 2026-06-28
+Specs: login, copilot, demand-tab, supply-tab (apps/web/e2e/)
+Result: login FAIL — API stack down (stays on /login)
+Re-run with stack up: npx playwright test e2e/*.spec.ts --project=desktop
+API demo validated: 32/32 — docs/qa-e2e-demo-v8.2.0-closure.txt

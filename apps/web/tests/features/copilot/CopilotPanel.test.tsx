@@ -6,13 +6,13 @@ describe('CopilotPanel', () => {
   it('renders copilot title and input', () => {
     render(<CopilotPanel />);
     expect(screen.getByText('Copilot')).toBeInTheDocument();
-    expect(screen.getByText(/Ask questions about your production plan/)).toBeInTheDocument();
+    expect(screen.getByText(/responses adapt to your selected role/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Ask about your production/)).toBeInTheDocument();
     expect(screen.getByText('Send')).toBeInTheDocument();
   });
 
   it('renders empty state message when no messages', () => {
     render(<CopilotPanel />);
-    expect(screen.getByText(/Ask about demand, material status/)).toBeInTheDocument();
+    expect(screen.getByText(/demand forecasts, feasibility, capacity, scenarios/i)).toBeInTheDocument();
   });
 });

@@ -1,0 +1,74 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: D:\AISOP\ipe\services\res-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 23 items
+
+services\res-svc\tests\test_api_resolution.py ..                         [  8%]
+services\res-svc\tests\test_approval_optimistic_lock.py .                [ 13%]
+services\res-svc\tests\test_idempotency.py ......                        [ 39%]
+services\res-svc\tests\test_strategy.py ..............                   [100%]{
+    "name": "POST /api/v1/resolution/approve http send",
+    "context": {
+        "trace_id": "0x7798a50082bfe1e22ae54b094a9672f6",
+        "span_id": "0xde0ecea8c9ee8a94",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x1999a3e192fe027d",
+    "start_time": "2026-06-21T14:21:54.123376Z",
+    "end_time": "2026-06-21T14:21:54.123586Z",
+    "status": {
+        "status_code": "UNSET"
+    },
+    "attributes": {
+        "asgi.event.type": "http.response.start",
+        "http.status_code": 200
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "attributes": {
+            "telemetry.sdk.language": "python",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.version": "1.42.1",
+            "service.name": "res-svc",
+            "service.version": "0.1.0",
+            "deployment.environment": "development"
+        },
+        "schema_url": ""
+    }
+}
+
+
+============================== warnings summary ===============================
+tests/test_api_resolution.py::test_health_endpoint
+  D:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 23 passed, 1 warning in 45.96s ========================
+python.exe : Exception while exporting Span.
+At line:1 char:1
++ & "D:\AISOP\ipe\.venv\Scripts\python.exe" -m pytest services/res-svc/ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Exception while exporting Span.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Traceback (most recent call last):
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 182, in _export
+    self._exporter.export(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        [
+        ^
+    ...<3 lines>...
+        ]
+        ^
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\sdk\trace\export\__init__.py", line 341, in export
+    self.out.write(self.formatter(span))
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+ValueError: I/O operation on closed file.

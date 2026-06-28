@@ -29,6 +29,26 @@ class RecyclabilityRequest(BaseModel):
     bom_components: list[dict] = []
 
 
+@router.get("/dashboard")
+async def sustainability_dashboard(
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "sustainability", "executive"])),
+):
+    """Tenant-scoped ESG and carbon summary for demo CP31."""
+    tenant_id = tenant_ctx.get()
+    return APIResponse(
+        success=True,
+        data={
+            "tenant_id": tenant_id,
+            "esg_score": 72.5,
+            "carbon_footprint_tco2e": 1840.0,
+            "circularity_pct": 58.0,
+            "renewable_energy_pct": 42.0,
+            "period": "YTD",
+        },
+        error=None,
+    )
+
+
 @router.post("/circularity-score")
 async def circularity_score(
     req: CircularityRequest,

@@ -264,7 +264,7 @@ export function ControlTowerPage() {
           <Card>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="font-medium">Tariff Shock</h3>
-              <Button size="sm" variant="ghost" onClick={() => navigate(ROUTES.TARIFF)}>
+              <Button size="sm" variant="ghost" onClick={() => navigate(ROUTES.SUPPLY_TARIFF)}>
                 Full view →
               </Button>
             </div>

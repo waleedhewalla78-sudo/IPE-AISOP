@@ -1,0 +1,8 @@
+=== IPE k6 smoke v8.2.0 ===
+Date: 2026-06-28
+Status: Skipped — Docker/Kong stack unavailable during final closure run.
+
+Script: tests/performance/k6/smoke.js
+Re-run: k6 run tests/performance/k6/smoke.js
+
+Prior baseline: docs/k6-smoke-console.txt (p95 within demo stack limits)

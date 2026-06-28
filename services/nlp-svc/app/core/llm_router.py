@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class LLMProvider(Enum):
+    OPENROUTER = "openrouter"
     ANTHROPIC = "anthropic"
     OLLAMA = "ollama"
     SAGEMAKER = "sagemaker"
@@ -41,7 +42,42 @@ TIER_FALLBACK: dict[int, list[LLMProvider]] = {
     3: [LLMProvider.VLLM, LLMProvider.OLLAMA, LLMProvider.SAGEMAKER, LLMProvider.ANTHROPIC],
 }
 
+
+def _fallback_chain_for_tier(tier: int) -> list[LLMProvider]:
+    chain = list(TIER_FALLBACK.get(tier, [LLMProvider.ANTHROPIC]))
+    pref = (settings.LLM_PRIMARY_PROVIDER or "auto").lower().strip()
+
+    ollama_ok = bool(settings.OLLAMA_ENDPOINT_URL.strip())
+    openrouter_ok = bool(settings.OPENROUTER_API_KEY)
+    anthropic_ok = bool(
+        settings.ANTHROPIC_API_KEY and settings.ANTHROPIC_API_KEY != "sk-ant-placeholder"
+    )
+
+    def _prepend(provider: LLMProvider, base: list[LLMProvider]) -> list[LLMProvider]:
+        return [provider] + [p for p in base if p != provider]
+
+    if pref == "ollama" and ollama_ok:
+        chain = _prepend(LLMProvider.OLLAMA, chain)
+    elif pref == "openrouter" and openrouter_ok:
+        chain = _prepend(LLMProvider.OPENROUTER, chain)
+    elif pref == "anthropic" and anthropic_ok:
+        chain = _prepend(LLMProvider.ANTHROPIC, chain)
+    elif pref == "auto":
+        if ollama_ok:
+            chain = _prepend(LLMProvider.OLLAMA, chain)
+        elif openrouter_ok:
+            chain = _prepend(LLMProvider.OPENROUTER, chain)
+        elif anthropic_ok:
+            chain = _prepend(LLMProvider.ANTHROPIC, chain)
+    else:
+        if openrouter_ok:
+            chain = _prepend(LLMProvider.OPENROUTER, chain)
+
+    return chain
+
+
 _CALL_METHODS: dict[LLMProvider, str] = {
+    LLMProvider.OPENROUTER: "_call_openrouter",
     LLMProvider.ANTHROPIC: "_call_anthropic",
     LLMProvider.OLLAMA: "_call_ollama",
     LLMProvider.SAGEMAKER: "_call_sagemaker",
@@ -55,9 +91,9 @@ class LLMTierRouter:
     def __init__(self, tenant_tier: int | None = None) -> None:
         self._tier: int = tenant_tier or settings.LLM_TIER_DEFAULT
         self._provider: LLMProvider = TIER_PROVIDER_MAP.get(self._tier, LLMProvider.ANTHROPIC)
-        self._fallback_chain: list[LLMProvider] = TIER_FALLBACK.get(
-            self._tier, [LLMProvider.ANTHROPIC]
-        )
+        self._fallback_chain: list[LLMProvider] = _fallback_chain_for_tier(self._tier)
+        if self._fallback_chain:
+            self._provider = self._fallback_chain[0]
 
     @property
     def tier(self) -> int:
@@ -100,6 +136,20 @@ class LLMTierRouter:
             "endpoint_url": settings.VLLM_ENDPOINT_URL,
         }
 
+    def _provider_available(self, provider: LLMProvider) -> bool:
+        if provider == LLMProvider.OPENROUTER:
+            return bool(settings.OPENROUTER_API_KEY)
+        if provider == LLMProvider.ANTHROPIC:
+            key = settings.ANTHROPIC_API_KEY
+            return bool(key and key != "sk-ant-placeholder")
+        if provider == LLMProvider.OLLAMA:
+            return bool(settings.OLLAMA_ENDPOINT_URL.strip())
+        if provider == LLMProvider.SAGEMAKER:
+            return bool(settings.SAGEMAKER_ENDPOINT_URL)
+        if provider == LLMProvider.VLLM:
+            return bool(settings.VLLM_ENDPOINT_URL)
+        return False
+
     async def route(self, prompt: str, system_prompt: str = "") -> str:
         """Route an LLM request through the tier provider with PII
         stripping and fallback."""
@@ -111,6 +161,8 @@ class LLMTierRouter:
 
         last_error: Exception | None = None
         for provider in self._fallback_chain:
+            if not self._provider_available(provider):
+                continue
             method_name = _CALL_METHODS.get(provider)
             if not method_name:
                 continue
@@ -143,15 +195,22 @@ class LLMTierRouter:
             ok = False
             detail = ""
             try:
-                if provider == LLMProvider.ANTHROPIC:
+                if provider == LLMProvider.OPENROUTER:
+                    ok = bool(settings.OPENROUTER_API_KEY)
+                    detail = "configured" if ok else "missing API key"
+                elif provider == LLMProvider.ANTHROPIC:
                     ok = self.get_anthropic_client() is not None
                     detail = "configured" if ok else "missing API key"
                 elif provider == LLMProvider.OLLAMA:
                     url = settings.OLLAMA_ENDPOINT_URL.rstrip("/")
-                    async with httpx.AsyncClient(timeout=3.0) as cli:
-                        resp = await cli.get(f"{url}/api/tags")
-                        ok = resp.is_success
-                    detail = "reachable" if ok else "unreachable"
+                    if not url:
+                        ok = False
+                        detail = "not configured"
+                    else:
+                        async with httpx.AsyncClient(timeout=3.0) as cli:
+                            resp = await cli.get(f"{url}/api/tags")
+                            ok = resp.is_success
+                        detail = "reachable" if ok else "unreachable"
                 elif provider == LLMProvider.SAGEMAKER:
                     ok = bool(settings.SAGEMAKER_ENDPOINT_URL)
                     detail = "configured" if ok else "not configured"
@@ -189,6 +248,41 @@ class LLMTierRouter:
             resp.raise_for_status()
             data = resp.json()
             return (data.get("message") or {}).get("content", "").strip()
+
+    async def _call_openrouter(self, prompt: str, system_prompt: str) -> str:
+        """Call OpenRouter (OpenAI-compatible) chat completions API."""
+        api_key = settings.OPENROUTER_API_KEY
+        if not api_key:
+            raise RuntimeError("OpenRouter API key not configured")
+
+        base = settings.OPENROUTER_BASE_URL.rstrip("/")
+        messages: list[dict[str, str]] = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        async with httpx.AsyncClient(timeout=120) as cli:
+            resp = await cli.post(
+                f"{base}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "http://localhost:8082",
+                    "X-Title": "IPE Copilot",
+                },
+                json={
+                    "model": settings.OPENROUTER_MODEL,
+                    "max_tokens": settings.MODEL_CONFIG.get("max_tokens", 1024),
+                    "messages": messages,
+                },
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            choices = data.get("choices") or []
+            if not choices:
+                raise RuntimeError("OpenRouter returned no choices")
+            content = (choices[0].get("message") or {}).get("content", "")
+            return str(content).strip()
 
     async def _call_anthropic(self, prompt: str, system_prompt: str) -> str:
         """Call Anthropic Claude API (Tier 1)."""

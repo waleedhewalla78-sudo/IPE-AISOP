@@ -66,10 +66,13 @@ async def _classify_intent(query: str) -> str:
     if keyword_intent:
         return keyword_intent
 
-    llm_response = await query_llm(_INTENT_PROMPT + f"Query: {query}")
-    for intent in _INTENTS:
-        if intent in llm_response.lower():
-            return intent
+    try:
+        llm_response = await query_llm(_INTENT_PROMPT + f"Query: {query}")
+        for intent in _INTENTS:
+            if intent in llm_response.lower():
+                return intent
+    except LLMUnavailableError:
+        pass
     return "general"
 
 

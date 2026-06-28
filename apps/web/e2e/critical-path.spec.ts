@@ -10,7 +10,7 @@ test.describe('Critical Path — Authentication', () => {
     expect(results.violations.filter((v) => v.impact === 'critical')).toHaveLength(0);
   });
 
-  test('navigates to /login, enters credentials, redirects to Control Tower, stores JWT', async ({ page }) => {
+  test('navigates to /login, enters credentials, redirects to Planning Dashboard, stores JWT', async ({ page }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
 
@@ -23,7 +23,7 @@ test.describe('Critical Path — Authentication', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page).toHaveURL(/\/control-tower/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/planning\/dashboard/, { timeout: 10000 });
 
     const jwt = await page.evaluate(() => localStorage.getItem('access_token'));
     expect(jwt).not.toBeNull();
@@ -32,11 +32,11 @@ test.describe('Critical Path — Authentication', () => {
 });
 
 test.describe('Critical Path — Resolution Center', () => {
-  test('navigates to /resolution, table renders, clicking MO shows scenario panel', async ({ page }) => {
+  test('navigates to /planning/resolution, table renders, clicking MO shows scenario panel', async ({ page }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
 
-    await page.goto('/resolution');
+    await page.goto('/planning/resolution');
 
     await expect(page.locator('h2, h3').filter({ hasText: /unresolved|resolution/i }).first()).toBeVisible();
 
@@ -62,14 +62,14 @@ test.describe('Critical Path — Planner Journey', () => {
     await page.fill('input[type="email"]', 'admin@demo.com');
     await page.fill('input[type="password"]', 'admin');
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/\/control-tower/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/planning\/dashboard/, { timeout: 10000 });
 
     const redBadge = page.locator('.text-red-500, .bg-red, [class*="bg-red"]').first();
     if (await redBadge.isVisible({ timeout: 3000 }).catch(() => false)) {
       await redBadge.click();
     }
 
-    await page.goto('/resolution');
+    await page.goto('/planning/resolution');
     await expect(page.locator('table')).toBeVisible({ timeout: 5000 });
 
     const moRows = page.locator('table tbody tr');
@@ -92,19 +92,19 @@ test.describe('Critical Path — Planner Journey', () => {
 });
 
 test.describe('Accessibility & Keyboard Navigation', () => {
-  test('Control Tower has no critical aXe violations', async ({ page }) => {
+  test('Planning Dashboard has no critical aXe violations', async ({ page }) => {
     await page.goto('/login');
     await page.fill('input[type="email"]', 'admin@demo.com');
     await page.fill('input[type="password"]', 'admin');
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/\/control-tower/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/planning\/dashboard/, { timeout: 10000 });
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter((v) => v.impact === 'critical')).toHaveLength(0);
   });
 
   test('Resolution Center has no critical aXe violations', async ({ page }) => {
-    await page.goto('/resolution');
+    await page.goto('/planning/resolution');
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter((v) => v.impact === 'critical')).toHaveLength(0);

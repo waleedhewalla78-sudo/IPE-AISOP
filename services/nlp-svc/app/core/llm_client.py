@@ -6,21 +6,12 @@ from app.config import settings
 from app.core.llm_errors import LLMUnavailableError
 from app.core.llm_router import LLMProvider, LLMTierRouter
 from app.core.tiered_router import TieredRouter
+from app.core.tool_agent_backend import _get_client, get_tool_agent_backend
 
 _router = LLMTierRouter()
 _tiered_router = TieredRouter()
 
-
-def _get_client() -> tuple:
-    """Get Anthropic client for tool-calling (used by copilot_agent).
-
-    Returns (client, model_config) or (None, None) if unavailable.
-    PII stripping is handled separately by the caller.
-    """
-    client = _router.get_anthropic_client()
-    if client is None:
-        return None, None
-    return client, settings.MODEL_CONFIG
+__all__ = ["query_llm", "get_llm_status", "stream_llm", "_get_client", "get_tool_agent_backend"]
 
 
 async def query_llm(prompt: str, system_prompt: str = "") -> str:

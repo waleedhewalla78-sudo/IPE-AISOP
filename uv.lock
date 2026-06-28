@@ -8,18 +8,25 @@ members = [
     "ipe-alert-svc",
     "ipe-cap-svc",
     "ipe-del-svc",
+    "ipe-demand-svc",
     "ipe-dpe-svc",
+    "ipe-equipment-svc",
     "ipe-fea-svc",
     "ipe-mat-svc",
+    "ipe-material-svc",
     "ipe-ml-svc",
     "ipe-network-svc",
     "ipe-nlp-svc",
     "ipe-odoo-connector",
+    "ipe-order-svc",
+    "ipe-procurement-svc",
     "ipe-quality-svc",
     "ipe-rec-svc",
     "ipe-res-svc",
+    "ipe-scenario-svc",
     "ipe-scn-svc",
     "ipe-shared",
+    "ipe-supply-svc",
     "ipe-sustain-svc",
 ]
 
@@ -1387,6 +1394,31 @@ dev = [
 ]
 
 [[package]]
+name = "ipe-demand-svc"
+version = "0.1.0"
+source = { virtual = "services/demand-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ipe-shared", editable = "services/shared" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pytest", specifier = ">=9.1.0" },
+    { name = "pytest-asyncio", specifier = ">=1.4.0" },
+]
+
+[[package]]
 name = "ipe-dpe-svc"
 version = "0.1.0"
 source = { virtual = "services/dpe-svc" }
@@ -1416,6 +1448,25 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
+
+[[package]]
+name = "ipe-equipment-svc"
+version = "0.1.0"
+source = { virtual = "services/equipment-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ipe-shared", editable = "services/shared" }]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.0" }]
 
 [[package]]
 name = "ipe-fea-svc"
@@ -1480,6 +1531,25 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
+
+[[package]]
+name = "ipe-material-svc"
+version = "0.1.0"
+source = { virtual = "services/material-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ipe-shared", editable = "services/shared" }]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.0" }]
 
 [[package]]
 name = "ipe-ml-svc"
@@ -1614,6 +1684,44 @@ dev = [
 ]
 
 [[package]]
+name = "ipe-order-svc"
+version = "0.1.0"
+source = { virtual = "services/order-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ipe-shared", editable = "services/shared" }]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.0" }]
+
+[[package]]
+name = "ipe-procurement-svc"
+version = "0.1.0"
+source = { virtual = "services/procurement-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ipe-shared", editable = "services/shared" }]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.0" }]
+
+[[package]]
 name = "ipe-quality-svc"
 version = "0.1.0"
 source = { virtual = "services/quality-svc" }
@@ -1702,6 +1810,31 @@ dev = [
     { name = "httpx" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+]
+
+[[package]]
+name = "ipe-scenario-svc"
+version = "0.1.0"
+source = { virtual = "services/scenario-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ipe-shared", editable = "services/shared" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pytest", specifier = ">=9.1.0" },
+    { name = "pytest-asyncio", specifier = ">=1.4.0" },
 ]
 
 [[package]]
@@ -1794,6 +1927,29 @@ requires-dist = [
     { name = "sentry-sdk", specifier = ">=2.15.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.35" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30.0" },
+]
+
+[[package]]
+name = "ipe-supply-svc"
+version = "0.1.0"
+source = { virtual = "services/supply-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ipe-shared", editable = "services/shared" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=9.1.0" },
+    { name = "pytest-asyncio", specifier = ">=1.4.0" },
 ]
 
 [[package]]
