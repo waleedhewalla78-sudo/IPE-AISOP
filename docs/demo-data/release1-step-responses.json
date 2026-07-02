@@ -2,14 +2,14 @@
     {
         "detail":  "JWT for Ahmed@nour",
         "step":  "1. IPE login",
-        "timestamp":  "2026-07-02T21:38:41.1145034+03:00",
+        "timestamp":  "2026-07-03T01:41:27.6554791+03:00",
         "status":  "PASS",
         "response":  null
     },
     {
         "detail":  "Odoo uid=2 v19.0-20260629",
         "step":  "2. Odoo connection test",
-        "timestamp":  "2026-07-02T21:38:43.7857624+03:00",
+        "timestamp":  "2026-07-03T01:41:28.7111166+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -25,7 +25,7 @@
     {
         "detail":  "password_set=True",
         "step":  "3. Save Odoo config (vault)",
-        "timestamp":  "2026-07-02T21:38:43.8638699+03:00",
+        "timestamp":  "2026-07-03T01:41:28.7414098+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -44,12 +44,12 @@
     {
         "detail":  "products updated=70 MOs updated=10 rescored=10",
         "step":  "4. Full Odoo -\u003e CDM sync",
-        "timestamp":  "2026-07-02T21:39:01.5417133+03:00",
+        "timestamp":  "2026-07-03T01:41:37.1716296+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
-                                      "sync_run_id":  "6463315c-6fc0-4c51-96da-ee1974e07cae",
+                                      "sync_run_id":  "099a7e0f-a433-42b2-bcce-b0616b3aef3d",
                                       "status":  "success",
                                       "products":  {
                                                        "synced":  0,
@@ -125,17 +125,17 @@
                      }
     },
     {
-        "detail":  "last_sync=2026-07-02T18:38:43.973201+00:00",
+        "detail":  "last_sync=2026-07-02T22:41:28.823463+00:00",
         "step":  "5. Sync status audit",
-        "timestamp":  "2026-07-02T21:39:01.6225088+03:00",
+        "timestamp":  "2026-07-03T01:41:37.2215256+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
                                       "last_sync":  {
-                                                        "id":  "6463315c-6fc0-4c51-96da-ee1974e07cae",
-                                                        "started_at":  "2026-07-02T18:38:43.973201+00:00",
-                                                        "finished_at":  "2026-07-02T18:38:55.686587+00:00",
+                                                        "id":  "099a7e0f-a433-42b2-bcce-b0616b3aef3d",
+                                                        "started_at":  "2026-07-02T22:41:28.823463+00:00",
+                                                        "finished_at":  "2026-07-02T22:41:33.687123+00:00",
                                                         "status":  "success",
                                                         "entity_counts":  {
                                                                               "boms":  {
@@ -213,7 +213,7 @@
     {
         "detail":  "flags=0",
         "step":  "6. Data quality flags",
-        "timestamp":  "2026-07-02T21:39:01.7063368+03:00",
+        "timestamp":  "2026-07-03T01:41:37.2411315+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -230,7 +230,7 @@
     {
         "detail":  "20 MOs; lowest score=45.0 constraint=material_shortage",
         "step":  "7. Feasibility queue (Control Tower)",
-        "timestamp":  "2026-07-02T21:39:02.0902952+03:00",
+        "timestamp":  "2026-07-03T01:41:37.2898533+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -334,20 +334,6 @@
                                           "unscorable":  false
                                       },
                                       {
-                                          "mo_id":  "7bf60330-fa17-4f34-b9f5-6f17dd621f72",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Drawer",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "6",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
                                           "mo_id":  "74fa1e04-ae11-464e-9aa8-3bb8ff1df061",
                                           "feasibility_score":  82.5,
                                           "primary_constraint":  "material",
@@ -383,6 +369,20 @@
                                           "required_date":  null,
                                           "customer_name":  null,
                                           "erp_mo_id":  "5",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "7bf60330-fa17-4f34-b9f5-6f17dd621f72",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Drawer",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "6",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -523,7 +523,7 @@
     {
         "detail":  "at_risk=1 avg=78.6",
         "step":  "8. Feasibility KPIs",
-        "timestamp":  "2026-07-02T21:39:02.1898643+03:00",
+        "timestamp":  "2026-07-03T01:41:37.3132125+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -540,7 +540,7 @@
     {
         "detail":  "8 scenarios (MO-ST expedite/overtime/split)",
         "step":  "9. Resolution scenarios",
-        "timestamp":  "2026-07-02T21:39:03.1545887+03:00",
+        "timestamp":  "2026-07-03T01:41:37.3648357+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -635,7 +635,7 @@
     {
         "detail":  "composite=100% threshold=70.0% bom=100.0% routing=100.0% inventory=100.0%",
         "step":  "9.5 MDR quality gate (pre-schedule)",
-        "timestamp":  "2026-07-02T21:39:03.5567826+03:00",
+        "timestamp":  "2026-07-03T01:41:37.4277430+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -662,7 +662,7 @@
     {
         "detail":  "8 ops scheduled",
         "step":  "10. OR-Tools schedule (cap-svc)",
-        "timestamp":  "2026-07-02T21:39:06.5470333+03:00",
+        "timestamp":  "2026-07-03T01:41:37.9504248+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -670,6 +670,48 @@
                                       "schedule":  {
                                                        "status":  "OPTIMAL",
                                                        "assignments":  [
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c06",
+                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                                               "start_minute":  0,
+                                                                               "end_minute":  210,
+                                                                               "duration":  210,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                               "sequence":  10,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Build 50 MVA Core-Coil",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c07",
+                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                                               "start_minute":  210,
+                                                                               "end_minute":  350,
+                                                                               "duration":  140,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                               "sequence":  20,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Install Cooling Radiators",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c08",
+                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
+                                                                               "start_minute":  350,
+                                                                               "end_minute":  455,
+                                                                               "duration":  105,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                               "sequence":  30,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Final HV Test \u0026 OLTC Commission",
+                                                                               "worker_id":  null
+                                                                           },
                                                                            {
                                                                                "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c01",
                                                                                "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
@@ -739,69 +781,27 @@
                                                                                "parent_operation_id":  null,
                                                                                "operation_name":  "Final Electrical Test (FPY)",
                                                                                "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c06",
-                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                                               "start_minute":  0,
-                                                                               "end_minute":  210,
-                                                                               "duration":  210,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                               "sequence":  10,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Build 50 MVA Core-Coil",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c07",
-                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                                               "start_minute":  210,
-                                                                               "end_minute":  350,
-                                                                               "duration":  140,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                               "sequence":  20,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Install Cooling Radiators",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c08",
-                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                                               "start_minute":  350,
-                                                                               "end_minute":  455,
-                                                                               "duration":  105,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                               "sequence":  30,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Final HV Test \u0026 OLTC Commission",
-                                                                               "worker_id":  null
                                                                            }
                                                                        ],
                                                        "mo_tardiness":  [
                                                                             {
+                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                                "due_date_minute":  7886,
+                                                                                "completion_minute":  455,
+                                                                                "tardiness_minutes":  0,
+                                                                                "on_time":  true
+                                                                            },
+                                                                            {
                                                                                 "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
-                                                                                "due_date_minute":  2368,
+                                                                                "due_date_minute":  2126,
                                                                                 "completion_minute":  545,
                                                                                 "tardiness_minutes":  0,
                                                                                 "on_time":  true
                                                                             },
                                                                             {
                                                                                 "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
-                                                                                "due_date_minute":  5248,
+                                                                                "due_date_minute":  5006,
                                                                                 "completion_minute":  345,
-                                                                                "tardiness_minutes":  0,
-                                                                                "on_time":  true
-                                                                            },
-                                                                            {
-                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                                "due_date_minute":  8128,
-                                                                                "completion_minute":  455,
                                                                                 "tardiness_minutes":  0,
                                                                                 "on_time":  true
                                                                             }
@@ -840,8 +840,8 @@
                                                       ],
                                       "labor_gaps":  [
                                                          {
-                                                             "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
-                                                             "work_center_name":  "Winding Station",
+                                                             "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                             "work_center_name":  "Core \u0026 Coil Assembly",
                                                              "required_count":  2,
                                                              "available_count":  3,
                                                              "has_gap":  false,
@@ -872,8 +872,8 @@
                                                              "recommendation":  "Sufficient coverage"
                                                          },
                                                          {
-                                                             "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                             "work_center_name":  "Tank Fabrication \u0026 Test Bay",
+                                                             "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                             "work_center_name":  "Core \u0026 Coil Assembly",
                                                              "required_count":  2,
                                                              "available_count":  3,
                                                              "has_gap":  false,
@@ -886,9 +886,9 @@
                                                         "updated_work_orders":  8
                                                     },
                                       "mo_versions":  {
+                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003":  1,
                                                           "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001":  1,
-                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002":  1,
-                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003":  1
+                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002":  1
                                                       },
                                       "xai_explanation":  {
                                                               "constraints":  [
@@ -917,7 +917,7 @@
     {
         "detail":  "activated=2 erp_mode=direct",
         "step":  "11. Schedule approve -\u003e Odoo activate",
-        "timestamp":  "2026-07-02T21:39:13.1317067+03:00",
+        "timestamp":  "2026-07-03T01:41:43.5386954+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -926,19 +926,19 @@
                                                         {
                                                             "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
                                                             "erp_mo_id":  "MO-ST-005",
-                                                            "new_planned_start":  "2026-07-02T18:39:07.404282+00:00",
-                                                            "new_planned_end":  "2026-07-02T22:39:07.404282+00:00",
-                                                            "version":  3,
-                                                            "ai_schedule_version":  2,
+                                                            "new_planned_start":  "2026-07-02T22:41:38.334288+00:00",
+                                                            "new_planned_end":  "2026-07-03T02:41:38.334288+00:00",
+                                                            "version":  7,
+                                                            "ai_schedule_version":  6,
                                                             "feasibility_score":  88.0
                                                         },
                                                         {
                                                             "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
                                                             "erp_mo_id":  "MO-ST-006",
-                                                            "new_planned_start":  "2026-07-02T18:39:07.404282+00:00",
-                                                            "new_planned_end":  "2026-07-03T02:14:07.404282+00:00",
-                                                            "version":  3,
-                                                            "ai_schedule_version":  2,
+                                                            "new_planned_start":  "2026-07-02T22:41:38.334288+00:00",
+                                                            "new_planned_end":  "2026-07-03T06:16:38.334288+00:00",
+                                                            "version":  7,
+                                                            "ai_schedule_version":  6,
                                                             "feasibility_score":  91.0
                                                         }
                                                     ],
@@ -978,7 +978,7 @@
     {
         "detail":  "baseline captured=False",
         "step":  "12. OTD baseline API",
-        "timestamp":  "2026-07-02T21:39:14.0588829+03:00",
+        "timestamp":  "2026-07-03T01:41:43.6057118+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -999,7 +999,7 @@
     {
         "detail":  "mos_saved=",
         "step":  "13. ROI metrics API",
-        "timestamp":  "2026-07-02T21:39:14.4559710+03:00",
+        "timestamp":  "2026-07-03T01:41:43.6618108+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,

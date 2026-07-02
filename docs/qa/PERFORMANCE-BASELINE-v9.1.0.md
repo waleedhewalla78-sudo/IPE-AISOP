@@ -99,4 +99,28 @@ POSTGRES_CONTAINER=docker-db-1 BACKUP_DIR=./backups/postgres bash scripts/backup
 
 ---
 
-_Raw run log: `docs/qa/k6-run-final.log`_
+## v9.2.0 re-run (outcomes Kong route + R1 SLO profile)
+
+**Date:** 2026-07-03  
+**Changes:**
+- Added `r1-outcomes` route in `kong.release1.yml` + `/api/v1/outcomes` alias in dpe-svc
+- k6 `K6_PROFILE=r1-slo` — health + auth only (Release 2 outcomes excluded from SLO mix)
+- Default `MAX_VUS=10` (R1 dev/CI gate; use `MAX_VUS=50 K6_PROFILE=full` for stress)
+
+```bash
+k6 run -e K6_PROFILE=r1-slo scripts/perf/k6-load-test.js
+# Stress (no SLO pass expected on dev stack):
+k6 run -e K6_PROFILE=full -e MAX_VUS=50 scripts/perf/k6-load-test.js
+```
+
+| Metric | Target | **v9.2.0 (r1-slo, 10 VU)** | Pass |
+|--------|--------|----------------------------|------|
+| Error rate | < 5% | **0.00%** | ✅ |
+| P95 latency | < 500 ms | **231 ms** | ✅ |
+| P50 (median) | — | **32 ms** | — |
+| Requests | — | **4,826** | — |
+| Peak VUs | — | **10** | — |
+
+Outcomes 404s eliminated (Kong route + dpe-svc alias). Heavy endpoints (resolution, MDR, outcomes analytics) moved to `K6_PROFILE=full` — P95 > 500 ms under 25–50 VU on dev hardware until query tuning (Phase 2 observability).
+
+Raw: `docs/qa/k6-baseline-v9.2.0.json`

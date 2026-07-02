@@ -39,6 +39,9 @@ services:
       - name: r1-compliance
         paths: [/api/v1/compliance]
         strip_path: false
+      - name: r1-outcomes
+        paths: [/api/v1/outcomes]
+        strip_path: false
 
   - name: fea-svc
     url: http://fea-svc:8004

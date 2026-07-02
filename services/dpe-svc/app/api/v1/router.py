@@ -31,6 +31,7 @@ from app.api.v1 import (
     feature_store,
     sop,
     mdr,
+    outcomes,
     planner_assist,
 )
 
@@ -44,6 +45,7 @@ api_router.include_router(demand.router)
 api_router.include_router(mdr.router)
 api_router.include_router(admin.router)
 api_router.include_router(analytics.router)
+api_router.include_router(outcomes.router)
 api_router.include_router(ai_trust.router)
 api_router.include_router(demand_sense.router)
 api_router.include_router(financial.router)
