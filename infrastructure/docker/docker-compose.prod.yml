@@ -1,0 +1,158 @@
+# Production overlay for IPE Release 1 stack.
+# Usage:
+#   docker compose -f infrastructure/docker/docker-compose.release1.yml \
+#                  -f infrastructure/docker/docker-compose.prod.yml up -d
+
+x-logging-default: &logging-default
+  driver: json-file
+  options:
+    max-size: "50m"
+    max-file: "3"
+
+x-healthcheck-default: &healthcheck-default
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 30s
+
+services:
+  kong:
+    restart: unless-stopped
+    environment:
+      KONG_NGINX_WORKER_PROCESSES: "auto"
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+    logging:
+      <<: *logging-default
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  db:
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ipe_test_pass}
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 4G
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  redis:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default
+
+  dpe-svc:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default
+    healthcheck:
+      <<: *healthcheck-default
+
+  fea-svc:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default
+    healthcheck:
+      <<: *healthcheck-default
+
+  res-svc:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default
+    healthcheck:
+      <<: *healthcheck-default
+
+  cap-svc:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default
+    healthcheck:
+      <<: *healthcheck-default
+
+  connector:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default
+    healthcheck:
+      <<: *healthcheck-default
+
+  web-ui:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    logging: *logging-default
+
+  keycloak:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+    logging: *logging-default
+
+  keycloak-db:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default
+
+  vault:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    logging: *logging-default
+
+  minio:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging: *logging-default

@@ -78,6 +78,7 @@ class KafkaConsumer:
             group_id=group_id,
             value_deserializer=lambda v: v,
             enable_auto_commit=False,
+            auto_offset_reset="earliest",
         )
 
     async def start(self):

@@ -31,6 +31,7 @@ class HealthResponse(BaseModel):
     service: str
     version: str
     timestamp: datetime
+    uptime_seconds: int | None = None
     dependencies: dict = {}
 
 

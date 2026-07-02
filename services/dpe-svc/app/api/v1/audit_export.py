@@ -17,7 +17,7 @@ from ipe_shared.schemas.common import APIResponse
 router = APIRouter(prefix="/compliance", tags=["compliance"])
 
 
-@router.get("/audit/export")
+@router.get("/audit/export", response_model=None)
 async def export_audit_log(
     start: datetime | None = Query(None),
     end: datetime | None = Query(None),
