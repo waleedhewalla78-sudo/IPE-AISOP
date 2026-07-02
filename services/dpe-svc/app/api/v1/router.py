@@ -20,6 +20,7 @@ from app.api.v1 import (
     notifications,
     feature_flags,
     compliance_evidence,
+    audit_export,
     part11,
     ml_ops,
     kms,
@@ -30,6 +31,7 @@ from app.api.v1 import (
     feature_store,
     sop,
     mdr,
+    planner_assist,
 )
 
 api_router = APIRouter()
@@ -56,6 +58,7 @@ api_router.include_router(notifications.router)
 api_router.include_router(signals.router)
 api_router.include_router(feature_flags.router)
 api_router.include_router(compliance_evidence.router)
+api_router.include_router(audit_export.router)
 api_router.include_router(part11.router)
 api_router.include_router(ml_ops.router)
 api_router.include_router(kms.router)
@@ -63,3 +66,4 @@ api_router.include_router(security_review.router)
 api_router.include_router(stripe_billing.router)
 api_router.include_router(sla_monitoring.router)
 api_router.include_router(feature_store.router)
+api_router.include_router(planner_assist.router)

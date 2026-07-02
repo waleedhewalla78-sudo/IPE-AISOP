@@ -1,0 +1,293 @@
+# IPE Release 1 — 8 services (includes fea-svc for Control Tower)
+# Usage: docker compose -f infrastructure/docker/docker-compose.release1.yml up -d
+
+x-jwt-public-volume: &jwt-public-volume
+  - ../../config/keys/jwt-public.pem:/app/config/keys/jwt-public.pem:ro
+
+services:
+  db:
+    image: postgres:16
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ipe
+      POSTGRES_PASSWORD: ipe_test_pass
+      POSTGRES_DB: ipe_test
+    volumes:
+      - r1_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ipe -d ipe_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  dpe-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/dpe-svc/Dockerfile
+    ports:
+      - "8020:8001"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      REDIS_URL: redis://redis:6379/0
+      IPE_RELEASE_PROFILE: release1
+      IPE_KMS_KEY_DIR: /data/kms
+      KEYCLOAK_URL: http://keycloak:8080
+    volumes:
+      - r1_kms_data:/data/kms
+      - ../../config/keys/jwt-private.pem:/app/config/keys/jwt-private.pem:ro
+      - ../../config/keys/jwt-public.pem:/app/config/keys/jwt-public.pem:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  fea-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/fea-svc/Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      REDIS_URL: redis://redis:6379/0
+      IPE_RELEASE_PROFILE: release1
+    volumes: *jwt-public-volume
+    depends_on:
+      db:
+        condition: service_healthy
+
+  res-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/res-svc/Dockerfile
+    ports:
+      - "8005:8005"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      REDIS_URL: redis://redis:6379/0
+      IPE_RELEASE_PROFILE: release1
+      IPE_OTEL_TRACING_ENABLED: "false"
+      IPE_OTEL_LOGGING_ENABLED: "false"
+      CONNECTOR_SVC_URL: http://connector:8009
+    volumes: *jwt-public-volume
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  cap-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/cap-svc/Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      REDIS_URL: redis://redis:6379/0
+      ERP_SYNC_MODE: direct
+      CONNECTOR_SVC_URL: http://connector:8009
+      IPE_RELEASE_PROFILE: release1
+      IPE_KMS_KEY_DIR: /data/kms
+    volumes:
+      - r1_kms_data:/data/kms
+      - ../../config/keys/jwt-public.pem:/app/config/keys/jwt-public.pem:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      connector:
+        condition: service_healthy
+
+  connector:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/connector/Dockerfile
+    ports:
+      - "8016:8009"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      REDIS_URL: redis://redis:6379/0
+      IPE_RELEASE_PROFILE: release1
+      ODOO_SYNC_SCHEDULER: "true"
+      ODOO_SYNC_INTERVAL_SEC: "900"
+      FEA_SVC_URL: http://fea-svc:8004
+      RES_SVC_URL: http://res-svc:8005
+      AUTO_PROPOSE_THRESHOLD: "75"
+      ODOO_URL: http://host.docker.internal:8069
+      ODOO_DB: starttrans1
+      ODOO_SYNC_ALERT_WEBHOOK: ""
+      IPE_KMS_KEY_DIR: /data/kms
+    volumes:
+      - r1_kms_data:/data/kms
+      - ../../config/keys/jwt-public.pem:/app/config/keys/jwt-public.pem:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8009/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  kong:
+    image: kong:3.7
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /opt/kong/kong.release1.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_LISTEN: "0.0.0.0:8000, 0.0.0.0:8443 ssl"
+      KONG_SSL_CERT: /etc/kong/certs/tls.crt
+      KONG_SSL_CERT_KEY: /etc/kong/certs/tls.key
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    volumes:
+      - ../kong/kong.release1.yml:/opt/kong/kong.release1.yml:ro
+      - ../../infrastructure/certs/ipe-dev.crt:/etc/kong/certs/tls.crt:ro
+      - ../../infrastructure/certs/ipe-dev.key:/etc/kong/certs/tls.key:ro
+    depends_on:
+      - dpe-svc
+      - fea-svc
+      - res-svc
+      - cap-svc
+      - connector
+
+  web-ui:
+    build:
+      context: ../../
+      dockerfile: apps/web/Dockerfile.release1
+      args:
+        VITE_RELEASE_PROFILE: release1
+        VITE_DEFAULT_LOCALE: ar
+        VITE_API_BASE_URL: ""
+    ports:
+      - "8082:80"
+    depends_on:
+      - kong
+
+  keycloak-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - r1_keycloak_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8180:8080"
+    volumes:
+      - ../keycloak/realm/ipe-realm.json:/opt/keycloak/data/import/ipe-realm.json:ro
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200'"]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 45s
+
+  vault:
+    image: hashicorp/vault:1.17
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ipe-dev-root
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    ports:
+      - "8200:8200"
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 5s
+
+  vault-init:
+    image: hashicorp/vault:1.17
+    depends_on:
+      vault:
+        condition: service_healthy
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ipe-dev-root
+      VAULT_KV_MOUNT: ipe
+    volumes:
+      - ../../scripts/vault-init.sh:/scripts/vault-init.sh:ro
+    entrypoint: ["/bin/sh", "/scripts/vault-init.sh"]
+    restart: "no"
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ipe
+      MINIO_ROOT_PASSWORD: ipe-minio-pass
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - r1_minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  r1_db_data:
+  r1_kms_data:
+  r1_keycloak_db:
+  r1_minio_data:

@@ -54,6 +54,10 @@ export const ExecutiveDashboardPage = lazyNamed(
   () => import('@/features/executive/components/ExecutiveDashboardPage'),
   'ExecutiveDashboardPage',
 );
+export const OutcomesPage = lazyNamed(
+  () => import('@/features/executive/components/OutcomesPage'),
+  'OutcomesPage',
+);
 export const CostOfChaosPage = lazyNamed(() => import('@/features/cost-of-chaos/CostOfChaosPage'), 'CostOfChaosPage');
 
 // Supply Chain tabs

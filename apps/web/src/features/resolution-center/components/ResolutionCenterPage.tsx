@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Table, TableHead, TableRow, TableHeader, TableCell } from '@/components/ui/Table';
+import { t } from '@/lib/i18n';
 import api from '@/lib/api';
 import type { MOWithConstraints, ResolutionScenario } from '@/types/cdm';
 
@@ -25,8 +26,9 @@ function severityColor(severity: string): string {
 }
 
 function constraintLabel(type: string): string {
-  const labels: Record<string, string> = { material: 'Material', capacity: 'Capacity', labor: 'Labor', bom: 'BOM', demand: 'Demand' };
-  return labels[type] ?? type;
+  const key = `resolution.constraint.${type}` as const;
+  const translated = t(key);
+  return translated !== key ? translated : type;
 }
 
 export function ResolutionCenterPage() {
@@ -139,21 +141,23 @@ export function ResolutionCenterPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-ipe-text">Resolution Center</h1>
-        <p className="text-sm text-ipe-text-muted">Constrain resolution and scenario comparison</p>
+        <h1 className="text-2xl font-bold text-ipe-text">{t('resolution.title')}</h1>
+        <p className="text-sm text-ipe-text-muted">{t('resolution.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-4">
           <Card>
-            <h3 className="mb-3 font-medium">Unresolved MOs ({loading ? '...' : unresolvedMos.length})</h3>
+            <h3 className="mb-3 font-medium">
+              {t('resolution.unresolvedMos')} ({loading ? '...' : unresolvedMos.length})
+            </h3>
             <div className="overflow-x-auto">
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableHeader>MO ID</TableHeader>
-                  <TableHeader>Feasibility</TableHeader>
-                  <TableHeader>Cause</TableHeader>
+                  <TableHeader>{t('resolution.moId')}</TableHeader>
+                  <TableHeader>{t('resolution.feasibility')}</TableHeader>
+                  <TableHeader>{t('resolution.cause')}</TableHeader>
                   <TableHeader />
                 </TableRow>
               </TableHead>
@@ -172,19 +176,21 @@ export function ResolutionCenterPage() {
                     </TableCell>
                     <TableCell className="text-xs text-ipe-text-muted">{mo.delay_cause?.replace(/_/g, ' ')}</TableCell>
                     <TableCell>
-                      <Button size="sm" variant="ghost">Select</Button>
+                      <Button size="sm" variant="ghost">{t('resolution.select')}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
               </tbody>
             </Table>
             </div>
-            {!loading && unresolvedMos.length === 0 && <p className="text-sm text-ipe-text-muted">No unresolved MOs.</p>}
+            {!loading && unresolvedMos.length === 0 && (
+              <p className="text-sm text-ipe-text-muted">{t('resolution.noUnresolved')}</p>
+            )}
           </Card>
 
           {selectedMo && (
             <Card>
-              <h3 className="mb-3 font-medium">Constraints &mdash; {selectedMo.id}</h3>
+              <h3 className="mb-3 font-medium">{t('resolution.constraints')} — {selectedMo.id}</h3>
               <div className="space-y-3">
                 {selectedMo.constraints.length > 0 ? selectedMo.constraints.map((c, i) => (
                   <div key={i} className="rounded-md border border-ipe-border p-3">
@@ -200,14 +206,16 @@ export function ResolutionCenterPage() {
                     )}
                   </div>
                 )) : (
-                  <p className="text-sm text-ipe-text-muted">No constraints data available for this MO.</p>
+                  <p className="text-sm text-ipe-text-muted">{t('resolution.noConstraints')}</p>
                 )}
               </div>
               {selectedMo.delay_cause && (
                 <div className="mt-3 rounded-md bg-ipe-surface-alt p-3">
-                  <p className="text-xs font-medium text-ipe-text-muted">Classified Cause</p>
+                  <p className="text-xs font-medium text-ipe-text-muted">{t('resolution.classifiedCause')}</p>
                   <p className="text-sm text-ipe-text">{selectedMo.delay_cause.replace(/_/g, ' ')}</p>
-                  <p className="text-xs text-ipe-text-muted">Confidence: {((selectedMo.delay_confidence ?? 0) * 100).toFixed(0)}%</p>
+                  <p className="text-xs text-ipe-text-muted">
+                    {t('resolution.confidence')}: {((selectedMo.delay_confidence ?? 0) * 100).toFixed(0)}%
+                  </p>
                 </div>
               )}
             </Card>
@@ -218,24 +226,24 @@ export function ResolutionCenterPage() {
           {selectedMo ? (
             <>
               <h3 className="text-lg font-medium text-ipe-text">
-                Scenarios for {selectedMo.id}
+                {t('resolution.scenariosFor')} {selectedMo.id}
                 <span className="ml-2 text-sm font-normal text-ipe-text-muted">
-                  ({filteredScenarios.length} proposed)
+                  ({filteredScenarios.length} {t('resolution.proposed')})
                 </span>
               </h3>
               {financial && (
                 <Card>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 text-sm">
                     <div>
-                      <p className="text-xs text-ipe-text-muted">COGM (baseline)</p>
+                      <p className="text-xs text-ipe-text-muted">{t('resolution.cogm')}</p>
                       <p className="font-semibold text-ipe-text">${financial.cogm.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ipe-text-muted">Revenue at risk</p>
+                      <p className="text-xs text-ipe-text-muted">{t('resolution.revenueAtRisk')}</p>
                       <p className="font-semibold text-red-600">${financial.revenue.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ipe-text-muted">Margin</p>
+                      <p className="text-xs text-ipe-text-muted">{t('resolution.margin')}</p>
                       <p className={`font-semibold ${financial.margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         ${financial.margin.toLocaleString()}
                       </p>
@@ -245,7 +253,7 @@ export function ResolutionCenterPage() {
               )}
               {filteredScenarios.length === 0 ? (
                 <Card>
-                  <p className="text-sm text-ipe-text-muted">No scenarios available for this MO.</p>
+                  <p className="text-sm text-ipe-text-muted">{t('resolution.noScenarios')}</p>
                 </Card>
               ) : (
                 filteredScenarios.map((sc) => (
@@ -259,7 +267,7 @@ export function ResolutionCenterPage() {
                           </Badge>
                           {sc.business_score !== null && (
                             <span className="ml-auto text-sm font-semibold tabular-nums">
-                              Score: {sc.business_score.toFixed(2)}
+                              {t('resolution.score')}: {sc.business_score.toFixed(2)}
                             </span>
                           )}
                         </div>
@@ -267,27 +275,20 @@ export function ResolutionCenterPage() {
                         <div className="flex flex-wrap gap-4 text-xs text-ipe-text-muted">
                           {sc.delivery_impact_days !== null && (
                             <span className={sc.delivery_impact_days < 0 ? 'text-green-600' : 'text-red-600'}>
-                              Delivery: {sc.delivery_impact_days > 0 ? '+' : ''}{sc.delivery_impact_days}d
+                              {t('resolution.delivery')}: {sc.delivery_impact_days > 0 ? '+' : ''}{sc.delivery_impact_days}d
                             </span>
                           )}
                           {sc.cost_impact !== null && (
                             <span className={sc.cost_impact > 0 ? 'text-red-600' : 'text-green-600'}>
-                              Scenario cost: ${sc.cost_impact.toLocaleString()}
+                              {t('resolution.scenarioCost')}: ${sc.cost_impact.toLocaleString()}
                             </span>
-                          )}
-                          {financial && (
-                            <>
-                              <span>COGM: ${financial.cogm.toLocaleString()}</span>
-                              <span>Revenue: ${financial.revenue.toLocaleString()}</span>
-                              <span>Margin: ${financial.margin.toLocaleString()}</span>
-                            </>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="mt-3 flex gap-2 border-t border-ipe-border pt-3">
-                      <Button size="sm" variant="primary">Approve</Button>
-                      <Button size="sm" variant="ghost">Reject</Button>
+                      <Button size="sm" variant="primary">{t('resolution.approve')}</Button>
+                      <Button size="sm" variant="ghost">{t('resolution.reject')}</Button>
                     </div>
                   </Card>
                 ))
@@ -296,8 +297,8 @@ export function ResolutionCenterPage() {
           ) : (
             <Card>
               <div className="flex flex-col items-center justify-center py-12">
-                <p className="text-lg font-medium text-ipe-text-muted">Select an MO</p>
-                <p className="mt-1 text-sm text-ipe-text-muted">Choose an unresolved MO from the left panel to view resolution scenarios.</p>
+                <p className="text-lg font-medium text-ipe-text-muted">{t('resolution.selectMo')}</p>
+                <p className="mt-1 text-sm text-ipe-text-muted">{t('resolution.selectMoHint')}</p>
               </div>
             </Card>
           )}

@@ -15,6 +15,7 @@ from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.events.producer import kafka_producer
 from ipe_shared.events.schemas import EventEnvelope
 from ipe_shared.middleware.tenant_context import tenant_ctx
+from ipe_shared.mdr.engine import calculate_mdr, format_mdr_response
 from ipe_shared.schemas.common import APIResponse
 from ipe_shared.schemas.xai import XAIExplanation
 
@@ -36,6 +37,29 @@ class AutoConfirmRequest(BaseModel):
     feasibility_score: float
     autonomy_mode: str = "shadow"
     primary_constraint: str | None = None
+
+
+@router.get("/mdr")
+async def get_mdr_score(
+    session: AsyncSession = Depends(get_db_session),
+    current_user: TokenPayload = Depends(require_roles(["admin", "planner", "manager", "auditor"])),
+) -> APIResponse:
+    """Master Data Readiness breakdown — composite score and per-dimension coverage."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(
+            success=False,
+            data=None,
+            error={"code": "NO_TENANT", "message": "X-Tenant-ID required"},
+        )
+    result = await calculate_mdr(session, tenant_id=tenant_id)
+    if result.get("error"):
+        return APIResponse(
+            success=False,
+            data=None,
+            error={"code": "MDR_ERROR", "message": result["error"]},
+        )
+    return APIResponse(success=True, data=format_mdr_response(tenant_id, result), error=None)
 
 
 @router.post("/score")
@@ -163,28 +187,51 @@ async def get_feasibility_queue(
                 mo.id, mo.feasibility_score, mo.primary_constraint,
                 p.name AS product_name,
                 dl.required_date,
-                c.name AS customer_name
+                c.name AS customer_name,
+                mo.erp_mo_id,
+                mo.sync_conflict,
+                (
+                    SELECT COALESCE(json_agg(json_build_object(
+                        'flag_code', f.flag_code,
+                        'message', f.message
+                    )), '[]'::json)
+                    FROM cdm_data_quality_flag f
+                    WHERE f.mo_id = mo.id AND f.tenant_id = mo.tenant_id
+                      AND f.resolved_at IS NULL
+                ) AS data_quality_flags
             FROM cdm_manufacturing_order mo
             LEFT JOIN cdm_demand_line dl ON dl.mo_id = mo.id
             LEFT JOIN cdm_product p ON p.id = mo.product_id
             LEFT JOIN cdm_customer c ON c.id = dl.customer_id
             WHERE mo.tenant_id = :tid
-              AND mo.feasibility_score IS NOT NULL
-            ORDER BY mo.feasibility_score ASC
+              AND (
+                mo.feasibility_score IS NOT NULL
+                OR EXISTS (
+                    SELECT 1 FROM cdm_data_quality_flag f2
+                    WHERE f2.mo_id = mo.id AND f2.tenant_id = mo.tenant_id
+                      AND f2.resolved_at IS NULL
+                )
+              )
+            ORDER BY mo.feasibility_score ASC NULLS FIRST
         """),
         {"tid": UUID(tenant_id)},
     )
-    queue = [
-        {
+    queue = []
+    for r in rows.fetchall():
+        flags = r[8] if r[8] else []
+        sync_conflict = r[7]
+        queue.append({
             "mo_id": str(r[0]),
             "feasibility_score": float(r[1]) if r[1] is not None else None,
             "primary_constraint": r[2],
             "product_name": r[3],
             "required_date": r[4].isoformat() if r[4] else None,
             "customer_name": r[5],
-        }
-        for r in rows.fetchall()
-    ]
+            "erp_mo_id": r[6],
+            "sync_conflict": sync_conflict,
+            "data_quality_flags": flags,
+            "unscorable": r[1] is None and bool(flags),
+        })
     return APIResponse(success=True, data=queue, error=None)
 
 

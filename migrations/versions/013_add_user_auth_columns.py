@@ -14,9 +14,15 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column("cdm_user", sa.Column("password_hash", sa.String(256), nullable=True, server_default=sa.text("NULL")))
-    op.add_column("cdm_user", sa.Column("full_name", sa.String(256), nullable=True, server_default=sa.text("NULL")))
-    op.add_column("cdm_user", sa.Column("is_active", sa.Boolean, nullable=False, server_default=sa.text("true")))
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    cols = [c["name"] for c in insp.get_columns("cdm_user")] if insp.has_table("cdm_user") else []
+    if "password_hash" not in cols:
+        op.add_column("cdm_user", sa.Column("password_hash", sa.String(256), nullable=True, server_default=sa.text("NULL")))
+    if "full_name" not in cols:
+        op.add_column("cdm_user", sa.Column("full_name", sa.String(256), nullable=True, server_default=sa.text("NULL")))
+    if "is_active" not in cols:
+        op.add_column("cdm_user", sa.Column("is_active", sa.Boolean, nullable=False, server_default=sa.text("true")))
 
 
 def downgrade():

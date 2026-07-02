@@ -1,0 +1,1023 @@
+﻿[
+    {
+        "detail":  "JWT for Ahmed@nour",
+        "step":  "1. IPE login",
+        "timestamp":  "2026-07-02T21:38:41.1145034+03:00",
+        "status":  "PASS",
+        "response":  null
+    },
+    {
+        "detail":  "Odoo uid=2 v19.0-20260629",
+        "step":  "2. Odoo connection test",
+        "timestamp":  "2026-07-02T21:38:43.7857624+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "connected":  true,
+                                      "uid":  2,
+                                      "server_version":  "19.0-20260629"
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "password_set=True",
+        "step":  "3. Save Odoo config (vault)",
+        "timestamp":  "2026-07-02T21:38:43.8638699+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "erp_type":  "odoo",
+                                      "odoo_url":  "http://host.docker.internal:8069",
+                                      "odoo_db":  "starttrans1",
+                                      "odoo_username":  "whewalla@gmail.com",
+                                      "enabled":  true,
+                                      "password_set":  true
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "products updated=70 MOs updated=10 rescored=10",
+        "step":  "4. Full Odoo -\u003e CDM sync",
+        "timestamp":  "2026-07-02T21:39:01.5417133+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "sync_run_id":  "6463315c-6fc0-4c51-96da-ee1974e07cae",
+                                      "status":  "success",
+                                      "products":  {
+                                                       "synced":  0,
+                                                       "updated":  70,
+                                                       "total":  70,
+                                                       "errors":  0
+                                                   },
+                                      "work_centers":  {
+                                                           "synced":  0,
+                                                           "updated":  7,
+                                                           "total":  7,
+                                                           "errors":  0
+                                                       },
+                                      "customers":  {
+                                                        "synced":  0,
+                                                        "updated":  5,
+                                                        "total":  5,
+                                                        "errors":  0
+                                                    },
+                                      "suppliers":  {
+                                                        "synced":  0,
+                                                        "updated":  3,
+                                                        "total":  3,
+                                                        "errors":  0
+                                                    },
+                                      "boms":  {
+                                                   "synced":  0,
+                                                   "updated":  2,
+                                                   "skipped":  8,
+                                                   "total":  10,
+                                                   "errors":  0
+                                               },
+                                      "bom_details":  {
+                                                          "lines":  8,
+                                                          "operations":  8,
+                                                          "boms":  10,
+                                                          "errors":  0
+                                                      },
+                                      "inventory":  {
+                                                        "updated":  25,
+                                                        "total":  25,
+                                                        "errors":  0
+                                                    },
+                                      "manufacturing_orders":  {
+                                                                   "synced":  0,
+                                                                   "updated":  10,
+                                                                   "skipped":  0,
+                                                                   "total":  10,
+                                                                   "errors":  0
+                                                               },
+                                      "demands":  {
+                                                      "synced":  0,
+                                                      "updated":  40,
+                                                      "skipped":  0,
+                                                      "total":  40,
+                                                      "errors":  0
+                                                  },
+                                      "supply":  {
+                                                     "synced":  0,
+                                                     "updated":  8,
+                                                     "skipped":  0,
+                                                     "total":  8,
+                                                     "errors":  0
+                                                 },
+                                      "rescored":  {
+                                                       "attempted":  10,
+                                                       "success":  10,
+                                                       "scenarios_proposed":  0
+                                                   }
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "last_sync=2026-07-02T18:38:43.973201+00:00",
+        "step":  "5. Sync status audit",
+        "timestamp":  "2026-07-02T21:39:01.6225088+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "last_sync":  {
+                                                        "id":  "6463315c-6fc0-4c51-96da-ee1974e07cae",
+                                                        "started_at":  "2026-07-02T18:38:43.973201+00:00",
+                                                        "finished_at":  "2026-07-02T18:38:55.686587+00:00",
+                                                        "status":  "success",
+                                                        "entity_counts":  {
+                                                                              "boms":  {
+                                                                                           "total":  10,
+                                                                                           "errors":  0,
+                                                                                           "synced":  0,
+                                                                                           "skipped":  8,
+                                                                                           "updated":  2
+                                                                                       },
+                                                                              "supply":  {
+                                                                                             "total":  8,
+                                                                                             "errors":  0,
+                                                                                             "synced":  0,
+                                                                                             "skipped":  0,
+                                                                                             "updated":  8
+                                                                                         },
+                                                                              "demands":  {
+                                                                                              "total":  40,
+                                                                                              "errors":  0,
+                                                                                              "synced":  0,
+                                                                                              "skipped":  0,
+                                                                                              "updated":  40
+                                                                                          },
+                                                                              "products":  {
+                                                                                               "total":  70,
+                                                                                               "errors":  0,
+                                                                                               "synced":  0,
+                                                                                               "updated":  70
+                                                                                           },
+                                                                              "customers":  {
+                                                                                                "total":  5,
+                                                                                                "errors":  0,
+                                                                                                "synced":  0,
+                                                                                                "updated":  5
+                                                                                            },
+                                                                              "inventory":  {
+                                                                                                "total":  25,
+                                                                                                "errors":  0,
+                                                                                                "updated":  25
+                                                                                            },
+                                                                              "suppliers":  {
+                                                                                                "total":  3,
+                                                                                                "errors":  0,
+                                                                                                "synced":  0,
+                                                                                                "updated":  3
+                                                                                            },
+                                                                              "bom_details":  {
+                                                                                                  "boms":  10,
+                                                                                                  "lines":  8,
+                                                                                                  "errors":  0,
+                                                                                                  "operations":  8
+                                                                                              },
+                                                                              "work_centers":  {
+                                                                                                   "total":  7,
+                                                                                                   "errors":  0,
+                                                                                                   "synced":  0,
+                                                                                                   "updated":  7
+                                                                                               },
+                                                                              "manufacturing_orders":  {
+                                                                                                           "total":  10,
+                                                                                                           "errors":  0,
+                                                                                                           "synced":  0,
+                                                                                                           "skipped":  0,
+                                                                                                           "updated":  10
+                                                                                                       }
+                                                                          },
+                                                        "error_summary":  null
+                                                    },
+                                      "next_sync_estimate_minutes":  15
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "flags=0",
+        "step":  "6. Data quality flags",
+        "timestamp":  "2026-07-02T21:39:01.7063368+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "flags":  [
+
+                                                ],
+                                      "count":  0
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "20 MOs; lowest score=45.0 constraint=material_shortage",
+        "step":  "7. Feasibility queue (Control Tower)",
+        "timestamp":  "2026-07-02T21:39:02.0902952+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  [
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380007",
+                                          "feasibility_score":  45.0,
+                                          "primary_constraint":  "material_shortage",
+                                          "product_name":  "Distribution Transformer 500 kVA",
+                                          "required_date":  "2026-07-04T10:08:03.184302+00:00",
+                                          "customer_name":  "Great Lakes Utility",
+                                          "erp_mo_id":  "MO-ST-007",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                          "feasibility_score":  52.0,
+                                          "primary_constraint":  "material_shortage",
+                                          "product_name":  "Distribution Transformer 500 kVA",
+                                          "required_date":  "2026-07-05T10:08:03.184302+00:00",
+                                          "customer_name":  "Great Lakes Utility",
+                                          "erp_mo_id":  "MO-ST-001",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380008",
+                                          "feasibility_score":  62.0,
+                                          "primary_constraint":  "capacity_overload",
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
+                                          "required_date":  "2026-07-11T10:08:03.184302+00:00",
+                                          "customer_name":  "Midwest Grid Co",
+                                          "erp_mo_id":  "MO-ST-008",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+                                          "feasibility_score":  68.0,
+                                          "primary_constraint":  "capacity_overload",
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
+                                          "required_date":  "2026-07-07T10:08:03.184302+00:00",
+                                          "customer_name":  "Midwest Grid Co",
+                                          "erp_mo_id":  "MO-ST-002",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                          "feasibility_score":  74.0,
+                                          "primary_constraint":  "labor_shortage",
+                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
+                                          "required_date":  "2026-07-09T10:08:03.184302+00:00",
+                                          "customer_name":  "Regional Power Authority",
+                                          "erp_mo_id":  "MO-ST-003",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "4d05a216-98ef-4504-8abb-382e2cb217b7",
+                                          "feasibility_score":  80.0,
+                                          "primary_constraint":  "demand",
+                                          "product_name":  "Table",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "2",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380004",
+                                          "feasibility_score":  81.0,
+                                          "primary_constraint":  null,
+                                          "product_name":  "Distribution Transformer 500 kVA",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "MO-ST-004",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "7bf60330-fa17-4f34-b9f5-6f17dd621f72",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Drawer",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "6",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "74fa1e04-ae11-464e-9aa8-3bb8ff1df061",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Desk Combination",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "1",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d2369359-c236-4bf6-b6ae-4ad976414ffa",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Table Top",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "3",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "05ceb218-477b-4805-b432-b580b6aa8dbc",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Drawer",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "5",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "0efea564-b321-41d9-8da0-60b020d1df7b",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Drawer",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "7",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "6808f2a7-1008-4c15-a768-fbf126336c23",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Dining Table",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "8",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "3b03cd83-df39-47e0-a2b9-e4eda664c819",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Transformer 500 kVA",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "9",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "0a0eda93-661b-4d41-afd7-19947a20acf5",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Transformer 1000 kVA",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "10",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "9459addc-6ea9-46f9-8083-8aed1626f7aa",
+                                          "feasibility_score":  82.5,
+                                          "primary_constraint":  "material",
+                                          "product_name":  "Drawer",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "4",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
+                                          "feasibility_score":  88.0,
+                                          "primary_constraint":  null,
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "MO-ST-005",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
+                                          "feasibility_score":  91.0,
+                                          "primary_constraint":  null,
+                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "MO-ST-006",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380010",
+                                          "feasibility_score":  93.0,
+                                          "primary_constraint":  null,
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "MO-ST-010",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      },
+                                      {
+                                          "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380009",
+                                          "feasibility_score":  95.0,
+                                          "primary_constraint":  null,
+                                          "product_name":  "Distribution Transformer 500 kVA",
+                                          "required_date":  null,
+                                          "customer_name":  null,
+                                          "erp_mo_id":  "MO-ST-009",
+                                          "sync_conflict":  null,
+                                          "data_quality_flags":  [
+
+                                                                 ],
+                                          "unscorable":  false
+                                      }
+                                  ],
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "at_risk=1 avg=78.6",
+        "step":  "8. Feasibility KPIs",
+        "timestamp":  "2026-07-02T21:39:02.1898643+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "avg_feasibility_score":  78.6,
+                                      "active_bottlenecks":  4,
+                                      "orders_at_risk":  1,
+                                      "otd_pct":  null
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "8 scenarios (MO-ST expedite/overtime/split)",
+        "step":  "9. Resolution scenarios",
+        "timestamp":  "2026-07-02T21:39:03.1545887+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "scenarios":  [
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380007",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380007",
+                                                            "strategy":  "defer_mo",
+                                                            "status":  "proposed",
+                                                            "business_score":  0.55,
+                                                            "delivery_impact_days":  5.0,
+                                                            "cost_impact":  12000.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        },
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380008",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380008",
+                                                            "strategy":  "overtime",
+                                                            "status":  "proposed",
+                                                            "business_score":  0.76,
+                                                            "delivery_impact_days":  1.0,
+                                                            "cost_impact":  4800.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        },
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                            "strategy":  "expedite_po",
+                                                            "status":  "proposed",
+                                                            "business_score":  0.82,
+                                                            "delivery_impact_days":  1.0,
+                                                            "cost_impact":  4200.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        },
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                            "strategy":  "substitute_material",
+                                                            "status":  "proposed",
+                                                            "business_score":  0.74,
+                                                            "delivery_impact_days":  2.0,
+                                                            "cost_impact":  1800.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        },
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                            "strategy":  "split_mo",
+                                                            "status":  "proposed",
+                                                            "business_score":  0.68,
+                                                            "delivery_impact_days":  3.0,
+                                                            "cost_impact":  950.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        },
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380004",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+                                                            "strategy":  "overtime",
+                                                            "status":  "proposed",
+                                                            "business_score":  0.79,
+                                                            "delivery_impact_days":  0.5,
+                                                            "cost_impact":  5600.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        },
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+                                                            "strategy":  "alternate_wc",
+                                                            "status":  "approved",
+                                                            "business_score":  0.71,
+                                                            "delivery_impact_days":  1.5,
+                                                            "cost_impact":  2100.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        },
+                                                        {
+                                                            "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380007",
+                                                            "strategy":  "expedite_po",
+                                                            "status":  "proposed",
+                                                            "business_score":  0.85,
+                                                            "delivery_impact_days":  null,
+                                                            "cost_impact":  8900.0,
+                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                        }
+                                                    ]
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "composite=100% threshold=70.0% bom=100.0% routing=100.0% inventory=100.0%",
+        "step":  "9.5 MDR quality gate (pre-schedule)",
+        "timestamp":  "2026-07-02T21:39:03.5567826+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "tenant_id":  "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+                                      "composite_score":  100.0,
+                                      "threshold":  70.0,
+                                      "passing":  true,
+                                      "dimensions":  {
+                                                         "bom_coverage":  100.0,
+                                                         "routing_coverage":  100.0,
+                                                         "inventory_coverage":  100.0,
+                                                         "lead_time_coverage":  100.0
+                                                     },
+                                      "recommendations":  [
+
+                                                          ],
+                                      "formula":  "composite = 0.40ÃBOM + 0.35Ãrouting + 0.25Ãinventory"
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "8 ops scheduled",
+        "step":  "10. OR-Tools schedule (cap-svc)",
+        "timestamp":  "2026-07-02T21:39:06.5470333+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "schedule":  {
+                                                       "status":  "OPTIMAL",
+                                                       "assignments":  [
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c01",
+                                                                               "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
+                                                                               "start_minute":  0,
+                                                                               "end_minute":  105,
+                                                                               "duration":  105,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                                               "sequence":  10,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Wind LV/HV Coils",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c02",
+                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                                               "start_minute":  350,
+                                                                               "end_minute":  490,
+                                                                               "duration":  140,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                                               "sequence":  20,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Core \u0026 Coil Assembly",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c03",
+                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
+                                                                               "start_minute":  490,
+                                                                               "end_minute":  545,
+                                                                               "duration":  55,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                                               "sequence":  30,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Tank Fit-Up \u0026 Vacuum Test",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c04",
+                                                                               "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
+                                                                               "start_minute":  105,
+                                                                               "end_minute":  280,
+                                                                               "duration":  175,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+                                                                               "sequence":  10,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Fabricate Pad-Mount Tank",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c05",
+                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
+                                                                               "start_minute":  280,
+                                                                               "end_minute":  345,
+                                                                               "duration":  65,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+                                                                               "sequence":  20,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Final Electrical Test (FPY)",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c06",
+                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                                               "start_minute":  0,
+                                                                               "end_minute":  210,
+                                                                               "duration":  210,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                               "sequence":  10,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Build 50 MVA Core-Coil",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c07",
+                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                                               "start_minute":  210,
+                                                                               "end_minute":  350,
+                                                                               "duration":  140,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                               "sequence":  20,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Install Cooling Radiators",
+                                                                               "worker_id":  null
+                                                                           },
+                                                                           {
+                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c08",
+                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
+                                                                               "start_minute":  350,
+                                                                               "end_minute":  455,
+                                                                               "duration":  105,
+                                                                               "on_time":  true,
+                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                               "sequence":  30,
+                                                                               "bom_level":  0,
+                                                                               "parent_operation_id":  null,
+                                                                               "operation_name":  "Final HV Test \u0026 OLTC Commission",
+                                                                               "worker_id":  null
+                                                                           }
+                                                                       ],
+                                                       "mo_tardiness":  [
+                                                                            {
+                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
+                                                                                "due_date_minute":  2368,
+                                                                                "completion_minute":  545,
+                                                                                "tardiness_minutes":  0,
+                                                                                "on_time":  true
+                                                                            },
+                                                                            {
+                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
+                                                                                "due_date_minute":  5248,
+                                                                                "completion_minute":  345,
+                                                                                "tardiness_minutes":  0,
+                                                                                "on_time":  true
+                                                                            },
+                                                                            {
+                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
+                                                                                "due_date_minute":  8128,
+                                                                                "completion_minute":  455,
+                                                                                "tardiness_minutes":  0,
+                                                                                "on_time":  true
+                                                                            }
+                                                                        ],
+                                                       "solver_status":  "OPTIMAL",
+                                                       "skill_relaxed":  false
+                                                   },
+                                      "bottlenecks":  [
+                                                          {
+                                                              "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
+                                                              "work_center_name":  "Winding Station",
+                                                              "total_load_hours":  4.67,
+                                                              "capacity_hours":  56.0,
+                                                              "utilization_pct":  8.3,
+                                                              "is_bottleneck":  false,
+                                                              "severity":  "low"
+                                                          },
+                                                          {
+                                                              "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                              "work_center_name":  "Core \u0026 Coil Assembly",
+                                                              "total_load_hours":  8.17,
+                                                              "capacity_hours":  112.0,
+                                                              "utilization_pct":  7.3,
+                                                              "is_bottleneck":  false,
+                                                              "severity":  "low"
+                                                          },
+                                                          {
+                                                              "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
+                                                              "work_center_name":  "Tank Fabrication \u0026 Test Bay",
+                                                              "total_load_hours":  3.75,
+                                                              "capacity_hours":  56.0,
+                                                              "utilization_pct":  6.7,
+                                                              "is_bottleneck":  false,
+                                                              "severity":  "low"
+                                                          }
+                                                      ],
+                                      "labor_gaps":  [
+                                                         {
+                                                             "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
+                                                             "work_center_name":  "Winding Station",
+                                                             "required_count":  2,
+                                                             "available_count":  3,
+                                                             "has_gap":  false,
+                                                             "recommendation":  "Sufficient coverage"
+                                                         },
+                                                         {
+                                                             "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                             "work_center_name":  "Core \u0026 Coil Assembly",
+                                                             "required_count":  2,
+                                                             "available_count":  3,
+                                                             "has_gap":  false,
+                                                             "recommendation":  "Sufficient coverage"
+                                                         },
+                                                         {
+                                                             "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
+                                                             "work_center_name":  "Tank Fabrication \u0026 Test Bay",
+                                                             "required_count":  2,
+                                                             "available_count":  3,
+                                                             "has_gap":  false,
+                                                             "recommendation":  "Sufficient coverage"
+                                                         },
+                                                         {
+                                                             "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
+                                                             "work_center_name":  "Winding Station",
+                                                             "required_count":  2,
+                                                             "available_count":  3,
+                                                             "has_gap":  false,
+                                                             "recommendation":  "Sufficient coverage"
+                                                         },
+                                                         {
+                                                             "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
+                                                             "work_center_name":  "Tank Fabrication \u0026 Test Bay",
+                                                             "required_count":  2,
+                                                             "available_count":  3,
+                                                             "has_gap":  false,
+                                                             "recommendation":  "Sufficient coverage"
+                                                         }
+                                                     ],
+                                      "total_operations":  8,
+                                      "persisted":  {
+                                                        "updated_mos":  3,
+                                                        "updated_work_orders":  8
+                                                    },
+                                      "mo_versions":  {
+                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001":  1,
+                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002":  1,
+                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003":  1
+                                                      },
+                                      "xai_explanation":  {
+                                                              "constraints":  [
+                                                                                  "no_overlap_per_work_center",
+                                                                                  "precedence_within_mo_groups",
+                                                                                  "bottleneck_ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
+                                                                                  "bottleneck_ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
+                                                                                  "bottleneck_2d47ecd1-69b1-4e4b-9ed0-421efffd0066"
+                                                                              ],
+                                                              "assumptions":  [
+                                                                                  "30s_solver_timeout",
+                                                                                  "oee_applied"
+                                                                              ],
+                                                              "confidence_score":  1.0,
+                                                              "contributing_factors":  {
+                                                                                           "ff3719d5-1609-42e8-93f3-edf13d1c2bf3":  0.083,
+                                                                                           "ec1ac1dd-be2c-47e0-91fa-a693f22b8233":  0.073,
+                                                                                           "2d47ecd1-69b1-4e4b-9ed0-421efffd0066":  0.067
+                                                                                       }
+                                                          }
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "activated=2 erp_mode=direct",
+        "step":  "11. Schedule approve -\u003e Odoo activate",
+        "timestamp":  "2026-07-02T21:39:13.1317067+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "activated":  [
+                                                        {
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
+                                                            "erp_mo_id":  "MO-ST-005",
+                                                            "new_planned_start":  "2026-07-02T18:39:07.404282+00:00",
+                                                            "new_planned_end":  "2026-07-02T22:39:07.404282+00:00",
+                                                            "version":  3,
+                                                            "ai_schedule_version":  2,
+                                                            "feasibility_score":  88.0
+                                                        },
+                                                        {
+                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
+                                                            "erp_mo_id":  "MO-ST-006",
+                                                            "new_planned_start":  "2026-07-02T18:39:07.404282+00:00",
+                                                            "new_planned_end":  "2026-07-03T02:14:07.404282+00:00",
+                                                            "version":  3,
+                                                            "ai_schedule_version":  2,
+                                                            "feasibility_score":  91.0
+                                                        }
+                                                    ],
+                                      "failed":  [
+
+                                                 ],
+                                      "total":  2,
+                                      "activated_count":  2,
+                                      "failed_count":  0,
+                                      "erp_event_published":  true,
+                                      "erp_direct_result":  {
+                                                                "success":  true,
+                                                                "data":  {
+                                                                             "activated":  [
+
+                                                                                           ],
+                                                                             "failed":  [
+                                                                                            {
+                                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
+                                                                                                "reason":  "NO_AI_SUGGESTION"
+                                                                                            },
+                                                                                            {
+                                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
+                                                                                                "reason":  "NO_AI_SUGGESTION"
+                                                                                            }
+                                                                                        ],
+                                                                             "total":  2,
+                                                                             "activated_count":  0,
+                                                                             "failed_count":  2
+                                                                         }
+                                                            }
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "baseline captured=False",
+        "step":  "12. OTD baseline API",
+        "timestamp":  "2026-07-02T21:39:14.0588829+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "baseline":  null,
+                                      "current_30d":  {
+                                                          "otd_pct":  50.0,
+                                                          "completed_mos":  2,
+                                                          "on_time_mos":  1,
+                                                          "lookback_days":  30
+                                                      },
+                                      "delta_vs_baseline":  null
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    },
+    {
+        "detail":  "mos_saved=",
+        "step":  "13. ROI metrics API",
+        "timestamp":  "2026-07-02T21:39:14.4559710+03:00",
+        "status":  "PASS",
+        "response":  {
+                         "success":  true,
+                         "data":  {
+                                      "weekly":  [
+                                                     {
+                                                         "week_start":  "2026-06-29",
+                                                         "completed_mos":  6,
+                                                         "on_time":  1,
+                                                         "otd_pct":  16.7,
+                                                         "avg_feasibility":  78.6,
+                                                         "at_risk_count":  4
+                                                     }
+                                                 ],
+                                      "mos_saved_total":  0
+                                  },
+                         "error":  null,
+                         "meta":  null
+                     }
+    }
+]

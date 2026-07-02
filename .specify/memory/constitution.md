@@ -1,18 +1,20 @@
 # IPE Platform Constitution
 
-## Sync Impact Report (V6.0 — 2026-06-23)
+## Sync Impact Report (Release 1 — 2026-06-29)
 
 | Change | Version bump | Notes |
 |--------|--------------|-------|
-| V6 migrations 024–027 RLS verified | PATCH | No principle change; compliance evidence in 004 checklists |
-| JWT demo auth for staging (Keycloak BLOCKED) | — | Documented in clarify-v6 C-V6-02; not a constitution waiver |
-| New Avro topics: tariff.shock, maintenance.block_required | — | Principle IV satisfied with paired consumers |
+| Added Principle VII: Customer-First Release Slicing | **MINOR 1.0.1 → 1.1.0** | Governs 013-release1-odoo-mena |
+| Added Release 1 Deployment Doctrine | — | 5–7 service profile; Odoo IS the product |
+| Added MENA Market Constraints | — | Arabic MVP, on-prem option, WhatsApp support |
+| Clarified Principle IV exception for R1 | — | Kafka optional in release1 compose |
+| v8.2.0 platform complete | — | Full 22-service stack remains in monorepo |
 
-**Compliance**: 004 V6-R1–R5 implementation verified against Principles I–VI. No amendments required.
+**Compliance**: Principles I–III remain NON-NEGOTIABLE in all deployments. Principle VII governs *what ships* to customer #1, not *what exists* in the repo.
 
 ---
 
-IPE (Intelligent Process Engine) is a microservices-based, event-driven platform for intelligent process automation. These principles are derived from the codebase architecture and V2 audit findings. They are binding on all changes.
+IPE (Intelligent Planning Engine) is a microservices-based, event-driven platform for **feasibility-first manufacturing planning** in MENA mid-market discrete manufacturing. These principles are binding on all changes.
 
 ## Core Principles
 
@@ -20,96 +22,137 @@ IPE (Intelligent Process Engine) is a microservices-based, event-driven platform
 
 Every database migration MUST enforce Row-Level Security on every table bearing a `tenant_id` column.
 
-- **RLS is not optional.** Any new table with `tenant_id` MUST have RLS enabled in the same migration (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY` followed by `CREATE POLICY tenant_isolation ... USING (tenant_id = current_setting('app.current_tenant')::uuid)`).
-- **Existing gap MUST be closed.** Migrations 002-012 created 22 tables with `tenant_id` but NO RLS policies. Any change touching those migrations or their models MUST add the missing RLS policies.
-- **Dynamic RLS loop is the pattern.** Migration 001's `FOR table IN (SELECT ...)` loop is the canonical pattern; new migrations SHOULD use the same procedural approach.
-- **Cross-tenant queries MUST use `app.set_tenant()`.** Application code MUST set `app.current_tenant` via the `get_current_tenant` dependency before executing tenant-scoped queries.
+- **RLS is not optional.** Any new table with `tenant_id` MUST have RLS enabled in the same migration.
+- **Existing gap MUST be closed.** Legacy tables without RLS policies MUST be remediated before production customer go-live.
+- **Dynamic RLS loop is the pattern.** Migration 001's procedural loop is canonical.
+- **Cross-tenant queries MUST use `app.set_tenant()`.** Application code MUST set `app.current_tenant` before tenant-scoped queries.
 
-**Rationale:** 22 tables without RLS represent a SOC 2 violation and a cross-tenant data exposure risk. Multi-tenant isolation is the platform's most critical security boundary.
+**Rationale:** Multi-tenant isolation is the platform's most critical security boundary. A paying factory customer MUST NOT see another tenant's MOs.
+
+---
 
 ### II. Service Authentication & Authorization
 
 Every API endpoint MUST be protected by at least one authentication or authorization layer.
 
-- **Zero open endpoints.** Every route MUST verify a valid JWT via the `get_current_user` dependency, except explicitly documented health/readiness probes (`/health`, `/ready`, `/metrics`).
-- **RBAC is mandatory for state-changing operations.** POST/PUT/PATCH/DELETE endpoints MUST check role permissions via `require_role(...)` or equivalent. The 5 services with zero RBAC (mat-svc, cap-svc, fea-svc, res-svc, rec-svc) MUST be remediated before any deployment.
-- **Rate limiting is required.** Every service MUST configure `slowapi` rate limits on its public endpoints.
-- **API keys for machine-to-machine.** Internal service-to-service calls SHOULD use API keys or mTLS, not user JWTs.
+- **Zero open endpoints** except `/health`, `/ready`, `/metrics`.
+- **RBAC is mandatory for state-changing operations.** POST/PUT/PATCH/DELETE MUST check role permissions.
+- **Rate limiting is required** on public endpoints.
+- **Release 1 exception:** Demo JWT auth acceptable for PoC; production customer MUST have tenant-scoped credentials and secrets in vault (not hardcoded).
 
-**Rationale:** 3 alert-svc endpoints had zero authentication and 5 services had zero RBAC. This is not acceptable for production.
+**Rationale:** A factory planner approving a schedule is a state-changing, auditable action.
+
+---
 
 ### III. Test-Backed Changes (NON-NEGOTIABLE)
 
 Every behavioral change MUST be accompanied by automated tests.
 
-- **Tests MUST pass before merge.** CI runs pytest with coverage across the matrix. Changes MUST pass on all configured platforms.
-- **No regression in test categories.** Unit tests, integration tests (with Docker services), and end-to-end flow tests MUST all remain green.
-- **Service-level test files required.** Every service MUST have at least `tests/test_api.py` (endpoint tests) and `tests/test_models.py` (model/DB tests). Services missing these MUST add them.
-- **Event tests must verify produce AND consume.** Any change to event producers MUST include a test that the corresponding consumer can process the message.
-- **No real network in tests.** External services (Kafka, PostgreSQL, Redis) MUST be stubbed or use testcontainers.
+- **Tests MUST pass before merge.**
+- **Odoo connector changes MUST include:** unit tests (mapper), integration tests (mock Odoo XML-RPC), and at least one end-to-end sync test with testcontainers or recorded fixtures.
+- **No real network in unit tests.** External services MUST be stubbed.
+- **Release 1 gate:** Connector sync + feasibility pipeline MUST have integration test proving MO ingest → Control Tower queue.
 
-**Rationale:** The audit found no test execution was possible due to missing dev dependencies and infrastructure. This MUST be fixed.
+**Rationale:** Bad Odoo data in production will be the norm, not the exception. Tests must cover defensive paths.
+
+---
 
 ### IV. Event-Driven Architecture Integrity
 
-The event bus is the backbone of inter-service communication; all topics, schemas, and handlers MUST be explicitly declared.
+The event bus is the backbone of inter-service communication in the **full platform**.
 
-- **Every topic MUST be created.** Topics are declared in `infrastructure/kafka/setup-topics.sh` or equivalent. The 11 topics referenced by code but NOT created in any script MUST be added before deployment.
-- **Avro schemas are mandatory for production topics.** Every new event type MUST have a registered Avro schema in the Schema Registry. Schemas MUST be versioned.
-- **Producers and consumers MUST be tested in pairs.** A change that adds a producer event MUST include or update the corresponding consumer handler, and vice versa.
-- **Consumer resilience.** Every consumer MUST:
-  - Implement idempotent processing (at-least-once delivery assumption)
-  - Handle deserialization errors gracefully (dead-letter queue or log+skip)
-  - Timeout after 30s of processing per message
-- **`create_consumer()` pattern is the standard.** All services MUST use `ipe_shared.events.consumer.create_consumer()`. The alert-svc consumer crash (calling nonexistent function) MUST be fixed.
+- **Full stack (22 services):** Kafka topics, Avro schemas, producer/consumer pairs as documented.
+- **Release 1 profile (`docker-compose.release1.yml`):** Kafka MAY be omitted if sync is batch-driven via connector cron. If omitted, MUST document synchronous call paths and MUST NOT silently drop events required for feasibility scoring.
+- **Consumer resilience:** Idempotent processing, deserialization error handling, 30s timeout.
 
-**Rationale:** 11 topics are being published to but never created; the alert-svc consumer references a nonexistent function. The event mesh will silently lose data.
+**Rationale:** Event mesh is v3.0 architecture. Customer #1 needs reliability over architectural purity.
+
+---
 
 ### V. Service Architecture & API Consistency
 
-All services follow a uniform layered architecture enforced by conventions.
+All services follow a uniform layered architecture.
 
-- **Layered structure.** Every FastAPI-based service MUST follow: `app/api/v1/` (routes), `app/models/` (SQLAlchemy/Pydantic models), `app/services/` (business logic), `app/events/` (producers/consumers), `app/deps.py` (dependencies).
-- **`/health`, `/ready`, `/metrics` on every service.** Health checks return 200, readiness checks verify DB/Kafka/Redis connectivity, metrics expose Prometheus-formatted output. Currently ZERO services mount `/metrics` -- this MUST be added.
-- **Port scheme standardization.** All services MUST use the port numbers from `Dockerfile` (8001-8010). docker-compose.yml and Helm values MUST be reconciled to match -- see configuration drift analysis for the 3 incompatible schemes.
-- **Import discipline.** Python files MUST NOT import from modules that don't exist. The dpe-svc `ctp.py` crash-on-import bug (importing `app.core.ctp` which doesn't exist) MUST never recur.
-- **Frontend-backend contract alignment.** Every frontend API call in `apps/web/src/features/*/api.ts` MUST have a corresponding backend route. Named imports MUST match actual exports (e.g. `import { api }` requires `export const api`, not `export default api`).
+- **Layered structure:** `app/api/v1/`, `app/models/`, `app/services/`, `app/events/`, `app/deps.py`.
+- **`/health`, `/ready`, `/metrics` on every deployed service.**
+- **Frontend-backend contract alignment.** Every UI API call MUST have a corresponding backend route.
+- **Release 1 deployed services:** `kong`, `dpe-svc`, `cap-svc`, `connector`, `web-ui`, `db`, (`redis` if sessions). All other services remain in monorepo but OFF the customer compose file until requested.
 
-**Rationale:** 3 port schemes, broken imports, and missing frontend routes make the system undeployable and unreachable.
+**Rationale:** 22 services in repo; 5–7 in production for customer #1.
+
+---
 
 ### VI. Observability & Monitoring
 
-Every service MUST be observable in both development and production.
+Every **deployed** service MUST be observable.
 
-- **`/metrics` is mandatory.** Every service MUST expose a Prometheus `/metrics` endpoint via `prometheus_fastapi_instrumentator`. Currently zero services do this.
-- **Structured logging.** All services MUST use JSON-formatted logging via `ipe_shared.logging` with correlation IDs propagated from incoming requests.
-- **Health checks.** Kubernetes readiness probes MUST use `/ready` (not `/health`). The Helm template currently uses `/health` -- this MUST be fixed.
-- **Alerting.** Services MUST emit RED metrics (Rate, Errors, Duration) for key operations. alert-svc MUST have functioning consumers to process events.
-- **Graceful degradation.** When downstream dependencies (DB, Kafka, Redis) are unavailable, services MUST surface this in `/ready` rather than crashing.
+- **`/metrics` mandatory** on release1 services.
+- **Structured JSON logging** with correlation IDs.
+- **Sync observability (Release 1):** Every Odoo sync run MUST log and persist: start time, end time, records synced, records skipped, errors, data quality flags. UI MUST show "Last synced at" timestamp.
+- **Graceful degradation:** `/ready` surfaces DB/Odoo connectivity; planner sees actionable message, not 500 stack trace.
 
-**Rationale:** Without `/metrics` on any service, there is zero operational visibility. Prometheus targets are incomplete and the alerting pipeline is broken.
+**Rationale:** When sync fails at 7am before the production meeting, the planner and support contact need immediate visibility.
+
+---
+
+### VII. Customer-First Release Slicing (NEW — Release 1)
+
+**The Odoo connector IS the product for customer #1.** Platform breadth serves demos; release depth serves revenue.
+
+- **One ERP first:** Odoo (XML-RPC + `ipe_connector` module). SAP/D365 scaffolds MUST NOT distract from Odoo production path until customer #2.
+- **One value proposition:** Planners see at-risk MOs from **live Odoo data** before the shift starts, with structured resolution options — not seed SQL, not manual spreadsheet maintenance.
+- **Three screens minimum:** Control Tower, Resolution Center, Executive OTD. Copilot, Scenarios, Supply Network, Quality, Sustainability are **POST-R1** unless customer contract explicitly includes them.
+- **Data quality before planning:** MOs missing BOM, routing, or work center capacity MUST be flagged as "unscorable" — never silent misleading feasibility scores.
+- **Conflict policy required:** When Odoo and IPE disagree (e.g., due date changed in Odoo after IPE approval), behavior MUST be documented and implemented (default: Odoo wins on master data; IPE wins on approved schedule until next sync flags conflict).
+- **Arabic MVP:** Control Tower, Resolution Center, navigation, and alerts MUST support Arabic before customer go-live (English may remain as secondary).
+- **Deployment options:** MUST support (a) Diligent-managed cloud VM and (b) customer on-prem single-VM compose. Full 22-service AWS/EKS is NOT required for R1.
+- **Support model:** Same-day response, business hours, WhatsApp/phone channel documented in runbook — not GitHub issues.
+
+**Rationale:** Engineering output exceeded go-to-market. Release 1 narrows to provable ROI for one paying factory.
+
+---
+
+## MENA Market Constraints (Binding on Release 1)
+
+| Constraint | Requirement |
+|------------|-------------|
+| **Buyer persona** | CEO / Operations Director — not IT steering committee |
+| **Competition** | Excel + Odoo MRP — not Kinaxis/SAP IBP in sales pitch |
+| **Pricing fit** | License $18K–30K/yr + implementation $12K–25K one-time |
+| **Connectivity** | Tolerate intermittent factory internet; batch sync > fragile webhooks |
+| **ROI timeline** | Measurable within 90 days: adoption, 2+ MOs saved, OTD trend |
+| **Implementation** | Fixed-scope SOW, data migration checklist, training curriculum — not demo script alone |
+
+---
 
 ## Security & Cross-Platform Constraints
 
-- **Cross-platform.** Code MUST run on Linux and Windows. Shell scripts in `scripts/` MUST have PowerShell equivalents or be tested on both.
-- **Secret management.** No hardcoded secrets in source code. The 3 instances of hardcoded DB passwords in migrations MUST use environment variables or secrets manager.
-- **Input validation.** All API endpoints MUST validate inputs via Pydantic models. Path traversal, SQL injection, and XSS vectors MUST be rejected at the boundary.
-- **Dependency scanning.** `pip-audit` or equivalent MUST pass on all Python services. The 59 known-vulnerability transitive dependencies MUST be addressed.
-- **Formatting.** `ruff check`, `mypy --strict`, and `prettier` (frontend) MUST pass on all code.
+- **Cross-platform.** PowerShell equivalents for all customer-facing scripts.
+- **Secret management.** Odoo credentials in tenant config / vault — never in source or logs.
+- **Input validation.** Pydantic models on all API boundaries.
+- **Formatting.** `ruff check`, `mypy`, `prettier` MUST pass.
+
+---
 
 ## Development Workflow & Quality Gates
 
-- **Branch naming.** `feat/<short-slug>`, `fix/<short-slug>`, `chore/<short-slug>`, `docs/<short-slug>`.
-- **PR requirements.** Every PR MUST: pass CI (lint + test + type-check), include tests for new behavior, update API docs if routes change, and address any audit findings in the affected area.
-- **Audit remediation tracking.** Issues from the V2 audit in `audit/v2/14-remediation-backlog.md` MUST be tracked in the project's issue tracker. P0 items block releases.
-- **Pre-commit hooks.** AI agents MUST run `ruff check` and `mypy` before presenting code as complete.
-- **Constitution compliance.** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance with these principles. Violations block merge.
+- **Branch naming:** `feat/<short-slug>`, `fix/<short-slug>`, `chore/<short-slug>`, `docs/<short-slug>`.
+- **PR requirements:** CI green, tests for new behavior, API docs if routes change.
+- **Release 1 gate (013):** Before customer go-live:
+  1. MO ingest from Odoo → Control Tower queue (live or recorded integration test)
+  2. `docker-compose.release1.yml` starts in ≤10 min on 8GB RAM VM
+  3. Arabic strings on 3 core screens
+  4. Implementation playbook + support runbook published
+  5. 90-day ROI metrics instrumented
+- **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
+
+---
 
 ## Governance
 
-- **Authority.** Principles I-VI are binding gates. Violations MUST be resolved by changing the code, not by diluting a principle.
-- **Amendments.** Changes to this document require PR with rationale and a SemVer version bump. Amendments MUST update the Sync Impact Report at the top of this file.
-- **Versioning.** MAJOR = principled removal/redefinition; MINOR = new principle or materially expanded guidance; PATCH = clarifications.
-- **Compliance review.** Every PR and review MUST verify compliance. Unjustified violations block merge.
+- **Authority.** Principles I–III and VII are binding gates for Release 1. Violations MUST be resolved by changing code, not diluting principles.
+- **Amendments.** Changes require PR with rationale and SemVer bump. Update Sync Impact Report.
+- **Versioning.** MAJOR = principled removal; MINOR = new principle; PATCH = clarifications.
+- **Compliance review.** Every PR MUST verify compliance.
 
-**Version**: 1.0.1 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-06-23
+**Version**: 1.1.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-06-29

@@ -1,38 +1,69 @@
 import os
 from unittest.mock import MagicMock, patch
-from uuid import uuid4
 
 import pytest
 
-from ipe_shared.auth.dependencies import get_current_user
-from ipe_shared.auth.jwt import create_access_token, decode_token
-from ipe_shared.auth.keycloak import KeycloakTokenValidator, auth_provider, keycloak_token_to_payload
+from ipe_shared.auth.keycloak import (
+    KeycloakTokenValidator,
+    auth_info,
+    auth_provider,
+    map_keycloak_roles,
+    keycloak_token_to_payload,
+)
 
 
-def test_auth_provider_defaults_local():
-    os.environ.pop("AUTH_PROVIDER", None)
+def test_auth_provider_defaults_local(monkeypatch):
+    monkeypatch.delenv("AUTH_PROVIDER", raising=False)
+    monkeypatch.delenv("AUTH_MODE", raising=False)
     assert auth_provider() == "local"
 
 
-def test_local_jwt_roundtrip():
-    token = create_access_token(uuid4(), uuid4(), "planner")
-    payload = decode_token(token)
-    assert payload.role == "planner"
+def test_auth_provider_keycloak_env(monkeypatch):
+    monkeypatch.setenv("AUTH_MODE", "keycloak")
+    assert auth_provider() == "keycloak"
 
 
 def test_keycloak_role_mapping():
-    validator = KeycloakTokenValidator(config=MagicMock())
-    role = validator.map_roles({"realm_access": {"roles": ["ipe-planner", "other"]}})
+    assert map_keycloak_roles({"realm_access": {"roles": ["ipe-planner", "other"]}}) == "planner"
+    assert map_keycloak_roles({"realm_access": {"roles": ["admin"]}}) == "admin"
+    assert map_keycloak_roles({"realm_access": {"roles": ["unknown"]}}) == "operator"
+
+
+def test_keycloak_token_to_payload_mocked(monkeypatch):
+    monkeypatch.setenv("KEYCLOAK_URL", "http://keycloak:8080")
+    fake_key = MagicMock()
+    fake_key.key = "secret"
+    with patch("ipe_shared.auth.keycloak.get_keycloak_jwks_client") as mock_client:
+        mock_client.return_value.get_signing_key_from_jwt.return_value = fake_key
+        with patch("ipe_shared.auth.keycloak.jwt.decode", return_value={
+            "sub": "user-1",
+            "tenant_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+            "realm_access": {"roles": ["ipe-admin"]},
+            "exp": 9999999999,
+            "iat": 1,
+        }):
+            payload = keycloak_token_to_payload("fake-token")
+            assert payload.role == "admin"
+            assert payload.type == "access"
+
+
+def test_auth_info_local(monkeypatch):
+    monkeypatch.setenv("AUTH_MODE", "local")
+    info = auth_info()
+    assert info["mode"] == "local"
+    assert info["keycloak_url"] == ""
+
+
+def test_auth_info_keycloak_public_url(monkeypatch):
+    monkeypatch.setenv("AUTH_MODE", "keycloak")
+    monkeypatch.setenv("KEYCLOAK_URL", "http://keycloak:8080")
+    monkeypatch.setenv("KEYCLOAK_PUBLIC_URL", "http://localhost:8180")
+    info = auth_info()
+    assert info["mode"] == "keycloak"
+    assert info["keycloak_url"] == "http://localhost:8180"
+
+
+def test_validator_backward_compat():
+    validator = KeycloakTokenValidator()
+    role = validator.map_roles({"realm_access": {"roles": ["planner"]}})
     assert role == "planner"
-
-
-def test_keycloak_token_to_payload_mocked():
-    with patch.object(KeycloakTokenValidator, "validate", return_value={
-        "sub": "user-1",
-        "tenant_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-        "realm_access": {"roles": ["ipe-admin"]},
-    }):
-        os.environ["AUTH_PROVIDER"] = "keycloak"
-        payload = keycloak_token_to_payload("fake-token")
-        assert payload.role == "admin"
-        os.environ["AUTH_PROVIDER"] = "local"

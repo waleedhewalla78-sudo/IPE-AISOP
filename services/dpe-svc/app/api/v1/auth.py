@@ -3,17 +3,20 @@ import hashlib
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ipe_shared.auth.dependencies import get_current_user
-from ipe_shared.auth.jwt import TokenPayload, create_access_token, create_refresh_token
+from ipe_shared.auth.jwt import TokenPayload, create_access_token, create_refresh_token, decode_token
+from ipe_shared.auth.token_blacklist import blacklist_token
 from ipe_shared.config import settings
 from ipe_shared.database.session import get_session
-from ipe_shared.schemas.auth import LoginRequest, LoginResponse, UserInfo
+from ipe_shared.schemas.auth import LoginRequest, LoginResponse, RefreshRequest, UserInfo
 from ipe_shared.schemas.common import APIResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+bearer_scheme = HTTPBearer()
 
 DEMO_TENANT_ID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
 DEV_PASSWORDS = frozenset({"demo", "admin"})
@@ -74,6 +77,89 @@ async def login(
             expires_in=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
     )
+
+
+@router.get("/info")
+async def auth_info() -> APIResponse[dict]:
+    from ipe_shared.auth.keycloak import auth_info as kc_auth_info
+
+    return APIResponse(success=True, data=kc_auth_info(), error=None)
+
+
+@router.post("/refresh", response_model=APIResponse[LoginResponse])
+async def refresh_access_token(
+    body: RefreshRequest,
+    session: AsyncSession = Depends(get_session),
+) -> APIResponse[LoginResponse]:
+    try:
+        payload = decode_token(body.refresh_token)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+
+    if payload.type != "refresh":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not a refresh token")
+
+    user = await _lookup_user_by_id(session, str(payload.sub))
+    if not user or not user.get("is_active"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+
+    user_id = UUID(str(user["id"]))
+    tenant_id = UUID(str(user["tenant_id"]))
+    role = str(user["role"])
+
+    access_token = create_access_token(user_id, tenant_id, role)
+    refresh_token = create_refresh_token(user_id, tenant_id, role)
+
+    return APIResponse(
+        data=LoginResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+            expires_in=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        )
+    )
+
+
+@router.post("/logout", response_model=APIResponse[dict])
+async def logout(
+    current_user: TokenPayload = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+) -> APIResponse[dict]:
+    import jwt as pyjwt
+
+    try:
+        unverified = pyjwt.decode(
+            credentials.credentials,
+            options={"verify_signature": False},
+            algorithms=["RS256", "HS256"],
+        )
+        jti = unverified.get("jti")
+        exp = unverified.get("exp")
+        if jti and exp:
+            await blacklist_token(str(jti), int(exp))
+    except Exception:
+        pass
+    return APIResponse(data={"message": "Logged out"})
+
+
+async def _lookup_user_by_id(session: AsyncSession, user_id: str) -> dict | None:
+    await session.execute(
+        text("SELECT set_config('app.current_tenant_id', :tid, true)"),
+        {"tid": DEMO_TENANT_ID},
+    )
+    result = await session.execute(
+        text(
+            """
+            SELECT id, tenant_id, email, full_name, role, password_hash, is_active
+            FROM cdm_user
+            WHERE id = :user_id
+            LIMIT 1
+            """
+        ),
+        {"user_id": user_id},
+    )
+    row = result.mappings().one_or_none()
+    return dict(row) if row else None
 
 
 @router.get("/me", response_model=APIResponse[UserInfo])

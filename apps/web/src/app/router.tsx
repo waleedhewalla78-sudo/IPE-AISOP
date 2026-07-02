@@ -17,6 +17,7 @@ import {
   CommandCenterDashboardPage,
   WarRoomPage,
   ExecutiveDashboardPage,
+  OutcomesPage,
   CostOfChaosPage,
   TariffPage,
   SCNDashboard,
@@ -70,6 +71,7 @@ export function AppRouter() {
             <Route path="dashboard" element={<CommandCenterDashboardPage />} />
             <Route path="war-room" element={<WarRoomPage />} />
             <Route path="executive" element={<ExecutiveDashboardPage />} />
+            <Route path="outcomes" element={<OutcomesPage />} />
             <Route path="equipment" element={<EquipmentHealthPage />} />
             <Route path="cost-of-chaos" element={<CostOfChaosPage />} />
           </Route>

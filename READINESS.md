@@ -2,7 +2,8 @@
 
 **Version**: v8.2.0  
 **Published**: 2026-06-27  
-**Supersedes**: v7.0.0, v6.1.0, v6.0.0, v1.0.0
+**Supersedes**: v7.0.0, v6.1.0, v6.0.0, v1.0.0  
+**Product spec**: [docs/PRD-IPE-COMPREHENSIVE-AS-IS.md](docs/PRD-IPE-COMPREHENSIVE-AS-IS.md)
 
 ---
 

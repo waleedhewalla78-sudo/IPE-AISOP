@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from '@/app/App';
 import { store } from '@/store/store';
 import '@/assets/styles/globals.css';
+import '@/lib/i18n';
 
 const rootEl = document.getElementById('root');
 if (!rootEl) throw new Error('Root element #root not found');

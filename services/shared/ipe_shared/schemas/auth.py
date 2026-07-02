@@ -15,6 +15,10 @@ class LoginResponse(BaseModel):
     expires_in: int
 
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
 class UserInfo(BaseModel):
     id: UUID
     email: str

@@ -24,6 +24,7 @@ export const ROUTES = {
   COMMAND_DASHBOARD: '/command-center/dashboard',
   COMMAND_WAR_ROOM: '/command-center/war-room',
   COMMAND_EXECUTIVE: '/command-center/executive',
+  COMMAND_OUTCOMES: '/command-center/outcomes',
   COMMAND_COST_OF_CHAOS: '/command-center/cost-of-chaos',
   COMMAND_EQUIPMENT: '/command-center/equipment',
 

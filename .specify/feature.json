@@ -1,30 +1,33 @@
 {
 
-  "feature_directory": "specs/010-v8-validation-convergence",
+  "feature_directory": "specs/015-enterprise-production-readiness",
 
-  "active_implementation": "specs/010-v8-validation-convergence",
+  "active_implementation": "specs/014-release2-growth",
 
-  "active_plan": "specs/010-v8-validation-convergence/plan.md",
+  "active_plan": "specs/015-enterprise-production-readiness/plan.md",
 
-  "readiness_score": 100,
+  "readiness_score": 82,
 
-  "release_target": "v8.2.0",
+  "readiness_note": "014 R2 implement complete pending demo verification; 015 enterprise program specified",
 
-  "phase": "010-v8-validation-convergence",
+  "release_target": "v10.0.0-enterprise",
 
-  "last_speckit_run": "2026-06-28",
+  "phase": "015-enterprise-production-readiness",
 
-  "v8_2_0_completion": "2026-06-28",
+  "customer": "Star Trans — Electrical Transformer Technology",
 
-  "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks", "implement", "converge"],
+  "prior_phase": "specs/014-release2-growth",
 
-  "streams": ["U1-copilot", "U2-demand", "U3-scenario", "U4-supply", "U5-orders", "U6-equipment", "U7-design-ai", "U8-procurement"],
+  "platform_release": "v8.2.0",
 
-  "prior_phase": "specs/009-v8-phase3-design-procurement",
+  "last_speckit_run": "2026-06-24-full-pipeline",
 
-  "demo_checkpoints": "32/32",
+  "speckit_phases_complete": ["constitution", "specify", "clarify", "analyze", "plan", "tasks", "taskstoissues", "implement-partial-014"],
 
-  "integration_tests_v8": "5/5"
+  "speckit_phases_pending": ["implement-015-phase0", "converge", "uat"],
+
+  "speckit_artifacts_version": "2.3",
+
+  "constitution_version": "1.1.0"
 
 }
-

@@ -21,6 +21,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from ipe_shared.config import settings
 from ipe_shared.database.connection import get_engine
 
 logger = logging.getLogger(__name__)
@@ -79,6 +80,24 @@ async def log_audit_event(
             await session.commit()
     except Exception as e:
         logger.error("Failed to write audit log: action=%s entity=%s error=%s", action, entity_id, e)
+
+    if settings.AUDIT_KAFKA_ENABLED:
+        try:
+            from ipe_shared.audit.kafka_publisher import publish_audit_event
+
+            await publish_audit_event(
+                tenant_id=str(tenant_id),
+                actor_type=actor_type,
+                actor_id=str(actor_id),
+                action=action,
+                entity_type=entity_type,
+                entity_id=str(entity_id),
+                before_state=before_state,
+                after_state=after_state,
+                rationale=rationale,
+            )
+        except Exception as exc:
+            logger.debug("Kafka audit fan-out skipped: %s", exc)
 
 
 def create_audit_writer(

@@ -2,6 +2,22 @@
 
 AI-driven production planning platform. ERP-agnostic. Odoo-first.
 
+**Version:** v8.2.0 (full platform) · Release 1 → v9.0.0-r1 (Odoo customer profile)  
+**Status:** 32/32 demo · 870+ tests · Star Trans Odoo UAT in progress
+
+## Documentation
+
+| Document | Audience |
+|----------|----------|
+| [**Comprehensive PRD (as-is)**](docs/PRD-IPE-COMPREHENSIVE-AS-IS.md) | Product, engineering, stakeholders — authoritative spec |
+| [**Executive one-pager**](docs/PRD-IPE-EXECUTIVE-ONE-PAGER.md) | Leadership — 5-minute overview |
+| [Product status](docs/PRODUCT-STATUS.md) | Feature matrix & validation |
+| [Readiness](READINESS.md) | Deployment readiness score |
+| [Architecture](docs/architecture.md) | Services, ports, event mesh |
+| [API reference](docs/api-reference.md) | Endpoint index |
+| [Odoo integration](docs/integration/ODOO-LOCAL-SETUP.md) | Release 1 ERP setup |
+| [Release 1 spec](specs/013-release1-odoo-mena/spec.md) | Star Trans scope |
+
 ## Quick Start
 
 ```bash
@@ -19,13 +35,18 @@ make migrate
 make dev
 ```
 
-**Version**: v6.1.0 → v7.0.0 completion  
-**Published**: 2026-06-26  
-**Architecture**: [docs/architecture.md](docs/architecture.md)  
-**API**: [docs/api-reference.md](docs/api-reference.md)  
-**Deploy**: [docs/deployment.md](docs/deployment.md)
+### Release 1 (Star Trans / Odoo — 8 services, 8 GB VM)
 
-## Services
+```powershell
+cd E:\AISOP\ipe
+.\scripts\deploy-release1.ps1
+.\scripts\setup-odoo-integration.ps1
+cd apps\web; $env:VITE_RELEASE_PROFILE='release1'; npm run dev
+```
+
+Web UI: http://localhost:8082 · API gateway: http://localhost:8000
+
+## Services (full stack)
 
 | Service | Port | Docs |
 |---------|------|------|
@@ -39,10 +60,10 @@ make dev
 | rec-svc | 8008 | http://localhost:8008/docs |
 | connector | 8009 | http://localhost:8009/docs |
 | alert-svc | 8010 | http://localhost:8010/docs |
-| Frontend | 3000 | http://localhost:3000 |
+| Frontend (Vite) | 8082 | http://localhost:8082 |
+| Kong gateway | 8000 | http://localhost:8000 |
 | Kafka UI | 8080 | http://localhost:8080 |
-| Grafana | 3000 | http://localhost:3000 |
-| Prometheus | 9090 | http://localhost:9090 |
+| PostgreSQL | 5433 | localhost:5433 (ipe_test) |
 
 ## Production Secrets
 

@@ -97,3 +97,16 @@ export async function fetchKPIs(): Promise<KPI | null> {
     return null;
   }
 }
+
+export async function queryPlannerAssist(query: string): Promise<{
+  intent: string;
+  answer_markdown: string;
+  citations: Record<string, unknown>[];
+  source?: string;
+}> {
+  const res = await api.post('/api/v1/planner-assist/query', { query });
+  if (!res.data?.success) {
+    throw new Error(res.data?.error?.message ?? 'Planner assist failed');
+  }
+  return res.data.data;
+}

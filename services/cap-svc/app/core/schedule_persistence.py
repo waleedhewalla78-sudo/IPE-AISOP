@@ -17,6 +17,7 @@ from ipe_shared.models.routing import RoutingOperation
 from ipe_shared.models.work_center import WorkCenter
 from ipe_shared.models.work_order import WorkOrder
 
+from app.core.erp_direct import activate_mos_in_odoo
 from app.core.priority_resolver import FEASIBILITY_GUARDRAIL_THRESHOLD, passes_feasibility_guardrail
 
 logger = logging.getLogger(__name__)
@@ -261,28 +262,41 @@ async def approve_schedule_mos(
 
     if activated:
         await session.commit()
-        envelope = kafka_producer.build_envelope(
-            event_type="ipe.schedule.approved",
-            tenant_id=str(tenant_id),
-            payload={
-                "approved_by": approved_by,
-                "mo_ids": [a["mo_id"] for a in activated],
-                "activated": activated,
-            },
-        )
         erp_event_published = True
-        try:
-            await kafka_producer.send_avro(
-                topic="ipe.schedule.approved",
-                key=str(tenant_id),
-                envelope=envelope,
-            )
-        except Exception:
-            erp_event_published = False
-            logger.exception(
-                "Failed to publish ipe.schedule.approved for tenant %s after CDM commit",
+        erp_direct_result = None
+
+        import os
+        if os.getenv("ERP_SYNC_MODE", "kafka").lower() == "direct":
+            direct = await activate_mos_in_odoo(
+                session,
                 tenant_id,
+                [UUID(a["mo_id"]) for a in activated],
+                approved_by=approved_by,
             )
+            erp_direct_result = direct
+            erp_event_published = direct.get("success", False)
+        else:
+            envelope = kafka_producer.build_envelope(
+                event_type="ipe.schedule.approved",
+                tenant_id=str(tenant_id),
+                payload={
+                    "approved_by": approved_by,
+                    "mo_ids": [a["mo_id"] for a in activated],
+                    "activated": activated,
+                },
+            )
+            try:
+                await kafka_producer.send_avro(
+                    topic="ipe.schedule.approved",
+                    key=str(tenant_id),
+                    envelope=envelope,
+                )
+            except Exception:
+                erp_event_published = False
+                logger.exception(
+                    "Failed to publish ipe.schedule.approved for tenant %s after CDM commit",
+                    tenant_id,
+                )
         return {
             "activated": activated,
             "failed": failed,
@@ -290,6 +304,7 @@ async def approve_schedule_mos(
             "activated_count": len(activated),
             "failed_count": len(failed),
             "erp_event_published": erp_event_published,
+            "erp_direct_result": erp_direct_result,
         }
     elif failed:
         await session.rollback()

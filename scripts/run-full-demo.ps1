@@ -4,8 +4,14 @@
 # Optional: .\scripts\run-full-demo.ps1 -ReportPath docs\demo-run-report.txt
 
 param(
-    [string]$ReportPath = ""
+    [string]$ReportPath = "",
+    [ValidateSet("default", "startrans")]
+    [string]$Profile = "default"
 )
+
+$HeroProductA = if ($Profile -eq "startrans") { "Distribution Transformer" } else { "Widget A" }
+$HeroProductB = if ($Profile -eq "startrans") { "Pad-Mount" } else { "Gadget B" }
+$MoPrefix = if ($Profile -eq "startrans") { "MO-ST" } else { "MO-DEMO" }
 
 $ErrorActionPreference = "Continue"
 $Base = "http://localhost:8000"
@@ -104,14 +110,18 @@ Test-Checkpoint "3. Resolution Center - scenarios (demo MOs)" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/resolution/scenarios" -Headers $h -TimeoutSec 60
     $scenarios = $r.data.scenarios
     if ($scenarios.Count -lt 8) { return $false }
-    "$($scenarios.Count) scenarios loaded (includes MO-DEMO expedite/overtime/split)"
+    "$($scenarios.Count) scenarios loaded (includes $MoPrefix expedite/overtime/split)"
 } -UiPath "/planning/resolution"
 
 Test-Checkpoint "4. Schedule - OR-Tools Gantt data" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ScheduleBody -TimeoutSec 90
     $ops = $r.data.total_operations
     if ($ops -lt 1) { return $false }
-    "$ops scheduled operations across Assembly, Machining, Packaging"
+    if ($Profile -eq "startrans") {
+        "$ops scheduled operations across Core & Coil, Winding, Test Bay"
+    } else {
+        "$ops scheduled operations across Assembly, Machining, Packaging"
+    }
 } -UiPath "/planning/schedule"
 
 Test-Checkpoint "5. Shop Floor - active work orders" {
@@ -140,22 +150,30 @@ Test-Checkpoint "7. Executive - delay breakdown" {
 
 Test-Checkpoint "8. Executive - OTD summary" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/analytics/executive-summary" -Headers $h -TimeoutSec 15
-    "OTD trend points: $(@($r.data.otd_trend).Count); completed MO history from MO-DEMO-009/010"
+    "OTD trend points: $(@($r.data.otd_trend).Count); completed MO history from $MoPrefix-009/010"
 } -UiPath "/command-center/executive"
 
 Test-Checkpoint "9. Dashboard alerts (War Room feed)" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/dashboard/alerts" -Headers $h -TimeoutSec 15
     $alerts = $r.data.alerts
     if ($alerts.Count -lt 8) { return $false }
-    "$($alerts.Count) active alerts (MO-DEMO-001 material, MO-DEMO-007 raw material, etc.)"
+    "$($alerts.Count) active alerts ($MoPrefix-001 material, $MoPrefix-007 raw material, etc.)"
 } -UiPath "/command-center/war-room"
 
 Test-Checkpoint "10. Copilot - FG stock query" {
-    $body = '{"query":"What is the current FG stock for Widget A and Gadget B?","stream":false}'
-    $r = Invoke-RestMethod -Uri "$Base/api/v1/copilot/query" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 180
+    $q = if ($Profile -eq "startrans") {
+        '{"query":"What is the current FG stock for Distribution Transformer 500 kVA and Pad-Mount Transformer 250 kVA?","stream":false}'
+    } else {
+        '{"query":"What is the current FG stock for Widget A and Gadget B?","stream":false}'
+    }
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/copilot/query" -Headers $h -Method POST -ContentType "application/json" -Body $q -TimeoutSec 180
     if ($r.data.intent -ne "material_status") { return $false }
-    if ($r.data.response -notmatch "Widget A") { return $false }
-    "intent=$($r.data.intent); Widget A and Gadget B quantities returned"
+    if ($Profile -eq "startrans") {
+        if ($r.data.response -notmatch "500 kVA") { return $false }
+    } elseif ($r.data.response -notmatch $HeroProductA) {
+        return $false
+    }
+    "intent=$($r.data.intent); $HeroProductA and $HeroProductB quantities returned"
 } -UiPath "/ai-governance/copilot"
 
 Test-Checkpoint "11. Copilot - at-risk orders query" {
@@ -351,7 +369,7 @@ Test-Checkpoint "31. Sustainability Dashboard - ESG score and carbon footprint" 
     if ($r.data.esg_score -lt 1) { return $false }
     if ($r.data.carbon_footprint_tco2e -lt 1) { return $false }
     "esg_score=$($r.data.esg_score) carbon_tco2e=$($r.data.carbon_footprint_tco2e)"
-} -UiPath "/command-center/sustainability"
+} -UiPath "/ai-governance/sustainability"
 
 Test-Checkpoint "32. Quality Intelligence - KPIs and defect trends" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/quality-events/dashboard" -Headers $h -TimeoutSec 20
@@ -359,7 +377,7 @@ Test-Checkpoint "32. Quality Intelligence - KPIs and defect trends" {
     if ($r.data.defect_rate_pct -lt 0) { return $false }
     if ($r.data.first_pass_yield_pct -lt 1) { return $false }
     "defect_rate=$($r.data.defect_rate_pct)% fpy=$($r.data.first_pass_yield_pct)% trend=$($r.data.trend)"
-} -UiPath "/command-center/quality"
+} -UiPath "/ai-governance/quality"
 
 Write-DemoLine ""
 Write-DemoLine "=============================================="

@@ -1,18 +1,17 @@
 """
-Secrets management scaffold — supports env vars (current) and vault providers (POST-B).
+Secrets management — env vars (default) and Vault / AWS SM providers.
 
-Providers:
-- env: current behavior, reads from environment variables
-- aws_sm: AWS Secrets Manager
-- hashi_vault: HashiCorp Vault
-
-Activation: SECRETS_PROVIDER=env|aws_sm|hashi_vault
+Activation: SECRETS_PROVIDER=env|hashi_vault|aws_sm
+Vault: VAULT_ENABLED=true, VAULT_ADDR, VAULT_TOKEN
 """
 
 from __future__ import annotations
 
+import logging
 import os
 from abc import ABC, abstractmethod
+
+logger = logging.getLogger(__name__)
 
 
 class SecretsProvider(ABC):
@@ -26,25 +25,41 @@ class EnvSecretsProvider(SecretsProvider):
         return os.getenv(key, default)
 
 
-class AwsSecretsProvider(SecretsProvider):
-    """POST-B: wire boto3 secretsmanager.get_secret_value."""
-
-    def get(self, key: str, default: str | None = None) -> str | None:
-        raise NotImplementedError("AWS Secrets Manager activation required (POST-B)")
-
-
 class HashiVaultSecretsProvider(SecretsProvider):
-    """POST-B: wire hvac client read."""
+    """Reads secrets via ipe_shared.config.vault_loader with env fallback."""
 
     def get(self, key: str, default: str | None = None) -> str | None:
-        raise NotImplementedError("HashiCorp Vault activation required (POST-B)")
+        try:
+            from ipe_shared.vault_loader import resolve_secret
+
+            return resolve_secret(key, default=default)
+        except ImportError:
+            logger.warning("ipe_shared not available; falling back to env for %s", key)
+            return os.getenv(key, default)
+
+
+class AwsSecretsProvider(SecretsProvider):
+    """AWS Secrets Manager — activation via boto3 (POST-B stub)."""
+
+    def get(self, key: str, default: str | None = None) -> str | None:
+        secret_id = os.getenv("AWS_SECRET_ID", key)
+        region = os.getenv("AWS_REGION", "us-east-1")
+        try:
+            import boto3
+
+            client = boto3.client("secretsmanager", region_name=region)
+            resp = client.get_secret_value(SecretId=secret_id)
+            return resp.get("SecretString", default)
+        except Exception as exc:
+            logger.debug("AWS SM read failed for %s: %s", secret_id, exc)
+            return os.getenv(key, default)
 
 
 def get_secrets_provider() -> SecretsProvider:
     provider = os.getenv("SECRETS_PROVIDER", "env").lower()
     if provider == "aws_sm":
         return AwsSecretsProvider()
-    if provider == "hashi_vault":
+    if provider in {"hashi_vault", "vault"}:
         return HashiVaultSecretsProvider()
     return EnvSecretsProvider()
 

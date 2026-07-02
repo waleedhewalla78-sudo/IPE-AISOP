@@ -1,0 +1,4 @@
+WC_CODE,NAME,CAPACITY_HRS,OEE,COST_PER_HR,STATUS
+WC001,Core & Coil Assembly,16.0,0.92,75.00,operational
+WC002,Winding Station,8.0,0.85,120.00,operational
+WC003,Tank Fabrication & Test Bay,8.0,0.95,45.00,operational

@@ -1,0 +1,6 @@
+PRODUCT_CODE,NAME,TYPE,UOM,STANDARD_COST,INTERNAL_REF
+PROD001,Distribution Transformer 500 kVA,distribution,unit,15.50,ST-DT-500
+PROD002,Pad-Mount Transformer 250 kVA,pad-mount,unit,42.00,ST-PM-250
+PROD003,Copper Winding Wire,raw-material,unit,3.25,ST-CU-WIRE
+PROD004,Power Transformer 50 MVA Core-Coil,power,unit,89.99,ST-PT-50M
+PROD005,CRGO Electrical Steel,raw-material,kg,1.10,ST-CRGO

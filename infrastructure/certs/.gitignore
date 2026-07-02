@@ -1,0 +1,5 @@
+# Dev TLS material — generate via scripts/generate-dev-certs.sh
+*.key
+*.crt
+*.pem
+!*.example
