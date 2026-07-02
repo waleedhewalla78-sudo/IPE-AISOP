@@ -1,55 +1,33 @@
 {
 
-  "feature_directory": "specs/005-ipe-program-status",
+  "feature_directory": "specs/015-enterprise-production-readiness",
 
-  "active_implementation": "specs/004-ai-first-v6",
+  "active_implementation": "specs/014-release2-growth",
 
-  "active_plan": "specs/005-ipe-program-status/plan.md",
+  "active_plan": "specs/015-enterprise-production-readiness/plan.md",
 
-  "readiness_score": 100,
+  "readiness_score": 82,
 
-  "speckit_built": "162/162",
+  "readiness_note": "014 R2 implement complete pending demo verification; 015 enterprise program specified",
 
-  "live_demo_score": "20/20",
+  "release_target": "v10.0.0-enterprise",
 
-  "chaos_score": "6/6",
+  "phase": "015-enterprise-production-readiness",
 
-  "audit_score_baseline": 74,
+  "customer": "Star Trans — Electrical Transformer Technology",
 
-  "audit_score_target": 100,
+  "prior_phase": "specs/014-release2-growth",
 
-  "audit_score_estimate": 95,
+  "platform_release": "v8.2.0",
 
-  "release_target": "v7.0.0",
+  "last_speckit_run": "2026-06-24-full-pipeline",
 
-  "git_status": "tags v1.0.0, v6.0.0, v6.0.1, v6.1.0",
+  "speckit_phases_complete": ["constitution", "specify", "clarify", "analyze", "plan", "tasks", "taskstoissues", "implement-partial-014"],
 
-  "T055_status": "Complete — v6.0.0 tagged on a203e68",
+  "speckit_phases_pending": ["implement-015-phase0", "converge", "uat"],
 
-  "T053_status": "Cancelled — superseded by v1.0.0 + v6.x",
+  "speckit_artifacts_version": "2.3",
 
-  "audit_fixes_committed": "C-01 through SEC-05; Wave 3 complete",
-
-  "phase": "v7-completion",
-
-  "last_speckit_run": "2026-06-26",
-
-  "speckit_phases_complete": ["specify", "clarify", "analyze", "plan", "tasks", "converge", "implement-2d", "implement-w3", "gap-analysis-p5"],
-
-  "active_implementation_phase": "v7.0.0 completion (P6–P12)",
-
-  "rel_prod_waves": {
-
-    "2A_k6": "complete",
-
-    "2B_chaos": "complete",
-
-    "2C_coverage": "complete",
-
-    "2D_ops": "complete",
-
-    "3_w3": "complete"
-
-  }
+  "constitution_version": "1.1.0"
 
 }

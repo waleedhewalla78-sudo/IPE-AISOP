@@ -15,6 +15,7 @@ from ipe_shared.observability.middleware import (
     CorrelationIdMiddleware,
     RequestLoggingMiddleware,
 )
+from ipe_shared.middleware.audit_request import AuditRequestMiddleware
 
 logger = logging.getLogger("ipe")
 
@@ -50,6 +51,9 @@ def setup_observability(app, service_name: str | None = None) -> None:
 
     app.add_middleware(CorrelationIdMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
+    if settings.AUDIT_REQUEST_MIDDLEWARE:
+        app.add_middleware(AuditRequestMiddleware)
+        logger.info("Audit request middleware enabled for service=%s", name)
 
     setup_metrics(app, service_name=name)
 

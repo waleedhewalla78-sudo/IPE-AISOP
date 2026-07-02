@@ -1,0 +1,5 @@
+PLAN_CODE,PLAN_NAME,MO_ID,OPERATION_SEQUENCE,OPERATION_NAME,WORK_CENTER_CODE,START_HOUR,DURATION_HOURS,STATUS,NOTES
+PLAN-STARTRANS-W12,Star Trans Week 12 Production,MO-ST-001,10,Wind LV/HV Coils,WC002,0,1.5,planned,Copper expedite lane
+PLAN-STARTRANS-W12,Star Trans Week 12 Production,MO-ST-001,20,Core & Coil Assembly,WC001,1.5,2,planned,Great Lakes Utility order
+PLAN-STARTRANS-W12,Star Trans Week 12 Production,MO-ST-001,30,Tank Fit-Up & Vacuum Test,WC003,3.5,0.75,planned,FPY checkpoint
+PLAN-STARTRANS-W12,Star Trans Week 12 Production,MO-ST-005,10,Fabricate Pad-Mount Tank,WC002,2.5,2.5,frozen,Pad-mount batch

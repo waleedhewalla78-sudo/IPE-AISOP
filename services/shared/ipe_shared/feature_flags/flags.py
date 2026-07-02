@@ -130,12 +130,12 @@ IPE_FEATURE_FLAGS: list[FeatureFlag] = [
         }],
     ),
     FeatureFlag(
-        name="ipe.ui.ai_trust",
-        enabled=True,
-        description="AI Trust Dashboard",
+        name="ipe.odoo.resolution_writeback",
+        enabled=False,
+        description="Post Odoo chatter / draft PO when a resolution scenario is approved",
         strategies=[{
             "name": "default",
-            "parameters": {"enabled": "true"},
+            "parameters": {"enabled": "false"},
         }],
     ),
 ]

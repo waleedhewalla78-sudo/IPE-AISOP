@@ -1,0 +1,21 @@
+﻿=== Release 1 Integration Demo ===
+2026-06-30 14:25:23
+Stack: 8 services + res-svc + Odoo 19 live
+
+[PASS] 1. IPE login - JWT for Ahmed@nour
+[PASS] 2. Odoo connection test - Odoo uid=2 v19.0-20260629
+[PASS] 3. Save Odoo config (vault) - password_set=True
+[PASS] 4. Full Odoo -> CDM sync - products updated=70 MOs updated=2 rescored=2
+[PASS] 5. Sync status audit - last_sync=2026-06-30T11:25:28.146817+00:00
+[PASS] 6. Data quality flags - flags=0
+[PASS] 7. Feasibility queue (Control Tower) - 12 MOs; lowest score=45.0 constraint=material_shortage
+[PASS] 8. Feasibility KPIs - at_risk=1 avg=76.2
+[PASS] 9. Resolution scenarios - 16 scenarios (MO-ST expedite/overtime/split)
+[PASS] 10. OR-Tools schedule (cap-svc) - 8 ops scheduled
+[PASS] 11. Schedule approve -> Odoo activate - activated=2 erp_mode=direct
+[PASS] 12. OTD baseline API - baseline captured=False
+[PASS] 13. ROI metrics API - mos_saved=
+
+=== RESULT: 13 PASS, 0 FAIL, 0 SKIP ===
+UI: http://localhost:8082/login (Ahmed@nour / admin)
+Release profile: release1 (Control Tower, Resolution, Admin Odoo tab)

@@ -1,8 +1,8 @@
-# Demo / REL-STACK overlay — minimal services for run-full-demo.ps1 (20 checkpoints).
+# Demo / REL-STACK overlay — minimal services for run-full-demo.ps1 (32 checkpoints).
 # Usage: docker compose -f docker-compose.yml -f docker-compose.demo.yml up -d ...
 #
-# Skips: ollama, airflow, keycloak, mlflow, jaeger, otel-collector, sustain, quality, ml-svc
-
+# Skips: ollama, airflow, keycloak, mlflow, jaeger, otel-collector, ml-svc
+# sustain-svc included for CP31 (sustainability dashboard)
 x-demo-otel-off: &demo-otel-off
   OTEL_TRACING_ENABLED: "false"
   OTEL_LOGGING_ENABLED: "false"
@@ -39,7 +39,7 @@ services:
   nlp-svc:
     environment:
       <<: *demo-otel-off
-      OLLAMA_ENDPOINT_URL: ""
+      IPE_OLLAMA_ENDPOINT_URL: ""
       IPE_LLM_ROUTING_ENABLED: "false"
     depends_on: !reset
       db:
@@ -75,6 +75,10 @@ services:
     environment:
       <<: *demo-otel-off
 
+  sustain-svc:
+    environment:
+      <<: *demo-otel-off
+
   kong:
     depends_on:
       dpe-svc:
@@ -98,4 +102,6 @@ services:
       scn-svc:
         condition: service_started
       network-svc:
+        condition: service_started
+      sustain-svc:
         condition: service_started

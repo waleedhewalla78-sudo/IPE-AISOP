@@ -4,8 +4,14 @@
 # Optional: .\scripts\run-full-demo.ps1 -ReportPath docs\demo-run-report.txt
 
 param(
-    [string]$ReportPath = ""
+    [string]$ReportPath = "",
+    [ValidateSet("default", "startrans")]
+    [string]$Profile = "default"
 )
+
+$HeroProductA = if ($Profile -eq "startrans") { "Distribution Transformer" } else { "Widget A" }
+$HeroProductB = if ($Profile -eq "startrans") { "Pad-Mount" } else { "Gadget B" }
+$MoPrefix = if ($Profile -eq "startrans") { "MO-ST" } else { "MO-DEMO" }
 
 $ErrorActionPreference = "Continue"
 $Base = "http://localhost:8000"
@@ -93,26 +99,30 @@ Test-Checkpoint "1. Control Tower - feasibility queue (10 MOs)" {
     if ($count -lt 10) { return $false }
     $worst = ($r.data | Sort-Object feasibility_score | Select-Object -First 1)
     "$count MOs; lowest score $($worst.feasibility_score) constraint $($worst.primary_constraint)"
-} -UiPath "/control-tower"
+} -UiPath "/planning/control-tower"
 
 Test-Checkpoint "2. Control Tower - KPIs" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/feasibility/kpis" -Headers $h -TimeoutSec 15
     "avg feasibility $($r.data.avg_feasibility_score), orders at risk $($r.data.orders_at_risk)"
-} -UiPath "/control-tower"
+} -UiPath "/planning/control-tower"
 
 Test-Checkpoint "3. Resolution Center - scenarios (demo MOs)" {
-    $r = Invoke-RestMethod -Uri "$Base/api/v1/resolution/scenarios" -Headers $h -TimeoutSec 15
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/resolution/scenarios" -Headers $h -TimeoutSec 60
     $scenarios = $r.data.scenarios
     if ($scenarios.Count -lt 8) { return $false }
-    "$($scenarios.Count) scenarios loaded (includes MO-DEMO expedite/overtime/split)"
-} -UiPath "/resolution-center"
+    "$($scenarios.Count) scenarios loaded (includes $MoPrefix expedite/overtime/split)"
+} -UiPath "/planning/resolution"
 
 Test-Checkpoint "4. Schedule - OR-Tools Gantt data" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ScheduleBody -TimeoutSec 90
     $ops = $r.data.total_operations
     if ($ops -lt 1) { return $false }
-    "$ops scheduled operations across Assembly, Machining, Packaging"
-} -UiPath "/schedule"
+    if ($Profile -eq "startrans") {
+        "$ops scheduled operations across Core & Coil, Winding, Test Bay"
+    } else {
+        "$ops scheduled operations across Assembly, Machining, Packaging"
+    }
+} -UiPath "/planning/schedule"
 
 Test-Checkpoint "5. Shop Floor - active work orders" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/shop-floor/items" -Headers $h -TimeoutSec 15
@@ -126,7 +136,7 @@ Test-Checkpoint "6. SCN Portal - supplier scorecards" {
     if ($r.suppliers.Count -lt 3) { return $false }
     $parts = ($r.suppliers | ForEach-Object { "$($_.name) $($_.score)%" }) -join ", "
     $parts
-} -UiPath "/scn-portal"
+} -UiPath "/supply-chain/scn-portal"
 
 Write-DemoLine ""
 Write-DemoLine "--- Analytics and Intelligence ---"
@@ -136,49 +146,57 @@ Test-Checkpoint "7. Executive - delay breakdown" {
     $count = @($r.data).Count
     if ($count -lt 1) { return $false }
     "$count delay categories (material, capacity, labor, supplier, quality)"
-} -UiPath "/executive"
+} -UiPath "/command-center/executive"
 
 Test-Checkpoint "8. Executive - OTD summary" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/analytics/executive-summary" -Headers $h -TimeoutSec 15
-    "OTD trend points: $(@($r.data.otd_trend).Count); completed MO history from MO-DEMO-009/010"
-} -UiPath "/executive"
+    "OTD trend points: $(@($r.data.otd_trend).Count); completed MO history from $MoPrefix-009/010"
+} -UiPath "/command-center/executive"
 
 Test-Checkpoint "9. Dashboard alerts (War Room feed)" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/dashboard/alerts" -Headers $h -TimeoutSec 15
     $alerts = $r.data.alerts
     if ($alerts.Count -lt 8) { return $false }
-    "$($alerts.Count) active alerts (MO-DEMO-001 material, MO-DEMO-007 raw material, etc.)"
-} -UiPath "/war-room"
+    "$($alerts.Count) active alerts ($MoPrefix-001 material, $MoPrefix-007 raw material, etc.)"
+} -UiPath "/command-center/war-room"
 
 Test-Checkpoint "10. Copilot - FG stock query" {
-    $body = '{"query":"What is the current FG stock for Widget A and Gadget B?","stream":false}'
-    $r = Invoke-RestMethod -Uri "$Base/api/v1/copilot/query" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 30
+    $q = if ($Profile -eq "startrans") {
+        '{"query":"What is the current FG stock for Distribution Transformer 500 kVA and Pad-Mount Transformer 250 kVA?","stream":false}'
+    } else {
+        '{"query":"What is the current FG stock for Widget A and Gadget B?","stream":false}'
+    }
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/copilot/query" -Headers $h -Method POST -ContentType "application/json" -Body $q -TimeoutSec 180
     if ($r.data.intent -ne "material_status") { return $false }
-    if ($r.data.response -notmatch "Widget A") { return $false }
-    "intent=$($r.data.intent); Widget A and Gadget B quantities returned"
-} -UiPath "/copilot"
+    if ($Profile -eq "startrans") {
+        if ($r.data.response -notmatch "500 kVA") { return $false }
+    } elseif ($r.data.response -notmatch $HeroProductA) {
+        return $false
+    }
+    "intent=$($r.data.intent); $HeroProductA and $HeroProductB quantities returned"
+} -UiPath "/ai-governance/copilot"
 
 Test-Checkpoint "11. Copilot - at-risk orders query" {
     $body = '{"query":"Which manufacturing orders are at risk this week?","stream":false}'
-    $r = Invoke-RestMethod -Uri "$Base/api/v1/copilot/query" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 30
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/copilot/query" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 180
     if ($r.data.intent -ne "feasibility_check") { return $false }
     "intent=$($r.data.intent); feasibility queue summarized"
-} -UiPath "/copilot"
+} -UiPath "/ai-governance/copilot"
 
 Test-Checkpoint "12. AI Trust - scores" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/ai-trust/scores" -Headers $h -TimeoutSec 15
     "trust metrics loaded"
-} -UiPath "/ai-trust"
+} -UiPath "/ai-governance/ai-trust"
 
 Test-Checkpoint "13. Admin - tenant config" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/admin/config" -Headers $h -TimeoutSec 15
     "autonomy mode: $($r.data.autonomy_mode)"
-} -UiPath "/admin"
+} -UiPath "/platform/admin"
 
 Test-Checkpoint "14. Inventory summary (master data)" {
     $r = Invoke-RestMethod -Uri "$Base/api/v1/material/inventory-summary" -Headers $h -TimeoutSec 15
     "$($r.data.total_products) finished goods with on-hand quantities"
-} -UiPath "/copilot"
+} -UiPath "/ai-governance/copilot"
 
 Test-Checkpoint "15. Schedule - persist after approve" {
     $sched = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule" -Headers $h -Method POST -ContentType "application/json" -Body $ApproveScheduleBody -TimeoutSec 90
@@ -190,7 +208,7 @@ Test-Checkpoint "15. Schedule - persist after approve" {
     $persisted = @($active.data.rows | Where-Object { $_.approved -eq $true })
     if ($persisted.Count -lt 1) { return $false }
     "approved $($approved.data.activated_count) MO(s); $($persisted.Count) persisted in active schedule$(if ($approved.data.erp_event_published -eq $false) { '; ERP sync deferred' } else { '' })"
-} -UiPath "/schedule"
+} -UiPath "/planning/schedule"
 
 Test-Checkpoint "17. V6-R1 - margin-aware priority ordering" {
     $margin = Invoke-RestMethod -Uri "$Base/api/v1/demand/priority/margin-aware" -Headers $h -TimeoutSec 20
@@ -205,7 +223,7 @@ Test-Checkpoint "17. V6-R1 - margin-aware priority ordering" {
     $total = [double]$breakdown.total_usd
     if ($total -lt 0) { return $false }
     "top MO margin score=$($top.margin_adjusted_score); activity total_usd=$total"
-} -UiPath "/schedule"
+} -UiPath "/planning/schedule"
 
 Test-Checkpoint "18. V6-R2 - tariff shock + substitute draft" {
     $body = '{"region":"Region_X","tariff_delta_pct":25.0,"margin_threshold_pct":15.0}'
@@ -214,7 +232,7 @@ Test-Checkpoint "18. V6-R2 - tariff shock + substitute draft" {
     $drafts = @($shock.data.substitute_drafts)
     if ($drafts.Count -lt 1) { return $false }
     "affected=$($shock.data.affected_mo_count); drafts=$($drafts.Count)"
-} -UiPath "/tariff"
+} -UiPath "/supply-chain/tariff"
 
 Test-Checkpoint "19. V6-R3 - CPM cascade under 2s" {
     $active = Invoke-RestMethod -Uri "$Base/api/v1/capacity/schedule/active" -Headers $h -TimeoutSec 20
@@ -243,7 +261,7 @@ Test-Checkpoint "19. V6-R3 - CPM cascade under 2s" {
     if ([int]$cascade.data.cascade_ms -gt 2000) { return $false }
     if (@($cascade.data.operations).Count -lt 1) { return $false }
     "cascade_ms=$($cascade.data.cascade_ms); critical_path=$($cascade.data.critical_path_ids.Count) ops"
-} -UiPath "/schedule"
+} -UiPath "/planning/schedule"
 
 Test-Checkpoint "20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room" {
     $telBody = '{"machine_id":"WC002","rul_hours":36,"vibration_rms":2.1}'
@@ -256,7 +274,110 @@ Test-Checkpoint "20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room
     $options = @($recovery.data.recovery_options)
     if ($options.Count -lt 1) { return $false }
     "maintenance block OK; chaos categories=$($cats.Count); recovery options=$($options.Count)"
-} -UiPath "/war-room"
+} -UiPath "/command-center/war-room"
+
+Write-DemoLine ""
+Write-DemoLine "--- v8 Phase 1-3 (SAP Gap Upgrade) ---"
+
+Test-Checkpoint "21. Demand Dashboard - forecast API" {
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/demand/forecast?horizon=short" -Headers $h -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    "forecast rows: $(@($r.data.forecasts).Count)"
+} -UiPath "/planning/demand"
+
+Test-Checkpoint "22. Demand - run sense cycle" {
+    $body = '{"horizon":"short","periods":7}'
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/demand/sense" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 30
+    if (-not $r.success) { return $false }
+    "forecasts_created=$($r.data.forecasts_created)"
+} -UiPath "/planning/demand"
+
+Test-Checkpoint "23. Scenario - create sandbox" {
+    $name = "Demo-$(Get-Date -Format 'HHmmss')"
+    $body = (@{ name = $name; description = "v8 demo scenario" } | ConvertTo-Json -Compress)
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/scenario" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    $script:v8ScenarioId = $r.data.scenario_id
+    "scenario_id=$($r.data.scenario_id)"
+} -UiPath "/planning/scenarios"
+
+Test-Checkpoint "24. Scenario - simulate KPIs" {
+    if (-not $script:v8ScenarioId) { return $false }
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/scenario/$($script:v8ScenarioId)/simulate" -Headers $h -Method POST -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    "KPI keys: $(@($r.data.kpis.PSObject.Properties.Name).Count)"
+} -UiPath "/planning/scenarios"
+
+Test-Checkpoint "25. Supply - network visibility" {
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/supply/network" -Headers $h -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    if (@($r.data.facilities).Count -lt 4) { return $false }
+    "facilities=$(@($r.data.facilities).Count) lanes=$(@($r.data.lanes).Count)"
+} -UiPath "/supply-chain/supply-planning"
+
+Test-Checkpoint "26. Orders - create customer order" {
+    $inv = Invoke-RestMethod -Uri "$Base/api/v1/material/inventory-summary" -Headers $h -TimeoutSec 20
+    $productId = $inv.data.items[0].product_id
+    if (-not $productId) { return $false }
+    $body = (@{ lines = @(@{ product_id = $productId; quantity = 2; unit_price = 10 }) } | ConvertTo-Json -Compress)
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/orders" -Headers $h -Method POST -ContentType "application/json" -Body $body -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    $script:v8OrderId = $r.data.order_id
+    "$($r.data.order_number) total=$($r.data.total_value)"
+} -UiPath "/supply-chain/orders"
+
+Test-Checkpoint "27. Equipment - fleet health" {
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/equipment" -Headers $h -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    $eq = @($r.data.equipment)
+    if ($eq.Count -lt 1) { return $false }
+    "equipment count=$($eq.Count) top health=$($eq[0].health_score)"
+} -UiPath "/command-center/equipment"
+
+Test-Checkpoint "28. Design AI - material catalog" {
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/materials" -Headers $h -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    if ($r.data.count -lt 1) { return $false }
+    "$($r.data.count) engineering materials"
+} -UiPath "/ai-governance/design-ai"
+
+Test-Checkpoint "29. Procurement - suppliers and spend" {
+    $sup = Invoke-RestMethod -Uri "$Base/api/v1/suppliers" -Headers $h -TimeoutSec 20
+    $spend = Invoke-RestMethod -Uri "$Base/api/v1/procurement/spend" -Headers $h -TimeoutSec 20
+    if (-not $spend.success) { return $false }
+    "suppliers=$(@($sup.data.suppliers).Count) spend_total=$($spend.data.summary.total)"
+} -UiPath "/supply-chain/procurement"
+
+Test-Checkpoint "30. Copilot - role agents and session" {
+    $agents = Invoke-RestMethod -Uri "$Base/api/v1/copilot/agents" -Headers $h -TimeoutSec 20
+    if (-not $agents.success) { return $false }
+    $roles = @($agents.data.agents | ForEach-Object { $_.role })
+    if ($roles -notcontains "planner") { return $false }
+    $sessBody = '{"role":"planner"}'
+    $sess = Invoke-RestMethod -Uri "$Base/api/v1/copilot/session" -Headers $h -Method POST -ContentType "application/json" -Body $sessBody -TimeoutSec 20
+    if (-not $sess.success) { return $false }
+    if ($sess.data.role -ne "planner") { return $false }
+    "agents=$($roles.Count) session=$($sess.data.session_id)"
+} -UiPath "/ai-governance/copilot"
+
+Write-DemoLine ""
+Write-DemoLine "--- v7 Extended Validation (Sustain + Quality) ---"
+
+Test-Checkpoint "31. Sustainability Dashboard - ESG score and carbon footprint" {
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/sustainability/dashboard" -Headers $h -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    if ($r.data.esg_score -lt 1) { return $false }
+    if ($r.data.carbon_footprint_tco2e -lt 1) { return $false }
+    "esg_score=$($r.data.esg_score) carbon_tco2e=$($r.data.carbon_footprint_tco2e)"
+} -UiPath "/ai-governance/sustainability"
+
+Test-Checkpoint "32. Quality Intelligence - KPIs and defect trends" {
+    $r = Invoke-RestMethod -Uri "$Base/api/v1/quality-events/dashboard" -Headers $h -TimeoutSec 20
+    if (-not $r.success) { return $false }
+    if ($r.data.defect_rate_pct -lt 0) { return $false }
+    if ($r.data.first_pass_yield_pct -lt 1) { return $false }
+    "defect_rate=$($r.data.defect_rate_pct)% fpy=$($r.data.first_pass_yield_pct)% trend=$($r.data.trend)"
+} -UiPath "/ai-governance/quality"
 
 Write-DemoLine ""
 Write-DemoLine "=============================================="

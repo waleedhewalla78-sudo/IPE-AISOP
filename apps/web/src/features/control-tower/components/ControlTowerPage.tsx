@@ -6,7 +6,11 @@ import { Table, TableHead, TableRow, TableHeader, TableCell } from '@/components
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { TariffShockPanel } from '@/features/tariff/components/TariffShockPanel';
+import { SyncStatusBar } from './SyncStatusBar';
+import { PlannerAssistPanel } from './PlannerAssistPanel';
 import { ROUTES } from '@/lib/constants';
+import { IS_RELEASE1 } from '@/lib/releaseProfile';
+import { t } from '@/lib/i18n';
 import { fetchQueue, fetchKPIs, getMockBottlenecks } from '../api';
 import { FeasibilityWebSocket } from '@/lib/ws';
 import type { MOQueueItem, KPI, BottleneckItem } from '../types';
@@ -163,6 +167,10 @@ export function ControlTowerPage() {
         )}
       </div>
 
+      {IS_RELEASE1 ? <SyncStatusBar /> : null}
+
+      <PlannerAssistPanel />
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card>
@@ -190,17 +198,31 @@ export function ControlTowerPage() {
               <tbody>
                 {queue.map((item) => (
                   <TableRow key={item.mo_id} className={rowBg(item.feasibility_score)}>
-                    <TableCell className="font-medium">{item.mo_id}</TableCell>
+                    <TableCell className="font-medium">
+                      <span>{item.erp_mo_id ?? item.mo_id.slice(0, 8)}</span>
+                      {(item.sync_conflict ||
+                        item.data_quality_flags?.some((f) => f.flag_code === 'SYNC_CONFLICT')) && (
+                        <Badge variant="warning" className="ml-2" title={JSON.stringify(item.sync_conflict ?? {})}>
+                          {t('controlTower.syncConflict')}
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{item.product_name}</TableCell>
                     <TableCell>{item.customer_name}</TableCell>
                     <TableCell>{new Date(item.required_date).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      <span className={`font-semibold ${scoreColor(item.feasibility_score)}`}>
-                        {item.feasibility_score !== null ? item.feasibility_score : '-'}
-                      </span>
-                      <Badge variant={scoreBadge(item.feasibility_score)} className="ml-2">
-                        {scoreLabel(item.feasibility_score)}
-                      </Badge>
+                      {item.unscorable || (item.feasibility_score === null && item.data_quality_flags?.length) ? (
+                        <Badge variant="warning">{t('controlTower.unscorable')}</Badge>
+                      ) : (
+                        <>
+                          <span className={`font-semibold ${scoreColor(item.feasibility_score)}`}>
+                            {item.feasibility_score !== null ? item.feasibility_score : '-'}
+                          </span>
+                          <Badge variant={scoreBadge(item.feasibility_score)} className="ml-2">
+                            {scoreLabel(item.feasibility_score)}
+                          </Badge>
+                        </>
+                      )}
                     </TableCell>
                     <TableCell>
                       {item.primary_constraint ? (
@@ -213,7 +235,9 @@ export function ControlTowerPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button size="sm" variant="secondary" onClick={() => navigate(`/resolution-center?mo_id=${item.mo_id}`)}>Resolve</Button>
+                      <Button size="sm" variant="secondary" onClick={() => navigate(`${ROUTES.PLANNING_RESOLUTION}?mo_id=${item.mo_id}`)}>
+                        {t('controlTower.resolve')}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -264,7 +288,7 @@ export function ControlTowerPage() {
           <Card>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="font-medium">Tariff Shock</h3>
-              <Button size="sm" variant="ghost" onClick={() => navigate(ROUTES.TARIFF)}>
+              <Button size="sm" variant="ghost" onClick={() => navigate(ROUTES.SUPPLY_TARIFF)}>
                 Full view →
               </Button>
             </div>

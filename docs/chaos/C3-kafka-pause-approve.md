@@ -1,5 +1,5 @@
 ﻿### C3: Kafka pause during schedule approve
-Start: 2026-06-26 16:54:58
+Start: 2026-06-27 00:37:20
 
 - approve HTTP: 200
 - activated_count: 2
@@ -8,4 +8,4 @@ Start: 2026-06-26 16:54:58
 - cap-svc log match ERP publish failure: no
 
 Result: PASS - CDM persist with deferred ERP event
-End: 2026-06-26 16:55:16
+End: 2026-06-27 00:37:38

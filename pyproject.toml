@@ -20,6 +20,13 @@ members = [
     "services/quality-svc",
     "services/scn-svc",
     "services/network-svc",
+    "services/demand-svc",
+    "services/scenario-svc",
+    "services/supply-svc",
+    "services/order-svc",
+    "services/equipment-svc",
+    "services/material-svc",
+    "services/procurement-svc",
     "services/shared",
 ]
 

@@ -24,10 +24,15 @@ PLACEHOLDER_VALUES = {
 
 REQUIRED_VARS: list[str] = [
     "DATABASE_URL",
-    "JWT_SECRET_KEY",
-    "KAFKA_BOOTSTRAP_SERVERS",
     "REDIS_URL",
 ]
+
+OPTIONAL_RECOMMENDED: dict[str, str] = {
+    "VAULT_ADDR": "HashiCorp Vault address",
+    "KEYCLOAK_URL": "Keycloak URL (if AUTH_MODE=keycloak)",
+    "KAFKA_BOOTSTRAP_SERVERS": "Kafka brokers (for event-driven features)",
+    "JWT_PUBLIC_KEY_PATH": "Path to RS256 public key (or set IPE_JWT_SIGNING_MODE=hs256 for dev)",
+}
 
 OPTIONAL_WITH_DEFAULTS: dict[str, str] = {
     "ANTHROPIC_API_KEY": "sk-ant-placeholder",
@@ -149,6 +154,27 @@ def validate_config() -> ConfigReport:
             value_preview=_preview(val),
         ))
 
+    _validate_jwt_keys(report)
+
+    for var, desc in OPTIONAL_RECOMMENDED.items():
+        val = _resolve_key(var)
+        if val is None:
+            if var == "JWT_PUBLIC_KEY_PATH" and _hs256_mode():
+                continue
+            report.optional.append(VarReport(
+                name=var,
+                status=VarStatus.WARNING,
+                value_preview="",
+                message=desc,
+            ))
+            logger.warning("[CONFIG] Recommended var not set: %s — %s", var, desc)
+            continue
+        report.optional.append(VarReport(
+            name=var,
+            status=VarStatus.OK,
+            value_preview=_preview(val),
+        ))
+
     for var, default in OPTIONAL_WITH_DEFAULTS.items():
         val = _resolve_key(var)
         if val is None:
@@ -186,3 +212,53 @@ def validate_config() -> ConfigReport:
 
     logger.info("Configuration validation complete. All OK=%s", report.all_ok)
     return report
+
+
+def _hs256_mode() -> bool:
+    mode = (_resolve_key("JWT_SIGNING_MODE") or "rs256").lower()
+    return mode in ("hs256", "hs")
+
+
+def _validate_jwt_keys(report: ConfigReport) -> None:
+    if _hs256_mode():
+        return
+    pub = _resolve_key("JWT_PUBLIC_KEY_PATH")
+    if not pub:
+        report.required.append(VarReport(
+            name="JWT_PUBLIC_KEY_PATH",
+            status=VarStatus.MISSING,
+            value_preview="",
+            message="Path to RS256 public key (or set IPE_JWT_SIGNING_MODE=hs256 for dev)",
+        ))
+        report.all_ok = False
+
+
+def validate_config_fatal() -> ConfigReport:
+    """Validate config and exit the process on missing required variables."""
+    import sys
+
+    missing_lines: list[str] = []
+    for var in REQUIRED_VARS:
+        if _resolve_key(var) is None:
+            missing_lines.append(f"  {var} — required connection string")
+
+    if not _hs256_mode() and not _resolve_key("JWT_PUBLIC_KEY_PATH"):
+        missing_lines.append(
+            "  JWT_PUBLIC_KEY_PATH — Path to RS256 public key (or set IPE_JWT_SIGNING_MODE=hs256)"
+        )
+
+    if missing_lines:
+        print("[CONFIG] FATAL: Missing required environment variables:\n" + "\n".join(missing_lines))
+        sys.exit(1)
+
+    for var, desc in OPTIONAL_RECOMMENDED.items():
+        if var == "JWT_PUBLIC_KEY_PATH" and _hs256_mode():
+            continue
+        if not _resolve_key(var):
+            print(f"[CONFIG] WARNING: Recommended var not set: {var} — {desc}")
+
+    try:
+        return validate_config()
+    except ValueError as exc:
+        print(f"[CONFIG] FATAL: {exc}")
+        sys.exit(1)

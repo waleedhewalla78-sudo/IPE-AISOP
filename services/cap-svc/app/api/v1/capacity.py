@@ -169,7 +169,7 @@ async def schedule_production(
     if not tenant_id:
         return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
 
-    mdr_quality_threshold = 70
+    mdr_quality_threshold = settings.MDR_QUALITY_GATE_THRESHOLD
     mdr_headers = {"X-Tenant-ID": tenant_id}
     if auth := request.headers.get("Authorization"):
         mdr_headers["Authorization"] = auth
@@ -181,7 +181,10 @@ async def schedule_production(
             )
             if mdr_resp.status_code == 200:
                 mdr_data = mdr_resp.json().get("data", {})
-                quality_score = mdr_data.get("overall_score", mdr_data.get("readiness_score"))
+                quality_score = mdr_data.get(
+                    "composite_score",
+                    mdr_data.get("overall_score", mdr_data.get("readiness_score")),
+                )
                 if mdr_data and not mdr_data.get("ai_scheduling_allowed", True):
                     logger.warning(
                         "MDR quality gate failed: score=%s threshold=%s",

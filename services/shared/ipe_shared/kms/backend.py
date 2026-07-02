@@ -172,11 +172,12 @@ class AWSKMSBackend(KMSBackend):
 
 def get_kms_backend() -> KMSBackend:
     """Get KMS backend: AWS if configured, else local."""
+    key_dir = os.getenv("IPE_KMS_KEY_DIR", ".kms_keys")
     try:
         return AWSKMSBackend()
     except Exception:
-        logger.info("Using local KMS backend for development")
-        return LocalKMSBackend()
+        logger.info("Using local KMS backend for development (dir=%s)", key_dir)
+        return LocalKMSBackend(key_dir=key_dir)
 
 
 _kms_backend: KMSBackend | None = None

@@ -121,3 +121,27 @@ async def test_executive_summary_no_tenant():
     body = resp.json()
     assert body["success"] is False
     assert body["error"]["code"] == "NO_TENANT"
+
+
+@pytest.mark.asyncio
+async def test_otd_baseline_no_tenant():
+    app = _build_app()
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        resp = await client.get("/api/v1/analytics/otd-baseline")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["success"] is False
+    assert body["error"]["code"] == "NO_TENANT"
+
+
+@pytest.mark.asyncio
+async def test_roi_metrics_no_tenant():
+    app = _build_app()
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        resp = await client.get("/api/v1/analytics/roi-metrics")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["success"] is False
+    assert body["error"]["code"] == "NO_TENANT"

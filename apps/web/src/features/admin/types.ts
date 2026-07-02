@@ -6,6 +6,16 @@ export interface TenantConfig {
   erp_type: string;
 }
 
+export interface OdooConfig {
+  erp_type?: string;
+  odoo_url: string;
+  odoo_db: string;
+  odoo_username: string;
+  odoo_password?: string;
+  enabled: boolean;
+  password_set?: boolean;
+}
+
 export interface ConfigData {
   priority_weights: Record<string, number>;
   strategic_product_ids: string[];

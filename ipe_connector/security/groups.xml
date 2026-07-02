@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_ipe_api_user" model="res.groups">
+        <field name="name">IPE API User</field>
+        <field name="comment">Access to IPE REST API endpoints (/ipe/api/v1/*)</field>
+    </record>
+</odoo>

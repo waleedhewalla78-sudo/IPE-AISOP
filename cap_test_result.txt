@@ -1,0 +1,1100 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: D:\AISOP\ipe\services\cap-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 194 items
+
+services\cap-svc\tests\test_api_capacity.py ...............              [  7%]
+services\cap-svc\tests\test_api_capacity_extended.py .........           [ 12%]
+services\cap-svc\tests\test_api_labor_extended.py .......                [ 15%]
+services\cap-svc\tests\test_cost_optimized.py .............              [ 22%]
+services\cap-svc\tests\test_green_scheduler.py ...............           [ 30%]
+services\cap-svc\tests\test_iot_health.py ..................             [ 39%]
+services\cap-svc\tests\test_multilevel_bom.py .............              [ 46%]
+services\cap-svc\tests\test_network_optimizer.py .................       [ 55%]
+services\cap-svc\tests\test_ortools_correctness.py ..................... [ 65%]
+.                                                                        [ 66%]
+services\cap-svc\tests\test_scenarios.py ........F                       [ 71%]
+services\cap-svc\tests\test_simulation.py ...                            [ 72%]
+services\cap-svc\tests\test_solver_interface.py ........................ [ 85%]
+............                                                             [ 91%]
+services\cap-svc\tests\test_worker_constraints.py .................      [100%]
+
+================================== FAILURES ===================================
+  + Exception Group Traceback (most recent call last):
+  |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_utils.py", line 85, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "D:\AISOP\ipe\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 811, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\runner.py", line 361, in from_call
+    |     result: TResult | None = func()
+    |                              ~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\runner.py", line 250, in <lambda>
+    |     lambda: runtest_hook(item=item, **kwds),
+    |             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_hooks.py", line 512, in __call__
+    |     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    |     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 167, in _multicall
+    |     raise exception
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\logging.py", line 865, in pytest_runtest_call
+    |     yield
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\capture.py", line 900, in pytest_runtest_call
+    |     return (yield)
+    |             ^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\skipping.py", line 268, in pytest_runtest_call
+    |     return (yield)
+    |             ^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 121, in _multicall
+    |     res = hook_impl.function(*args)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\runner.py", line 184, in pytest_runtest_call
+    |     item.runtest()
+    |     ~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pytest_asyncio\plugin.py", line 569, in runtest
+    |     super().runtest()
+    |     ~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\python.py", line 1707, in runtest
+    |     self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+    |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_hooks.py", line 512, in __call__
+    |     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    |     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 167, in _multicall
+    |     raise exception
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 53, in run_old_style_hookwrapper
+    |     return result.get_result()
+    |            ~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_result.py", line 103, in get_result
+    |     raise exc.with_traceback(tb)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 38, in run_old_style_hookwrapper
+    |     res = yield
+    |           ^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pluggy\_callers.py", line 121, in _multicall
+    |     res = hook_impl.function(*args)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\_pytest\python.py", line 167, in pytest_pyfunc_call
+    |     result = testfunction(**testargs)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\pytest_asyncio\plugin.py", line 905, in inner
+    |     runner.run(coro, context=context)
+    |     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\asyncio\runners.py", line 128, in run
+    |     return self._loop.run_until_complete(task)
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\asyncio\base_events.py", line 719, in run_until_complete
+    |     return future.result()
+    |            ~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\services\cap-svc\tests\test_scenarios.py", line 89, in test_unauthorized_role_returns_403
+    |     response = await client.post(
+    |                ^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1859, in post
+    |     return await self.request(
+    |            ^^^^^^^^^^^^^^^^^^^
+    |     ...<13 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1540, in request
+    |     return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1629, in send
+    |     response = await self._send_handling_auth(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<4 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    |     response = await self._send_handling_redirects(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    |     response = await self._send_single_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    |     response = await transport.handle_async_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_transports\asgi.py", line 170, in handle_async_request
+    |     await self.app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\applications.py", line 1162, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\instrumentation\asgi\__init__.py", line 806, in __call__
+    |     await self.app(scope, otel_receive, otel_send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\instrumentation\fastapi\__init__.py", line 297, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 36, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 37, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 32, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 18, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1620, in _handle_selected
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1629, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1218, in handle
+    |     await app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 466, in app
+    |     solved_result = await solve_dependencies(
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<6 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 672, in solve_dependencies
+    |     solved = await _solve_generator(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 586, in _solve_generator
+    |     return await stack.enter_async_context(cm)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 668, in enter_async_context
+    |     result = await _enter(cm)
+    |              ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    |     return await anext(self.gen)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\database\session.py", line 16, in get_session
+    |     await session.execute(
+    |     ...<2 lines>...
+    |     )
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 448, in execute
+    |     result = await greenlet_spawn(
+    |              ^^^^^^^^^^^^^^^^^^^^^
+    |     ...<6 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    |     result = context.throw(*sys.exc_info())
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2373, in execute
+    |     return self._execute_internal(
+    |            ~~~~~~~~~~~~~~~~~~~~~~^
+    |         statement,
+    |         ^^^^^^^^^^
+    |     ...<4 lines>...
+    |         _add_event=_add_event,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2261, in _execute_internal
+    |     conn = self._connection_for_bind(bind)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2113, in _connection_for_bind
+    |     return trans._connection_for_bind(engine, execution_options)
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "<string>", line 2, in _connection_for_bind
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    |     ret_value = fn(self, *arg, **kw)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1191, in _connection_for_bind
+    |     conn = bind.connect()
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3295, in connect
+    |     return self._connection_cls(self)
+    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 144, in __init__
+    |     self._dbapi_connection = engine.raw_connection()
+    |                              ~~~~~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3319, in raw_connection
+    |     return self.pool.connect()
+    |            ~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 448, in connect
+    |     return _ConnectionFairy._checkout(self)
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1272, in _checkout
+    |     fairy = _ConnectionRecord.checkout(pool)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    |     rec = pool._do_get()
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 178, in _do_get
+    |     with util.safe_reraise():
+    |          ~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 176, in _do_get
+    |     return self._create_connection()
+    |            ~~~~~~~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 389, in _create_connection
+    |     return _ConnectionRecord(self)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    |     self.__connect()
+    |     ~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    |     with util.safe_reraise():
+    |          ~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    |     self.dbapi_connection = connection = pool._invoke_creator(self)
+    |                                          ~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\create.py", line 667, in connect
+    |     return dialect.connect(*cargs_tup, **cparams)
+    |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 630, in connect
+    |     return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 955, in connect
+    |     await_only(creator_fn(*arg, **kw)),
+    |     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    |     return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+    |            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    |     value = await result
+    |             ^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connection.py", line 2443, in connect
+    |     return await connect_utils._connect(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<22 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1218, in _connect
+    |     conn = await _connect_addr(
+    |            ^^^^^^^^^^^^^^^^^^^^
+    |     ...<6 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1054, in _connect_addr
+    |     return await __connect_addr(params, True, *args)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1102, in __connect_addr
+    |     await connected
+    | asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "ipe"
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\AISOP\ipe\services\cap-svc\tests\test_scenarios.py", line 89, in test_unauthorized_role_returns_403
+    response = await client.post(
+               ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1859, in post
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\httpx\_transports\asgi.py", line 170, in handle_async_request
+    await self.app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\applications.py", line 1162, in __call__
+    await super().__call__(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\instrumentation\asgi\__init__.py", line 806, in __call__
+    await self.app(scope, otel_receive, otel_send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\instrumentation\fastapi\__init__.py", line 297, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 36, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 37, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 32, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 18, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1620, in _handle_selected
+    await route.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1629, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1218, in handle
+    await app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 466, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 672, in solve_dependencies
+    solved = await _solve_generator(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 586, in _solve_generator
+    return await stack.enter_async_context(cm)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 668, in enter_async_context
+    result = await _enter(cm)
+             ^^^^^^^^^^^^^^^^
+  File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\database\session.py", line 16, in get_session
+    await session.execute(
+    ...<2 lines>...
+    )
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 448, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2373, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2261, in _execute_internal
+    conn = self._connection_for_bind(bind)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2113, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1191, in _connection_for_bind
+    conn = bind.connect()
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3295, in connect
+    return self._connection_cls(self)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 144, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3319, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 448, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1272, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    rec = pool._do_get()
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 178, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 176, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 389, in _create_connection
+    return _ConnectionRecord(self)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\create.py", line 667, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 955, in connect
+    await_only(creator_fn(*arg, **kw)),
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connection.py", line 2443, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<22 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1218, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1054, in _connect_addr
+    return await __connect_addr(params, True, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1102, in __connect_addr
+    await connected
+asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "ipe"
+
+The above exception was the direct cause of the following exception:
+E   asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "ipe"
+---------------------------- Captured stdout setup ----------------------------
+{"asctime": "2026-06-21T17:20:01+0300", "name": "ipe", "levelname": "INFO", "message": "Structured JSON logging enabled for service=cap-svc", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:01+0300", "name": "ipe", "levelname": "INFO", "message": "OTel tracing enabled, console exporter (default)", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:01+0300", "name": "ipe", "levelname": "INFO", "message": "OTel FastAPI instrumented for service=cap-svc", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:01+0300", "name": "ipe", "levelname": "INFO", "message": "OTel tracing instrumented for service=cap-svc", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:01+0300", "name": "ipe", "levelname": "INFO", "message": "OTel asyncpg instrumented", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:01+0300", "name": "ipe", "levelname": "INFO", "message": "OTel Redis instrumented", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:01+0300", "name": "ipe", "levelname": "INFO", "message": "Observability setup complete for service=cap-svc version=0.1.0", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+----------------------------- Captured log setup ------------------------------
+INFO     ipe:setup.py:32 Structured JSON logging enabled for service=cap-svc
+INFO     ipe:tracing.py:49 OTel tracing enabled, console exporter (default)
+WARNING  opentelemetry.trace:__init__.py:556 Overriding of current TracerProvider is not allowed
+WARNING  opentelemetry.instrumentation.instrumentor:instrumentor.py:92 Attempting to instrument while already instrumented
+INFO     ipe:tracing.py:82 OTel FastAPI instrumented for service=cap-svc
+INFO     ipe:setup.py:49 OTel tracing instrumented for service=cap-svc
+WARNING  opentelemetry.instrumentation.instrumentor:instrumentor.py:92 Attempting to instrument while already instrumented
+INFO     ipe:tracing.py:88 OTel asyncpg instrumented
+WARNING  opentelemetry.instrumentation.instrumentor:instrumentor.py:92 Attempting to instrument while already instrumented
+INFO     ipe:tracing.py:96 OTel Redis instrumented
+INFO     ipe:setup.py:66 Observability setup complete for service=cap-svc version=0.1.0
+---------------------------- Captured stdout call -----------------------------
+{"asctime": "2026-06-21T17:20:02+0300", "name": "ipe.error", "levelname": "ERROR", "message": "Unhandled exception: password authentication failed for user \"ipe\"", "exc_info": "  + Exception Group Traceback (most recent call last):\n  |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_utils.py\", line 85, in create_collapsing_task_group\n  |     async with anyio.create_task_group() as tg:\n  |                ~~~~~~~~~~~~~~~~~~~~~~~^^\n  |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\anyio\\_backends\\_asyncio.py\", line 811, in __aexit__\n  |     raise BaseExceptionGroup(\n  |         \"unhandled errors in a TaskGroup\", self._exceptions\n  |     ) from None\n  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py\", line 164, in __call__\n    |     await self.app(scope, receive, _send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\opentelemetry\\instrumentation\\fastapi\\__init__.py\", line 297, in __call__\n    |     await self.app(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py\", line 88, in __call__\n    |     await self.app(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\middleware\\tenant_context.py\", line 36, in dispatch\n    |     return await call_next(request)\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\observability\\metrics.py\", line 37, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\observability\\middleware.py\", line 32, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    |     response = await self.dispatch_func(request, call_next)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\observability\\middleware.py\", line 18, in dispatch\n    |     response = await call_next(request)\n    |                ^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    |     raise app_exc from app_exc.__cause__ or app_exc.__context__\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    |     await self.app(scope, receive_or_disconnect, send_no_error)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py\", line 63, in __call__\n    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    |     raise exc\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    |     await app(scope, receive, sender)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py\", line 18, in __call__\n    |     await self.app(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 660, in __call__\n    |     await self.middleware_stack(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 680, in app\n    |     await route.handle(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1609, in handle\n    |     await self.original_router.handle(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2047, in handle\n    |     await included_router._handle_selected(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1620, in _handle_selected\n    |     await route.handle(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1609, in handle\n    |     await self.original_router.handle(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2047, in handle\n    |     await included_router._handle_selected(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1629, in _handle_selected\n    |     await original_route.handle(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1218, in handle\n    |     await app(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 143, in app\n    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    |     raise exc\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    |     await app(scope, receive, sender)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 129, in app\n    |     response = await f(request)\n    |                ^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 466, in app\n    |     solved_result = await solve_dependencies(\n    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |     ...<6 lines>...\n    |     )\n    |     ^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\dependencies\\utils.py\", line 672, in solve_dependencies\n    |     solved = await _solve_generator(\n    |              ^^^^^^^^^^^^^^^^^^^^^^^\n    |     ...<3 lines>...\n    |     )\n    |     ^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\dependencies\\utils.py\", line 586, in _solve_generator\n    |     return await stack.enter_async_context(cm)\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"C:\\Users\\Hp\\AppData\\Roaming\\uv\\python\\cpython-3.14-windows-x86_64-none\\Lib\\contextlib.py\", line 668, in enter_async_context\n    |     result = await _enter(cm)\n    |              ^^^^^^^^^^^^^^^^\n    |   File \"C:\\Users\\Hp\\AppData\\Roaming\\uv\\python\\cpython-3.14-windows-x86_64-none\\Lib\\contextlib.py\", line 214, in __aenter__\n    |     return await anext(self.gen)\n    |            ^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\database\\session.py\", line 16, in get_session\n    |     await session.execute(\n    |     ...<2 lines>...\n    |     )\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\ext\\asyncio\\session.py\", line 448, in execute\n    |     result = await greenlet_spawn(\n    |              ^^^^^^^^^^^^^^^^^^^^^\n    |     ...<6 lines>...\n    |     )\n    |     ^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 201, in greenlet_spawn\n    |     result = context.throw(*sys.exc_info())\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2373, in execute\n    |     return self._execute_internal(\n    |            ~~~~~~~~~~~~~~~~~~~~~~^\n    |         statement,\n    |         ^^^^^^^^^^\n    |     ...<4 lines>...\n    |         _add_event=_add_event,\n    |         ^^^^^^^^^^^^^^^^^^^^^^\n    |     )\n    |     ^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2261, in _execute_internal\n    |     conn = self._connection_for_bind(bind)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2113, in _connection_for_bind\n    |     return trans._connection_for_bind(engine, execution_options)\n    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"<string>\", line 2, in _connection_for_bind\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\state_changes.py\", line 137, in _go\n    |     ret_value = fn(self, *arg, **kw)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 1191, in _connection_for_bind\n    |     conn = bind.connect()\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 3295, in connect\n    |     return self._connection_cls(self)\n    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 144, in __init__\n    |     self._dbapi_connection = engine.raw_connection()\n    |                              ~~~~~~~~~~~~~~~~~~~~~^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 3319, in raw_connection\n    |     return self.pool.connect()\n    |            ~~~~~~~~~~~~~~~~~^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 448, in connect\n    |     return _ConnectionFairy._checkout(self)\n    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 1272, in _checkout\n    |     fairy = _ConnectionRecord.checkout(pool)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 712, in checkout\n    |     rec = pool._do_get()\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\impl.py\", line 178, in _do_get\n    |     with util.safe_reraise():\n    |          ~~~~~~~~~~~~~~~~~^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\langhelpers.py\", line 122, in __exit__\n    |     raise exc_value.with_traceback(exc_tb)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\impl.py\", line 176, in _do_get\n    |     return self._create_connection()\n    |            ~~~~~~~~~~~~~~~~~~~~~~~^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 389, in _create_connection\n    |     return _ConnectionRecord(self)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 674, in __init__\n    |     self.__connect()\n    |     ~~~~~~~~~~~~~~^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 900, in __connect\n    |     with util.safe_reraise():\n    |          ~~~~~~~~~~~~~~~~~^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\langhelpers.py\", line 122, in __exit__\n    |     raise exc_value.with_traceback(exc_tb)\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 896, in __connect\n    |     self.dbapi_connection = connection = pool._invoke_creator(self)\n    |                                          ~~~~~~~~~~~~~~~~~~~~^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\create.py\", line 667, in connect\n    |     return dialect.connect(*cargs_tup, **cparams)\n    |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\default.py\", line 630, in connect\n    |     return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501\n    |            ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\dialects\\postgresql\\asyncpg.py\", line 955, in connect\n    |     await_only(creator_fn(*arg, **kw)),\n    |     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 132, in await_only\n    |     return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501\n    |            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 196, in greenlet_spawn\n    |     value = await result\n    |             ^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connection.py\", line 2443, in connect\n    |     return await connect_utils._connect(\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |     ...<22 lines>...\n    |     )\n    |     ^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1218, in _connect\n    |     conn = await _connect_addr(\n    |            ^^^^^^^^^^^^^^^^^^^^\n    |     ...<6 lines>...\n    |     )\n    |     ^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1054, in _connect_addr\n    |     return await __connect_addr(params, True, *args)\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1102, in __connect_addr\n    |     await connected\n    | asyncpg.exceptions.InvalidPasswordError: password authentication failed for user \"ipe\"\n    +------------------------------------\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py\", line 164, in __call__\n    await self.app(scope, receive, _send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\opentelemetry\\instrumentation\\fastapi\\__init__.py\", line 297, in __call__\n    await self.app(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py\", line 88, in __call__\n    await self.app(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\middleware\\tenant_context.py\", line 36, in dispatch\n    return await call_next(request)\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\observability\\metrics.py\", line 37, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\observability\\middleware.py\", line 32, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 193, in __call__\n    response = await self.dispatch_func(request, call_next)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\observability\\middleware.py\", line 18, in dispatch\n    response = await call_next(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 168, in call_next\n    raise app_exc from app_exc.__cause__ or app_exc.__context__\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\base.py\", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py\", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py\", line 18, in __call__\n    await self.app(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 660, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\routing.py\", line 680, in app\n    await route.handle(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1609, in handle\n    await self.original_router.handle(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2047, in handle\n    await included_router._handle_selected(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1620, in _handle_selected\n    await route.handle(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1609, in handle\n    await self.original_router.handle(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 2047, in handle\n    await included_router._handle_selected(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1629, in _handle_selected\n    await original_route.handle(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 1218, in handle\n    await app(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 143, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\starlette\\_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 129, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\routing.py\", line 466, in app\n    solved_result = await solve_dependencies(\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<6 lines>...\n    )\n    ^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\dependencies\\utils.py\", line 672, in solve_dependencies\n    solved = await _solve_generator(\n             ^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n    )\n    ^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\fastapi\\dependencies\\utils.py\", line 586, in _solve_generator\n    return await stack.enter_async_context(cm)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Hp\\AppData\\Roaming\\uv\\python\\cpython-3.14-windows-x86_64-none\\Lib\\contextlib.py\", line 668, in enter_async_context\n    result = await _enter(cm)\n             ^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Hp\\AppData\\Roaming\\uv\\python\\cpython-3.14-windows-x86_64-none\\Lib\\contextlib.py\", line 214, in __aenter__\n    return await anext(self.gen)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\services\\shared\\ipe_shared\\database\\session.py\", line 16, in get_session\n    await session.execute(\n    ...<2 lines>...\n    )\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\ext\\asyncio\\session.py\", line 448, in execute\n    result = await greenlet_spawn(\n             ^^^^^^^^^^^^^^^^^^^^^\n    ...<6 lines>...\n    )\n    ^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 201, in greenlet_spawn\n    result = context.throw(*sys.exc_info())\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2373, in execute\n    return self._execute_internal(\n           ~~~~~~~~~~~~~~~~~~~~~~^\n        statement,\n        ^^^^^^^^^^\n    ...<4 lines>...\n        _add_event=_add_event,\n        ^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2261, in _execute_internal\n    conn = self._connection_for_bind(bind)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2113, in _connection_for_bind\n    return trans._connection_for_bind(engine, execution_options)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<string>\", line 2, in _connection_for_bind\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\state_changes.py\", line 137, in _go\n    ret_value = fn(self, *arg, **kw)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 1191, in _connection_for_bind\n    conn = bind.connect()\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 3295, in connect\n    return self._connection_cls(self)\n           ~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 144, in __init__\n    self._dbapi_connection = engine.raw_connection()\n                             ~~~~~~~~~~~~~~~~~~~~~^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 3319, in raw_connection\n    return self.pool.connect()\n           ~~~~~~~~~~~~~~~~~^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 448, in connect\n    return _ConnectionFairy._checkout(self)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 1272, in _checkout\n    fairy = _ConnectionRecord.checkout(pool)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 712, in checkout\n    rec = pool._do_get()\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\impl.py\", line 178, in _do_get\n    with util.safe_reraise():\n         ~~~~~~~~~~~~~~~~~^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\langhelpers.py\", line 122, in __exit__\n    raise exc_value.with_traceback(exc_tb)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\impl.py\", line 176, in _do_get\n    return self._create_connection()\n           ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 389, in _create_connection\n    return _ConnectionRecord(self)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 674, in __init__\n    self.__connect()\n    ~~~~~~~~~~~~~~^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 900, in __connect\n    with util.safe_reraise():\n         ~~~~~~~~~~~~~~~~~^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\langhelpers.py\", line 122, in __exit__\n    raise exc_value.with_traceback(exc_tb)\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\pool\\base.py\", line 896, in __connect\n    self.dbapi_connection = connection = pool._invoke_creator(self)\n                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\create.py\", line 667, in connect\n    return dialect.connect(*cargs_tup, **cparams)\n           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\default.py\", line 630, in connect\n    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501\n           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\dialects\\postgresql\\asyncpg.py\", line 955, in connect\n    await_only(creator_fn(*arg, **kw)),\n    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 132, in await_only\n    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\sqlalchemy\\util\\_concurrency_py3k.py\", line 196, in greenlet_spawn\n    value = await result\n            ^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connection.py\", line 2443, in connect\n    return await connect_utils._connect(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<22 lines>...\n    )\n    ^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1218, in _connect\n    conn = await _connect_addr(\n           ^^^^^^^^^^^^^^^^^^^^\n    ...<6 lines>...\n    )\n    ^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1054, in _connect_addr\n    return await __connect_addr(params, True, *args)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\AISOP\\ipe\\.venv\\Lib\\site-packages\\asyncpg\\connect_utils.py\", line 1102, in __connect_addr\n    await connected\nasyncpg.exceptions.InvalidPasswordError: password authentication failed for user \"ipe\"", "service_name": "cap-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "ERROR"}
+------------------------------ Captured log call ------------------------------
+ERROR    ipe.error:error_handler.py:29 Unhandled exception: password authentication failed for user "ipe"
+  + Exception Group Traceback (most recent call last):
+  |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_utils.py", line 85, in create_collapsing_task_group
+  |     async with anyio.create_task_group() as tg:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "D:\AISOP\ipe\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 811, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\instrumentation\fastapi\__init__.py", line 297, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 36, in dispatch
+    |     return await call_next(request)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 37, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 32, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 18, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1620, in _handle_selected
+    |     await route.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    |     await self.original_router.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    |     await included_router._handle_selected(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1629, in _handle_selected
+    |     await original_route.handle(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1218, in handle
+    |     await app(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 466, in app
+    |     solved_result = await solve_dependencies(
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<6 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 672, in solve_dependencies
+    |     solved = await _solve_generator(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 586, in _solve_generator
+    |     return await stack.enter_async_context(cm)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 668, in enter_async_context
+    |     result = await _enter(cm)
+    |              ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    |     return await anext(self.gen)
+    |            ^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\services\shared\ipe_shared\database\session.py", line 16, in get_session
+    |     await session.execute(
+    |     ...<2 lines>...
+    |     )
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 448, in execute
+    |     result = await greenlet_spawn(
+    |              ^^^^^^^^^^^^^^^^^^^^^
+    |     ...<6 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    |     result = context.throw(*sys.exc_info())
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2373, in execute
+    |     return self._execute_internal(
+    |            ~~~~~~~~~~~~~~~~~~~~~~^
+    |         statement,
+    |         ^^^^^^^^^^
+    |     ...<4 lines>...
+    |         _add_event=_add_event,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2261, in _execute_internal
+    |     conn = self._connection_for_bind(bind)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2113, in _connection_for_bind
+    |     return trans._connection_for_bind(engine, execution_options)
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "<string>", line 2, in _connection_for_bind
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    |     ret_value = fn(self, *arg, **kw)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1191, in _connection_for_bind
+    |     conn = bind.connect()
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3295, in connect
+    |     return self._connection_cls(self)
+    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 144, in __init__
+    |     self._dbapi_connection = engine.raw_connection()
+    |                              ~~~~~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3319, in raw_connection
+    |     return self.pool.connect()
+    |            ~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 448, in connect
+    |     return _ConnectionFairy._checkout(self)
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1272, in _checkout
+    |     fairy = _ConnectionRecord.checkout(pool)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    |     rec = pool._do_get()
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 178, in _do_get
+    |     with util.safe_reraise():
+    |          ~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 176, in _do_get
+    |     return self._create_connection()
+    |            ~~~~~~~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 389, in _create_connection
+    |     return _ConnectionRecord(self)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    |     self.__connect()
+    |     ~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    |     with util.safe_reraise():
+    |          ~~~~~~~~~~~~~~~~~^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    |     raise exc_value.with_traceback(exc_tb)
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    |     self.dbapi_connection = connection = pool._invoke_creator(self)
+    |                                          ~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\create.py", line 667, in connect
+    |     return dialect.connect(*cargs_tup, **cparams)
+    |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 630, in connect
+    |     return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 955, in connect
+    |     await_only(creator_fn(*arg, **kw)),
+    |     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    |     return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+    |            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    |     value = await result
+    |             ^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connection.py", line 2443, in connect
+    |     return await connect_utils._connect(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<22 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1218, in _connect
+    |     conn = await _connect_addr(
+    |            ^^^^^^^^^^^^^^^^^^^^
+    |     ...<6 lines>...
+    |     )
+    |     ^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1054, in _connect_addr
+    |     return await __connect_addr(params, True, *args)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1102, in __connect_addr
+    |     await connected
+    | asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "ipe"
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\instrumentation\fastapi\__init__.py", line 297, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\middleware\tenant_context.py", line 36, in dispatch
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\observability\metrics.py", line 37, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 32, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\observability\middleware.py", line 18, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1620, in _handle_selected
+    await route.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1609, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 2047, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1629, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 1218, in handle
+    await app(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 143, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 129, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\routing.py", line 466, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 672, in solve_dependencies
+    solved = await _solve_generator(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\dependencies\utils.py", line 586, in _solve_generator
+    return await stack.enter_async_context(cm)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 668, in enter_async_context
+    result = await _enter(cm)
+             ^^^^^^^^^^^^^^^^
+  File "C:\Users\Hp\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\services\shared\ipe_shared\database\session.py", line 16, in get_session
+    await session.execute(
+    ...<2 lines>...
+    )
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\ext\asyncio\session.py", line 448, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2373, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2261, in _execute_internal
+    conn = self._connection_for_bind(bind)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2113, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 1191, in _connection_for_bind
+    conn = bind.connect()
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3295, in connect
+    return self._connection_cls(self)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 144, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3319, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 448, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1272, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 712, in checkout
+    rec = pool._do_get()
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 178, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\impl.py", line 176, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 389, in _create_connection
+    return _ConnectionRecord(self)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 674, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 900, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\pool\base.py", line 896, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\create.py", line 667, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\dialects\postgresql\asyncpg.py", line 955, in connect
+    await_only(creator_fn(*arg, **kw)),
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\sqlalchemy\util\_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connection.py", line 2443, in connect
+    return await connect_utils._connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<22 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1218, in _connect
+    conn = await _connect_addr(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1054, in _connect_addr
+    return await __connect_addr(params, True, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py", line 1102, in __connect_addr
+    await connected
+asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "ipe"
+D:\AISOP\ipe\.venv\Lib\site-packages\asyncpg\connect_utils.py:1102: asyncpg.exceptions.InvalidPasswordError: password authentication failed for user "ipe"
+============================== warnings summary ===============================
+tests/test_api_capacity.py::test_health_endpoint
+  D:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+tests/test_api_labor_extended.py::test_labor_create_skill
+  D:\AISOP\ipe\services\cap-svc\app\api\v1\labor.py:75: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(skill)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_api_labor_extended.py::test_labor_create_worker
+  D:\AISOP\ipe\services\cap-svc\app\api\v1\labor.py:116: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(worker)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_api_labor_extended.py::test_labor_create_shift
+  D:\AISOP\ipe\services\cap-svc\app\api\v1\labor.py:162: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(shift)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_iot_health.py::TestIoTTelemetryAPI::test_telemetry_no_tenant_returns_error
+  D:\AISOP\ipe\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED services\cap-svc\tests\test_scenarios.py::test_unauthorized_role_returns_403
+================= 1 failed, 193 passed, 5 warnings in 50.50s ==================

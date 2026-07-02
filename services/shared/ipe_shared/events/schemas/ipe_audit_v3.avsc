@@ -1,0 +1,31 @@
+{
+  "type": "record",
+  "name": "AuditLogEvent",
+  "namespace": "ipe.audit",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "tenant_id", "type": "string"},
+    {"name": "event_type", "type": "string"},
+    {"name": "occurred_at", "type": "string"},
+    {"name": "schema_version", "type": "int", "default": 3},
+    {"name": "prev_hash", "type": ["null", "string"], "default": null},
+    {"name": "chain_hash", "type": "string"},
+    {
+      "name": "payload",
+      "type": {
+        "type": "record",
+        "name": "AuditPayload",
+        "fields": [
+          {"name": "actor_type", "type": "string"},
+          {"name": "actor_id", "type": "string"},
+          {"name": "action", "type": "string"},
+          {"name": "entity_type", "type": "string"},
+          {"name": "entity_id", "type": "string"},
+          {"name": "before_state", "type": ["null", "string"], "default": null},
+          {"name": "after_state", "type": ["null", "string"], "default": null},
+          {"name": "rationale", "type": ["null", "string"], "default": null}
+        ]
+      }
+    }
+  ]
+}

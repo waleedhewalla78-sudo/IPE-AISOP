@@ -1,0 +1,16 @@
+# Ollama on the Docker host (Windows/Mac) — no ollama container required.
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.demo.yml -f docker-compose.ollama-host.yml up -d
+#
+# Requires Ollama running on the host: ollama serve (default :11434)
+
+services:
+  nlp-svc:
+    environment:
+      IPE_LLM_PRIMARY_PROVIDER: ollama
+      IPE_OLLAMA_ENDPOINT_URL: http://host.docker.internal:11434
+      IPE_OLLAMA_MODEL: ${IPE_OLLAMA_MODEL:-llama3.2:3b}
+      IPE_OPENROUTER_API_KEY: ""
+      IPE_ANTHROPIC_API_KEY: ""
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

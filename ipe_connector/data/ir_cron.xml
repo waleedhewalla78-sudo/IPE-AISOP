@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Placeholder crons — enable when IPE Kong is reachable from Odoo host -->
+    <record id="ir_cron_ipe_pull_forecasts" model="ir.cron">
+        <field name="name">IPE: Pull demand forecasts (disabled by default)</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="state">code</field>
+        <field name="code"># Configure IPE Kong URL in ipe.config before enabling</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

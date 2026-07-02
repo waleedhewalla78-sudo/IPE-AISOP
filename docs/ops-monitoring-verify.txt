@@ -1,0 +1,12 @@
+IPE Monitoring Verification — 2026-06-26
+Prometheus: http://localhost:9091
+Grafana:    http://localhost:3002 (admin / ipe_admin)
+Loki:       http://localhost:3100
+
+Docker compose up: SUCCESS (exit 0)
+Containers: docker-prometheus-1, docker-loki-1, docker-promtail-1, docker-grafana-1
+
+Note: Run .\scripts\run-monitoring-stack.ps1 -VerifyOnly after demo app stack is up
+      for full Prometheus target scrape validation (requires cap/dpe/mat-svc running).
+
+OVERALL: PASS (stack started)

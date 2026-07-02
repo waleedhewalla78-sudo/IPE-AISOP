@@ -12,13 +12,16 @@ from ipe_shared.database.connection import init_database, close_database
 from app.config import settings
 from app.api.v1.router import api_router
 from app.events.consumers import start_consumers, stop_consumers
+from app.jobs.sync_scheduler import start_sync_scheduler, stop_sync_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_database(settings.DATABASE_URL)
     await start_consumers()
+    start_sync_scheduler()
     yield
+    await stop_sync_scheduler()
     await stop_consumers()
     await close_database()
 

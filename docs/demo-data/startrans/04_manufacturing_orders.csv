@@ -1,0 +1,11 @@
+MO_ID,PRODUCT_CODE,QTY,FEASIBILITY,MATERIAL_SCORE,CAPACITY_SCORE,PRIMARY_CONSTRAINT,STATUS,CUSTOMER
+MO-ST-001,PROD001,500,52.0,45.0,70.0,material_shortage,in_progress,Great Lakes Utility
+MO-ST-002,PROD002,250,68.0,72.0,55.0,capacity_overload,planned,Midwest Grid Co
+MO-ST-003,PROD004,120,74.0,80.0,78.0,labor_shortage,planned,Regional Power Authority
+MO-ST-004,PROD001,300,81.0,85.0,82.0,,confirmed,Great Lakes Utility
+MO-ST-005,PROD002,180,88.0,90.0,86.0,,in_progress,Midwest Grid Co
+MO-ST-006,PROD004,90,91.0,92.0,90.0,,confirmed,Regional Power Authority
+MO-ST-007,PROD001,600,45.0,40.0,50.0,material_shortage,planned,Great Lakes Utility
+MO-ST-008,PROD002,400,62.0,65.0,58.0,capacity_overload,planned,Midwest Grid Co
+MO-ST-009,PROD001,200,95.0,94.0,96.0,,completed,Great Lakes Utility
+MO-ST-010,PROD002,150,93.0,91.0,94.0,,completed,Midwest Grid Co

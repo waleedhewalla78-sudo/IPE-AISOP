@@ -97,19 +97,25 @@ class TestPIIStripping:
 
 
 class TestAnthropicProvider:
+    pytestmark = pytest.mark.integration
+
     @pytest.mark.asyncio
-    async def test_tier1_calls_anthropic(self, router_tier1):
+    async def test_tier1_calls_anthropic(self, router_tier1, monkeypatch):
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ANTHROPIC_API_KEY", "sk-ant-unit-test-key")
+        router = LLMTierRouter(tenant_tier=1)
         mock_msg = MagicMock()
         mock_msg.content = [MagicMock(text="Hello from Claude")]
         mock_client = AsyncMock()
         mock_client.messages.create = AsyncMock(return_value=mock_msg)
 
         with patch.object(
-            router_tier1,
+            router,
             "get_anthropic_client",
             return_value=mock_client,
         ):
-            result = await router_tier1.route("Hello", "system")
+            result = await router.route("Hello", "system")
             assert result == "Hello from Claude"
             mock_client.messages.create.assert_awaited_once()
 
@@ -123,18 +129,22 @@ class TestAnthropicProvider:
                 await router_tier1.route("Hello")
 
     @pytest.mark.asyncio
-    async def test_tier1_pii_stripped_before_anthropic(self, router_tier1):
+    async def test_tier1_pii_stripped_before_anthropic(self, monkeypatch):
+        from app.config import settings
+
+        monkeypatch.setattr(settings, "ANTHROPIC_API_KEY", "sk-ant-unit-test-key")
+        router = LLMTierRouter(tenant_tier=1)
         mock_msg = MagicMock()
         mock_msg.content = [MagicMock(text="Response")]
         mock_client = AsyncMock()
         mock_client.messages.create = AsyncMock(return_value=mock_msg)
 
         with patch.object(
-            router_tier1,
+            router,
             "get_anthropic_client",
             return_value=mock_client,
         ):
-            result = await router_tier1.route("My email is test@test.com", "system")
+            result = await router.route("My email is test@test.com", "system")
             assert result == "Response"
             call_kwargs = mock_client.messages.create.call_args
             sent_prompt = call_kwargs.kwargs["messages"][0]["content"]
@@ -143,6 +153,8 @@ class TestAnthropicProvider:
 
 
 class TestSageMakerProvider:
+    pytestmark = pytest.mark.integration
+
     @pytest.mark.asyncio
     async def test_tier2_calls_sagemaker(self, router_tier2):
         mock_response = MagicMock()
@@ -200,6 +212,8 @@ class TestSageMakerProvider:
 
 
 class TestVLLMProvider:
+    pytestmark = pytest.mark.integration
+
     @pytest.mark.asyncio
     async def test_tier3_calls_vllm(self, router_tier3):
         mock_response = MagicMock()
@@ -230,6 +244,8 @@ class TestVLLMProvider:
 
 
 class TestFallbackLogic:
+    pytestmark = pytest.mark.integration
+
     @pytest.mark.asyncio
     async def test_anthropic_unavailable_falls_back_to_sagemaker(
         self,
@@ -316,6 +332,8 @@ class TestFallbackLogic:
 
 
 class TestPIIBeforeAllProviders:
+    pytestmark = pytest.mark.integration
+
     @pytest.mark.asyncio
     async def test_pii_stripped_before_sagemaker(self, router_tier2):
         mock_msg = MagicMock()

@@ -15,6 +15,7 @@ class Role(StrEnum):
     OPERATOR = "operator"
     MANAGER = "manager"
     EXECUTIVE = "executive"
+    PROCUREMENT = "procurement"
 
 
 PERMISSIONS = {
@@ -25,6 +26,7 @@ PERMISSIONS = {
     Role.MANAGER: {"read", "write", "approve", "run_solver", "cost_optimize"},
     Role.OPERATOR: {"read", "write_own"},
     Role.EXECUTIVE: {"read", "view_kpis"},
+    Role.PROCUREMENT: {"read", "write", "view_kpis"},
 }
 
 

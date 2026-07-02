@@ -1,0 +1,575 @@
+﻿=== IPE Full Backend Test Suite v8.2.0 ===
+Started: 2026-06-28 11:02:21
+
+--- shared ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\shared
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 147 items
+
+tests\integration\test_adversarial_rbac.py sssss                         [  3%]
+tests\integration\test_audit_log_immutability.py ss                      [  4%]
+tests\integration\test_kafka_flow.py sssss                               [  8%]
+tests\integration\test_rls_isolation.py ...                              [ 10%]
+tests\test_audit_service.py ....                                         [ 12%]
+tests\test_auth_keycloak.py ....                                         [ 15%]
+tests\test_auth_models.py ....                                           [ 18%]
+tests\test_billing_adapter.py ...                                        [ 20%]
+tests\test_database.py ....                                              [ 23%]
+tests\test_edge_auth.py ........                                         [ 28%]
+tests\test_edge_conflict_resolution.py ..........                        [ 35%]
+tests\test_edge_local_db.py ..............                               [ 44%]
+tests\test_exceptions.py ..........                                      [ 51%]
+tests\test_healthz.py ..                                                 [ 53%]
+tests\test_jwt.py ...                                                    [ 55%]
+tests\test_middleware.py ...                                             [ 57%]
+tests\test_rbac.py ........                                              [ 62%]
+tests\test_rbac_decorator.py .....                                       [ 65%]
+tests\test_rbac_dependencies.py ...........                              [ 73%]
+tests\test_schemas.py ...........................                        [ 91%]
+tests\test_session.py ...                                                [ 93%]
+tests\test_tenant.py .....                                               [ 97%]
+tests\test_tenant_middleware.py ....                                     [100%]
+
+============================== warnings summary ===============================
+..\..\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 135 passed, 12 skipped, 1 warning in 21.16s =================
+
+--- dpe-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\dpe-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 180 items
+
+tests\test_analytics.py ..                                               [  1%]
+tests\test_api_compliance_extended.py ................                   [ 10%]
+tests\test_api_ctp.py .....                                              [ 12%]
+tests\test_api_demand.py ..................                              [ 22%]
+tests\test_api_demand_no_tenant.py ..                                    [ 23%]
+tests\test_api_financial.py ...............                              [ 32%]
+tests\test_apictp_extended.py ....                                       [ 34%]
+tests\test_auth.py ....                                                  [ 36%]
+tests\test_auth_verify.py ....                                           [ 38%]
+tests\test_chaos_cost_aggregate.py ..                                    [ 40%]
+tests\test_chaos_cost_helpers.py .......                                 [ 43%]
+tests\test_classifier.py .......                                         [ 47%]
+tests\test_cost_accounting.py .................                          [ 57%]
+tests\test_demand_sense.py ....                                          [ 59%]
+tests\test_dpe_handlers.py ..                                            [ 60%]
+tests\test_dpe_handlers_inventory.py .                                   [ 61%]
+tests\test_dpe_handlers_success.py .                                     [ 61%]
+tests\test_financial_projection.py .................                     [ 71%]
+tests\test_margin_fallback.py .                                          [ 71%]
+tests\test_margin_priority.py .....                                      [ 74%]
+tests\test_mdr_api.py ...                                                [ 76%]
+tests\test_mdr_engine.py ...                                             [ 77%]
+tests\test_mdr_remediation.py ....                                       [ 80%]
+tests\test_priority.py ........                                          [ 84%]
+tests\test_sop_api.py .......                                            [ 88%]
+tests\test_sop_solver.py ...........                                     [ 94%]
+tests\test_stripe_billing.py ...                                         [ 96%]
+tests\test_tariff_shock.py .....                                         [ 98%]
+tests\test_weather_signal.py ..                                          [100%]
+
+============================== warnings summary ===============================
+tests/test_analytics.py::test_executive_summary_all_metrics_present
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+tests/test_analytics.py: 3 warnings
+tests/test_api_compliance_extended.py: 16 warnings
+tests/test_api_ctp.py: 5 warnings
+tests/test_api_demand.py: 18 warnings
+tests/test_api_demand_no_tenant.py: 2 warnings
+tests/test_api_financial.py: 15 warnings
+tests/test_apictp_extended.py: 4 warnings
+tests/test_auth.py: 4 warnings
+tests/test_mdr_api.py: 3 warnings
+tests/test_sop_api.py: 7 warnings
+tests/test_stripe_billing.py: 3 warnings
+  E:\AISOP\ipe\services\dpe-svc\app\main.py:36: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @_app.on_event("startup")
+
+tests/test_analytics.py: 6 warnings
+tests/test_api_compliance_extended.py: 32 warnings
+tests/test_api_ctp.py: 10 warnings
+tests/test_api_demand.py: 36 warnings
+tests/test_api_demand_no_tenant.py: 4 warnings
+tests/test_api_financial.py: 30 warnings
+tests/test_apictp_extended.py: 8 warnings
+tests/test_auth.py: 8 warnings
+tests/test_mdr_api.py: 6 warnings
+tests/test_sop_api.py: 14 warnings
+tests/test_stripe_billing.py: 6 warnings
+  E:\AISOP\ipe\.venv\Lib\site-packages\fastapi\applications.py:4601: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/test_analytics.py: 3 warnings
+tests/test_api_compliance_extended.py: 16 warnings
+tests/test_api_ctp.py: 5 warnings
+tests/test_api_demand.py: 18 warnings
+tests/test_api_demand_no_tenant.py: 2 warnings
+tests/test_api_financial.py: 15 warnings
+tests/test_apictp_extended.py: 4 warnings
+tests/test_auth.py: 4 warnings
+tests/test_mdr_api.py: 3 warnings
+tests/test_sop_api.py: 7 warnings
+tests/test_stripe_billing.py: 3 warnings
+  E:\AISOP\ipe\services\dpe-svc\app\main.py:41: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @_app.on_event("shutdown")
+
+tests/test_api_financial.py::test_financial_project_valid
+tests/test_api_financial.py::test_financial_project_zero_quantity
+tests/test_api_financial.py::test_financial_batch_projection
+  E:\AISOP\ipe\services\dpe-svc\app\api\v1\financial.py:121: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(projection)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+===================== 180 passed, 324 warnings in 21.69s ======================
+
+--- cap-svc ---
+uv.exe : Downloading numpy (11.9MiB)
+At E:\AISOP\ipe\scripts\run-all-service-tests.ps1:22 char:15
++     $result = & uv @args 2>&1 | Out-String
++               ~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Downloading numpy (11.9MiB):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Downloading pyarrow (26.7MiB)
+Downloading pillow (6.9MiB)
+Downloading scikit-learn (7.9MiB)
+Downloading mlflow-skinny (3.3MiB)
+Downloading mlflow (12.0MiB)
+Downloading ortools (23.5MiB)
+Downloading matplotlib (9.0MiB)
+Downloading pywin32 (6.7MiB)
+Downloading pandas (10.6MiB)
+Downloading scipy (35.6MiB)
+Downloading mlflow-tracing (1.6MiB)
+Downloading fonttools (2.2MiB)
+ Downloaded mlflow-tracing
+ Downloaded fonttools
+ Downloaded mlflow-skinny
+ Downloaded pillow
+ Downloaded pywin32
+ Downloaded scikit-learn
+ Downloaded matplotlib
+ Downloaded pandas
+ Downloaded numpy
+ Downloaded mlflow
+ Downloaded ortools
+ Downloaded pyarrow
+ Downloaded scipy
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 63 packages in 58.17s
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\cap-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 275 items
+
+tests\test_activity_objective.py ..                                      [  0%]
+tests\test_api_capacity.py ...............                               [  6%]
+tests\test_api_capacity_extended.py .........                            [  9%]
+tests\test_api_capacity_solve.py ....                                    [ 10%]
+tests\test_api_cpm_cascade.py ...                                        [ 12%]
+tests\test_api_labor_extended.py .......                                 [ 14%]
+tests\test_api_project_plans.py .....                                    [ 16%]
+tests\test_api_schedule_approve.py ....                                  [ 17%]
+tests\test_cost_optimized.py .............                               [ 22%]
+tests\test_event_handlers_unit.py ..                                     [ 23%]
+tests\test_green_scheduler.py ...............                            [ 28%]
+tests\test_guardrail_85.py ..                                            [ 29%]
+tests\test_heuristic_scheduler.py .                                      [ 29%]
+tests\test_iot_health.py ..................                              [ 36%]
+tests\test_labor_unit.py ...                                             [ 37%]
+tests\test_maintenance_block.py ........                                 [ 40%]
+tests\test_mdr_gate.py ...                                               [ 41%]
+tests\test_multilevel_bom.py .............                               [ 46%]
+tests\test_network_optimizer.py .................                        [ 52%]
+tests\test_ortools_correctness.py ......................                 [ 60%]
+tests\test_priority_resolver.py ...                                      [ 61%]
+tests\test_priority_resolver_extended.py ....                            [ 62%]
+tests\test_priority_resolver_margin.py .                                 [ 63%]
+tests\test_project_plan_parser.py ........                               [ 66%]
+tests\test_project_plan_service_extended.py .......                      [ 68%]
+tests\test_project_plan_service_unit.py ...                              [ 69%]
+tests\test_scenarios.py .........                                        [ 73%]
+tests\test_scenarios_diff.py .                                           [ 73%]
+tests\test_scenarios_disruption.py ..                                    [ 74%]
+tests\test_scenarios_mock.py .                                           [ 74%]
+tests\test_scenarios_solve.py ..                                         [ 75%]
+tests\test_schedule_persistence.py ........                              [ 78%]
+tests\test_simulation.py ...                                             [ 79%]
+tests\test_solver_interface.py ....................................      [ 92%]
+tests\test_visual_cpm.py ....                                            [ 93%]
+tests\test_worker_constraints.py .................                       [100%]
+
+============================== warnings summary ===============================
+tests/test_api_capacity.py::test_health_endpoint
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+tests/test_api_labor_extended.py::test_labor_create_skill
+  E:\AISOP\ipe\services\cap-svc\app\api\v1\labor.py:75: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(skill)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_api_labor_extended.py::test_labor_create_worker
+  E:\AISOP\ipe\services\cap-svc\app\api\v1\labor.py:116: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(worker)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_api_labor_extended.py::test_labor_create_shift
+  E:\AISOP\ipe\services\cap-svc\app\api\v1\labor.py:162: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(shift)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_iot_health.py::TestIoTTelemetryAPI::test_telemetry_no_tenant_returns_error
+  E:\AISOP\ipe\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_schedule_persistence.py::test_persist_schedule_proposal_skips_synthetic_maintenance_ops
+  E:\AISOP\ipe\services\cap-svc\app\core\schedule_persistence.py:66: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    session.add(wo)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 275 passed, 6 warnings in 127.96s (0:02:07) =================
+
+--- mat-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\mat-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 121 items
+
+tests\test_api_material.py ...............                               [ 12%]
+tests\test_api_material_extended.py .......                              [ 18%]
+tests\test_apictp_extended.py ....                                       [ 21%]
+tests\test_atp_math.py .......                                           [ 27%]
+tests\test_atp_probabilistic.py ...........                              [ 36%]
+tests\test_atp_verify.py ......                                          [ 41%]
+tests\test_ctp_solver.py ..............                                  [ 52%]
+tests\test_event_handlers_unit.py .                                      [ 53%]
+tests\test_landed_cost.py ...                                            [ 56%]
+tests\test_netting_extended.py ....                                      [ 59%]
+tests\test_netting_mock.py ..                                            [ 61%]
+tests\test_netting_priority.py ...                                       [ 63%]
+tests\test_po_suggestion.py ..................                           [ 78%]
+tests\test_safety_stock.py ....................                          [ 95%]
+tests\test_supplier_model.py ......                                      [100%]
+
+============================== warnings summary ===============================
+tests/test_api_material.py::test_health_endpoint
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 121 passed, 1 warning in 12.42s =======================
+
+--- demand-svc ---
+............                                                             [100%]
+============================== warnings summary ===============================
+tests/test_api.py::test_health
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+12 passed, 1 warning in 4.38s
+
+--- scenario-svc ---
+......                                                                   [100%]
+============================== warnings summary ===============================
+tests/test_api.py::test_health
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+6 passed, 1 warning in 5.31s
+
+--- supply-svc ---
+.....                                                                    [100%]
+============================== warnings summary ===============================
+tests/test_api.py::test_health
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 1 warning in 10.39s
+
+--- order-svc ---
+.....                                                                    [100%]
+============================== warnings summary ===============================
+tests/test_api.py::test_health
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 1 warning in 3.30s
+
+--- equipment-svc ---
+.....                                                                    [100%]
+============================== warnings summary ===============================
+tests/test_api.py::test_health
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 1 warning in 2.75s
+
+--- material-svc ---
+......                                                                   [100%]
+============================== warnings summary ===============================
+tests/test_api.py::test_health
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+6 passed, 1 warning in 3.56s
+
+--- procurement-svc ---
+........                                                                 [100%]
+============================== warnings summary ===============================
+tests/test_api.py::test_health
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+8 passed, 1 warning in 3.47s
+
+--- nlp-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\nlp-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 114 items
+
+tests\test_api_copilot.py .......                                        [  6%]
+tests\test_consumers_lifecycle.py ..                                     [  7%]
+tests\test_copilot_agent.py ....                                         [ 11%]
+tests\test_copilot_tools.py .............                                [ 22%]
+tests\test_core.py ...........                                           [ 32%]
+tests\test_llm_client_extended.py .........                              [ 40%]
+tests\test_ollama_tool_agent.py ....                                     [ 43%]
+tests\test_orchestrator_fetchers.py ....................                 [ 61%]
+tests\test_orchestrator_keywords.py .........                            [ 69%]
+tests\test_response_formatter.py ...                                     [ 71%]
+tests\test_response_formatter_extended.py ...................            [ 88%]
+tests\test_role_agents.py ..                                             [ 90%]
+tests\test_sse_edge_cases.py .......                                     [ 96%]
+tests\test_tiered_router.py ....                                         [100%]
+
+============================== warnings summary ===============================
+tests/test_api_copilot.py::test_copilot_agents
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+tests/test_copilot_tools.py::TestGetOrderStatus::test_success
+  C:\Users\HP\AppData\Local\Python\pythoncore-3.14-64\Lib\unittest\mock.py:2259: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    def __init__(self, name, parent):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_core.py::test_query_llm_with_api_key_unknown_host
+  E:\AISOP\ipe\services\nlp-svc\app\core\llm_router.py:171: DeprecationWarning: The model 'claude-sonnet-4-20250514' is deprecated and will reach end-of-life on June 15th, 2026.
+  Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.
+    result = await call_fn(clean_prompt, clean_system)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+====================== 114 passed, 3 warnings in 14.09s =======================
+
+--- del-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\del-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 53 items
+
+tests\test_api_delay.py ...............                                  [ 28%]
+tests\test_api_quality_extended.py ...                                   [ 33%]
+tests\test_classifiers.py ...........                                    [ 54%]
+tests\test_f1_score.py ....                                              [ 62%]
+tests\test_quality_processor.py ....................                     [100%]
+
+============================== warnings summary ===============================
+tests/test_api_delay.py::test_health_endpoint
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 53 passed, 1 warning in 6.32s ========================
+
+--- fea-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\fea-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 91 items
+
+tests\test_api_feasibility.py .....................                      [ 23%]
+tests\test_api_feasibility_extended.py .........                         [ 32%]
+tests\test_api_feasibility_queue_kpi.py ....                             [ 37%]
+tests\test_auto_confirm.py .....                                         [ 42%]
+tests\test_constraint_honesty.py .......                                 [ 50%]
+tests\test_disruption_ws.py ...                                          [ 53%]
+tests\test_dual_gate.py ...                                              [ 57%]
+tests\test_event_handlers.py .....                                       [ 62%]
+tests\test_labor_autonomy.py ...                                         [ 65%]
+tests\test_scorer_edge_cases.py ........................                 [ 92%]
+tests\test_scorer_gates_mock.py ....                                     [ 96%]
+tests\test_ws_manager.py ...                                             [100%]
+
+============================== warnings summary ===============================
+tests/test_api_feasibility.py::test_health_endpoint
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 91 passed, 1 warning in 9.06s ========================
+
+--- res-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\res-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 23 items
+
+tests\test_api_resolution.py ..                                          [  8%]
+tests\test_approval_optimistic_lock.py .                                 [ 13%]
+tests\test_idempotency.py ......                                         [ 39%]
+tests\test_strategy.py ..............                                    [100%]
+
+============================== warnings summary ===============================
+tests/test_api_resolution.py::test_health_endpoint
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 23 passed, 1 warning in 40.86s ========================
+
+--- alert-svc ---
+uv.exe : warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+At E:\AISOP\ipe\scripts\run-all-service-tests.ps1:22 char:15
++     $result = & uv @args 2>&1 | Out-String
++               ~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: Failed...ed performance.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 1 package in 360ms
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\alert-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 25 items
+
+tests\test_api_alerts.py ........                                        [ 32%]
+tests\test_api_incidents_extended.py ...                                 [ 44%]
+tests\test_api_war_room.py ..                                            [ 52%]
+tests\test_notifier.py ..                                                [ 60%]
+tests\test_rules.py ....                                                 [ 76%]
+tests\test_war_room_extended.py .....                                    [ 96%]
+tests\test_war_room_recovery.py .                                        [100%]
+
+============================== warnings summary ===============================
+tests/test_api_alerts.py::test_list_alerts_empty
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 25 passed, 1 warning in 6.21s ========================
+
+--- quality-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\quality-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 21 items
+
+tests\test_api_quality.py ...                                            [ 14%]
+tests\test_predictor.py .......                                          [ 47%]
+tests\test_spc.py ...........                                            [100%]
+
+============================== warnings summary ===============================
+..\..\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 21 passed, 1 warning in 4.00s ========================
+
+--- sustain-svc ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: E:\AISOP\ipe\services\sustain-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 25 items
+
+tests\test_api_sustainability.py ....                                    [ 16%]
+tests\test_eol_planner.py ......                                         [ 40%]
+tests\test_recyclability.py .......                                      [ 68%]
+tests\test_scorer.py ........                                            [100%]
+
+============================== warnings summary ===============================
+..\..\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11
+  E:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 25 passed, 1 warning in 3.75s ========================
+
+=== Summary: 1110 passed, 0 failed ===
+Completed: 2026-06-28 11:13:08

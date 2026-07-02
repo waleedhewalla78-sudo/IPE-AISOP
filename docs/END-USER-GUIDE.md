@@ -1,736 +1,1264 @@
-# IPE Platform — End User Guide
+# IPE Platform — Comprehensive End User Guide
 
-**Version:** 1.0.0  
-**Last Updated:** June 2026
+**Product:** Intelligent Planning Engine (IPE)  
+**Version:** v7.0.0  
+**Last updated:** June 2026  
+**Audience:** Planners, supervisors, operators, managers, executives, auditors, and administrators
 
 ---
 
 ## Table of Contents
 
-1. [Introduction](#1-introduction)
-2. [Getting Started](#2-getting-started)
-3. [Navigation Overview](#3-navigation-overview)
-4. [Control Tower](#4-control-tower)
-5. [Schedule](#5-schedule)
-6. [Resolution Center](#6-resolution-center)
-7. [Copilot (AI Assistant)](#7-copilot-ai-assistant)
-8. [Shop Floor](#8-shop-floor)
-9. [Executive Dashboard](#9-executive-dashboard)
-10. [War Room](#10-war-room)
-11. [AI Trust Dashboard](#11-ai-trust-dashboard)
-12. [Supply Chain Network Portal](#12-supply-chain-network-portal)
-13. [MLOps Dashboard](#13-mlops-dashboard)
-14. [Onboarding Wizard](#14-onboarding-wizard)
-15. [Common Workflows](#15-common-workflows)
-16. [Troubleshooting](#16-troubleshooting)
-17. [Glossary](#17-glossary)
-18. [Index](#18-index)
+1. [Product Overview](#1-product-overview)
+2. [Getting Access](#2-getting-access)
+3. [User Interface Layout](#3-user-interface-layout)
+4. [User Roles and Permissions](#4-user-roles-and-permissions)
+5. [How IPE Works — The Planning Pipeline](#5-how-ipe-works--the-planning-pipeline)
+6. [Module Reference](#6-module-reference)
+7. [Role-Based Workflows](#7-role-based-workflows)
+8. [Integrations](#8-integrations)
+9. [Configuration and Autonomy Modes](#9-configuration-and-autonomy-modes)
+10. [Advanced and Power-User Topics](#10-advanced-and-power-user-topics)
+11. [Best Practices](#11-best-practices)
+12. [Troubleshooting](#12-troubleshooting)
+13. [Glossary](#13-glossary)
+14. [Quick Reference Index](#14-quick-reference-index)
 
 ---
 
-## 1. Introduction
+## 1. Product Overview
 
-### What is IPE?
+### 1.1 What is IPE?
 
-IPE (Intelligent Production Engine) is an AI-powered manufacturing operations platform that helps you:
+IPE (Intelligent Planning Engine) is an AI-assisted manufacturing operations platform. It connects demand, materials, capacity, feasibility scoring, resolution planning, and shop-floor execution into one coordinated system.
 
-- **Prioritize demand** using AI-driven scoring across customer value, urgency, margin, and strategic importance
-- **Schedule production** with constraint-aware optimization (capacity, materials, labor)
-- **Resolve disruptions** by generating and comparing resolution scenarios
-- **Track quality** with statistical process control and defect prediction
-- **Monitor sustainability** through carbon footprint and circularity scoring
-- **Get AI assistance** via a natural language copilot that can query production data
+IPE helps your organization:
 
-### Who is this guide for?
+- **Prioritize manufacturing orders (MOs)** using multi-factor scoring (customer value, margin, urgency, strategic importance)
+- **Detect constraints early** — material shortages, capacity overloads, labor gaps, BOM issues
+- **Generate resolution scenarios** with cost, delivery, and business impact estimates
+- **Build optimized schedules** using constraint programming (Google OR-Tools)
+- **Monitor disruptions** in a centralized War Room with mitigation options
+- **Query production data in natural language** through the AI Copilot
+- **Track trust, quality, sustainability, and compliance** metrics alongside operations
 
-This guide is for **planners, operators, managers, and executives** who use IPE daily to plan, schedule, monitor, and resolve manufacturing operations.
+### 1.2 Core Capabilities at a Glance
 
-### Key Concepts
+| Capability | Primary modules | Who uses it most |
+|------------|-----------------|------------------|
+| Production health monitoring | Control Tower, War Room | Planners, supervisors |
+| Constraint resolution | Resolution Center | Planners, managers |
+| Schedule planning & approval | Schedule | Planners, managers |
+| Shop-floor execution | Shop Floor | Operators, supervisors |
+| Executive analytics | Executive, Cost of Chaos | Managers, executives |
+| Supply chain visibility | SCN Portal, Tariff | Supply chain managers |
+| AI assistance | Copilot, AI Trust | Planners, all roles (read) |
+| Governance | Admin, MDR, Compliance | Administrators, auditors |
+| Quality & sustainability | Quality, Sustainability | Quality engineers, ESG teams |
+
+### 1.3 Key Concepts
 
 | Term | Definition |
-|------|-----------|
-| **MO** | Manufacturing Order — a work order to produce a specific product |
-| **Feasibility Score** | AI-computed score (0–100) indicating how likely an MO can be completed on time |
-| **Constraint** | A bottleneck or shortage preventing an MO from being feasible (Material, Capacity, Labor, Demand, BOM) |
-| **Scenario** | A proposed resolution strategy for a constraint, with cost and delivery impact estimates |
-| **Control Tower** | The main dashboard showing production health at a glance |
-| **Shadow Mode** | AI makes recommendations but does not take automatic actions |
+|------|------------|
+| **MO (Manufacturing Order)** | A work order to produce a specific product quantity by a required date |
+| **Feasibility Score** | AI score from 0–100 predicting whether an MO can complete on time |
+| **Constraint** | A bottleneck blocking feasibility: Material (M), Capacity (C), Labor (L), Demand (D), BOM (B) |
+| **Scenario** | A proposed resolution strategy with estimated cost and delivery impact |
+| **Control Tower** | Default home dashboard — live production health |
+| **Shadow Mode** | AI recommends actions but does not auto-apply them (default in demo) |
+| **Suggest Mode** | AI proposes changes; planner must approve |
+| **Autonomous Mode** | AI may auto-apply within configured guardrails |
+| **MDR (Master Data Readiness)** | Composite data-quality gate before autonomous scheduling |
+| **ATP** | Available to Promise — inventory availability check |
+| **CPM** | Critical Path Method — identifies schedule-driving operations |
 
----
+### 1.4 Demo Environment Reference
 
-## 2. Getting Started
+When using the bundled demo tenant **Demo Manufacturing Inc**:
 
-### Logging In
-
-1. Open your browser and navigate to the IPE URL provided by your administrator (e.g., `http://localhost:8082`)
-2. Enter your **email** and **password**
-3. Click **Sign In**
-4. You will be redirected to the **Control Tower** (home page)
-
-### Session Management
-
-- Your session expires after **60 minutes** of inactivity
-- If your session expires, you will be redirected to the login page
-- Click **Sign In** again to resume
-
-### Understanding Your Role
-
-Your role determines what you can see and do:
-
-| Role | Can Do |
+| Item | Value |
 |------|--------|
-| **Operator** | View shop floor, update own tasks |
-| **Planner** | Full access to scheduling, resolution, demand management |
-| **Manager** | All planner access plus S&OP and financial projections |
-| **Executive** | View dashboards, KPIs, and analytics |
-| **Admin** | Full system access including configuration and user management |
+| Web application | http://localhost:8082 |
+| API gateway | http://localhost:8000 |
+| Primary login | `Ahmed@nour` / `admin` |
+| Alternate login | `admin@demo.com` / `demo` |
+| Demo MOs | MO-DEMO-001 through MO-DEMO-010 |
+| Hero products | Widget A, Gadget B, Assembly D |
+| Customers | Acme Corp, Globex, Initech |
+
+Your production deployment will use URLs and credentials provided by your administrator.
 
 ---
 
-## 3. Navigation Overview
+## 2. Getting Access
 
-### Sidebar Menu
+### 2.1 Logging In
 
-The sidebar on the left provides access to all main modules:
+1. Open the IPE URL in a supported browser (Chrome, Edge, or Firefox recommended).
+2. You arrive at the **Login** page (`/login`).
+3. Enter your **email** and **password**.
+4. Click **Sign In**.
+5. On success, you are redirected to the **Planning Dashboard** (`/planning/dashboard`).
 
-| Icon | Module | Description |
-|------|--------|-------------|
-| 🏠 | **Control Tower** | Production overview and live monitoring |
-| 📅 | **Schedule** | Gantt chart and production schedule approval |
-| 🔧 | **Resolution Center** | View and resolve production constraints |
-| 🤖 | **Copilot** | AI assistant for natural language queries |
-| 🏭 | **Shop Floor** | Offline-capable shop floor operations |
-| ⚙️ | **Admin** | System configuration (admin only) |
+**UI elements on the login page:**
 
-### Top-Level Pages (via URL or sidebar links)
+- Email field — your corporate email or assigned demo account
+- Password field — masked input
+- Sign In button — submits credentials to the authentication service
 
-| Page | URL | Description |
-|------|-----|-------------|
-| Control Tower | `/control-tower` | Default home page |
-| Executive Dashboard | `/executive` | High-level analytics and P&L |
-| War Room | `/war-room` | Disruption aggregation and mitigation |
-| AI Trust | `/ai-trust` | AI model transparency and adoption |
-| SCN Portal | `/scn-portal` | Supplier management |
-| MLOps | `/ml-ops` | ML model monitoring |
-| Onboarding | `/onboarding` | New tenant setup wizard |
+**Expected outcome:** The header shows your name or email; the sidebar lists all modules you are permitted to use.
+
+### 2.2 Signing Out
+
+1. Look at the top-right of the header bar (labeled **Intelligent Planning Engine**).
+2. Click **Sign out**.
+3. You return to the login page; your session token is cleared.
+
+### 2.3 Session Behavior
+
+- Sessions expire after approximately **60 minutes** of inactivity.
+- If your session expires, API calls return **401 Unauthorized** and the app redirects you to login.
+- Sign in again to continue; unsaved form changes may be lost.
+
+### 2.4 Browser and Device Recommendations
+
+| Use case | Recommendation |
+|----------|----------------|
+| Planning & analytics | Desktop or laptop, 1920×1080 or larger |
+| Shop floor | Tablet; Shop Floor supports offline queue |
+| Executive review | Desktop; Executive and War Room use charts |
+| Copilot | Any device with keyboard; responses may take 5–15 seconds |
 
 ---
 
-## 4. Control Tower
+## 3. User Interface Layout
 
-**Purpose:** Real-time production health overview. This is your home page and primary monitoring screen.
+Every authenticated page shares the same shell:
 
-**URL:** `/control-tower` (default landing page)
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Header: "Intelligent Planning Engine"    [User] [Sign out] │
+├──────────────┬──────────────────────────────────────────────┤
+│   Sidebar    │  Main content area (module page)             │
+│   (nav)      │                                              │
+│              │                                              │
+└──────────────┴──────────────────────────────────────────────┘
+```
 
-### 4.1 KPI Cards
+### 3.1 Header Bar
 
-At the top of the page, four cards display key metrics:
+- **Left:** Product title — *Intelligent Planning Engine*
+- **Right:** Your display name (or email) and **Sign out** button
 
-| Card | Description | What it means |
-|------|-------------|---------------|
-| **Avg Feasibility Score** | Average feasibility score across all active MOs | Higher is better; green ≥80, yellow 60–79, red <60 |
-| **Active Bottlenecks** | Number of work centers running above 85% utilization | More bottlenecks = more production risk |
-| **Orders at Risk** | MOs with feasibility score below 70 | These orders need attention |
-| **On-Time Delivery** | Percentage of MOs delivered on schedule | "Not available in Shadow Mode" when AI is not auto-scheduling |
+### 3.2 Sidebar Navigation
 
-### 4.2 MO Risk Queue
+The left sidebar lists **six hubs**. Each hub opens a landing page with **tabs** for related modules. The active hub is highlighted in blue.
 
-A table showing all manufacturing orders sorted by risk (lowest feasibility first):
+| Icon | Hub | Root URL | Tabs |
+|------|-----|----------|------|
+| 📊 | Planning Hub | `/planning` | Dashboard, Control Tower, Resolution, Schedule |
+| 🎯 | Command Center | `/command-center` | Dashboard, War Room, Executive, Cost of Chaos |
+| 🌐 | Supply Chain | `/supply-chain` | Tariff, SCN Portal, Inventory |
+| 🤖 | AI & Governance | `/ai-governance` | Copilot, AI Trust, MDR, Compliance, Quality, Sustainability |
+| 🏭 | Shop Floor | `/shop-floor` | (standalone — operator work orders) |
+| ⚙️ | Platform | `/platform` | Admin, Onboarding, MLOps |
+
+**Default after login:** `/planning/dashboard` (Planning team dashboard).
+
+**Legacy bookmarks:** Old URLs such as `/control-tower`, `/copilot`, or `/executive` automatically redirect to the matching hub tab.
+
+### 3.3 Hub Tab Navigation
+
+Within a hub, use the horizontal tab bar below the hub title to switch modules without leaving the hub context. Example — **Planning Hub**:
+
+| Tab | URL | Purpose |
+|-----|-----|---------|
+| Dashboard | `/planning/dashboard` | Planner KPI overview and quick links |
+| Control Tower | `/planning/control-tower` | Feasibility queue and bottlenecks |
+| Resolution | `/planning/resolution` | Constraint scenarios |
+| Schedule | `/planning/schedule` | Gantt chart and approval |
+
+**Command Center Dashboard** (`/command-center/dashboard`) serves executives with alerts, OTD, and cost-of-chaos summaries.
+
+### 3.4 Legacy Module URLs (Redirects)
+
+These former sidebar URLs still work via automatic redirect:
+
+| Legacy URL | Redirects to |
+|------------|--------------|
+| `/control-tower` | `/planning/control-tower` |
+| `/resolution`, `/resolution-center` | `/planning/resolution` |
+| `/schedule` | `/planning/schedule` |
+| `/war-room`, `/executive`, `/cost-of-chaos` | Matching Command Center tab |
+| `/tariff`, `/scn-portal` | Matching Supply Chain tab |
+| `/copilot`, `/ai-trust`, `/mdr`, etc. | Matching AI & Governance tab |
+| `/admin`, `/onboarding`, `/ml-ops` | Matching Platform tab |
+
+### 3.5 Common UI Patterns
+
+| Element | Meaning |
+|---------|---------|
+| **Card** | White panel grouping related content |
+| **Badge** | Small colored label (green = good, yellow = warning, red = critical) |
+| **Spinner** | Data loading — wait before interacting |
+| **Tab buttons** | Switch views within a page (e.g., Admin → Configuration / Data Quality / LLM) |
+| **Primary button** | Main action (blue) — Approve, Save, Send |
+| **Secondary button** | Alternate action — Cancel, Retry |
+
+---
+
+## 4. User Roles and Permissions
+
+IPE uses **Role-Based Access Control (RBAC)**. Your role is assigned by an administrator and embedded in your login token. If you attempt an action your role cannot perform, the system returns **403 Forbidden**.
+
+### 4.1 Role Definitions
+
+| Role | Typical job title | Primary responsibility |
+|------|-------------------|------------------------|
+| **admin** | System / tenant administrator | Full configuration, user management, all operational actions |
+| **planner** | Production planner | Scheduling, resolution, demand management, Copilot |
+| **manager** | Operations manager | Approvals, solver runs, analytics, team oversight |
+| **supervisor** | Line supervisor | View schedules, acknowledge disruptions, shop floor oversight |
+| **executive** | Director / VP Operations | KPIs, War Room recovery options, read-only analytics |
+| **auditor** | Compliance / internal audit | Read-only access, audit logs, KPIs, scenarios |
+| **operator** | Shop floor operator | Own task updates, limited read access |
+
+### 4.2 Permission Matrix
+
+The table below summarizes what each role can do. “✓” = allowed; “—” = not allowed or read-only only.
+
+| Action / Area | admin | planner | manager | supervisor | executive | auditor | operator |
+|---------------|:-----:|:-------:|:-------:|:----------:|:---------:|:-------:|:--------:|
+| View Control Tower & KPIs | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| View feasibility queue | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| Run capacity schedule (solver) | ✓ | ✓ | ✓ | — | — | — | — |
+| Approve schedule | ✓ | ✓ | ✓ | — | — | — | — |
+| Approve resolution scenarios | ✓ | ✓ | ✓ | — | — | — | — |
+| Use Copilot (query) | ✓ | ✓ | ✓ | ✓ | — | ✓ | — |
+| View War Room disruptions | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
+| War Room recovery options | ✓ | ✓ | ✓ | — | ✓ | — | — |
+| View Executive / Cost of Chaos | ✓ | ✓ | ✓ | — | ✓ | ✓ | — |
+| Shop Floor — view tasks | ✓ | ✓ | ✓ | ✓ | — | — | ✓ |
+| Shop Floor — update own tasks | ✓ | — | — | ✓ | — | — | ✓ |
+| Admin configuration | ✓ | — | — | — | — | — | — |
+| View audit / compliance logs | ✓ | — | — | — | — | ✓ | — |
+| Material write (ATP, netting) | ✓ | ✓ | — | — | — | — | — |
+| Tariff shock simulation | ✓ | ✓ | ✓ | — | — | — | — |
+| MDR dashboard | ✓ | ✓ | ✓ | — | — | — | — |
+
+### 4.3 What Happens When Access Is Denied
+
+- **401 Unauthorized:** Session expired — sign in again.
+- **403 Forbidden:** Your role lacks permission — contact your administrator to request access or use an account with the appropriate role.
+
+### 4.4 Autonomy Mode Interaction with Roles
+
+Even with planner permissions, **Shadow Mode** (default) means:
+
+- AI generates recommendations and scenarios
+- **You** must explicitly approve schedules and resolutions
+- OTD metrics may show “Not available in Shadow Mode” until autonomous scheduling is enabled
+
+Only **admin** users can change autonomy mode in the Admin console.
+
+---
+
+## 5. How IPE Works — The Planning Pipeline
+
+Understanding the end-to-end flow helps you know which module to open for each task.
+
+```
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐    ┌──────────────┐
+│ ERP / Demand│───▶│ Material ATP │───▶│  Capacity   │───▶│ Feasibility  │
+│  (Orders)   │    │  (mat-svc)   │    │  Schedule   │    │   Scoring    │
+└─────────────┘    └──────────────┘    │  (cap-svc)  │    │  (fea-svc)   │
+                                         └─────────────┘    └──────┬───────┘
+                                                                    │
+                    ┌──────────────┐    ┌─────────────┐            ▼
+                    │ Shop Floor   │◀───│  Approved   │◀─── Resolution
+                    │  Execution   │    │  Schedule   │     Scenarios
+                    └──────────────┘    └─────────────┘     (res-svc)
+```
+
+### 5.1 Stage-by-Stage Summary
+
+| Stage | What happens | Where you see it |
+|-------|--------------|------------------|
+| 1. Demand intake | Customer orders and MOs enter the system | Control Tower queue |
+| 2. Material check | Inventory ATP determines material feasibility | Constraint icon **M** |
+| 3. Capacity schedule | OR-Tools assigns operations to work centers | Schedule Gantt |
+| 4. Feasibility score | Dual-gate AI scoring (0–100) | Control Tower, KPI cards |
+| 5. Resolution | AI proposes expedite, reroute, reschedule options | Resolution Center |
+| 6. Approval | Planner approves scenario and/or schedule | Resolution Center, Schedule |
+| 7. ERP sync | Approved plan exported to ERP (when connected) | Automatic via Connector |
+| 8. Execution | Operators progress work on shop floor | Shop Floor |
+
+### 5.2 Data Dependencies
+
+- **Resolution scenarios** require a feasibility score and identified constraint — open Resolution Center from Control Tower for best results.
+- **Schedule approval** requires MOs with feasibility above the planner threshold (typically ≥85% for approve guardrail in demo).
+- **Copilot material queries** pull live data from mat-svc — ensure ERP/inventory sync is current for accurate answers.
+- **MDR gate** must pass (composite score ≥ threshold) before autonomous scheduling is allowed.
+
+---
+
+## 6. Module Reference
+
+Each section follows: **Purpose → When to use → How to access → UI walkthrough → Expected outcomes → Tips**
+
+---
+
+### 6.1 Control Tower
+
+**Purpose:** Real-time production health overview — your daily starting point.
+
+**URL:** `/planning/control-tower` (also reachable via Planning Hub → Control Tower tab; legacy `/control-tower` redirects here)
+
+**When to use:** Start of shift, before production meetings, after disruptions.
+
+#### KPI Cards (top row)
+
+| Card | Meaning | Color guidance |
+|------|---------|----------------|
+| Avg Feasibility Score | Mean score across active MOs | Green ≥80, Yellow 60–79, Red <60 |
+| Active Bottlenecks | Work centers above 85% utilization | Higher = more risk |
+| Orders at Risk | MOs with feasibility below 70 | Requires immediate attention |
+| On-Time Delivery | OTD percentage | May show “Not available in Shadow Mode” |
+
+#### MO Risk Queue (main table)
 
 | Column | Description |
 |--------|-------------|
-| **MO ID** | Manufacturing order identifier |
-| **Product** | Product being manufactured |
-| **Customer** | Customer who placed the order |
-| **Required Date** | When the order is due |
-| **Feasibility** | Color-coded badge: 🟢 Green ≥90, 🟡 Yellow 70–89, 🔴 Red <70 |
-| **Constraint** | Icons indicating constraint type: M=Material, C=Capacity, L=Labor, D=Demand, B=BOM |
-| **Resolve** | Button to open this MO in the Resolution Center |
+| MO ID | Manufacturing order identifier (e.g., MO-DEMO-001) |
+| Product | Product name |
+| Customer | Customer who placed the order |
+| Required Date | Due date |
+| Feasibility | Color badge: Green ≥90, Yellow 70–89, Red <70 |
+| Constraint | Icons: M=Material, C=Capacity, L=Labor, D=Demand, B=BOM |
+| Resolve | Button — opens Resolution Center for this MO |
 
-**Actions:**
-- Click **Resolve** on any row to jump to the Resolution Center with that MO pre-selected
-- The table updates in **real-time** via WebSocket — you'll see new scores appear without refreshing
+**Live updates:** The queue refreshes via WebSocket when feasibility scores change — no manual refresh needed.
 
-### 4.3 Bottleneck Map
+#### Bottleneck Map
 
-Shows work centers running above capacity:
+Horizontal bars per work center:
 
-- **Red bar** (>95%): Critical — severely overloaded
-- **Orange bar** (>85%): Warning — near capacity
-- **Yellow bar** (>70%): Watch — approaching limit
-- **Green bar** (≤70%): Healthy — within capacity
+- **Red (>95%):** Critical overload
+- **Orange (>85%):** Warning
+- **Yellow (>70%):** Watch
+- **Green (≤70%):** Healthy
 
-### 4.4 How to Use the Control Tower
+**Expected outcome:** You can identify the highest-risk MOs and overloaded work centers within seconds.
 
-**Daily monitoring workflow:**
-1. Check the **KPI cards** for overall health
-2. Scan the **MO Risk Queue** for red (critical) items
-3. Click **Resolve** on any red/yellow MO to investigate
-4. Check the **Bottleneck Map** to see which work centers are overloaded
-5. The queue updates automatically — no manual refresh needed
+**Best practice:** Sort mentally by red feasibility first, then check bottleneck map for systemic capacity issues.
 
 ---
 
-## 5. Schedule
+### 6.2 Schedule
 
-**Purpose:** Visualize the production schedule as a Gantt chart and approve AI-suggested schedules.
+**Purpose:** Visualize and approve the production schedule on a Gantt timeline.
 
 **URL:** `/schedule`
 
-### 5.1 Gantt Chart
+**When to use:** After reviewing Control Tower; before releasing plan to shop floor or ERP.
 
-The main area shows a timeline-based view of all scheduled operations:
+**Roles required:** View — supervisor+; Approve — planner, admin, manager
 
-**Visual Elements:**
-- **Blue bars**: Planned operations (current schedule)
-- **Green overlay**: AI-suggested improvements
-- **Gray bars**: Frozen operations (cannot be changed)
-- **Red pulsing bars**: Disrupted operations (delayed or impacted)
-- **Time axis**: Shows hours across the scheduling horizon
+#### Gantt Chart Elements
+
+| Visual | Meaning |
+|--------|---------|
+| Blue bars | Planned operations |
+| Green overlay | AI-suggested improvements |
+| Gray bars | Frozen operations (cannot move) |
+| Red pulsing bars | Disrupted / impacted operations |
 
 **Interactions:**
-- **Hover** over a bar to see operation details (MO, work center, start/end time)
-- **Click** a row to expand and see the "Disruption Cascade" — which downstream operations are affected
-- **Status badges**: Impacted (red), Approved (green)
 
-### 5.2 Approval Queue
+- **Hover** a bar — see MO, work center, start/end time
+- **Click** a row — expand disruption cascade (downstream impact)
+- Status badges: **Impacted** (red), **Approved** (green)
 
-A card at the top showing pending AI schedule suggestions:
+#### Approval Queue (top card)
 
-- Displays the number of MOs with pending approvals
-- Click **Approve All (N)** to accept all AI suggestions at once
-- Once approved, the schedule can be synced to your ERP system
+- Shows count of MOs pending approval
+- **Approve All (N)** — accepts all pending AI suggestions
+- Individual MO approval also available
 
-### 5.3 How to Use the Schedule
+**Expected outcome:** After approval, schedule persists in the system and is eligible for ERP export.
 
-**Schedule approval workflow:**
-1. Open the **Schedule** page
-2. Review the Gantt chart — look for red (disrupted) and green (AI-suggested) bars
-3. Click on individual rows to see disruption cascades
-4. Review the **Approval Queue** card at the top
-5. Click **Approve All** or approve individual MOs
-6. After approval, the schedule is ready to sync to your ERP
+**Important:** Demo guardrail requires feasibility ≥85% for approve on certain MOs (MO-DEMO-005/006 in seed data).
+
+#### V6 Advanced Features on Schedule Page
+
+| Feature | What it does |
+|---------|--------------|
+| **Margin-aware priority** | Shows activity-based cost and margin scores for top MOs |
+| **CPM cascade** | Critical path analysis — typically completes in under 2 seconds |
+| **Disruption simulation** | Model machine breakdown impact on downstream ops |
 
 ---
 
-## 6. Resolution Center
+### 6.3 Resolution Center
 
-**Purpose:** View production constraints and compare AI-generated resolution scenarios.
+**Purpose:** Compare AI-generated resolution scenarios for constrained MOs.
 
-**URL:** `/resolution` (alias: `/resolution-center`)
+**URL:** `/resolution-center` or `/resolution`
 
-### 6.1 Left Panel — Unresolved MOs
+**When to use:** When an MO shows a constraint in Control Tower or Copilot identifies an at-risk order.
 
-A table listing MOs with active constraints:
+#### Left Panel — Unresolved MOs
 
 | Column | Description |
 |--------|-------------|
-| **MO ID** | Manufacturing order identifier |
-| **Feasibility** | Color-coded badge (same as Control Tower) |
-| **Cause** | Primary constraint type (Material Shortage, Capacity Overload, etc.) |
-| **Select** | Button to view scenarios for this MO |
+| MO ID | Order identifier |
+| Feasibility | Color-coded score |
+| Cause | Primary constraint (Material Shortage, Capacity Overload, etc.) |
+| Select | Opens scenarios for this MO |
 
-**Constraint Detail Card (appears when you select an MO):**
-- **Severity**: Critical / High / Medium / Low
-- **Constraint Type**: Material / Capacity / Labor / BOM / Demand
-- **Detail**: Description of the specific issue
-- **Classified Cause**: AI-identified root cause with confidence percentage
+**Constraint Detail Card** (after selecting an MO):
 
-### 6.2 Right Panel — Scenario Comparison
+- Severity: Critical / High / Medium / Low
+- Constraint type and detailed description
+- AI-classified root cause with confidence percentage
 
-For the selected MO, you see resolution scenario cards:
+#### Right Panel — Scenario Comparison
+
+Each scenario card shows:
 
 | Field | Description |
 |-------|-------------|
-| **Strategy Name** | e.g., "Expedite Material", "Reroute to Backup WC", "Reschedule" |
-| **Status Badge** | Approved (green) / Rejected (red) / Proposed (gray) |
-| **Business Score** | AI-computed score (0–100) of how well this resolves the constraint |
-| **Delivery Impact** | Days saved or lost (green = positive, red = negative) |
-| **Cost Impact** | Dollar cost of this resolution |
-| **Approve** | Button to approve and execute this scenario |
-| **Reject** | Button to reject this scenario |
+| Strategy Name | e.g., Expedite Material, Reroute, Reschedule |
+| Status | Approved / Rejected / Proposed |
+| Business Score | 0–100 — how well this resolves the constraint |
+| Delivery Impact | Days saved (green) or lost (red) |
+| Cost Impact | Estimated dollar cost |
+| Approve / Reject | Action buttons |
 
-### 6.3 How to Resolve a Constraint
+**Workflow:**
 
-**Resolution workflow:**
-1. Open the **Resolution Center**
-2. Find the MO you want to resolve in the left panel
-3. Click **Select** to view available scenarios
-4. Review each scenario's **Business Score**, **Delivery Impact**, and **Cost Impact**
-5. Choose the best scenario and click **Approve**
-6. The resolution is executed and the MO status updates
+1. Open Resolution Center
+2. Select an MO from the left panel
+3. Review scenario cards — compare score, cost, delivery
+4. Click **Approve** on the best option
+5. MO status updates; feasibility may improve on next queue refresh
+
+**Expected outcome:** Approved scenario is recorded; resolution event may publish to Kafka for downstream services.
 
 ---
 
-## 7. Copilot (AI Assistant)
+### 6.4 Copilot (AI Assistant)
 
-**Purpose:** Natural language interface for querying production data and getting AI-powered insights.
+**Purpose:** Ask production questions in plain language; receive data-driven answers.
 
 **URL:** `/copilot`
 
-### 7.1 Chat Interface
+**When to use:** Quick lookups, executive briefings, exploratory analysis without navigating multiple dashboards.
 
-- **Message input**: Type your question at the bottom
-- **Send button**: Submit your query
-- **Response area**: AI responses appear with:
-  - **Intent badge**: Shows what the AI understood (e.g., "demand_query", "schedule_query", "disruption_analysis")
-  - **Sources**: Data sources used to generate the response
-  - **Streaming**: Text appears character by character as the AI generates it
+**Roles:** planner, admin, manager, supervisor, auditor
 
-### 7.2 Example Queries
+#### Chat Interface
 
-| Query | What the AI does |
-|-------|-----------------|
-| "What is the status of MO-001?" | Queries the MO status and returns progress, constraints, and timeline |
-| "Why is order 123 delayed?" | Classifies the delay cause and provides root cause analysis |
-| "Show me capacity for WC-01" | Returns current utilization and available capacity |
-| "What's the best resolution for the material shortage on MO-005?" | Generates and recommends resolution scenarios |
-| "Simulate a 3-day supplier delay for Supplier X" | Runs a disruption simulation and shows impact |
+| Element | Location | Action |
+|---------|----------|--------|
+| Message history | Center | Scrollable conversation |
+| Text input | Bottom | Type your question |
+| Send button | Bottom-right | Submit query |
 
-### 7.3 Tool Calls
+**Response includes:**
 
-The Copilot can invoke backend tools to get real-time data. You'll see:
-- A **spinner** while the tool executes
-- The **tool name** (e.g., `get_order_status`, `simulate_disruption`)
-- The **result** displayed inline
+- **Intent badge** — how the AI classified your question
+- **Answer text** — synthesized from live system data
+- **Sources** — which services contributed (e.g., `nlp-svc:material_status`)
 
-### 7.4 Streaming Responses
+#### Supported Intent Categories
 
-Responses stream in real-time via Server-Sent Events (SSE):
-- Text appears word by word
-- A blinking cursor (`|`) shows the response is still generating
-- If the response is long, a heartbeat ping keeps the connection alive
+| Intent | Example question | Data sources |
+|--------|------------------|--------------|
+| `material_status` | “What is our finished goods inventory?” | mat-svc inventory |
+| `demand_query` | “Show customer orders due this week” | dpe-svc demands |
+| `capacity_status` | “Which work centers are overloaded?” | cap-svc schedule |
+| `delay_analysis` | “Why are orders late?” | dpe-svc alerts |
+| `feasibility_check` | “Which MOs are at risk?” | fea-svc queue |
+| `resolution_help` | “What scenarios exist for MO-DEMO-001?” | res-svc scenarios |
+| `general` | “Hello” / general manufacturing questions | LLM with context |
+
+#### Example Queries
+
+```
+What is our Widget A on-hand quantity?
+Which orders are at risk this week?
+Show me capacity utilization for Assembly Line 1
+What resolution options exist for material shortages?
+Summarize active alerts in the war room
+```
+
+**Expected outcome:** Response within 5–15 seconds with intent label and sourced data.
+
+**Limitations:**
+
+- Copilot **reads** data and explains — it does **not** modify live production records
+- If LLM service is offline, you see: *“Copilot is offline or could not reach the API…”*
+- Complex “what-if” simulations may require Resolution Center or Schedule tools
+
+**Best practice:** Be specific — include MO IDs, product names, or date ranges for best results.
 
 ---
 
-## 8. Shop Floor
+### 6.5 Shop Floor
 
-**Purpose:** Offline-capable interface for shop floor operators to view and update production tasks.
+**Purpose:** Operator-facing view of active and pending work orders.
 
 **URL:** `/shop-floor`
 
-### 8.1 Status Indicators
+**When to use:** On the production line; tablet-friendly.
 
-At the top of the page:
-- **Online/Offline badge**: Green when connected, red when offline
-- **Pending sync counter**: Yellow badge showing how many changes are queued for sync
+#### Page Elements
 
-### 8.2 Barcode Scanner
+| Element | Description |
+|---------|-------------|
+| Online/Offline badge | Green = connected; Red = offline mode |
+| Pending sync counter | Yellow badge — queued changes awaiting upload |
+| Barcode scanner input | Scan or type MO/product ID, press Enter |
+| In Progress column | Green-bordered cards with progress bars |
+| Pending column | Yellow-bordered cards awaiting start |
 
-- A text input field at the top
-- Scan a barcode or type an MO/product ID
-- Press **Enter** to look up the scanned item
+**Card contents:** MO ID, Work Center, Operator name, Progress percentage
 
-### 8.3 Task Columns
+#### Offline Behavior
 
-**In Progress column:**
-- Cards with green left border
-- Shows: MO ID, Work Center, Operator name, Progress bar with percentage
+1. Connection lost → badge turns **Offline**
+2. Updates saved locally
+3. Pending sync counter increments
+4. On reconnect → automatic sync; counter returns to zero
 
-**Pending column:**
-- Cards with yellow left border
-- Shows: MO ID, Work Center, Operator name
-
-### 8.4 Offline Support
-
-When you lose internet connection:
-1. The status badge turns **red** (Offline)
-2. Any updates you make are saved locally
-3. A **pending sync counter** shows queued changes
-4. When connection is restored, changes sync automatically
-5. The counter returns to zero when all changes are synced
+**Roles:** Operators update own tasks; supervisors view all.
 
 ---
 
-## 9. Executive Dashboard
+### 6.6 Executive Dashboard
 
-**Purpose:** High-level analytics, P&L, and strategic planning views for managers and executives.
+**Purpose:** Strategic KPIs, OTD trends, delay analysis, and financial views.
 
 **URL:** `/executive`
 
-### 9.1 KPI Cards
+**When to use:** Weekly operations review, board reporting, S&OP meetings.
+
+**Roles:** All can view; executives and managers primary audience.
+
+#### KPI Cards
 
 | Card | Description |
 |------|-------------|
-| **AI-Scheduled OTD %** | On-time delivery rate when AI manages scheduling |
-| **Manual-Scheduled OTD %** | On-time delivery rate with manual scheduling |
-| **Planning Cycle Time** | Average days from order to production start |
-| **Inventory Investment** | Total value of inventory held |
+| AI-Scheduled OTD % | On-time delivery under AI scheduling |
+| Manual-Scheduled OTD % | OTD under manual planning |
+| Planning Cycle Time | Days from order to production start |
+| Inventory Investment | Total inventory value |
 
-### 9.2 Charts and Visualizations
+#### Charts and Tables
 
-- **AI vs Manual OTD Trend**: Line chart comparing AI and manual scheduling performance over 90 days
-- **Delay Root Cause Coverage**: Progress bar showing what percentage of delays have been root-cause analyzed
-- **Planner Productivity**: Cards showing time savings from AI automation
+- **AI vs Manual OTD Trend** — 90-day line chart
+- **Delay Root Cause Coverage** — percentage of delays analyzed
+- **OTD by Work Center** — tabular breakdown
+- **Delay Root Cause Breakdown** — pie chart by category
+- **P&L Statement** — Revenue, COGM, COPQ, margins
+- **S&OP Gap Analysis** — demand vs capacity
+- **What-If Simulation** — test scenario impact on margin/OTD
 
-### 9.3 Detailed Tables
-
-- **OTD by Work Center**: Table showing on-time delivery percentage per work center
-- **Delay Root Cause Breakdown**: Pie chart and table of delay causes with percentages
-- **Planning Accuracy**: Statistical measures of how accurate plans are vs actuals
-
-### 9.4 Financial Views
-
-- **P&L Statement**: Revenue, COGM, COPQ, Gross Margin, Net Margin with percentage breakdowns
-- **S&OP Gap Analysis**: Demand vs capacity comparison with bottleneck identification
-- **What-If Simulation**: Test different scenarios and see margin/OTD impact
+**Expected outcome:** Executive-ready view of planning effectiveness and financial exposure.
 
 ---
 
-## 10. War Room
+### 6.7 War Room
 
-**Purpose:** Aggregated view of all active disruptions with mitigation options.
+**Purpose:** Aggregated disruption view with mitigation options and recovery planning.
 
 **URL:** `/war-room`
 
-### 10.1 KPI Cards
+**When to use:** During supply chain events, machine breakdowns, supplier delays.
+
+#### KPI Cards
 
 | Card | Description |
 |------|-------------|
-| **Active Disruptions** | Number of unresolved disruption events (red) |
-| **Impacted MOs** | Total manufacturing orders affected |
-| **Revenue at Risk** | Dollar value of revenue threatened by disruptions |
-| **Mitigation Options** | Number of available resolution strategies |
+| Active Disruptions | Count of unresolved events |
+| Impacted MOs | Orders affected |
+| Revenue at Risk | Dollar exposure |
+| Mitigation Options | Available recovery strategies |
 
-### 10.2 Disruption Event Cards
+#### Disruption Event Cards
 
-Each disruption shows:
-- **Type**: Supplier delay, port strike, machine breakdown, etc.
-- **Status**: Active (red), Mitigating (yellow), Resolved (green)
-- **Source**: Name and ID of the disrupted entity
-- **Delay Days**: How many days of delay (red text)
-- **Impacted MOs count**: Number of affected orders
+Each event shows:
 
-**Expanded view** shows a table of impacted MOs with:
-- MO ID
-- Delay days
-- Affected components
-- Revenue at risk
-- Severity badge
+- **Type** — supplier delay, port strike, machine breakdown, etc.
+- **Status** — Active (red), Mitigating (yellow), Resolved (green)
+- **Source** — Entity name and ID
+- **Delay Days** — duration impact
+- **Impacted MOs** — expandable table with severity
 
-### 10.3 Mitigation Scenario Cards
+#### Mitigation Scenario Cards
 
-Three columns showing available mitigation options:
-- **Name**: e.g., "Switch to Backup Supplier", "Expedite Shipping"
-- **Description**: What this mitigation does
-- **Cost**: Dollar cost ($K)
-- **OTD Impact**: Percentage improvement in on-time delivery
-- **Delay Reduction**: Days saved
-- **Confidence**: AI confidence in this mitigation
-- **Assign Task**: Button to assign this mitigation to a team member
+Three-column comparison:
+
+- Name and description
+- Cost ($K)
+- OTD impact (%)
+- Delay reduction (days)
+- Confidence score
+- **Assign Task** — delegate to team member
+
+**Roles:** View — planner, admin, manager, supervisor; Recovery options — includes executive.
 
 ---
 
-## 11. AI Trust Dashboard
+### 6.8 Cost of Chaos
 
-**Purpose:** Transparent view of AI model performance, accuracy, and adoption metrics.
+**Purpose:** Quantify financial impact of production disruptions over time.
+
+**URL:** `/cost-of-chaos`
+
+**When to use:** Justify investment in resilience; prioritize mitigation spending.
+
+#### Page Elements
+
+| Element | Description |
+|---------|-------------|
+| Period toggle | **7d** or **30d** view |
+| Total chaos cost | Aggregate USD impact |
+| Category breakdown | Pareto bar chart by disruption type |
+| Top drivers | Ranked list with percentage contribution |
+| Link to War Room | Navigate to active mitigations |
+
+**Categories typically include:** Material delay, capacity loss, quality hold, supplier failure, logistics disruption.
+
+**Expected outcome:** Clear dollar attribution of chaos cost by category for the selected period.
+
+---
+
+### 6.9 Tariff Resilience
+
+**Purpose:** Simulate regional tariff increases and identify margin-erosion risk with substitute material drafts.
+
+**URL:** `/tariff`
+
+**When to use:** Trade policy changes, sourcing reviews, margin protection planning.
+
+#### Tariff Shock Simulator
+
+| Input | Description | Default (demo) |
+|-------|-------------|----------------|
+| Region | Target region code | Region_X |
+| Tariff delta (%) | Percentage increase | 25 |
+| Margin threshold (%) | Flag MOs below this margin | 15 |
+
+Click **Run Shock Simulation**.
+
+#### Results
+
+| Output | Description |
+|--------|-------------|
+| Affected MOs | Orders whose margin falls below threshold |
+| Margin impact table | Per-MO margin before/after |
+| Substitute drafts | AI-proposed BOM substitutions to recover margin |
+
+**Expected outcome (demo):** ~6 affected MOs, ~6 substitute drafts generated.
+
+---
+
+### 6.10 AI Trust Dashboard
+
+**Purpose:** Transparency into AI model performance and adoption.
 
 **URL:** `/ai-trust`
 
-### 11.1 Trust Score Cards
+**When to use:** Governance reviews, AI adoption campaigns, override analysis.
 
-Five cards showing trust dimensions:
-- **Accuracy**: How often AI predictions are correct
-- **Consistency**: How stable AI outputs are over time
-- **Fairness**: Whether AI treats all scenarios equitably
-- **Transparency**: How explainable AI decisions are
-- **Reliability**: System uptime and availability
+#### Trust Dimensions
 
-Each card shows: Score %, Trend arrow (up/down/stable), Delta % change
+| Dimension | Measures |
+|-----------|----------|
+| Accuracy | Prediction correctness |
+| Consistency | Output stability over time |
+| Fairness | Equitable treatment across scenarios |
+| Transparency | Explainability of decisions |
+| Reliability | System availability |
 
-### 11.2 Composite Trust Score
+**Composite score:** High (≥80), Good (60–79), Needs Improvement (<60)
 
-A weighted average of all trust dimensions with a badge:
-- **High** (≥80): AI is performing well
-- **Good** (60–79): Acceptable performance
-- **Needs Improvement** (<60): Attention required
+#### Additional Sections
 
-### 11.3 Model Accuracy Table
-
-| Column | Description |
-|--------|-------------|
-| **Model** | Name of the ML model |
-| **Predictions** | Number of predictions made |
-| **Accuracy %** | Correct predictions / total (color-coded) |
-| **Confidence** | Average confidence score |
-| **MAPE** | Mean Absolute Percentage Error |
-
-### 11.4 AI vs Manual Impact
-
-Side-by-side comparison showing how AI performs against manual processes:
-- **OTD**: On-time delivery comparison
-- **Cycle Time**: Planning cycle time comparison
-- **Delta**: Improvement or regression amount
-
-### 11.5 Override Nudge
-
-When users frequently override AI recommendations:
-- Shows current adoption percentage
-- Warns that overriding AI reduces OTD by a specific percentage
-- Encourages reviewing AI reasoning before overriding
+- **Model Accuracy Table** — per-model predictions, MAPE, confidence
+- **AI vs Manual Impact** — OTD and cycle time comparison
+- **Override Nudge** — warns when frequent AI overrides reduce OTD
 
 ---
 
-## 12. Supply Chain Network Portal
+### 6.11 SCN Portal (Supply Chain Network)
 
-**Purpose:** Monitor supplier performance and manage supply chain relationships.
+**Purpose:** Supplier performance scorecards and relationship monitoring.
 
 **URL:** `/scn-portal`
 
-### 12.1 KPI Cards
+#### KPI Cards
 
 | Card | Description |
 |------|-------------|
-| **Total Suppliers** | Number of registered suppliers |
-| **Active** | Currently active suppliers (green) |
-| **Avg Score** | Average supplier performance score |
-| **At Risk** | Suppliers with score below 70 (red) |
+| Total Suppliers | Registered count |
+| Active | Currently active suppliers |
+| Avg Score | Mean performance score |
+| At Risk | Suppliers scoring below 70 |
 
-### 12.2 Supplier Table
+#### Supplier Table
 
 | Column | Description |
 |--------|-------------|
-| **Name** | Supplier company name |
-| **Tier** | Supply chain tier (1 = direct, 2 = sub-supplier, 3 = lower tier) |
-| **Score** | Performance score: 🟢 Green ≥80, 🟡 Yellow ≥60, 🔴 Red <60 |
-| **Lead Time** | Average delivery lead time in days |
-| **Defect Rate** | Percentage of defective deliveries |
-| **Status** | Active (green), Warning (yellow), Inactive (gray) |
+| Name | Supplier company |
+| Tier | 1=direct, 2=sub, 3=lower tier |
+| Score | Green ≥80, Yellow ≥60, Red <60 |
+| Lead Time | Average delivery days |
+| Defect Rate | Percentage defective |
+| Status | Active / Warning / Inactive |
+
+**Demo suppliers:** Global Materials Ltd (88%), Parts R Us (95%), QuickShip Logistics (75%)
 
 ---
 
-## 13. MLOps Dashboard
+### 6.12 MLOps Dashboard
 
-**Purpose:** Monitor deployed ML models, their accuracy, and drift detection.
+**Purpose:** Monitor deployed ML models, accuracy, and data drift.
 
 **URL:** `/ml-ops`
 
-### 13.1 KPI Cards
-
-| Card | Description |
-|------|-------------|
-| **Total Models** | Number of registered ML models |
-| **Deployed** | Models currently in production (green) |
-| **Avg Accuracy** | Average accuracy across all models |
-| **Drift Alerts** | Models with PSI > 0.25 (red) — indicating data drift |
-
-### 13.2 Models Table
-
 | Column | Description |
 |--------|-------------|
-| **Model** | Model name |
-| **Version** | Current version number |
-| **Accuracy %** | Model accuracy (color-coded) |
-| **Drift PSI** | Population Stability Index: 🔴 >0.25 (drift), 🟡 >0.1 (warning), 🟢 ≤0.1 (stable) |
-| **Status** | Deployed (green), Staging (yellow), Retired (gray) |
-| **Last Trained** | Date of last training run |
+| Model | Model name |
+| Version | Current version |
+| Accuracy % | Color-coded performance |
+| Drift PSI | Population Stability Index — red if >0.25 |
+| Status | Deployed / Staging / Retired |
+| Last Trained | Training date |
+
+**When to use:** ML engineering reviews; investigate feasibility score degradation.
 
 ---
 
-## 14. Onboarding Wizard
+### 6.13 Admin Console
 
-**Purpose:** Guided setup for new tenants to configure their IPE instance.
+**Purpose:** Tenant configuration, data quality monitoring, LLM provider health.
+
+**URL:** `/admin`
+
+**Roles:** **admin only**
+
+#### Tab: Configuration
+
+| Setting | Description |
+|---------|-------------|
+| Priority Weights | Sliders/inputs for demand scoring factors (customer tier, margin, urgency, etc.) |
+| Feasibility Thresholds | Auto-confirm and planner approval thresholds (0–100) |
+| Autonomy Mode | **shadow** / **suggest** / **autonomous** |
+| Strategic Product IDs | Products receiving priority boost |
+
+Click **Save Configuration** to apply.
+
+#### Tab: Data Quality
+
+| Metric | Threshold |
+|--------|-----------|
+| BOM Completeness | Good ≥80%, Review 60–79%, Critical <60% |
+| Lead Time Accuracy | Same thresholds |
+| Inventory Record Accuracy | Same thresholds |
+
+#### Tab: LLM Tiers
+
+- Active provider (e.g., openrouter, anthropic)
+- Routing enabled/disabled
+- Per-provider health badges
+
+---
+
+### 6.14 Master Data Readiness (MDR)
+
+**Purpose:** Composite data-quality gate controlling whether AI autonomous scheduling is permitted.
+
+**URL:** `/mdr`
+
+#### Key Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Composite Score | Weighted average across dimensions |
+| Gate Threshold | Minimum score required (typically 70%) |
+| Scheduling Allowed | Badge — pass/fail |
+
+#### Dimensions (weighted)
+
+| Dimension | Typical weight |
+|-----------|----------------|
+| BOM completeness | 35% |
+| Lead time accuracy | 25% |
+| Routing accuracy | 20% |
+| Inventory accuracy | 20% |
+
+**Recommendations list:** Action items to improve score below gate.
+
+**Dependency:** Autonomous mode in Admin should not be enabled until MDR gate passes.
+
+---
+
+### 6.15 Quality Dashboard
+
+**URL:** `/quality`
+
+**Purpose:** Statistical process control and defect prediction.
+
+#### Tabs
+
+| Tab | Content |
+|-----|---------|
+| SPC (X-bar) | Control chart with UCL/LCL, out-of-control points, process sigma |
+| P-Chart | Defect proportion over time |
+| Defect Prediction | Risk level (low/medium/high), contributing factors |
+
+**When to use:** Quality holds affecting schedule; root-cause analysis for delay category “quality.”
+
+---
+
+### 6.16 Sustainability Dashboard
+
+**URL:** `/sustainability`
+
+**Purpose:** Circularity scoring, end-of-life planning, recyclability analysis.
+
+#### Tabs
+
+| Tab | Content |
+|-----|---------|
+| Circularity | Score /100, material recovery %, take-back eligibility |
+| EOL Plan | Product lifecycle phases (Active Sale → End of Life) |
+| Recyclability | Per-component recyclable flag and grade |
+
+---
+
+### 6.17 Compliance Dashboard
+
+**URL:** `/compliance`
+
+**Purpose:** Audit trail visibility and compliance KPIs.
+
+**Roles:** admin, auditor (primary)
+
+#### Contents
+
+- Compliance KPI cards (audit coverage, policy adherence)
+- **Audit Log Table** — timestamp, actor, action, entity, rationale
+- Common actions: `APPROVE_SCHEDULE`, `RUN_SCENARIO`, `COPILOT_CHAT`, `COST_OPTIMIZE`
+
+**When to use:** Regulatory audits, internal controls verification, post-incident review.
+
+---
+
+### 6.18 Onboarding Wizard
 
 **URL:** `/onboarding`
 
-### Step-by-Step Process
+**Purpose:** Guided setup for new tenants (typically run once by admin).
 
-**Step 1 — Welcome**
-- Introduction to IPE and what you'll configure
-
-**Step 2 — Company Info**
-- **Company Name**: Your company's name
-- **Industry**: Select from Automotive, Electronics, Aerospace, Food & Beverage, Pharmaceuticals
-- **Employee Count**: 1-50, 51-200, 201-1000, 1000+
-
-**Step 3 — Choose Plan**
-
-| Plan | Price | Features |
-|------|-------|----------|
-| **Basic** | $5K/mo | Core scheduling, demand management |
-| **Professional** | $15K/mo | All Basic + AI copilot, advanced analytics |
-| **Enterprise** | $50K/mo | All Professional + custom integrations, priority support |
-
-**Step 4 — Admin Account**
-- **Admin Email**: Primary administrator email
-- **Admin Name**: Administrator's full name
-
-**Step 5 — Integrations**
-Connect to your ERP system:
-- SAP (RFC/BAPI)
-- Microsoft Dynamics 365 (OData)
-- Odoo (JSON-RPC)
-- **Skip for now** — configure later
-
-**Step 6 — Complete**
-- Confirmation screen with a button to go to the Control Tower
+| Step | Content |
+|------|---------|
+| 1. Welcome | Introduction |
+| 2. Company Info | Name, industry, employee count |
+| 3. Choose Plan | Basic / Professional / Enterprise |
+| 4. Admin Account | Primary admin email and name |
+| 5. Integrations | SAP, D365, Odoo, or Skip |
+| 6. Complete | Confirmation → Control Tower |
 
 ---
 
-## 15. Common Workflows
+## 7. Role-Based Workflows
 
-### Workflow 1: Daily Production Review
+### 7.1 Planner — Daily Production Review (15–30 min)
 
-**Goal:** Start your day by assessing production health
+**Goal:** Ensure no critical MO is unaddressed before shift start.
 
-1. **Log in** to IPE → You land on the **Control Tower**
-2. Check **KPI cards** — note any red indicators
-3. Review the **MO Risk Queue** — focus on red (feasibility <70) items
-4. Click **Resolve** on the highest-risk MO
-5. In the **Resolution Center**, review the proposed scenarios
-6. **Approve** the best scenario for each critical MO
-7. Check the **Bottleneck Map** — if any work center is red, investigate capacity
-8. Switch to the **Schedule** page to review the Gantt chart
-9. **Approve** any pending AI schedule suggestions
+1. Sign in → **Control Tower**
+2. Review KPI cards — note red/yellow indicators
+3. Scan **MO Risk Queue** — sort by lowest feasibility
+4. For each red MO (<70): click **Resolve**
+5. In **Resolution Center**: compare scenarios → **Approve** best option
+6. Open **Schedule** — review Gantt for conflicts
+7. **Approve** pending schedule suggestions
+8. Optional: ask Copilot *“Summarize orders at risk today”*
 
-### Workflow 2: Resolving a Material Shortage
-
-**Goal:** Address a material constraint on a specific MO
-
-1. From the **Control Tower**, find the MO with an "M" (Material) constraint icon
-2. Click **Resolve** to open the **Resolution Center**
-3. Review the constraint detail card — note the specific material shortage
-4. Compare scenarios:
-   - **Expedite Material**: Higher cost, faster delivery
-   - **Reroute to Alternative**: Uses different materials, moderate cost
-   - **Reschedule**: Delay the MO, lowest cost
-5. Click **Approve** on your chosen scenario
-6. The system executes the resolution and updates the MO status
-
-### Workflow 3: Using the Copilot for Quick Insights
-
-**Goal:** Get a quick answer without navigating dashboards
-
-1. Click **Copilot** in the sidebar
-2. Type a natural language question, such as:
-   - "What's the status of all orders for Customer X?"
-   - "Which work centers are overloaded this week?"
-   - "What caused the delay on MO-123?"
-3. Wait for the streaming response
-4. Review the **intent badge** to confirm the AI understood your question
-5. Check **sources** to see where the data came from
-
-### Workflow 4: Approving a Schedule and Syncing to ERP
-
-**Goal:** Finalize the production schedule and push to your ERP
-
-1. Open the **Schedule** page
-2. Review the **Gantt chart** for the coming week
-3. Check the **Approval Queue** — see how many MOs need approval
-4. Click **Approve All** (or approve individually)
-5. The schedule is now finalized
-6. To sync to ERP, the system automatically sends approved MOs via the Connector service
-
-### Workflow 5: Responding to a Disruption
-
-**Goal:** Handle a supply chain disruption
-
-1. An alert appears on the **Control Tower** or **War Room**
-2. Open the **War Room** page
-3. Review the **disruption event card** — type, source, delay days
-4. Check the **Impacted MOs** table — see which orders are affected
-5. Review **Mitigation Scenario Cards** — compare cost, OTD impact, and confidence
-6. Click **Assign Task** on the best mitigation option
-7. The assigned team member receives notification and takes action
-
-### Workflow 6: Shop Floor Updates (Offline)
-
-**Goal:** Update production progress from the shop floor
-
-1. Open the **Shop Floor** page on a tablet or mobile device
-2. Check the **Online/Offline** indicator at the top
-3. **Scan a barcode** or type the MO ID
-4. Find the MO in the **In Progress** column
-5. Update the progress percentage
-6. If offline, changes are queued locally
-7. When reconnected, changes sync automatically (check pending counter)
+**Success criteria:** No unreviewed red MOs; schedule approved for release.
 
 ---
 
-## 16. Troubleshooting
+### 7.2 Manager — Weekly Operations Meeting
 
-### Common Issues
+**Goal:** Present performance and assign mitigation resources.
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| "Cannot reach this page" | Docker services not running | Ask admin to run `docker compose up -d` |
-| 401 Unauthorized | Session expired | Log in again |
-| "Not available in Shadow Mode" | AI auto-scheduling disabled | This is normal in Shadow Mode — AI makes recommendations but doesn't auto-apply |
-| Feasibility score not updating | WebSocket disconnected | Refresh the page; check network connection |
-| Copilot not responding | NLP service down or no API key | Contact admin to check NLP service health |
-| Shop floor shows "Offline" | Network connection lost | Changes will sync when connection is restored |
-| Empty dashboard | No seed data loaded | Ask admin to run seed data script |
-
-### Health Check
-
-If you suspect a service issue, your admin can check:
-- Each service has a health endpoint at `/api/v1/health`
-- Docker status: `docker ps` should show all services as "healthy"
+1. **Executive Dashboard** — capture OTD and delay breakdown
+2. **Cost of Chaos** — 30-day view for financial narrative
+3. **War Room** — review active disruptions; **Assign Task** on top mitigation
+4. **AI Trust** — note adoption rate and override warnings
+5. **SCN Portal** — flag at-risk suppliers for sourcing review
 
 ---
 
-## 17. Glossary
+### 7.3 Supervisor — Shift Handoff
+
+**Goal:** Align shop floor with approved plan.
+
+1. **Control Tower** — note bottleneck work centers
+2. **Schedule** — confirm approved operations for the shift
+3. **Shop Floor** — verify In Progress and Pending columns match plan
+4. Acknowledge disruptions in **War Room** if assigned
+
+---
+
+### 7.4 Operator — Task Execution
+
+**Goal:** Progress assigned work orders accurately.
+
+1. Open **Shop Floor** on tablet
+2. Confirm **Online** status (or work offline if needed)
+3. Scan barcode or enter MO ID
+4. Update progress on assigned operation
+5. Verify sync when back online
+
+---
+
+### 7.5 Executive — Monthly Business Review
+
+**Goal:** Assess planning ROI and disruption exposure.
+
+1. **Executive** — OTD trend, P&L, S&OP gap
+2. **Cost of Chaos** — top 3 cost drivers
+3. **War Room** — revenue at risk summary
+4. **AI Trust** — composite trust score trend
+5. Optional Copilot: *“What were the top delay causes this month?”*
+
+---
+
+### 7.6 Auditor — Compliance Review
+
+**Goal:** Verify controls and traceability.
+
+1. **Compliance** — export mental note of audit log entries
+2. **Admin → Data Quality** — verify master data metrics
+3. **Resolution Center** — spot-check approved scenarios have rationale
+4. **MDR** — confirm gate status documented
+
+**Note:** Auditors have read access; approval actions require planner/manager roles.
+
+---
+
+### 7.7 Administrator — Tenant Setup
+
+**Goal:** Configure tenant for production use.
+
+1. Complete **Onboarding Wizard** (or manual setup)
+2. **Admin → Configuration** — set priority weights and thresholds
+3. Set **Autonomy Mode** to **shadow** initially
+4. Verify **MDR** gate status at `/mdr`
+5. Configure ERP connector (see §8.1)
+6. Configure LLM provider in Admin → LLM Tiers
+7. Run demo verification script (ask IT) before go-live
+
+---
+
+## 8. Integrations
+
+### 8.1 ERP Systems (Odoo, SAP, Microsoft D365)
+
+**What it does:** Synchronizes demands, BOMs, inventory, and approved schedules between IPE and your ERP.
+
+**User-visible effects:**
+
+- MOs appear in Control Tower after ERP sync
+- Approved schedules export back to ERP for execution
+- Inventory in Copilot matches ERP when sync is healthy
+
+**Odoo (supported in demo/test):**
+
+- Connector service polls or receives webhooks from Odoo
+- Uses HMAC-signed requests for security
+
+**SAP / D365:**
+
+- Adapter scaffolding exists; live connection requires enterprise credentials
+- Configure during Onboarding Step 5 or contact administrator
+
+**If ERP sync fails:**
+
+- Schedule still persists in IPE (CDM path)
+- Approve may show “ERP sync deferred” — planner should retry or contact admin
+- Chaos scenario C3 validates this graceful degradation
+
+### 8.2 AI / LLM (Copilot)
+
+**What it does:** Powers natural-language Copilot responses.
+
+**Providers (configured by admin):**
+
+- **OpenRouter** (recommended for demo) — routes to models like Gemini, Claude, GPT
+- **Anthropic Claude** — direct API
+- **Ollama** — local/on-prem fallback
+
+**User impact:** No configuration needed — if Copilot responds, integration is working.
+
+### 8.3 Kafka Event Mesh (Background)
+
+**What it does:** Services communicate asynchronously (demand classified, feasibility scored, resolution approved, etc.).
+
+**User impact:** Generally invisible. If Kafka is paused:
+
+- Core UI still works
+- ERP export may defer until messaging restores
+
+### 8.4 Identity (Keycloak / SSO)
+
+**Production target:** Enterprise SSO via SAML/OAuth (Azure AD, Okta).
+
+**Current demo:** Local email/password authentication.
+
+**When SSO is enabled:** Login page redirects to corporate IdP; roles mapped from IdP groups.
+
+---
+
+## 9. Configuration and Autonomy Modes
+
+### 9.1 Autonomy Modes (Admin)
+
+| Mode | AI behavior | User responsibility |
+|------|-------------|---------------------|
+| **shadow** | Recommend only; never auto-apply | Approve all schedules and resolutions |
+| **suggest** | Pre-fill approvals; highlight changes | Review and confirm each suggestion |
+| **autonomous** | Auto-apply within guardrails | Monitor exceptions only |
+
+**Default in demo:** `shadow`
+
+### 9.2 Feasibility Thresholds
+
+| Threshold | Typical use |
+|-----------|-------------|
+| Auto-confirm | MOs above this may skip manual review (autonomous mode) |
+| Planner | MOs below this blocked from schedule approve |
+
+Configure in **Admin → Configuration**.
+
+### 9.3 Priority Weights
+
+Adjust how demand scoring ranks MOs:
+
+- Customer tier weight
+- Margin weight
+- Urgency / required date weight
+- Strategic product boost
+
+Changes affect queue ordering over time — save and monitor Control Tower after adjustment.
+
+---
+
+## 10. Advanced and Power-User Topics
+
+### 10.1 Critical Path (CPM) Analysis
+
+On **Schedule**, trigger CPM cascade after changing an operation date:
+
+- Identifies critical path operations (typically 3 ops in demo)
+- Completes in under 2 seconds
+- Use when negotiating dates with customers — shows minimum feasible duration
+
+### 10.2 Tariff Substitute Drafts
+
+After running tariff shock:
+
+- Review substitute drafts per affected MO
+- Compare margin recovery vs material risk
+- Coordinate with sourcing before applying BOM changes in ERP
+
+### 10.3 Schedule Approve Guardrails
+
+- MOs with feasibility <85% may be rejected at approve
+- Improve feasibility via Resolution Center first
+- Check MDR gate if autonomous scheduling blocked
+
+### 10.4 Copilot Intent Debugging
+
+If answer seems wrong:
+
+1. Check **intent badge** — did AI classify correctly?
+2. Rephrase with explicit MO ID or module name
+3. Verify source services in **Sources** line
+4. Admin: check **Admin → LLM Tiers** for provider health
+
+### 10.5 WebSocket Live Updates
+
+Control Tower queue updates live — if stale:
+
+- Refresh page once
+- Check network stability
+- Persistent issue → report to admin (fea-svc WebSocket)
+
+### 10.6 Multi-Tenant Isolation
+
+Each user belongs to one tenant. You only see your organization's MOs, inventory, and suppliers. Cross-tenant data is never displayed.
+
+---
+
+## 11. Best Practices
+
+### 11.1 General
+
+- Start every day at **Control Tower**, not Schedule
+- Resolve **material constraints before capacity** — material fixes often improve feasibility score
+- Use **Copilot for questions**, **Resolution Center for actions**
+- Approve schedules only after reviewing **disruption cascades** on red bars
+
+### 11.2 Data Quality
+
+- Monitor **Admin → Data Quality** weekly
+- Do not enable **autonomous** mode until **MDR** gate passes
+- Keep BOM and routing data current in ERP — IPE scores depend on it
+
+### 11.3 AI Trust
+
+- Read scenario **Business Score** and **confidence** before approving
+- Minimize unnecessary AI overrides — AI Trust dashboard shows OTD impact
+- Review **AI Trust** monthly with planning team
+
+### 11.4 Disruption Response
+
+- **War Room** for multi-MO events; **Resolution Center** for single-MO fixes
+- Assign mitigation tasks with clear owners
+- After resolution, verify **Cost of Chaos** category decreases in next period
+
+---
+
+## 12. Troubleshooting
+
+### 12.1 Common Issues
+
+| Symptom | Likely cause | What to do |
+|---------|--------------|------------|
+| Login page won't load | Web UI not running | Contact admin — run `npm run dev` in apps/web or deploy UI |
+| 401 after working session | Session expired | Sign in again |
+| 403 on Approve | Wrong role | Use planner/admin/manager account |
+| Empty Control Tower | No seed data / wrong tenant | Admin runs seed scripts |
+| Feasibility not updating | WebSocket disconnected | Refresh page; check network |
+| Copilot offline message | nlp-svc down or no LLM key | Admin checks service health and OpenRouter/Anthropic config |
+| Schedule approve fails | Feasibility below threshold | Resolve constraints first |
+| “Not available in Shadow Mode” | Autonomy is shadow | Expected — enable suggest/autonomous only with admin approval |
+| Shop Floor offline | Network loss | Continue working; sync when reconnected |
+| ERP not updated after approve | Connector down or Kafka paused | Schedule saved in IPE; admin retries ERP sync |
+| Tariff simulation error | API timeout | Retry; reduce scope; contact admin |
+| Empty War Room | No active disruptions in data | Normal if no seeded delay events |
+
+### 12.2 Health Checks (Administrator)
+
+Each service exposes `GET /api/v1/health`. Gateway health: `http://localhost:8000/api/v1/health`
+
+Quick product check script:
+
+```powershell
+cd E:\AISOP\ipe
+.\scripts\check-product.ps1
+```
+
+Full regression (20 checkpoints):
+
+```powershell
+.\scripts\run-full-demo.ps1
+```
+
+### 12.3 Getting Help
+
+| Issue type | Contact |
+|------------|---------|
+| Access / roles | Tenant administrator |
+| ERP sync | Integration administrator |
+| AI / Copilot | Platform administrator (LLM config) |
+| Data discrepancies | Master data steward + admin |
+| Compliance / audit | Auditor role user or compliance officer |
+
+---
+
+## 13. Glossary
 
 | Term | Definition |
-|------|-----------|
-| **ATP** | Available to Promise — inventory availability check |
-| **BOM** | Bill of Materials — list of components needed to make a product |
-| **CTP** | Capable to Promise — checks both material and capacity availability |
-| **COPQ** | Cost of Poor Quality — total cost of defects, rework, scrap, warranty |
-| **COGM** | Cost of Goods Manufactured — total production cost |
-| **CP-SAT** | Constraint Programming SATisfiability solver (OR-Tools) |
+|------|------------|
+| **ATP** | Available to Promise — can we fulfill from inventory? |
+| **BOM** | Bill of Materials — components to make a product |
+| **CDM** | Canonical Data Model — IPE’s internal persisted schedule format |
+| **CP-SAT** | OR-Tools constraint programming solver |
+| **CPM** | Critical Path Method |
+| **CTP** | Capable to Promise — material + capacity check |
+| **COPQ** | Cost of Poor Quality |
+| **COGM** | Cost of Goods Manufactured |
 | **DSAR** | Data Subject Access Request (GDPR) |
-| **EOL** | End of Life |
-| **Feasibility Score** | AI score (0–100) predicting if an MO can be completed on time |
-| **Gantt Chart** | Timeline visualization of production schedule |
-| **HMAC** | Hash-based Message Authentication Code — used for webhook verification |
-| **JWT** | JSON Web Token — authentication token |
-| **KMS** | Key Management Service — encryption key management |
+| **EOL** | End of Life (product phase) |
+| **Gantt** | Timeline chart of scheduled operations |
+| **HMAC** | Message authentication for secure webhooks |
+| **JWT** | JSON Web Token — session credential |
+| **Kafka** | Event streaming platform (background messaging) |
+| **MDR** | Master Data Readiness |
 | **MO** | Manufacturing Order |
 | **OTD** | On-Time Delivery |
-| **pATP** | Probabilistic ATP — Monte Carlo simulation of material availability |
-| **PSI** | Population Stability Index — measures data drift in ML models |
+| **pATP** | Probabilistic ATP — statistical availability |
+| **PSI** | Population Stability Index (ML drift) |
 | **RBAC** | Role-Based Access Control |
-| **RLS** | Row-Level Security — database-level tenant isolation |
+| **RLS** | Row-Level Security — database tenant isolation |
 | **S&OP** | Sales and Operations Planning |
 | **SCN** | Supply Chain Network |
 | **SPC** | Statistical Process Control |
-| **XAI** | Explainable AI — transparency in AI decision-making |
+| **SSE** | Server-Sent Events (streaming responses) |
+| **XAI** | Explainable AI |
 
 ---
 
-## 18. Index
+## 14. Quick Reference Index
 
 | Topic | Section |
 |-------|---------|
-| Approving schedules | 5.3, 15.4 |
-| Barcode scanning | 8.2 |
-| Bottleneck Map | 4.3 |
-| Copilot queries | 7.2 |
-| Constraint resolution | 6.3, 15.2 |
-| Control Tower overview | 4.1 |
-| Daily review workflow | 15.1 |
-| Disruption response | 15.5 |
-| Executive analytics | 9 |
-| Feasibility score meaning | 4.1 |
-| GDPR DSAR | Admin Guide |
-| Gantt chart | 5.1 |
-| Login | 2.1 |
-| MO Risk Queue | 4.2 |
-| Offline mode | 8.4 |
-| Onboarding | 14 |
-| P&L Statement | 9.4 |
-| Quality SPC | Admin Guide |
-| Resolution scenarios | 6.2 |
-| Role permissions | 2.4 |
-| Schedule approval | 5.2, 15.4 |
-| Session management | 2.2 |
-| Shop Floor updates | 8, 15.6 |
-| Sidebar navigation | 3 |
-| Streaming responses | 7.4 |
-| Supplier management | 12 |
-| Sustainability | Admin Guide |
-| Trust scores | 11.1 |
-| War Room | 10 |
-| WebSocket live updates | 4.2 |
-| What-If simulation | 9.4 |
+| Login / logout | §2.1, §2.2 |
+| Role permissions | §4 |
+| Control Tower KPIs | §6.1 |
+| Schedule approval | §6.2, §7.1 |
+| Resolution scenarios | §6.3 |
+| Copilot queries | §6.4 |
+| Shop Floor offline | §6.5 |
+| Executive analytics | §6.6 |
+| War Room | §6.7 |
+| Cost of Chaos | §6.8 |
+| Tariff simulation | §6.9 |
+| AI Trust | §6.10 |
+| Suppliers | §6.11 |
+| MLOps | §6.12 |
+| Admin config | §6.13 |
+| MDR gate | §6.14 |
+| Quality SPC | §6.15 |
+| Sustainability | §6.16 |
+| Compliance audit | §6.17 |
+| Onboarding | §6.18 |
+| ERP integration | §8.1 |
+| Autonomy modes | §9.1 |
+| Daily planner workflow | §7.1 |
+| Troubleshooting | §12 |
+| Glossary | §13 |
+
+---
+
+## Related Documentation
+
+| Document | Audience | Content |
+|----------|----------|---------|
+| [FULL-DEMO-GUIDE.md](./FULL-DEMO-GUIDE.md) | Presenters | Step-by-step demo script with checkpoints |
+| [ADMIN-GUIDE.md](./ADMIN-GUIDE.md) | Administrators | Installation, Docker, Kafka, security |
+| [qa-e2e-readiness-report.md](./qa-e2e-readiness-report.md) | QA / release | Validation evidence |
+| [api-reference.md](./api-reference.md) | Developers | API endpoints |
+
+---
+
+*This guide covers IPE v7.0.0 as validated in the demo environment. Production deployments may differ in URLs, SSO, and enabled modules — consult your administrator for environment-specific details.*

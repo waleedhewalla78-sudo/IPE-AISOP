@@ -9,10 +9,14 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
     LLM_TIER_DEFAULT: int = 1
     LLM_ROUTING_ENABLED: bool = False
+    LLM_PRIMARY_PROVIDER: str = "auto"  # auto | ollama | openrouter | anthropic
     ANTHROPIC_API_KEY: str = "sk-ant-placeholder"
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_MODEL: str = "google/gemini-2.5-flash"
     SAGEMAKER_ENDPOINT_URL: str = ""
     OLLAMA_ENDPOINT_URL: str = "http://ollama:11434"
-    OLLAMA_MODEL: str = "llama3.2"
+    OLLAMA_MODEL: str = "llama3.1:8b"
     VLLM_ENDPOINT_URL: str = ""
     AWS_REGION: str = "us-east-1"
     MODEL_CONFIG: dict = {"model": "claude-sonnet-4-20250514", "max_tokens": 1024}

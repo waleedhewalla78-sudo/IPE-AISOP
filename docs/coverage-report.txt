@@ -1,0 +1,43 @@
+IPE Coverage Report — Wave 2C (REL-PROD)
+Date: 2026-06-26
+Threshold: fail_under=60 (cap-svc, mat-svc, dpe-svc)
+Command: uv run pytest tests/ -m "not integration" --cov=app --cov-report=term
+
+=== cap-svc ===
+249 passed in 78.27s
+TOTAL                               3368   1069    68%
+Required test coverage of 60.0% reached. Total coverage: 68.26%
+
+Key audit modules:
+  app/api/v1/capacity.py            597    212    64%
+  app/core/schedule_persistence.py  138     19    86%
+
+New tests:
+  tests/test_api_schedule_approve.py::test_approve_returns_409_on_version_conflict PASSED
+  tests/test_mdr_gate.py (3 tests) PASSED
+
+=== mat-svc ===
+105 passed in 70.50s
+TOTAL                              912    316    65%
+Required test coverage of 60.0% reached. Total coverage: 65.35%
+
+Key audit modules:
+  app/api/v1/material.py             270     97    64%
+
+New tests:
+  tests/test_api_material.py::test_check_availability_rule_based_with_tenant PASSED
+  tests/test_api_material.py::test_check_availability_invalid_date PASSED
+
+=== dpe-svc ===
+147 passed, 2 skipped in 42.64s
+TOTAL                             2192    745    66%
+Required test coverage of 60.0% reached. Total coverage: 66.01%
+
+Key audit modules:
+  app/core/tariff_shock.py           100     15    85%
+
+New tests:
+  tests/test_tariff_shock.py::test_get_tariff_exposure_with_region_data PASSED
+  tests/test_tariff_shock.py::test_get_tariff_exposure_skips_attrs_without_region PASSED
+
+OVERALL: 3/3 critical services PASS at >=60% gate.

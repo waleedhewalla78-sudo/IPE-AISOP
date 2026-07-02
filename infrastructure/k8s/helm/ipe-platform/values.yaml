@@ -38,6 +38,14 @@ infrastructure:
     storageClass: "gp3"
     resources:
       requests: { cpu: "100m", memory: "256Mi" }
+
+certManager:
+  enabled: false
+  issuerName: ipe-letsencrypt
+  email: platform@ipe.example.com
+  ingressClass: nginx
+  hosts:
+    - api.ipe.example.com
       limits: { cpu: "500m", memory: "1Gi" }
 
   kong:

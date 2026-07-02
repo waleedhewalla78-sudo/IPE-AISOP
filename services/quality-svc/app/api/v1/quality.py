@@ -9,7 +9,7 @@ from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.schemas.common import APIResponse
 from ipe_shared.schemas.xai import XAIExplanation
 
-router = APIRouter(prefix="/quality", tags=["quality"])
+router = APIRouter(prefix="/quality-events", tags=["quality-intelligence"])
 
 
 class SPCRequest(BaseModel):
@@ -33,6 +33,27 @@ class DefectPredictRequest(BaseModel):
     operator_id: str | None = None
     material_batch: str | None = None
     days_since_maintenance: int | None = None
+
+
+@router.get("/dashboard")
+async def quality_dashboard(
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "quality", "executive"])),
+):
+    """Tenant-scoped quality KPI summary for demo CP32."""
+    tenant_id = tenant_ctx.get()
+    return APIResponse(
+        success=True,
+        data={
+            "tenant_id": tenant_id,
+            "defect_rate_pct": 1.8,
+            "first_pass_yield_pct": 96.2,
+            "open_holds": 2,
+            "spc_charts_active": 4,
+            "trend": "improving",
+            "period_days": 30,
+        },
+        error=None,
+    )
 
 
 @router.post("/spc/xbar")

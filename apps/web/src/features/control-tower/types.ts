@@ -69,13 +69,22 @@ export interface BottleneckItem {
   severity: string;
 }
 
+export interface DataQualityFlag {
+  flag_code: string;
+  message: string;
+}
+
 export interface MOQueueItem {
   mo_id: string;
+  erp_mo_id?: string | null;
   product_name: string;
   customer_name: string;
   required_date: string;
   feasibility_score: number | null;
   primary_constraint: string | null;
+  data_quality_flags?: DataQualityFlag[];
+  unscorable?: boolean;
+  sync_conflict?: Record<string, unknown> | null;
 }
 
 export interface KPI {

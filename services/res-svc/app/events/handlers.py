@@ -15,12 +15,17 @@ async def handle_feasibility_scored(event: dict):
         return
 
     data = envelope.data
-    is_feasible = data.get("is_feasible", True)
-    if is_feasible:
+    mo_id = str(data.get("mo_id") or data.get("demand_line_id") or "")
+    if not mo_id:
         return
 
-    mo_id = str(data.get("demand_line_id", ""))
-    constraint = data.get("primary_constraint", "capacity_overload")
+    score = data.get("feasibility_score")
+    if score is not None and float(score) >= 75.0:
+        return
+    if data.get("is_feasible") is True and score is None:
+        return
+
+    constraint = data.get("primary_constraint") or "capacity_overload"
 
     strategies = generate_strategies(mo_id, constraint)
     best = None

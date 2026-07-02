@@ -7,6 +7,7 @@ from sqlalchemy import select as sa_select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.business_score import score_scenario
+from app.core.odoo_notify import notify_odoo_resolution
 from app.core.strategy import generate_strategies
 from ipe_shared.audit.service import log_audit_event
 from ipe_shared.auth.jwt import TokenPayload
@@ -63,16 +64,26 @@ async def propose_scenarios(
         mo_data={"quantity": float(mo.quantity)},
     )
 
+    existing = await session.execute(
+        sa_select(ResolutionScenario.strategy).where(
+            ResolutionScenario.tenant_id == tid,
+            ResolutionScenario.mo_id == req.mo_id,
+            ResolutionScenario.status == "proposed",
+        )
+    )
+    existing_strategies = {row[0] for row in existing.fetchall()}
+
     scenarios = []
     best = None
     best_score = -1
     for s in raw_strategies:
+        if s["strategy"] in existing_strategies:
+            continue
         scored = score_scenario(s)
         if scored["business_score"] > best_score:
             best_score = scored["business_score"]
             best = s
         scenario_id = uuid4()
-        # Persist to database
         session.add(ResolutionScenario(
             id=scenario_id, tenant_id=tid, mo_id=req.mo_id,
             strategy=s["strategy"], description=s.get("description", ""),
@@ -214,6 +225,8 @@ async def approve_scenario(
         },
         rationale=req.comment or f"Approved by {current_user.sub}",
     )
+
+    await notify_odoo_resolution(scenario, mo, str(tid))
 
     return APIResponse(success=True, data={
         "scenario_id": str(scenario.id),

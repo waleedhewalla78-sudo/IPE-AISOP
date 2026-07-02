@@ -1,0 +1,9 @@
+{
+  "key_id": "enc-test-key",
+  "key_arn": "local://enc-test-key",
+  "algorithm": "AES-256",
+  "created_at": "2026-06-28T08:02:59.655100+00:00",
+  "metadata": {
+    "material_hash": "737fd4101afb3c0cab025ebe99b2bf7422916386904ee37ba9e5b073f7b20495"
+  }
+}

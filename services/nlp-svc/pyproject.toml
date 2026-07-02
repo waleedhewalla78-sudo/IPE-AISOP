@@ -12,8 +12,12 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
-addopts = "-v --tb=short --strict-markers"
-markers = [ "unit", "integration", "slow" ]
+addopts = "-v --tb=short --strict-markers -m 'not integration'"
+markers = [
+    "unit: fast unit tests",
+    "integration: tests requiring external LLM infrastructure (SageMaker/vLLM)",
+    "slow: long-running tests",
+]
 [tool.coverage.run]
 source = ["app"]
 omit = ["*/tests/*"]

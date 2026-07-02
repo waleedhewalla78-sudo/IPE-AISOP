@@ -1,3 +1,6 @@
+# ⚠️ SUPERSEDED — This document is preserved for historical reference only.
+# See `specs/010-v8-validation-convergence/analyze.md` for the current authoritative analysis.
+
 # IPE Platform — Cross-Artifact Consistency & Coverage Analysis
 
 **Date:** 2026-06-21 (Verified)

@@ -40,7 +40,7 @@ async def test_health_endpoint(client):
 @pytest.mark.asyncio
 async def test_spc_xbar(client, auth_headers):
     response = await client.post(
-        "/api/v1/quality/spc/xbar",
+        "/api/v1/quality-events/spc/xbar",
         json={
             "measurements": [
                 [10.1, 10.2, 10.0],
@@ -64,7 +64,7 @@ async def test_spc_xbar(client, auth_headers):
 @pytest.mark.asyncio
 async def test_defect_predict(client, auth_headers):
     response = await client.post(
-        "/api/v1/quality/predict",
+        "/api/v1/quality-events/predict",
         json={
             "mo_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
             "work_center_id": "wc-weld-01",

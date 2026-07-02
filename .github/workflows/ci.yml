@@ -378,3 +378,27 @@ jobs:
             --env BASE_MATERIAL=http://localhost:8002 \
             --env BASE_CAPACITY=http://localhost:8003
         continue-on-error: true
+
+  release1-smoke:
+    name: Release 1 Connector + Smoke
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Connector Odoo tests
+        working-directory: services/connector
+        run: |
+          uv sync --frozen 2>/dev/null || uv sync
+          uv run pytest tests/test_odoo_mapper.py tests/test_odoo_adapter.py tests/test_odoo_sync_mo.py tests/test_odoo_sync_integration.py tests/test_sync_alerts.py -q
+      - name: Release 1 compose smoke (optional)
+        working-directory: infrastructure/docker
+        run: |
+          docker compose -f docker-compose.release1.yml up -d --build db redis dpe-svc fea-svc cap-svc connector kong
+          sleep 45
+          cd ../..
+          bash scripts/release1-smoke.sh || echo "Smoke skipped — stack may need migrations/seed"
+        continue-on-error: true

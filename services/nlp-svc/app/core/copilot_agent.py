@@ -4,7 +4,9 @@ import json
 from collections.abc import AsyncGenerator
 
 from app.core.copilot_tools import TOOL_DEFINITIONS, TOOL_HANDLERS
-from app.core.llm_client import _get_client
+from app.core.llm_client import get_tool_agent_backend
+from app.core.ollama_tool_client import OllamaToolClient, anthropic_tool_defs_to_ollama
+from app.core.tool_agent_backend import ToolAgentBackend
 from ipe_shared.security.pii import strip_pii_from_prompt
 
 SYSTEM_PROMPT = """You are a production planning AI copilot. You help planners understand schedules,
@@ -22,40 +24,23 @@ Always explain your findings clearly and suggest actionable next steps when appr
 Be concise but thorough.
 """
 
+_NOT_CONFIGURED_MSG = (
+    "LLM service not configured. Set IPE_OLLAMA_ENDPOINT_URL (recommended) or IPE_ANTHROPIC_API_KEY."
+)
 
-async def run_agent_with_tools(
-    query: str,
+
+async def _run_anthropic_tool_loop(
+    backend: ToolAgentBackend,
+    clean_query: str,
     tenant_id: str,
-    max_iterations: int = 5,
+    max_iterations: int,
 ) -> AsyncGenerator[dict, None]:
-    """Run the LLM agent with tool calling in a loop.
-
-    The agent can call tools up to max_iterations times before responding.
-    Each iteration: LLM either calls a tool or provides a final text response.
-
-    Yields:
-        Dicts with type: "thinking", "tool_call", "tool_result", or "response".
-    """
-    client, model_config = _get_client()
-    if client is None:
-        yield {
-            "type": "response",
-            "content": "LLM service not configured. Please set ANTHROPIC_API_KEY.",
-        }
-        return
-
-    model = model_config.get("model", "claude-sonnet-4-20250514")
-    max_tokens = model_config.get("max_tokens", 1024)
-
-    clean_query, redacted = strip_pii_from_prompt(query)
-    if redacted:
-        import logging
-
-        logging.getLogger(__name__).info("PII stripped from copilot query: types=%s", redacted)
-
+    client = backend.client
+    model = backend.model_config.get("model", "claude-sonnet-4-20250514")
+    max_tokens = backend.model_config.get("max_tokens", 1024)
     messages = [{"role": "user", "content": clean_query}]
 
-    for iteration in range(max_iterations):
+    for _iteration in range(max_iterations):
         try:
             response = await client.messages.create(
                 model=model,
@@ -72,7 +57,6 @@ async def run_agent_with_tools(
 
             if response.stop_reason == "tool_use":
                 tool_uses = [block for block in response.content if block.type == "tool_use"]
-
                 messages.append({"role": "assistant", "content": response.content})
 
                 tool_results = []
@@ -98,8 +82,8 @@ async def run_agent_with_tools(
 
                 messages.append({"role": "user", "content": tool_results})
 
-        except Exception as e:
-            yield {"type": "response", "content": f"Error: {e!s}"}
+        except Exception as exc:
+            yield {"type": "response", "content": f"Error: {exc!s}"}
             return
 
     yield {
@@ -108,14 +92,93 @@ async def run_agent_with_tools(
     }
 
 
+async def _run_ollama_tool_loop(
+    backend: ToolAgentBackend,
+    clean_query: str,
+    tenant_id: str,
+    max_iterations: int,
+) -> AsyncGenerator[dict, None]:
+    client: OllamaToolClient = backend.client
+    max_tokens = backend.model_config.get("max_tokens", 1024)
+    ollama_tools = anthropic_tool_defs_to_ollama(TOOL_DEFINITIONS)
+    messages: list[dict] = [{"role": "user", "content": clean_query}]
+
+    for _iteration in range(max_iterations):
+        try:
+            turn = await client.create_turn(
+                messages=messages,
+                tools=ollama_tools,
+                system_prompt=SYSTEM_PROMPT,
+                max_tokens=max_tokens,
+            )
+
+            if turn.stop_reason == "end_turn":
+                yield {"type": "response", "content": turn.text or "No response generated."}
+                return
+
+            if turn.stop_reason == "tool_use" and turn.tool_calls:
+                OllamaToolClient.append_assistant_message(messages, turn.raw_message)
+
+                tool_results_payload: list[dict] = []
+                for tc in turn.tool_calls:
+                    yield {"type": "tool_call", "tool": tc.name, "input": tc.arguments}
+
+                    handler = TOOL_HANDLERS.get(tc.name)
+                    if handler:
+                        result = await handler(tenant_id=tenant_id, **tc.arguments)
+                    else:
+                        result = {"error": f"Unknown tool: {tc.name}"}
+
+                    yield {"type": "tool_result", "tool": tc.name, "result": result}
+                    tool_results_payload.append(result)
+
+                OllamaToolClient.append_tool_results(messages, turn.tool_calls, tool_results_payload)
+                continue
+
+            yield {"type": "response", "content": turn.text or "No response generated."}
+            return
+
+        except Exception as exc:
+            detail = str(exc) or "Ollama request failed — try a smaller model or increase timeout"
+            yield {"type": "response", "content": f"Error ({type(exc).__name__}): {detail}"}
+            return
+
+    yield {
+        "type": "response",
+        "content": "I've reached the maximum number of tool iterations. Please rephrase your question.",
+    }
+
+
+async def run_agent_with_tools(
+    query: str,
+    tenant_id: str,
+    max_iterations: int = 5,
+) -> AsyncGenerator[dict, None]:
+    """Run the LLM agent with tool calling in a loop."""
+    backend = get_tool_agent_backend()
+    if backend is None:
+        yield {"type": "response", "content": _NOT_CONFIGURED_MSG}
+        return
+
+    clean_query, redacted = strip_pii_from_prompt(query)
+    if redacted:
+        import logging
+
+        logging.getLogger(__name__).info("PII stripped from copilot query: types=%s", redacted)
+
+    if backend.provider == "ollama":
+        async for event in _run_ollama_tool_loop(backend, clean_query, tenant_id, max_iterations):
+            yield event
+    else:
+        async for event in _run_anthropic_tool_loop(backend, clean_query, tenant_id, max_iterations):
+            yield event
+
+
 async def run_agent_streaming(
     query: str,
     tenant_id: str,
 ) -> AsyncGenerator[str, None]:
-    """Run the agent and stream results as SSE events.
-
-    Yields SSE-formatted strings for frontend consumption.
-    """
+    """Run the agent and stream results as SSE events."""
     async for event in run_agent_with_tools(query, tenant_id):
         chunk = json.dumps(event)
         yield f"data: {chunk}\n\n"

@@ -91,7 +91,7 @@ async def activate_schedule(
             odoo_result = client.execute(
                 "mrp.production", "search_read",
                 args=[[["id", "=", erp_id]]],
-                kwargs={"fields": ["id", "date_planned_start", "date_planned_finished", "__last_update"]},
+                kwargs={"fields": ["id", "date_start", "date_finished", "write_date"]},
             )
             if not odoo_result:
                 failed.append({"mo_id": str(mo_id), "reason": "ERP_MO_NOT_FOUND"})
@@ -102,10 +102,14 @@ async def activate_schedule(
             new_start = mo.ai_suggested_start.strftime("%Y-%m-%d %H:%M:%S")
             new_end = mo.ai_suggested_end.strftime("%Y-%m-%d %H:%M:%S")
 
-            client.write("mrp.production", [erp_id], {
-                "date_planned_start": new_start,
-                "date_planned_finished": new_end,
-            })
+            write_vals = {"date_start": new_start, "date_finished": new_end}
+            try:
+                client.write("mrp.production", [erp_id], write_vals)
+            except Exception:
+                client.write("mrp.production", [erp_id], {
+                    "date_planned_start": new_start,
+                    "date_planned_finished": new_end,
+                })
 
             try:
                 client.execute("mrp.production", "button_unreserve", args=[[erp_id]])

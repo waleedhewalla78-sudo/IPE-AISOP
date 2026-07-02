@@ -1,3 +1,12 @@
+# IPE Docker Compose — 22 application services + infrastructure
+# Host:Internal port map (single source of truth):
+#   dpe-svc:8020:8001  mat-svc:8002:8002  cap-svc:8003:8003  fea-svc:8004:8004
+#   del-svc:8006:8006  nlp-svc:8007:8007  rec-svc:8008:8008  demand-svc:8040:8040
+#   scenario-svc:8050:8050  supply-svc:8060:8060  equipment-svc:8061:8061  order-svc:8070:8070
+#   material-svc:8090:8090  procurement-svc:8100:8100  alert-svc:8010:8010  sustain-svc:8012:8012
+#   quality-svc:8013:8013  scn-svc:8014:8014  network-svc:8015:8015  ml-svc:8011:8009
+#   connector:8016:8016  kong:8000:8000  db:5433:5432  redis:6380:6379  kafka:9092:9092
+#   web-ui:8082:8082 (see web service)  keycloak:8180:8080
 services:
   db:
     image: postgres:16
@@ -208,7 +217,6 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_TRACING_ENABLED: "true"
       OTEL_LOGGING_ENABLED: "true"
-      ANTHROPIC_API_KEY: "mock_anthropic_key" # Replace with actual key for Anthropic API
     depends_on:
       db:
         condition: service_healthy
@@ -266,6 +274,178 @@ services:
       retries: 5
       start_period: 10s
 
+  demand-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/demand-svc/Dockerfile
+    ports:
+      - "8040:8040"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8040/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  scenario-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/scenario-svc/Dockerfile
+    ports:
+      - "8050:8050"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8050/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  supply-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/supply-svc/Dockerfile
+    ports:
+      - "8060:8060"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8060/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  order-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/order-svc/Dockerfile
+    ports:
+      - "8070:8070"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8070/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  equipment-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/equipment-svc/Dockerfile
+    ports:
+      - "8061:8061"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8061/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  material-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/material-svc/Dockerfile
+    ports:
+      - "8090:8090"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8090/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  procurement-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/procurement-svc/Dockerfile
+    ports:
+      - "8100:8100"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACING_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   nlp-svc:
     env_file:
       - ipe-common.env
@@ -281,9 +461,12 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_TRACING_ENABLED: "true"
       OTEL_LOGGING_ENABLED: "true"
-      ANTHROPIC_API_KEY: "mock_anthropic_key" # Replace with actual key for Anthropic API
-      OLLAMA_ENDPOINT_URL: http://ollama:11434
-      OLLAMA_MODEL: llama3.2
+      IPE_OPENROUTER_API_KEY: ${IPE_OPENROUTER_API_KEY:-}
+      IPE_OPENROUTER_MODEL: ${IPE_OPENROUTER_MODEL:-google/gemini-2.5-flash}
+      IPE_ANTHROPIC_API_KEY: ${IPE_ANTHROPIC_API_KEY:-}
+      IPE_LLM_PRIMARY_PROVIDER: ${IPE_LLM_PRIMARY_PROVIDER:-auto}
+      IPE_OLLAMA_ENDPOINT_URL: ${IPE_OLLAMA_ENDPOINT_URL:-}
+      IPE_OLLAMA_MODEL: ${IPE_OLLAMA_MODEL:-llama3.1:8b}
       DPE_SVC_URL: http://dpe-svc:8001
       MAT_SVC_URL: http://mat-svc:8002
       CAP_SVC_URL: http://cap-svc:8003
@@ -648,7 +831,7 @@ services:
       [
         "sh",
         "-c",
-        "pip install -q alembic psycopg2-binary sqlalchemy && cd /app/migrations && alembic upgrade heads",
+        "pip install -q alembic psycopg2-binary sqlalchemy && cd /app/migrations && alembic upgrade 035",
       ]
     working_dir: /app
 

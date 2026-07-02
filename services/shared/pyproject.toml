@@ -28,6 +28,8 @@ dependencies = [
     "python-multipart>=0.0.9",
     "redis>=5.0.0",
     "fastavro>=1.12.2",
+    "hvac>=2.3.0",
+    "minio>=7.2.0",
 ]
 
 [tool.pytest.ini_options]

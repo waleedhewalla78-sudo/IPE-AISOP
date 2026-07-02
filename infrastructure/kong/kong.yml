@@ -203,8 +203,91 @@ services:
           - /api/v1/reconciliation
         strip_path: false
 
+  - name: demand-svc
+    url: http://demand-svc:8040
+    routes:
+      - name: demand-forecast-route
+        paths:
+          - /api/v1/demand/forecast
+        strip_path: false
+      - name: demand-sense-route
+        paths:
+          - /api/v1/demand/sense
+        strip_path: false
+      - name: demand-accuracy-route
+        paths:
+          - /api/v1/demand/accuracy
+        strip_path: false
+      - name: demand-signal-route
+        paths:
+          - /api/v1/demand/signal
+        strip_path: false
+
+  - name: scenario-svc
+    url: http://scenario-svc:8050
+    routes:
+      - name: scenario-route
+        paths:
+          - /api/v1/scenario
+        strip_path: false
+
+  - name: supply-svc
+    url: http://supply-svc:8060
+    routes:
+      - name: supply-route
+        paths:
+          - /api/v1/supply
+        strip_path: false
+
+  - name: order-svc
+    url: http://order-svc:8070
+    routes:
+      - name: order-route
+        paths:
+          - /api/v1/orders
+        strip_path: false
+
+  - name: equipment-svc
+    url: http://equipment-svc:8061
+    routes:
+      - name: equipment-route
+        paths:
+          - /api/v1/equipment
+        strip_path: false
+      - name: maintenance-route
+        paths:
+          - /api/v1/maintenance
+        strip_path: false
+
+  - name: material-svc
+    url: http://material-svc:8090
+    routes:
+      - name: materials-route
+        paths:
+          - /api/v1/materials
+        strip_path: false
+      - name: design-route
+        paths:
+          - /api/v1/design
+        strip_path: false
+
+  - name: procurement-svc
+    url: http://procurement-svc:8100
+    routes:
+      - name: procurement-suppliers-route
+        paths:
+          - /api/v1/suppliers
+        strip_path: false
+      - name: procurement-route
+        paths:
+          - /api/v1/procurement
+        strip_path: false
+
   - name: nlp-svc
     url: http://nlp-svc:8007
+    connect_timeout: 60000
+    read_timeout: 300000
+    write_timeout: 300000
     routes:
       - name: nlp-copilot-route
         paths:

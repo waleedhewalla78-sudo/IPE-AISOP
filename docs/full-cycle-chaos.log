@@ -1,0 +1,7 @@
+﻿docker : Error response from daemon: No such container: docker-chaos-svc-1
+At C:\Users\HP\AppData\Local\Temp\ps-script-bad60706-c3b0-48d6-914e-4312bdc92610.ps1:113 char:399
++ ... cle-alert.log; docker logs docker-chaos-svc-1 --tail 200 2>&1 | Out-F ...
++                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error response ...ker-chaos-svc-1:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

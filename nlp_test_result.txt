@@ -1,0 +1,72 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.0, pluggy-1.6.0
+rootdir: D:\AISOP\ipe\services\nlp-svc
+configfile: pyproject.toml
+plugins: anyio-4.14.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 58 items
+
+services\nlp-svc\tests\test_api_copilot.py ..E.                          [  6%]
+services\nlp-svc\tests\test_copilot_tools.py ..........                  [ 24%]
+services\nlp-svc\tests\test_core.py ........                             [ 37%]
+services\nlp-svc\tests\test_llm_router.py ............................F  [ 87%]
+services\nlp-svc\tests\test_sse_edge_cases.py .......                    [100%]
+
+=================================== ERRORS ====================================
+___________ ERROR at setup of test_query_with_tenant_and_mocked_llm ___________
+E   jwt.exceptions.InvalidKeyError: HMAC key must not be empty.
+---------------------------- Captured stdout setup ----------------------------
+{"asctime": "2026-06-21T17:20:52+0300", "name": "ipe", "levelname": "INFO", "message": "Structured JSON logging enabled for service=nlp-svc", "service_name": "nlp-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:52+0300", "name": "ipe", "levelname": "INFO", "message": "OTel tracing enabled, console exporter (default)", "service_name": "nlp-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:52+0300", "name": "ipe", "levelname": "INFO", "message": "OTel FastAPI instrumented for service=nlp-svc", "service_name": "nlp-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:52+0300", "name": "ipe", "levelname": "INFO", "message": "OTel tracing instrumented for service=nlp-svc", "service_name": "nlp-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:52+0300", "name": "ipe", "levelname": "INFO", "message": "OTel asyncpg instrumented", "service_name": "nlp-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:52+0300", "name": "ipe", "levelname": "INFO", "message": "OTel Redis instrumented", "service_name": "nlp-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+{"asctime": "2026-06-21T17:20:52+0300", "name": "ipe", "levelname": "INFO", "message": "Observability setup complete for service=nlp-svc version=0.1.0", "service_name": "nlp-svc", "version": "0.1.0", "correlation_id": "unknown", "severity": "INFO"}
+----------------------------- Captured log setup ------------------------------
+INFO     ipe:setup.py:32 Structured JSON logging enabled for service=nlp-svc
+INFO     ipe:tracing.py:49 OTel tracing enabled, console exporter (default)
+WARNING  opentelemetry.trace:__init__.py:556 Overriding of current TracerProvider is not allowed
+WARNING  opentelemetry.instrumentation.instrumentor:instrumentor.py:92 Attempting to instrument while already instrumented
+INFO     ipe:tracing.py:82 OTel FastAPI instrumented for service=nlp-svc
+INFO     ipe:setup.py:49 OTel tracing instrumented for service=nlp-svc
+WARNING  opentelemetry.instrumentation.instrumentor:instrumentor.py:92 Attempting to instrument while already instrumented
+INFO     ipe:tracing.py:88 OTel asyncpg instrumented
+WARNING  opentelemetry.instrumentation.instrumentor:instrumentor.py:92 Attempting to instrument while already instrumented
+INFO     ipe:tracing.py:96 OTel Redis instrumented
+INFO     ipe:setup.py:66 Observability setup complete for service=nlp-svc version=0.1.0
+================================== FAILURES ===================================
+E   assert None is not None
+D:\AISOP\ipe\services\nlp-svc\tests\test_llm_router.py:432: assert None is not None
+============================== warnings summary ===============================
+tests/test_api_copilot.py::test_health_endpoint
+  D:\AISOP\ipe\.venv\Lib\site-packages\pythonjsonlogger\jsonlogger.py:11: DeprecationWarning: pythonjsonlogger.jsonlogger has been moved to pythonjsonlogger.json
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED services\nlp-svc\tests\test_llm_router.py::TestGetConfigs::test_anthropic_client_configured
+ERROR services\nlp-svc\tests\test_api_copilot.py::test_query_with_tenant_and_mocked_llm
+============== 1 failed, 56 passed, 1 warning, 1 error in 11.33s ==============
+python.exe : Exception while exporting Span.
+At line:1 char:1
++ & "D:\AISOP\ipe\.venv\Scripts\python.exe" -m pytest services/nlp-svc/ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Exception while exporting Span.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Traceback (most recent call last):
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 182, in _export
+    self._exporter.export(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        [
+        ^
+    ...<3 lines>...
+        ]
+        ^
+    )
+    ^
+  File "D:\AISOP\ipe\.venv\Lib\site-packages\opentelemetry\sdk\trace\export\__init__.py", line 341, in export
+    self.out.write(self.formatter(span))
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+ValueError: I/O operation on closed file.

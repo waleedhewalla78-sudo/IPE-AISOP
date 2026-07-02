@@ -11,11 +11,13 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.copilot_agent import run_agent_streaming, run_agent_with_tools
 from ipe_shared.audit.service import log_audit_event
 from ipe_shared.auth.jwt import TokenPayload
 from ipe_shared.auth.rbac import require_roles
+from ipe_shared.database.session import get_session
 from ipe_shared.events.producer import kafka_producer
 from ipe_shared.events.schemas import EventEnvelope
 from ipe_shared.middleware.tenant_context import tenant_ctx
@@ -33,11 +35,19 @@ router = APIRouter(prefix="/copilot", tags=["copilot"])
 class ChatRequest(BaseModel):
     message: str
     stream: bool = False
+    session_id: str | None = None
+    role: str | None = None
 
 
 class QueryRequest(BaseModel):
     query: str
     stream: bool = False
+    session_id: str | None = None
+    role: str | None = None
+
+
+class SessionCreateRequest(BaseModel):
+    role: str | None = None
 
 
 async def _sse_stream(message: str, tenant_id: str) -> AsyncGenerator[str, None]:
@@ -226,6 +236,7 @@ async def copilot_chat(
 async def copilot_query(
     req: QueryRequest,
     request: Request,
+    db: AsyncSession = Depends(get_session),
     current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "supervisor", "auditor"])),
 ):
     """Legacy query endpoint (backward compatible with Sprint 4 copilot)."""
@@ -238,7 +249,12 @@ async def copilot_query(
 
     from app.core.orchestrator import route_query
     from app.core.llm_errors import LLMUnavailableError
+    from app.core.role_agents import resolve_agent
+    from app.core.copilot_session import append_turn
+    from uuid import UUID as PyUUID
+
     auth_header = request.headers.get("Authorization")
+    agent = resolve_agent(req.role or getattr(current_user, "role", None))
     try:
         result = await route_query(req.query, tenant_id, auth_header=auth_header)
     except LLMUnavailableError as exc:
@@ -267,6 +283,20 @@ async def copilot_query(
         ).model_dump(mode="json"),
     )
 
+    if req.session_id:
+        await append_turn(
+            db,
+            tenant_id=tenant_id,
+            session_id=PyUUID(req.session_id),
+            user_message=req.query,
+            assistant_message=result.get("response", ""),
+            intent=result.get("intent"),
+        )
+        await db.commit()
+
+    result["agent_role"] = agent.role
+    result["follow_up_suggestions"] = list(agent.follow_up_suggestions)
+
     return APIResponse(success=True, data=result, error=None)
 
 
@@ -280,3 +310,51 @@ async def copilot_llm_status(
 
     status = await get_llm_status(tenant_id)
     return APIResponse(success=True, data=status, error=None)
+
+
+@router.get("/agents")
+async def copilot_agents(
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "supervisor", "executive", "auditor"])),
+):
+    from app.core.role_agents import list_agents_for_role
+
+    user_role = getattr(current_user, "role", None) or "planner"
+    return APIResponse(success=True, data={"agents": list_agents_for_role(str(user_role))}, error=None)
+
+
+@router.post("/session")
+async def copilot_create_session(
+    req: SessionCreateRequest,
+    db: AsyncSession = Depends(get_session),
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "supervisor", "executive"])),
+):
+    from uuid import UUID as PyUUID
+
+    from app.core.copilot_session import create_session
+    from app.core.role_agents import resolve_agent
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    agent = resolve_agent(req.role or getattr(current_user, "role", None))
+    row = await create_session(
+        db,
+        tenant_id=tenant_id,
+        user_id=PyUUID(str(current_user.sub)),
+        role=agent.role,
+        context={"follow_up_suggestions": list(agent.follow_up_suggestions)},
+    )
+    await db.commit()
+    return APIResponse(
+        success=True,
+        data={
+            "session_id": str(row.id),
+            "role": row.role,
+            "agent": agent.label,
+            "follow_up_suggestions": list(agent.follow_up_suggestions),
+        },
+        error=None,
+    )
+

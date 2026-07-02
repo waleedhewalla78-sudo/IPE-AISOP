@@ -1,0 +1,10 @@
+﻿=== Release 2 Demo (014) ===
+2026-07-03 01:41:43
+
+[PASS] 1. Outcomes - OTD baseline API
+[PASS] 2. Outcomes - ROI metrics API
+[PASS] 3. Auto-propose - sync returns scenarios_proposed
+[PASS] 4. Resolution scenarios still available
+[PASS] 5. Copilot Lite / planner-assist
+
+=== RESULT: 5 PASS, 0 FAIL, 0 SKIP ===

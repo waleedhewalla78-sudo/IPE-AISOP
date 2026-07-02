@@ -1,0 +1,62 @@
+﻿==============================================
+ IPE Full-Cycle Demo Verification
+ 2026-06-27 10:17:58
+==============================================
+
+[PASS] 0. Login (Ahmed@nour / admin)
+       UI: http://localhost:8082/login
+       -> JWT issued for tenant Demo Manufacturing Inc
+
+--- Planning and Operations Modules ---
+[PASS] 1. Control Tower - feasibility queue (10 MOs)
+       UI: http://localhost:8082/control-tower
+       -> 10 MOs; lowest score 45.0 constraint material_shortage
+[PASS] 2. Control Tower - KPIs
+       UI: http://localhost:8082/control-tower
+       -> avg feasibility 74.9, orders at risk 1
+[FAIL] 3. Resolution Center - scenarios (demo MOs) - The operation has timed out.
+[FAIL] 4. Schedule - OR-Tools Gantt data - The remote server returned an error: (503) Server Unavailable.
+[PASS] 5. Shop Floor - active work orders
+       UI: http://localhost:8082/shop-floor
+       -> 6 work orders: MO-DEMO-001 on Machining Center; MO-DEMO-002 on Machining Center; MO-DEMO-003 on Assembly Line 1; MO-DEMO-001 on Assembly Line 1; MO-DEMO-002 on Packaging Station; MO-DEMO-001 on Packaging Station
+[PASS] 6. SCN Portal - supplier scorecards
+       UI: http://localhost:8082/scn-portal
+       -> Global Materials Ltd 88.0%, Parts R Us 95.0%, QuickShip Logistics 75.0%
+
+--- Analytics and Intelligence ---
+[PASS] 7. Executive - delay breakdown
+       UI: http://localhost:8082/executive
+       -> 6 delay categories (material, capacity, labor, supplier, quality)
+[PASS] 8. Executive - OTD summary
+       UI: http://localhost:8082/executive
+       -> OTD trend points: 2; completed MO history from MO-DEMO-009/010
+[PASS] 9. Dashboard alerts (War Room feed)
+       UI: http://localhost:8082/war-room
+       -> 8 active alerts (MO-DEMO-001 material, MO-DEMO-007 raw material, etc.)
+[FAIL] 10. Copilot - FG stock query - The operation has timed out
+[FAIL] 11. Copilot - at-risk orders query - The request was aborted: The operation has timed out.
+[FAIL] 12. AI Trust - scores - The operation has timed out.
+[FAIL] 13. Admin - tenant config - The operation has timed out.
+[FAIL] 14. Inventory summary (master data) - The operation has timed out.
+[PASS] 15. Schedule - persist after approve
+       UI: http://localhost:8082/schedule
+       -> approved 2 MO(s); 2 persisted in active schedule; ERP sync deferred
+[PASS] 17. V6-R1 - margin-aware priority ordering
+       UI: http://localhost:8082/schedule
+       -> top MO margin score=56.16; activity total_usd=1991.25
+[PASS] 18. V6-R2 - tariff shock + substitute draft
+       UI: http://localhost:8082/tariff
+       -> affected=6; drafts=6
+[PASS] 19. V6-R3 - CPM cascade under 2s
+       UI: http://localhost:8082/schedule
+       -> cascade_ms=44; critical_path=3 ops
+[PASS] 20. V6-R4/R5 - maintenance telemetry + Cost of Chaos + War Room
+       UI: http://localhost:8082/war-room
+       -> maintenance block OK; chaos categories=3; recovery options=3
+
+==============================================
+ RESULT: 13 / 20 passed, 7 failed
+==============================================
+ Fix failures, then re-run:
+   .\scripts\seed-demo-client.ps1
+   docker compose -f infrastructure\docker up -d --force-recreate kong

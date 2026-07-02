@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel, Field
 from sqlalchemy import case, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,9 +19,184 @@ from ipe_shared.models import (
 from ipe_shared.models.demand import DemandLine
 from ipe_shared.models.inventory import InventoryPosition
 from ipe_shared.models.product import Product
+from ipe_shared.models.tenant import Tenant
 from ipe_shared.schemas.common import APIResponse
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
+
+
+class OtdBaselineCaptureRequest(BaseModel):
+    lookback_days: int = Field(default=90, ge=7, le=365)
+    source: str = Field(default="ipe_cdm", description="ipe_cdm | manual | odoo")
+
+
+async def _compute_otd_pct(session: AsyncSession, tenant_id: UUID, lookback_days: int) -> dict:
+    cutoff = datetime.now(timezone.utc) - timedelta(days=lookback_days)
+    stmt = select(
+        func.count().filter(
+            ManufacturingOrder.actual_end <= ManufacturingOrder.planned_end,
+        ).label("on_time"),
+        func.count().label("total"),
+    ).where(
+        ManufacturingOrder.tenant_id == tenant_id,
+        ManufacturingOrder.actual_end.isnot(None),
+        ManufacturingOrder.planned_end.isnot(None),
+        ManufacturingOrder.actual_end >= cutoff,
+    )
+    row = (await session.execute(stmt)).one()
+    total = int(row.total or 0)
+    on_time = int(row.on_time or 0)
+    otd_pct = round((on_time / total) * 100, 1) if total else None
+    return {
+        "otd_pct": otd_pct,
+        "completed_mos": total,
+        "on_time_mos": on_time,
+        "lookback_days": lookback_days,
+    }
+
+
+@router.get("/otd-baseline")
+async def get_otd_baseline(
+    session: AsyncSession = Depends(get_session),
+    current_user=Depends(require_roles(["admin", "planner", "executive"])),
+):
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    tid = UUID(tenant_id)
+    tenant = (await session.execute(select(Tenant).where(Tenant.id == tid))).scalar_one_or_none()
+    if not tenant:
+        return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "Tenant not found"})
+
+    baseline = (tenant.config or {}).get("otd_baseline")
+    current = await _compute_otd_pct(session, tid, 30)
+    delta = None
+    if baseline and baseline.get("otd_pct") is not None and current.get("otd_pct") is not None:
+        delta = round(current["otd_pct"] - float(baseline["otd_pct"]), 1)
+
+    return APIResponse(
+        success=True,
+        data={
+            "baseline": baseline,
+            "current_30d": current,
+            "delta_vs_baseline": delta,
+        },
+        error=None,
+    )
+
+
+@router.post("/otd-baseline/capture")
+async def capture_otd_baseline(
+    body: OtdBaselineCaptureRequest,
+    session: AsyncSession = Depends(get_session),
+    current_user=Depends(require_roles(["admin", "planner"])),
+):
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    tid = UUID(tenant_id)
+    tenant = (await session.execute(select(Tenant).where(Tenant.id == tid))).scalar_one_or_none()
+    if not tenant:
+        return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "Tenant not found"})
+
+    stats = await _compute_otd_pct(session, tid, body.lookback_days)
+    cfg = dict(tenant.config or {})
+    cfg["otd_baseline"] = {
+        **stats,
+        "source": body.source,
+        "captured_at": datetime.now(timezone.utc).isoformat(),
+        "captured_by": getattr(current_user, "email", "admin"),
+    }
+    tenant.config = cfg
+    await session.commit()
+
+    return APIResponse(success=True, data=cfg["otd_baseline"], error=None)
+
+
+@router.get("/roi-metrics")
+async def roi_metrics(
+    weeks: int = Query(default=13, ge=1, le=52),
+    session: AsyncSession = Depends(get_session),
+    current_user=Depends(require_roles(["admin", "planner", "executive"])),
+):
+    """Weekly ROI metrics for Release 1 (SC-R1-02, SC-R1-03)."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    tid = UUID(tenant_id)
+    week_col = func.date_trunc("week", ManufacturingOrder.updated_at)
+    stmt = (
+        select(
+            week_col.label("week_start"),
+            func.count().filter(ManufacturingOrder.status == "completed").label("completed_mos"),
+            func.count().filter(
+                ManufacturingOrder.actual_end.isnot(None),
+                ManufacturingOrder.planned_end.isnot(None),
+                ManufacturingOrder.actual_end <= ManufacturingOrder.planned_end,
+            ).label("on_time"),
+            func.avg(ManufacturingOrder.feasibility_score).label("avg_feasibility"),
+            func.count().filter(ManufacturingOrder.feasibility_score < 70).label("at_risk_count"),
+        )
+        .where(ManufacturingOrder.tenant_id == tid)
+        .group_by(week_col)
+        .order_by(week_col.desc())
+        .limit(weeks)
+    )
+    rows = (await session.execute(stmt)).fetchall()
+    tenant = (await session.execute(select(Tenant).where(Tenant.id == tid))).scalar_one_or_none()
+    mos_saved = int((tenant.config or {}).get("roi_mos_saved", 0)) if tenant else 0
+
+    data = [
+        {
+            "week_start": str(r.week_start.date()) if r.week_start else None,
+            "completed_mos": int(r.completed_mos or 0),
+            "on_time": int(r.on_time or 0),
+            "otd_pct": round((int(r.on_time or 0) / int(r.completed_mos)) * 100, 1)
+            if r.completed_mos else None,
+            "avg_feasibility": round(float(r.avg_feasibility), 1) if r.avg_feasibility else None,
+            "at_risk_count": int(r.at_risk_count or 0),
+        }
+        for r in rows
+    ]
+
+    return APIResponse(
+        success=True,
+        data={"weekly": data, "mos_saved_total": mos_saved},
+        error=None,
+    )
+
+
+class MosSavedRequest(BaseModel):
+    increment: int = Field(default=1, ge=1, le=100)
+
+
+@router.post("/roi-metrics/mos-saved")
+async def record_mos_saved(
+    body: MosSavedRequest,
+    session: AsyncSession = Depends(get_session),
+    current_user=Depends(require_roles(["admin", "planner"])),
+):
+    """Increment MOs-saved counter for 90-day ROI (US-12)."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    tid = UUID(tenant_id)
+    tenant = (await session.execute(select(Tenant).where(Tenant.id == tid))).scalar_one_or_none()
+    if not tenant:
+        return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "Tenant not found"})
+
+    cfg = dict(tenant.config or {})
+    total = int(cfg.get("roi_mos_saved", 0)) + body.increment
+    cfg["roi_mos_saved"] = total
+    cfg["roi_mos_saved_updated_at"] = datetime.now(timezone.utc).isoformat()
+    tenant.config = cfg
+    await session.commit()
+
+    return APIResponse(success=True, data={"mos_saved_total": total}, error=None)
 
 
 @router.get("/executive-summary")

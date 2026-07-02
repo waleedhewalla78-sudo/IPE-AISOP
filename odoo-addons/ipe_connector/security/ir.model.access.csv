@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ipe_config,ipe.config,model_ipe_config,base.group_system,1,1,1,1
+access_ipe_export_queue,ipe.export.queue,model_ipe_export_queue,base.group_system,1,1,1,1
+access_ipe_import_log,ipe.import.log,model_ipe_import_log,base.group_system,1,1,1,1

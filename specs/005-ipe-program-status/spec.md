@@ -4,9 +4,11 @@
 
 **Created**: 2026-06-23
 
-**Status**: Active — updated 2026-06-26 (`REL-PROD` phase)
+**Status**: Active — updated 2026-06-27 (v8.2.0 validated)
 
-**Live demo**: **20/20** stable (2026-06-26) — post-rebuild verify in `docs/demo-run-report-v6-post-rebuild.txt`
+**Live demo**: **30/30** stable — `docs/qa-e2e-demo-v8-report.txt` (2026-06-27)
+
+**v8 scope**: See [../010-v8-validation-convergence/analyze.md](../010-v8-validation-convergence/analyze.md) for post-v8 rollup.
 
 **Product scope**: **IPE AISOP only** — Nexus Social / external scaffolds out of scope for this program
 
@@ -56,9 +58,9 @@
 
 | Goal | Exit evidence | Status |
 |------|---------------|--------|
-| **Live demo 20/20** | `docs/demo-run-report-v6.txt` | ⬜ 14/20 last run |
-| **REL-STACK green** | Kong :8000, migrations 027, seed | ⬜ in progress |
-| **Git tag v6.0.0** | T055 + stakeholder approval | ⬜ pending demo |
+| **Live demo 20/20** | `docs/qa-e2e-demo-report.txt` | ✅ 20/20 (2026-06-27) |
+| **REL-STACK green** | Kong :8000, migrations 027, seed | ✅ |
+| **Git tag v7.0.0** | Release checklist + stakeholder approval | ⬜ tag pending |
 | **Readiness 96/100** | `READINESS.md` | ✅ code complete |
 
 ### Post-v6.0.0 (POST-* backlog — see `tasks.md`)

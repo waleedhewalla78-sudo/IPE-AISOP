@@ -196,6 +196,27 @@ async def score_from_mo(
     session: AsyncSession | None = None,
     autonomy_mode: str = "shadow",
 ) -> dict:
+    if session is not None:
+        flag_row = await session.execute(
+            text("""
+                SELECT flag_code, message FROM cdm_data_quality_flag
+                WHERE tenant_id = :tenant_id AND mo_id = :mo_id AND resolved_at IS NULL
+                LIMIT 1
+            """),
+            {"tenant_id": UUID(tenant_id), "mo_id": UUID(mo_id)},
+        )
+        flag = flag_row.fetchone()
+        if flag:
+            return {
+                "feasibility_score": None,
+                "primary_constraint": "data_quality",
+                "action_taken": "unscorable",
+                "data_quality_flag": flag[0],
+                "data_quality_message": flag[1],
+                "is_feasible": False,
+                "risk_level": "high",
+            }
+
     cap_score = 100.0
     lab_score = 100.0
 

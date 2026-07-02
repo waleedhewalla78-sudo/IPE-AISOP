@@ -10,6 +10,7 @@ COPY pyproject.toml /app/pyproject.toml
 COPY services/shared /app/services/shared
 COPY services/cap-svc/pyproject.toml /app/services/cap-svc/
 
+ENV UV_HTTP_TIMEOUT=600
 RUN uv sync --no-dev --directory /app/services/cap-svc
 
 COPY services/cap-svc/app /app/services/cap-svc/app

@@ -150,6 +150,20 @@
 
 
 
+## Phase V8 — Validation convergence (maps 010)
+
+| Task | Description | Status |
+|------|-------------|--------|
+| V8-01 | QA-001–010 validation sprint | ✅ |
+| V8-02 | Demo 30/30 (CP21–30) | ✅ |
+| V8-03 | v8 integration 5/5 | ✅ |
+| V8-04 | Migrations 029–033 | ✅ |
+| V8-05 | Speckit 010 artifacts | ✅ |
+| V8-06 | READINESS + PRODUCT-STATUS sync | ✅ |
+| V8-07 | Git tag v8.2.0 | ⬜ Pending sign-off |
+
+---
+
 ## Phase P4: Ongoing Sync
 
 
@@ -230,9 +244,7 @@
 
 | REL-PROD | 24 | 23 | 1 (live verify) |
 
-| **Wave 3** | 5 | 0 | 5 |
-
-
+| 010 Validation | 30 | 22 | 8 |
 
 ---
 

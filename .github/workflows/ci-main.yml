@@ -1,0 +1,72 @@
+name: CI — Main Branch (Build + Push)
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push service images
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          SHA="${{ github.sha }}"
+          for svc in dpe-svc demand-svc supply-svc scenario-svc cap-svc fea-svc \
+                     res-svc connector order-svc equipment-svc material-svc \
+                     procurement-svc nlp-svc alert-svc network-svc; do
+            echo "Building $svc..."
+            docker build \
+              -t "${REGISTRY}/${REPO}/${svc}:${SHA}" \
+              -t "${REGISTRY}/${REPO}/${svc}:latest" \
+              -f "services/${svc}/Dockerfile" \
+              .
+            docker push "${REGISTRY}/${REPO}/${svc}:${SHA}"
+            docker push "${REGISTRY}/${REPO}/${svc}:latest"
+          done
+          echo "Building web-ui..."
+          docker build \
+            -t "${REGISTRY}/${REPO}/web-ui:${SHA}" \
+            -t "${REGISTRY}/${REPO}/web-ui:latest" \
+            -f apps/web/Dockerfile.release1 \
+            .
+          docker push "${REGISTRY}/${REPO}/web-ui:${SHA}"
+          docker push "${REGISTRY}/${REPO}/web-ui:latest"
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to staging (SSH)
+        env:
+          DEPLOY_HOST: ${{ secrets.STAGING_HOST }}
+          DEPLOY_KEY: ${{ secrets.STAGING_SSH_KEY }}
+        run: |
+          if [[ -z "${DEPLOY_HOST}" || -z "${DEPLOY_KEY}" ]]; then
+            echo "STAGING_HOST or STAGING_SSH_KEY not configured — skipping SSH deploy"
+            exit 0
+          fi
+          install -m 600 /dev/stdin ~/.ssh/deploy_key <<< "$DEPLOY_KEY"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key "$DEPLOY_HOST" "
+            cd /opt/ipe && git pull && \
+            docker compose -f infrastructure/docker/docker-compose.release1.yml pull && \
+            docker compose -f infrastructure/docker/docker-compose.release1.yml up -d
+          "
