@@ -1,0 +1,39 @@
+# Local / kind development overrides
+global:
+  environment: "development"
+  imageRegistry: localhost:5000
+  imageTag: "dev"
+  ingress:
+    tls:
+      enabled: false
+
+auth:
+  mode: "local"
+  jwtMode: "hs256"
+
+kafka:
+  enabled: false
+
+keycloak:
+  enabled: false
+
+vault:
+  enabled: false
+
+prometheus:
+  enabled: false
+
+grafana:
+  enabled: false
+
+services:
+  dpe-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
+  fea-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
+  cap-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
+  mat-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
+  connector: { replicaCount: 1 }
+  res-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
+
+webUi:
+  replicaCount: 1
+  hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }

@@ -1,0 +1,15 @@
+apiVersion: v2
+name: ipe
+description: IPE (Intelligent Planning Engine) — AI-assisted manufacturing planning platform
+type: application
+version: 1.0.0
+appVersion: "9.4.0-p3"
+maintainers:
+  - name: IPE Engineering
+keywords:
+  - manufacturing
+  - planning
+  - scheduling
+  - aps
+  - odoo
+home: https://github.com/waleedhewalla78-sudo/IPE-AISOP

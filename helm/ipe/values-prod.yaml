@@ -1,0 +1,62 @@
+# Full enterprise production profile
+global:
+  environment: "production"
+  ingress:
+    host: "ipe.example.com"
+    tls:
+      enabled: true
+
+auth:
+  mode: "keycloak"
+  jwtMode: "rs256"
+
+audit:
+  enabled: true
+
+kafka:
+  enabled: true
+
+keycloak:
+  enabled: true
+
+vault:
+  enabled: true
+
+prometheus:
+  enabled: true
+
+grafana:
+  enabled: true
+
+alertmanager:
+  enabled: true
+
+releaseProfile: "full"
+
+services:
+  dpe-svc: { enabled: true }
+  fea-svc: { enabled: true }
+  cap-svc: { enabled: true }
+  mat-svc: { enabled: true }
+  connector: { enabled: true }
+  res-svc: { enabled: true }
+  nlp-svc: { enabled: true }
+  demand-svc: { enabled: true }
+  scenario-svc: { enabled: true }
+  supply-svc: { enabled: true }
+  order-svc: { enabled: true }
+  equipment-svc: { enabled: true }
+  material-svc: { enabled: true }
+  procurement-svc: { enabled: true }
+  alert-svc: { enabled: true }
+  sustain-svc: { enabled: true }
+  quality-svc: { enabled: true }
+  scn-svc: { enabled: true }
+  rec-svc: { enabled: true }
+  ml-svc: { enabled: true }
+  del-svc: { enabled: true }
+  network-svc: { enabled: true }
+
+webUi:
+  env:
+    VITE_RELEASE_PROFILE: "full"

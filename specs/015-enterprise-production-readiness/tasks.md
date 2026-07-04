@@ -14,7 +14,7 @@
 | 0 Security | T001–T020 | ✅ Complete (Option B E2E) |
 | 1 Hardening / K8s prep | T030–T050 | ✅ Phase 1 close (k6 profiles; Helm remainder deferred to Phase 3+) |
 | **2 Gates / Observability** | **T060–T068 + T081–T130** | ✅ **Complete** |
-| 3 Scale/Compliance | T090–T110 | ⬜ Not started |
+| 3 Scale/Compliance | T090–T110 | 🔄 In progress (Helm + SAP/D365 scaffolds) |
 | 4 GTM | T120–T140 | ⬜ Not started |
 | Hygiene | T000 | ✅ |
 
@@ -98,19 +98,24 @@
 
 ---
 
-## Phase 3 — Scale & Compliance (Weeks 15–22) — ⬜ Not started
+## Phase 3 — Scale & Compliance (Weeks 15–22) — 🔄 In progress
 
-| ID | Task | Priority | Status |
-|----|------|----------|--------|
-| T090a | GDPR export production-harden | P1 | ⬜ |
-| T091a | GDPR erasure + retention purge jobs | P1 | ⬜ |
-| T092 | WCAG 2.1 AA audit + fix critical | P1 | ⬜ |
-| T093 | SOC 2 Type I gap assessment | P1 | ⬜ |
-| T094 | k6 500 VU load test in CI | P0 | ⬜ |
-| T095 | SAP S/4 connector (5 entities) | P1 | ⬜ |
-| T096 | D365 connector (5 entities) | P2 | ⬜ |
-| T097 | API v2 versioning Kong routes | P1 | ⬜ |
-| T098 | Tenant resource quotas (CPU/conn) — *app quotas done in P2* | P1 | ✅ (app-level) |
+| ID | Task | Priority | Status | Evidence |
+|----|------|----------|--------|----------|
+| T030 | Helm chart for all services | P0 | 🔄 | `helm/ipe/` |
+| T031 | HPA minReplicas | P0 | 🔄 | `templates/hpa.yaml` |
+| T032 | PDB minAvailable | P0 | 🔄 | `templates/pdb.yaml` |
+| T039 | NetworkPolicy zero-trust | P1 | 🔄 | `templates/networkpolicy.yaml` |
+| T090a | GDPR export production-harden | P1 | ⬜ | |
+| T091a | GDPR erasure + retention purge jobs | P1 | ⬜ | |
+| T092 | WCAG 2.1 AA audit + fix critical | P1 | ⬜ | |
+| T093 | SOC 2 Type I gap assessment | P1 | ⬜ | |
+| T094 | k6 500 VU load test in CI | P0 | ⬜ | |
+| T095 | SAP S/4 connector (5 entities) | P1 | 🔄 Scaffold | `app/connectors/sap/` |
+| T096 | D365 connector (5 entities) | P2 | 🔄 Scaffold | `app/connectors/d365/` |
+| T097 | API v2 versioning Kong routes | P1 | ⬜ | |
+| T098 | Tenant resource quotas (CPU/conn) — *app quotas done in P2* | P1 | ✅ (app-level) | |
+| T099 | Customer readiness package (Track B) | P0 | ✅ | `docs/customer/star-trans/` |
 
 ---
 

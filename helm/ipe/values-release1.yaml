@@ -1,0 +1,92 @@
+# Release 1 — 8-service profile for Star Trans
+# helm install ipe ./helm/ipe -f helm/ipe/values-release1.yaml
+
+global:
+  environment: "production"
+
+releaseProfile: "release1"
+
+auth:
+  mode: "local"
+  provider: "local"
+  jwtMode: "hs256"
+
+audit:
+  enabled: false
+
+kafka:
+  enabled: false
+
+keycloak:
+  enabled: false
+
+vault:
+  enabled: false
+
+prometheus:
+  enabled: false
+
+grafana:
+  enabled: false
+
+alertmanager:
+  enabled: false
+
+postgresql:
+  primary:
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "500m" }
+    persistence:
+      size: "10Gi"
+
+services:
+  dpe-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  fea-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  cap-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  mat-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  connector:
+    enabled: true
+    replicaCount: 1
+  res-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  nlp-svc: { enabled: false }
+  demand-svc: { enabled: false }
+  scenario-svc: { enabled: false }
+  supply-svc: { enabled: false }
+  order-svc: { enabled: false }
+  equipment-svc: { enabled: false }
+  material-svc: { enabled: false }
+  procurement-svc: { enabled: false }
+  alert-svc: { enabled: false }
+  sustain-svc: { enabled: false }
+  quality-svc: { enabled: false }
+  scn-svc: { enabled: false }
+  rec-svc: { enabled: false }
+  ml-svc: { enabled: false }
+  del-svc: { enabled: false }
+  network-svc: { enabled: false }
+
+webUi:
+  replicaCount: 1
+  env:
+    VITE_RELEASE_PROFILE: "release1"
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilization: 70

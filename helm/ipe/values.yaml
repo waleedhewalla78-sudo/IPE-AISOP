@@ -1,0 +1,456 @@
+# IPE Helm Values — Base Configuration
+# Override with values-prod.yaml or values-release1.yaml
+
+global:
+  imageRegistry: ghcr.io/waleedhewalla78-sudo/ipe
+  imagePullPolicy: IfNotPresent
+  imageTag: "v9.4.0-p3"
+  environment: "production"
+  defaultTenantId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+  defaultTenantName: "default"
+  nameOverride: ""
+  fullnameOverride: ""
+  ingress:
+    enabled: true
+    className: "nginx"
+    host: "ipe.example.com"
+    tls:
+      enabled: true
+      secretName: "ipe-tls-secret"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+  monitoring:
+    enabled: true
+
+releaseProfile: "full"
+
+auth:
+  mode: "keycloak"
+  provider: "keycloak"
+  jwtMode: "rs256"
+
+audit:
+  enabled: true
+
+database:
+  poolSize: 10
+  maxOverflow: 20
+
+mdr:
+  threshold: "0.70"
+
+postgresql:
+  enabled: true
+  image: postgres:16-alpine
+  auth:
+    database: ipe
+    username: ipe_user
+    existingSecret: ipe-db-secret
+  primary:
+    resources:
+      requests: { memory: "512Mi", cpu: "250m" }
+      limits: { memory: "2Gi", cpu: "1000m" }
+    persistence:
+      enabled: true
+      size: "20Gi"
+      storageClass: "standard"
+  readReplicas:
+    enabled: false
+    replicaCount: 1
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+  auth:
+    enabled: true
+    existingSecret: ipe-redis-secret
+  master:
+    resources:
+      requests: { memory: "128Mi", cpu: "100m" }
+      limits: { memory: "512Mi", cpu: "500m" }
+  persistence:
+    enabled: true
+    size: "2Gi"
+  replica:
+    replicaCount: 1
+
+kafka:
+  enabled: true
+  serviceName: kafka
+  controller:
+    replicaCount: 3
+    persistence:
+      enabled: true
+      size: "10Gi"
+
+kong:
+  enabled: true
+  ingressController:
+    enabled: true
+  proxy:
+    type: LoadBalancer
+
+services:
+  dpe-svc:
+    enabled: true
+    replicaCount: 2
+    port: 8001
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck:
+      enabled: true
+      path: /api/v1/health
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilization: 70
+    pdb:
+      enabled: true
+      minAvailable: 1
+
+  fea-svc:
+    enabled: true
+    replicaCount: 2
+    port: 8004
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck:
+      enabled: true
+      path: /api/v1/health
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilization: 70
+    pdb:
+      enabled: true
+      minAvailable: 1
+
+  cap-svc:
+    enabled: true
+    replicaCount: 2
+    port: 8003
+    resources:
+      requests: { memory: "512Mi", cpu: "300m" }
+      limits: { memory: "2Gi", cpu: "2000m" }
+    env: {}
+    healthCheck:
+      enabled: true
+      path: /api/v1/health
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilization: 70
+    pdb:
+      enabled: true
+      minAvailable: 1
+
+  mat-svc:
+    enabled: true
+    replicaCount: 2
+    port: 8002
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck:
+      enabled: true
+      path: /api/v1/health
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilization: 70
+    pdb:
+      enabled: true
+      minAvailable: 1
+
+  connector:
+    enabled: true
+    replicaCount: 1
+    port: 8009
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck:
+      enabled: true
+      path: /api/v1/health
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 1
+      targetCPUUtilization: 70
+    pdb:
+      enabled: true
+      minAvailable: 1
+
+  res-svc:
+    enabled: true
+    replicaCount: 2
+    port: 8005
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck:
+      enabled: true
+      path: /api/v1/health
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilization: 70
+    pdb:
+      enabled: true
+      minAvailable: 1
+
+  nlp-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8007
+    resources:
+      requests: { memory: "512Mi", cpu: "300m" }
+      limits: { memory: "2Gi", cpu: "2000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  demand-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8040
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  scenario-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8050
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  supply-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8060
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  order-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8070
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  equipment-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8061
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  material-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8090
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  procurement-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8100
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  alert-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8010
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  sustain-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8012
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  quality-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8013
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  scn-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8014
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  rec-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8008
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  ml-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8011
+    resources:
+      requests: { memory: "512Mi", cpu: "300m" }
+      limits: { memory: "2Gi", cpu: "2000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  del-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8006
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+  network-svc:
+    enabled: false
+    replicaCount: 1
+    port: 8015
+    resources:
+      requests: { memory: "256Mi", cpu: "200m" }
+      limits: { memory: "1Gi", cpu: "1000m" }
+    env: {}
+    healthCheck: { enabled: true, path: /api/v1/health, initialDelaySeconds: 15, periodSeconds: 10 }
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+    pdb: { enabled: true, minAvailable: 1 }
+
+webUi:
+  enabled: true
+  replicaCount: 2
+  port: 8082
+  resources:
+    requests: { memory: "128Mi", cpu: "100m" }
+    limits: { memory: "256Mi", cpu: "500m" }
+  env:
+    VITE_RELEASE_PROFILE: "full"
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilization: 70
+
+keycloak:
+  enabled: true
+
+vault:
+  enabled: true
+
+prometheus:
+  enabled: true
+
+grafana:
+  enabled: true
+
+alertmanager:
+  enabled: true
+
+serviceAccount:
+  create: true
+  name: ""
+
+nodeSelector: {}
+affinity: {}
+tolerations: []
