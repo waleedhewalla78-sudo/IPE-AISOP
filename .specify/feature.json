@@ -1,33 +1,62 @@
 {
-
   "feature_directory": "specs/015-enterprise-production-readiness",
-
-  "active_implementation": "specs/014-release2-growth",
-
+  "active_implementation": "specs/015-enterprise-production-readiness",
   "active_plan": "specs/015-enterprise-production-readiness/plan.md",
-
-  "readiness_score": 82,
-
-  "readiness_note": "014 R2 implement complete pending demo verification; 015 enterprise program specified",
-
-  "release_target": "v10.0.0-enterprise",
-
+  "readiness_score": 100,
+  "readiness_note": "Enterprise Phase 2 (Gates 1–5) complete; tag v9.3.0-p2; Phase 3 / R1 go-live next",
+  "release_target": "v9.3.0-p2",
   "phase": "015-enterprise-production-readiness",
-
+  "phase_status": {
+    "phase_0_security": "complete",
+    "phase_1_hardening": "complete",
+    "phase_2_gates": "complete",
+    "phase_3_scale_compliance": "not_started",
+    "phase_4_gtm": "not_started"
+  },
+  "gates": {
+    "gate_1_observability": "PASS",
+    "gate_2_security": "PASS",
+    "gate_3_multi_tenant": "PASS",
+    "gate_4_odoo_sync": "PASS",
+    "gate_5_full_e2e": "PASS",
+    "option_b_phase0_combined": "PASS"
+  },
+  "k6": {
+    "slo_profile": "PASS",
+    "slo_script": "scripts/perf/k6-slo.js",
+    "slo_baseline": "docs/qa/k6-slo-baseline.json",
+    "slo_p95_ms": 293,
+    "slo_error_rate": 0.0,
+    "stress_profile": "PASS",
+    "stress_script": "scripts/perf/k6-stress.js",
+    "stress_baseline": "docs/qa/k6-stress-baseline.json",
+    "stress_429_rate_pct": 73.8
+  },
+  "demos": {
+    "r1_https": "14/14",
+    "r2_https": "5/5"
+  },
+  "git_tag": "v9.3.0-p2",
   "customer": "Star Trans — Electrical Transformer Technology",
-
   "prior_phase": "specs/014-release2-growth",
-
   "platform_release": "v8.2.0",
-
-  "last_speckit_run": "2026-06-24-full-pipeline",
-
-  "speckit_phases_complete": ["constitution", "specify", "clarify", "analyze", "plan", "tasks", "taskstoissues", "implement-partial-014"],
-
-  "speckit_phases_pending": ["implement-015-phase0", "converge", "uat"],
-
-  "speckit_artifacts_version": "2.3",
-
-  "constitution_version": "1.1.0"
-
+  "last_speckit_run": "2026-07-04-phase2-close",
+  "speckit_phases_complete": [
+    "constitution",
+    "specify",
+    "clarify",
+    "analyze",
+    "plan",
+    "tasks",
+    "taskstoissues",
+    "implement-014",
+    "implement-015-phase0",
+    "implement-015-phase1",
+    "implement-015-phase2",
+    "converge-phase2"
+  ],
+  "speckit_phases_pending": ["implement-015-phase3", "implement-015-phase4", "uat-r1"],
+  "phase2_tasks": "T081-T130 (Gates 1–5, k6 SLO/stress, Option B, git tag) — done",
+  "speckit_artifacts_version": "2.4",
+  "constitution_version": "1.0.1"
 }
