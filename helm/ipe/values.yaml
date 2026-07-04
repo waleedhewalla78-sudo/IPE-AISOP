@@ -45,8 +45,9 @@ postgresql:
   enabled: true
   image: postgres:16-alpine
   auth:
-    database: ipe
-    username: ipe_user
+    database: ipe_test
+    username: ipe
+    password: ipe_test_pass
     existingSecret: ipe-db-secret
   primary:
     resources:
@@ -63,8 +64,10 @@ postgresql:
 redis:
   enabled: true
   image: redis:7-alpine
+  url: "redis://redis:6379/0"
   auth:
-    enabled: true
+    enabled: false
+    password: ""
     existingSecret: ipe-redis-secret
   master:
     resources:
@@ -450,6 +453,11 @@ alertmanager:
 serviceAccount:
   create: true
   name: ""
+
+networkPolicy:
+  enabled: true
+
+commonEnv: {}
 
 nodeSelector: {}
 affinity: {}

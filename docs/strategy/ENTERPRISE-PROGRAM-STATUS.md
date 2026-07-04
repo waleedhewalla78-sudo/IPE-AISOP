@@ -17,7 +17,7 @@
 | **Enterprise Phase 0** | 100% | ✅ Complete (Option B E2E) |
 | **Enterprise Phase 1** | 100% | ✅ Complete (hardening + k6 profile split) |
 | **Enterprise Phase 2** | 100% | ✅ Complete (Gates 1–5, `v9.3.0-p2`) |
-| Enterprise Phase 3 | 25% | 🔄 In progress — Helm chart + SAP/D365 scaffolds |
+| Enterprise Phase 3 | 35% | 🔄 Helm scaffold + Gate 10 PASS; Gates 6–9, 11 pending |
 | Enterprise Phase 4 | 0% | ⬜ Not started |
 
 ---
@@ -69,7 +69,7 @@
 | Connector registry | 🔄 | `app/connectors/registry.py` |
 | Compose–K8s parity | 🔄 Script ready | `scripts/k8s/test-compose-k8s-parity.py` |
 | Customer readiness (Track B) | ✅ | `docs/customer/star-trans/*` |
-| Gate 6–11 (kind deploy, HPA, R1 on K8s) | ⬜ | Requires cluster + images |
+| Gate 6–11 (kind deploy, HPA, R1 on K8s) | 🔄 | Gate 10 ✅; 6–9, 11 need helm + cluster |
 
 ## Next actions
 

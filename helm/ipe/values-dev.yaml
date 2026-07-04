@@ -1,23 +1,35 @@
-# Local / kind development overrides
+# Local / kind development — Release 1 subset, local auth, infra in-cluster
 global:
   environment: "development"
-  imageRegistry: localhost:5000
+  imageRegistry: ipe
   imageTag: "dev"
+  imagePullPolicy: Never
   ingress:
+    enabled: true
+    className: nginx
+    host: ""
     tls:
       enabled: false
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+releaseProfile: "release1"
 
 auth:
   mode: "local"
+  provider: "local"
   jwtMode: "hs256"
 
-kafka:
+audit:
+  enabled: false
+
+vault:
   enabled: false
 
 keycloak:
   enabled: false
 
-vault:
+kafka:
   enabled: false
 
 prometheus:
@@ -26,14 +38,86 @@ prometheus:
 grafana:
   enabled: false
 
+alertmanager:
+  enabled: false
+
+kong:
+  enabled: false
+
+networkPolicy:
+  enabled: false
+
+postgresql:
+  enabled: true
+  auth:
+    database: ipe_test
+    username: ipe
+    password: ipe_test_pass
+
+redis:
+  enabled: true
+  url: "redis://redis:6379/0"
+
+commonEnv:
+  HOME: "/tmp"
+  UV_CACHE_DIR: "/tmp/uv-cache"
+  XDG_CACHE_HOME: "/tmp"
+  IPE_JWT_SECRET_KEY: "dev-only-change-in-production-min-32-chars-long!!"
+  IPE_JWT_SIGNING_MODE: "hs256"
+  IPE_ENVIRONMENT: "development"
+  IPE_RELEASE_PROFILE: "release1"
+  IPE_OTEL_TRACING_ENABLED: "false"
+  IPE_OTEL_LOGGING_ENABLED: "false"
+  AUTH_MODE: "local"
+  AUTH_PROVIDER: "local"
+  VAULT_ENABLED: "false"
+  IPE_AUDIT_REQUEST_MIDDLEWARE: "false"
+  IPE_AUDIT_KAFKA_ENABLED: "false"
+
 services:
-  dpe-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
-  fea-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
-  cap-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
-  mat-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
-  connector: { replicaCount: 1 }
-  res-svc: { replicaCount: 1, hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 } }
+  dpe-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  fea-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  cap-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  mat-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  connector:
+    enabled: true
+    replicaCount: 1
+    env:
+      ODOO_SYNC_SCHEDULER: "false"
+  res-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  nlp-svc: { enabled: false }
+  demand-svc: { enabled: false }
+  scenario-svc: { enabled: false }
+  supply-svc: { enabled: false }
+  order-svc: { enabled: false }
+  equipment-svc: { enabled: false }
+  material-svc: { enabled: false }
+  procurement-svc: { enabled: false }
+  alert-svc: { enabled: false }
+  sustain-svc: { enabled: false }
+  quality-svc: { enabled: false }
+  scn-svc: { enabled: false }
+  rec-svc: { enabled: false }
+  ml-svc: { enabled: false }
+  del-svc: { enabled: false }
+  bom-svc: { enabled: false }
+  network-svc: { enabled: false }
 
 webUi:
+  enabled: false
   replicaCount: 1
-  hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }

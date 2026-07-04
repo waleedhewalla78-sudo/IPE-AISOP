@@ -1,18 +1,15 @@
 # IPE Platform Constitution
 
-## Sync Impact Report (Release 1 — 2026-06-29)
-
-| Change | Version bump | Notes |
-|--------|--------------|-------|
-| Added Principle VII: Customer-First Release Slicing | **MINOR 1.0.1 → 1.1.0** | Governs 013-release1-odoo-mena |
-| Added Release 1 Deployment Doctrine | — | 5–7 service profile; Odoo IS the product |
-| Added MENA Market Constraints | — | Arabic MVP, on-prem option, WhatsApp support |
-| Clarified Principle IV exception for R1 | — | Kafka optional in release1 compose |
-| v8.2.0 platform complete | — | Full 22-service stack remains in monorepo |
-
-**Compliance**: Principles I–III remain NON-NEGOTIABLE in all deployments. Principle VII governs *what ships* to customer #1, not *what exists* in the repo.
-
----
+<!--
+Sync Impact Report (Enterprise Phase 2 close — 2026-07-04)
+Version: 1.1.0 → 1.2.0 (MINOR)
+Added: Principle VIII — Enterprise Gate Verification
+Added: Phase 3 K8s deployment doctrine (Helm-first, compose parity)
+Updated: Principle VI — Phase 2 observability gates PASS (metrics, Grafana, k6)
+Updated: Principle VII — R1 customer package ready; UAT blocked on SOW
+Templates: plan-template ✅ aligned | spec-template ✅ aligned | tasks-template ✅ aligned
+Deferred: SOC 2 Type I evidence collection (Phase 3 task, not principle change)
+-->
 
 IPE (Intelligent Planning Engine) is a microservices-based, event-driven platform for **feasibility-first manufacturing planning** in MENA mid-market discrete manufacturing. These principles are binding on all changes.
 
@@ -37,10 +34,11 @@ Every API endpoint MUST be protected by at least one authentication or authoriza
 
 - **Zero open endpoints** except `/health`, `/ready`, `/metrics`.
 - **RBAC is mandatory for state-changing operations.** POST/PUT/PATCH/DELETE MUST check role permissions.
-- **Rate limiting is required** on public endpoints.
-- **Release 1 exception:** Demo JWT auth acceptable for PoC; production customer MUST have tenant-scoped credentials and secrets in vault (not hardcoded).
+- **Rate limiting is required** on public endpoints (Kong + service-level where applicable).
+- **Enterprise profile:** Keycloak OIDC + RS256 JWT MUST be verified by Gate 2 and Option B scripts before enterprise tag promotion.
+- **Release 1 profile:** Local/demo JWT acceptable for PoC; production customer MUST use tenant-scoped credentials and secrets in vault (not hardcoded).
 
-**Rationale:** A factory planner approving a schedule is a state-changing, auditable action.
+**Rationale:** A factory planner approving a schedule is a state-changing, auditable action. Enterprise gates proved SSO, Vault, TLS, and audit in `v9.3.0-p2`.
 
 ---
 
@@ -50,6 +48,7 @@ Every behavioral change MUST be accompanied by automated tests.
 
 - **Tests MUST pass before merge.**
 - **Odoo connector changes MUST include:** unit tests (mapper), integration tests (mock Odoo XML-RPC), and at least one end-to-end sync test with testcontainers or recorded fixtures.
+- **ERP scaffold changes (SAP/D365) MUST include:** import/unit tests proving registry factory and no-op sync paths do not raise.
 - **No real network in unit tests.** External services MUST be stubbed.
 - **Release 1 gate:** Connector sync + feasibility pipeline MUST have integration test proving MO ingest → Control Tower queue.
 
@@ -76,9 +75,10 @@ All services follow a uniform layered architecture.
 - **Layered structure:** `app/api/v1/`, `app/models/`, `app/services/`, `app/events/`, `app/deps.py`.
 - **`/health`, `/ready`, `/metrics` on every deployed service.**
 - **Frontend-backend contract alignment.** Every UI API call MUST have a corresponding backend route.
-- **Release 1 deployed services:** `kong`, `dpe-svc`, `cap-svc`, `connector`, `web-ui`, `db`, (`redis` if sessions). All other services remain in monorepo but OFF the customer compose file until requested.
+- **Port scheme:** Dockerfile ports are canonical; docker-compose, Kong, and Helm values MUST stay reconciled.
+- **Release 1 deployed services:** `kong`, `dpe-svc`, `fea-svc`, `cap-svc`, `mat-svc`, `connector`, `res-svc`, `web-ui`, `db`, (`redis` if sessions). All other services remain in monorepo but OFF the customer compose file until requested.
 
-**Rationale:** 22 services in repo; 5–7 in production for customer #1.
+**Rationale:** 22 services in repo; 8 in production for customer #1 (Release 1 profile).
 
 ---
 
@@ -86,29 +86,44 @@ All services follow a uniform layered architecture.
 
 Every **deployed** service MUST be observable.
 
-- **`/metrics` mandatory** on release1 services.
+- **`/metrics` mandatory** on release1 and enterprise services (Gate 1: 9/9 Prometheus targets).
 - **Structured JSON logging** with correlation IDs.
+- **Performance baselines:** k6 SLO profile (normal load) and stress profile (rate limiter) MUST both pass before enterprise phase tags; they measure different things and MUST NOT be combined into one script.
 - **Sync observability (Release 1):** Every Odoo sync run MUST log and persist: start time, end time, records synced, records skipped, errors, data quality flags. UI MUST show "Last synced at" timestamp.
 - **Graceful degradation:** `/ready` surfaces DB/Odoo connectivity; planner sees actionable message, not 500 stack trace.
 
-**Rationale:** When sync fails at 7am before the production meeting, the planner and support contact need immediate visibility.
+**Rationale:** Phase 2 closed with Grafana dashboards, Alertmanager rules, and documented SLO baselines (`docs/qa/PERFORMANCE-BASELINE-v9.1.0.md`).
 
 ---
 
-### VII. Customer-First Release Slicing (NEW — Release 1)
+### VII. Customer-First Release Slicing
 
 **The Odoo connector IS the product for customer #1.** Platform breadth serves demos; release depth serves revenue.
 
-- **One ERP first:** Odoo (XML-RPC + `ipe_connector` module). SAP/D365 scaffolds MUST NOT distract from Odoo production path until customer #2.
-- **One value proposition:** Planners see at-risk MOs from **live Odoo data** before the shift starts, with structured resolution options — not seed SQL, not manual spreadsheet maintenance.
+- **One ERP first:** Odoo (XML-RPC + optional `ipe_connector` module). SAP/D365 scaffolds MUST NOT block Odoo production path until customer #2 is contracted.
+- **One value proposition:** Planners see at-risk MOs from **live Odoo data** before the shift starts, with structured resolution options.
 - **Three screens minimum:** Control Tower, Resolution Center, Executive OTD. Copilot, Scenarios, Supply Network, Quality, Sustainability are **POST-R1** unless customer contract explicitly includes them.
 - **Data quality before planning:** MOs missing BOM, routing, or work center capacity MUST be flagged as "unscorable" — never silent misleading feasibility scores.
-- **Conflict policy required:** When Odoo and IPE disagree (e.g., due date changed in Odoo after IPE approval), behavior MUST be documented and implemented (default: Odoo wins on master data; IPE wins on approved schedule until next sync flags conflict).
-- **Arabic MVP:** Control Tower, Resolution Center, navigation, and alerts MUST support Arabic before customer go-live (English may remain as secondary).
-- **Deployment options:** MUST support (a) Diligent-managed cloud VM and (b) customer on-prem single-VM compose. Full 22-service AWS/EKS is NOT required for R1.
-- **Support model:** Same-day response, business hours, WhatsApp/phone channel documented in runbook — not GitHub issues.
+- **Conflict policy:** Odoo wins on master data; IPE wins on approved schedule until next sync flags conflict (Gate 4 verified).
+- **Arabic MVP:** Control Tower, Resolution Center, navigation, and alerts MUST support Arabic before customer go-live.
+- **Deployment options:** MUST support (a) Diligent-managed cloud VM and (b) customer on-prem single-VM compose. Full K8s is Phase 3 enterprise track, NOT required for Star Trans R1 go-live.
+- **Customer readiness package:** Deployment guide, SOW input, UAT plan, field mapping worksheet, and training curriculum MUST exist before SOW signature (`docs/customer/star-trans/`).
 
 **Rationale:** Engineering output exceeded go-to-market. Release 1 narrows to provable ROI for one paying factory.
+
+---
+
+### VIII. Enterprise Gate Verification (NEW — Phase 2+)
+
+**No enterprise phase tag without scripted gate evidence.**
+
+- **Gates 1–5 are mandatory** before `v9.3.0-p2`-class tags: observability, security, multi-tenant, Odoo sync, full E2E (R1+R2+audit).
+- **Option B (Phase 0 combined)** MUST pass when enterprise flags are ON: Keycloak, Vault, TLS, Audit, Combined demo.
+- **Phase 3 gates (6–11)** MUST pass before `v9.4.0-p3`: Helm lint/render, kind deploy health, compose–K8s parity, HPA smoke, ERP scaffold imports, R1 demo on K8s ingress.
+- **Gate scripts are the source of truth.** Markdown status tables MUST reference script paths and last PASS output; manual claims without script evidence do not satisfy this principle.
+- **Regression:** R1 14/14 HTTPS and R2 5/5 MUST re-run after each phase gate that touches auth, networking, or connector paths.
+
+**Rationale:** Phase 2 closure required reproducible verification, not checklist theater. Phase 3 inherits the same discipline for K8s and ERP expansion.
 
 ---
 
@@ -118,7 +133,7 @@ Every **deployed** service MUST be observable.
 |------------|-------------|
 | **Buyer persona** | CEO / Operations Director — not IT steering committee |
 | **Competition** | Excel + Odoo MRP — not Kinaxis/SAP IBP in sales pitch |
-| **Pricing fit** | License $18K–30K/yr + implementation $12K–25K one-time |
+| **Pricing fit** | License $18K–30K/yr + implementation $12K–25K one-time (OQ-7 pending commercial sign-off) |
 | **Connectivity** | Tolerate intermittent factory internet; batch sync > fragile webhooks |
 | **ROI timeline** | Measurable within 90 days: adoption, 2+ MOs saved, OTD trend |
 | **Implementation** | Fixed-scope SOW, data migration checklist, training curriculum — not demo script alone |
@@ -127,8 +142,8 @@ Every **deployed** service MUST be observable.
 
 ## Security & Cross-Platform Constraints
 
-- **Cross-platform.** PowerShell equivalents for all customer-facing scripts.
-- **Secret management.** Odoo credentials in tenant config / vault — never in source or logs.
+- **Cross-platform.** PowerShell equivalents for all customer-facing and gate verification scripts.
+- **Secret management.** Odoo credentials in tenant config / Vault — never in source or logs.
 - **Input validation.** Pydantic models on all API boundaries.
 - **Formatting.** `ruff check`, `mypy`, `prettier` MUST pass.
 
@@ -144,15 +159,16 @@ Every **deployed** service MUST be observable.
   3. Arabic strings on 3 core screens
   4. Implementation playbook + support runbook published
   5. 90-day ROI metrics instrumented
+- **Enterprise gate (015):** Gates 1–5 + k6 profiles + Option B before Phase 2 tag; Gates 6–11 before Phase 3 tag.
 - **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
 
 ---
 
 ## Governance
 
-- **Authority.** Principles I–III and VII are binding gates for Release 1. Violations MUST be resolved by changing code, not diluting principles.
-- **Amendments.** Changes require PR with rationale and SemVer bump. Update Sync Impact Report.
-- **Versioning.** MAJOR = principled removal; MINOR = new principle; PATCH = clarifications.
+- **Authority.** Principles I–III, VII, and VIII are binding gates. Violations MUST be resolved by changing code, not diluting principles.
+- **Amendments.** Changes require PR with rationale and SemVer bump. Update Sync Impact Report (HTML comment at top).
+- **Versioning.** MAJOR = principled removal; MINOR = new principle or materially expanded doctrine; PATCH = clarifications.
 - **Compliance review.** Every PR MUST verify compliance.
 
-**Version**: 1.1.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-06-29
+**Version**: 1.2.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-04

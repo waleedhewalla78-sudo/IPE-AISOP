@@ -49,16 +49,34 @@ spec:
               value: {{ $name | quote }}
             - name: IPE_PORT
               value: {{ $svc.port | quote }}
+            - name: IPE_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ipe-db-secret
+                  key: url
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
                   name: ipe-db-secret
+                  key: url
+            - name: IPE_REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ipe-redis-secret
                   key: url
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
                   name: ipe-redis-secret
                   key: url
+            {{- range $key, $val := $.Values.commonEnv }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- range $key, $val := $svc.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
           resources:
             {{- toYaml $svc.resources | nindent 12 }}
           {{- if $svc.healthCheck.enabled }}

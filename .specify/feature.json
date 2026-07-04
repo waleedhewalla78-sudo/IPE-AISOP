@@ -3,14 +3,14 @@
   "active_implementation": "specs/015-enterprise-production-readiness",
   "active_plan": "specs/015-enterprise-production-readiness/plan.md",
   "readiness_score": 100,
-  "readiness_note": "Enterprise Phase 2 (Gates 1–5) complete; tag v9.3.0-p2; Phase 3 / R1 go-live next",
-  "release_target": "v9.3.0-p2",
+  "readiness_note": "Phase 2 complete (v9.3.0-p2); Phase 3 Gates 6-11 in progress",
+  "release_target": "v9.4.0-p3",
   "phase": "015-enterprise-production-readiness",
   "phase_status": {
     "phase_0_security": "complete",
     "phase_1_hardening": "complete",
     "phase_2_gates": "complete",
-    "phase_3_scale_compliance": "not_started",
+    "phase_3_scale_compliance": "in_progress",
     "phase_4_gtm": "not_started"
   },
   "gates": {
@@ -19,7 +19,13 @@
     "gate_3_multi_tenant": "PASS",
     "gate_4_odoo_sync": "PASS",
     "gate_5_full_e2e": "PASS",
-    "option_b_phase0_combined": "PASS"
+    "option_b_phase0_combined": "PASS",
+    "gate_6_helm_lint": "PASS",
+    "gate_7_kind_deploy": "PASS",
+    "gate_8_compose_k8s_parity": "PENDING",
+    "gate_9_hpa_smoke": "PENDING",
+    "gate_10_erp_scaffolds": "PASS",
+    "gate_11_r1_on_k8s": "PENDING"
   },
   "k6": {
     "slo_profile": "PASS",
@@ -40,7 +46,7 @@
   "customer": "Star Trans — Electrical Transformer Technology",
   "prior_phase": "specs/014-release2-growth",
   "platform_release": "v8.2.0",
-  "last_speckit_run": "2026-07-04-phase2-close",
+  "last_speckit_run": "2026-07-04-full-pipeline",
   "speckit_phases_complete": [
     "constitution",
     "specify",
@@ -53,10 +59,16 @@
     "implement-015-phase0",
     "implement-015-phase1",
     "implement-015-phase2",
-    "converge-phase2"
+    "implement-015-phase3-partial",
+    "converge-phase3"
   ],
-  "speckit_phases_pending": ["implement-015-phase3", "implement-015-phase4", "uat-r1"],
-  "phase2_tasks": "T081-T130 (Gates 1–5, k6 SLO/stress, Option B, git tag) — done",
-  "speckit_artifacts_version": "2.4",
-  "constitution_version": "1.0.1"
+  "speckit_phases_pending": [
+    "implement-015-phase3-gates",
+    "implement-015-phase4",
+    "uat-r1"
+  ],
+  "phase2_tasks": "T081-T130 — done",
+  "phase3_tasks": "T030-T157 — Gates 6-11 pending cluster/helm",
+  "speckit_artifacts_version": "2.5",
+  "constitution_version": "1.2.0"
 }

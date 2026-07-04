@@ -100,19 +100,48 @@
 
 ## Phase 3 — Scale & Compliance (Weeks 15–22) — 🔄 In progress
 
+### Helm / K8s (Stream 1)
+
 | ID | Task | Priority | Status | Evidence |
 |----|------|----------|--------|----------|
 | T030 | Helm chart for all services | P0 | 🔄 | `helm/ipe/` |
 | T031 | HPA minReplicas | P0 | 🔄 | `templates/hpa.yaml` |
 | T032 | PDB minAvailable | P0 | 🔄 | `templates/pdb.yaml` |
 | T039 | NetworkPolicy zero-trust | P1 | 🔄 | `templates/networkpolicy.yaml` |
+| T140 | K8s deployment guide | P0 | ✅ | `docs/operations/K8S-DEPLOYMENT-GUIDE.md` |
+| T141 | `deploy-kind.sh` + `verify-k8s.sh` | P0 | 🔄 | `scripts/k8s/` |
+| T142 | Compose–K8s parity script | P0 | 🔄 | `scripts/k8s/test-compose-k8s-parity.py` |
+
+### Phase 3 verification gates (Gates 6–11)
+
+| ID | Task | Priority | Status | Evidence |
+|----|------|----------|--------|----------|
+| T150 | **Gate 6** — `helm lint` + `helm template` (release1 + prod) | P0 | ✅ | `scripts/k8s/verify-gate6.ps1` — 2026-07-04 |
+| T151 | **Gate 7** — kind deploy; all pods Ready; health 200 | P0 | ✅ | kind `ipe-dev`; 6/6 pods 200 — 2026-07-04 |
+| T152 | **Gate 8** — Compose–K8s parity (structure match) | P0 | ⬜ | `test-compose-k8s-parity.py` |
+| T153 | **Gate 9** — HPA smoke (scale on CPU) | P1 | ⬜ | full profile only |
+| T154 | **Gate 10** — SAP/D365 scaffold unit tests | P0 | ✅ | `tests/test_erp_scaffolds.py` |
+| T155 | **Gate 11** — R1 demo 14/14 via K8s ingress | P0 | ⬜ | adapt `demo-http.ps1` base URL |
+| T156 | k6 SLO re-run on K8s ingress | P1 | ⬜ | P95 < 500ms |
+| T157 | Git tag `v9.4.0-p3` after Gates 6–11 | P0 | ⬜ | |
+
+### ERP scaffolds (Stream 2)
+
+| ID | Task | Priority | Status | Evidence |
+|----|------|----------|--------|----------|
+| T095 | SAP S/4 connector (5 entities) | P1 | 🔄 Scaffold | `app/connectors/sap/` |
+| T096 | D365 connector (5 entities) | P2 | 🔄 Scaffold | `app/connectors/d365/` |
+| T095a | Connector registry factory | P1 | ✅ | `app/connectors/registry.py` |
+
+### Compliance / load (Stream 3 — deferred)
+
+| ID | Task | Priority | Status | Evidence |
+|----|------|----------|--------|----------|
 | T090a | GDPR export production-harden | P1 | ⬜ | |
 | T091a | GDPR erasure + retention purge jobs | P1 | ⬜ | |
 | T092 | WCAG 2.1 AA audit + fix critical | P1 | ⬜ | |
 | T093 | SOC 2 Type I gap assessment | P1 | ⬜ | |
 | T094 | k6 500 VU load test in CI | P0 | ⬜ | |
-| T095 | SAP S/4 connector (5 entities) | P1 | 🔄 Scaffold | `app/connectors/sap/` |
-| T096 | D365 connector (5 entities) | P2 | 🔄 Scaffold | `app/connectors/d365/` |
 | T097 | API v2 versioning Kong routes | P1 | ⬜ | |
 | T098 | Tenant resource quotas (CPU/conn) — *app quotas done in P2* | P1 | ✅ (app-level) | |
 | T099 | Customer readiness package (Track B) | P0 | ✅ | `docs/customer/star-trans/` |
@@ -145,4 +174,19 @@
 
 ---
 
-*Tasks version 2.0 — Phase 2 close 2026-07-04*
+*Tasks version 2.1 — Phase 3 Speckit pipeline 2026-07-04*
+
+---
+
+## Phase 4: Convergence (2026-07-04)
+
+Assessment after `/speckit.implement` partial Phase 3 run. Remaining work appended for next implement cycle.
+
+| ID | Task | Priority | Status | Notes |
+|----|------|----------|--------|-------|
+| T158 | Install/document Helm 3.14+ prerequisite | P0 | ✅ | Helm 4.2.2 via winget |
+| T159 | Build and push container images to kind registry | P0 | ✅ | `build-kind-images.ps1` |
+| T160 | Wire PostgreSQL/Redis in Helm values | P0 | ✅ | `templates/postgresql.yaml`, `redis.yaml` |
+| T161 | Add `pytest` to connector dev deps; run Gate 10 in CI | P1 | ⬜ | Tests written; pytest not in local env |
+| T162 | Create GitHub issues from ISSUES.md | P2 | ✅ | Issues #12-#24 |
+| T163 | Star Trans UAT execution on customer Odoo staging | P0 | ⬜ | Business-blocked: SOW + staging access |
