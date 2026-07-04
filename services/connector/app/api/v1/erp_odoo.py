@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.feature_flags.flags import get_feature_flags
+from ipe_shared.events.odoo_sync_monitor import odoo_sync_monitor
 from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.integrations.odoo_credentials import decrypt_odoo_password
 from ipe_shared.schemas.common import APIResponse
@@ -189,6 +190,7 @@ async def resolution_notify(
                 "supplier_id": (tenant.config or {}).get("default_supplier_id") if tenant else None,
                 "lines": [],
             })
+        odoo_sync_monitor.record_sync("ipe_to_odoo", "resolution_notify", erp_mo_id, True)
         return APIResponse(
             success=True,
             data={"chatter": chatter, "draft_po": po_result, "erp_mo_id": erp_mo_id},
@@ -196,5 +198,6 @@ async def resolution_notify(
         )
     except Exception as e:
         logger.exception("Resolution notify failed")
+        odoo_sync_monitor.record_sync("ipe_to_odoo", "resolution_notify", erp_mo_id, False)
         return APIResponse(success=False, data=None, error={"code": "RESOLUTION_NOTIFY_FAILED", "message": str(e)})
 

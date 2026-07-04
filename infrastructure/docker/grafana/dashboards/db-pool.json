@@ -1,0 +1,77 @@
+{
+  "title": "IPE Database Pool",
+  "uid": "ipe-db-pool",
+  "version": 1,
+  "tags": ["ipe", "phase2", "database"],
+  "schemaVersion": 39,
+  "timezone": "utc",
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Pool Utilization (SLO: 80%)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0.8 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "ipe_db_pool_checked_out / clamp_min(ipe_db_pool_size, 1)",
+          "legendFormat": "{{ service }}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Checked Out Connections",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "ipe_db_pool_checked_out",
+          "legendFormat": "{{ service }}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Pool Size",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "ipe_db_pool_size",
+          "legendFormat": "{{ service }}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Overflow Connections",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "ipe_db_pool_overflow",
+          "legendFormat": "{{ service }}"
+        }
+      ]
+    }
+  ]
+}

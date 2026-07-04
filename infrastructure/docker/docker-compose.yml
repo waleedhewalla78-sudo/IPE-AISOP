@@ -794,6 +794,8 @@ services:
       - ../kong/kong.yml:/opt/kong/kong.yml
       - ../kong/plugins/ipe-tenant-strip:/usr/local/share/lua/5.1/kong/plugins/ipe-tenant-strip
     depends_on:
+      redis:
+        condition: service_healthy
       dpe-svc:
         condition: service_started
       mat-svc:
@@ -869,6 +871,10 @@ services:
       db:
         condition: service_healthy
     entrypoint: ["sh", "-c", "pip install mlflow psycopg2-binary && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql://ipe:ipe_test_pass@db:5432/mlflow --default-artifact-root /mlflow/artifacts"]
+
+networks:
+  default:
+    name: ipe-network
 
 volumes:
   db_data:

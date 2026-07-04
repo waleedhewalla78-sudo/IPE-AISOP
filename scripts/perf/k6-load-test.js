@@ -9,6 +9,10 @@ const MAX_VUS = parseInt(__ENV.MAX_VUS || "10", 10);
 const PROFILE = __ENV.K6_PROFILE || "r1-slo";
 
 const ENDPOINT_PROFILES = {
+  // Health-only SLO — no auth, avoids Keycloak + per-IP rate-limit noise at high VU
+  "health-only": [
+    { weight: 100, method: "GET", path: "/api/v1/health", name: "Health Check", tag: "health" },
+  ],
   // R1 SLO baseline — fast read paths only (Release 2 outcomes excluded per Phase 1 gate)
   "r1-slo": [
     { weight: 50, method: "GET", path: "/api/v1/health", name: "Health Check", tag: "health" },

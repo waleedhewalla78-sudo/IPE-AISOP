@@ -1,0 +1,50 @@
+{
+  "title": "IPE Kafka Consumer Lag",
+  "uid": "ipe-kafka-lag",
+  "version": 1,
+  "tags": ["ipe", "phase2", "kafka"],
+  "schemaVersion": 39,
+  "timezone": "utc",
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Consumer Lag by Topic (SLO: 1000)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "ipe_kafka_consumer_lag",
+          "legendFormat": "{{ service }} / {{ topic }} / {{ consumer_group }}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Max Lag (all groups)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 10 },
+      "targets": [
+        {
+          "expr": "max(ipe_kafka_consumer_lag)",
+          "legendFormat": "max lag"
+        }
+      ]
+    }
+  ]
+}

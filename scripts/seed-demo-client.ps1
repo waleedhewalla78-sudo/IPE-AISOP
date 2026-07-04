@@ -15,7 +15,7 @@ if (-not $running) {
     exit 1
 }
 
-Get-Content $SqlFile -Raw | docker exec -i $Container psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1
+Get-Content $SqlFile -Raw | docker exec -i $Container psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1 | ForEach-Object { Write-Host $_ }
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "Client demo data loaded." -ForegroundColor Green

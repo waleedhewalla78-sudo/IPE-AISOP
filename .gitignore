@@ -52,3 +52,9 @@ Thumbs.db
 config/keys/jwt-private.pem
 config/keys/*.bak.*
 config/keys/trusted/
+
+# Local demo credentials (do not commit)
+scripts/odoo/.login-body.json
+backups/
+docs/qa/*-metrics.ndjson
+

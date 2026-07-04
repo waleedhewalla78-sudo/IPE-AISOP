@@ -13,19 +13,24 @@ plugins:
         - POST
         - PUT
         - DELETE
+        - PATCH
         - OPTIONS
       headers:
         - Authorization
         - Content-Type
         - X-Tenant-ID
+        - X-Request-ID
       max_age: 3600
       preflight_continue: false
 
   - name: rate-limiting
     config:
-      minute: 200
-      limit_by: consumer
-      policy: local
+      minute: 500
+      limit_by: ip
+      policy: redis
+      redis_host: redis
+      redis_port: 6379
+      redis_database: 2
       fault_tolerant: true
       hide_client_headers: false
 
@@ -35,8 +40,23 @@ plugins:
       size_unit: megabytes
 
 services:
+  - name: dpe-auth-public
+    url: http://dpe-svc:8001
+    routes:
+      - name: dpe-health-route
+        paths:
+          - /api/v1/health
+        strip_path: false
+      - name: dpe-auth-login-route
+        paths:
+          - /api/v1/auth/login
+          - /api/v1/auth/refresh
+        strip_path: false
+
   - name: dpe-svc
     url: http://dpe-svc:8001
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: dpe-demand-route
         paths:
@@ -45,14 +65,6 @@ services:
       - name: dpe-financial-route
         paths:
           - /api/v1/financial
-        strip_path: false
-      - name: dpe-health-route
-        paths:
-          - /api/v1/health
-        strip_path: false
-      - name: dpe-auth-login-route
-        paths:
-          - /api/v1/auth/login
         strip_path: false
       - name: dpe-auth-me-route
         paths:
@@ -145,6 +157,8 @@ services:
 
   - name: mat-svc
     url: http://mat-svc:8002
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: mat-route
         paths:
@@ -153,6 +167,8 @@ services:
 
   - name: cap-svc
     url: http://cap-svc:8003
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: cap-route
         paths:
@@ -165,6 +181,8 @@ services:
 
   - name: res-svc
     url: http://res-svc:8005
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: res-route
         paths:
@@ -173,6 +191,8 @@ services:
 
   - name: fea-svc
     url: http://fea-svc:8004
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: fea-route
         paths:
@@ -185,6 +205,8 @@ services:
 
   - name: del-svc
     url: http://del-svc:8006
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: del-delay-route
         paths:
@@ -197,6 +219,8 @@ services:
 
   - name: rec-svc
     url: http://rec-svc:8008
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: rec-route
         paths:
@@ -205,6 +229,8 @@ services:
 
   - name: demand-svc
     url: http://demand-svc:8040
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: demand-forecast-route
         paths:
@@ -225,6 +251,8 @@ services:
 
   - name: scenario-svc
     url: http://scenario-svc:8050
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: scenario-route
         paths:
@@ -233,6 +261,8 @@ services:
 
   - name: supply-svc
     url: http://supply-svc:8060
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: supply-route
         paths:
@@ -241,6 +271,8 @@ services:
 
   - name: order-svc
     url: http://order-svc:8070
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: order-route
         paths:
@@ -249,6 +281,8 @@ services:
 
   - name: equipment-svc
     url: http://equipment-svc:8061
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: equipment-route
         paths:
@@ -261,6 +295,8 @@ services:
 
   - name: material-svc
     url: http://material-svc:8090
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: materials-route
         paths:
@@ -273,6 +309,8 @@ services:
 
   - name: procurement-svc
     url: http://procurement-svc:8100
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: procurement-suppliers-route
         paths:
@@ -288,6 +326,8 @@ services:
     connect_timeout: 60000
     read_timeout: 300000
     write_timeout: 300000
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: nlp-copilot-route
         paths:
@@ -300,6 +340,8 @@ services:
 
   - name: alert-svc
     url: http://alert-svc:8010
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: alert-route
         paths:
@@ -316,6 +358,8 @@ services:
 
   - name: sustain-svc
     url: http://sustain-svc:8012
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: sustain-route
         paths:
@@ -324,6 +368,8 @@ services:
 
   - name: quality-svc
     url: http://quality-svc:8013
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: quality-route
         paths:
@@ -332,6 +378,8 @@ services:
 
   - name: scn-svc
     url: http://scn-svc:8014
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: scn-route
         paths:
@@ -340,6 +388,8 @@ services:
 
   - name: network-svc
     url: http://network-svc:8015
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: network-route
         paths:
@@ -352,6 +402,8 @@ services:
 
   - name: connector
     url: http://connector:8009
+    plugins:
+      - name: ipe-tenant-strip
     routes:
       - name: connector-ipe-route
         paths:
@@ -363,5 +415,28 @@ services:
         strip_path: false
 
 consumers:
-  - username: ipe-service
-  - username: tenant-user
+  - username: tenant-aaa-111
+    custom_id: aaaaaaaa-1111-4111-8111-111111111111
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          limit_by: consumer
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_database: 2
+          fault_tolerant: true
+
+  - username: tenant-bbb-222
+    custom_id: bbbbbbbb-2222-4222-8222-222222222222
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          limit_by: consumer
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_database: 2
+          fault_tolerant: true

@@ -1,0 +1,58 @@
+# IPE Phase 2 — Prometheus configuration
+# Scrapes all FastAPI services at /metrics (ipe_shared.metrics middleware)
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: ipe
+    env: development
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: kong
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["kong:8001"]
+    scrape_interval: 30s
+
+  # Release 1 core + full hybrid stack (22 application services)
+  - job_name: ipe-services
+    metrics_path: /metrics
+    scrape_timeout: 10s
+    static_configs:
+      - targets:
+          - dpe-svc:8001
+          - mat-svc:8002
+          - cap-svc:8003
+          - fea-svc:8004
+          - res-svc:8005
+          - del-svc:8006
+          - nlp-svc:8007
+          - rec-svc:8008
+          - connector:8009
+          - alert-svc:8010
+          - sustain-svc:8012
+          - quality-svc:8013
+          - scn-svc:8014
+          - network-svc:8015
+          - demand-svc:8040
+          - scenario-svc:8050
+          - supply-svc:8060
+          - equipment-svc:8061
+          - order-svc:8070
+          - material-svc:8090
+          - procurement-svc:8100
+        labels:
+          tier: application

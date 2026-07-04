@@ -1,0 +1,33 @@
+# Phase 2 Stream 3B — Per-tenant Kong consumers (reference fragment)
+# Copy the `consumers` block into kong.yml / kong.release1.yml, or generate new tenants with:
+#   python scripts/kong/generate-tenant-consumer.py --username tenant-ccc --custom-id <uuid>
+#
+# JWT `tenant_id` claim must match each consumer's `custom_id`.
+# The ipe-tenant-strip plugin maps JWT tenant_id → Kong consumer for per-consumer rate limits.
+
+consumers:
+  - username: tenant-aaa-111
+    custom_id: aaaaaaaa-1111-4111-8111-111111111111
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          limit_by: consumer
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_database: 2
+          fault_tolerant: true
+
+  - username: tenant-bbb-222
+    custom_id: bbbbbbbb-2222-4222-8222-222222222222
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          limit_by: consumer
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_database: 2
+          fault_tolerant: true

@@ -16,6 +16,7 @@ from ipe_shared.auth.jwt import TokenPayload
 from ipe_shared.auth.rbac import require_roles
 from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.schemas.common import APIResponse
+from ipe_shared.tenant.quotas import enforce_quota
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,8 @@ async def create_user(
     current_user: TokenPayload = Depends(require_roles(["admin"])),
 ):
     tenant_id = tenant_ctx.get() or str(uuid4())
+    user_count = sum(1 for u in _user_store.values() if u.get("tenant_id") == str(tenant_id))
+    await enforce_quota(str(tenant_id), "users", user_count)
     user_id = str(uuid4())
     scim_user = {
         "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],

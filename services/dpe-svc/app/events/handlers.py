@@ -10,6 +10,7 @@ from ipe_shared.models.bom import BillOfMaterial
 from ipe_shared.models.demand import DemandLine
 from ipe_shared.models.manufacturing_order import ManufacturingOrder
 from ipe_shared.models.product import Product
+from ipe_shared.tenant.quotas import count_tenant_resource, enforce_quota
 
 
 async def handle_demand_created(event: dict):
@@ -67,16 +68,22 @@ async def handle_demand_created(event: dict):
             bom_id = bom_row[0] if bom_row else None
 
             if bom_id:
-                mo = ManufacturingOrder(
-                    product_id=demand_line.product_id,
-                    bom_id=bom_id,
-                    quantity=demand_line.quantity,
-                    status="draft",
-                )
-                session.add(mo)
-                await session.flush()
-                mo_id = mo.id
-                demand_line.mo_id = mo_id
+                if not tid:
+                    mo_id = None
+                else:
+                    mo_count = await count_tenant_resource(session, tid, "manufacturing_orders")
+                    await enforce_quota(str(tid), "manufacturing_orders", mo_count)
+                    mo = ManufacturingOrder(
+                        tenant_id=tid,
+                        product_id=demand_line.product_id,
+                        bom_id=bom_id,
+                        quantity=demand_line.quantity,
+                        status="draft",
+                    )
+                    session.add(mo)
+                    await session.flush()
+                    mo_id = mo.id
+                    demand_line.mo_id = mo_id
             else:
                 mo_id = None
 

@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import re
 import traceback
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -11,9 +13,34 @@ from aiokafka import AIOKafkaConsumer
 from ipe_shared.cache.redis_client import redis_client
 from ipe_shared.config import settings
 from ipe_shared.events.producer import kafka_producer
+from ipe_shared.metrics.middleware import KAFKA_CONSUMER_LAG
 from ipe_shared.middleware.tenant_context import tenant_ctx
 
 logger = logging.getLogger(__name__)
+
+
+def _sanitize_group_component(value: str) -> str:
+    """Kafka group IDs allow alphanumerics, dots, hyphens, and underscores."""
+    return re.sub(r"[^a-zA-Z0-9._-]", "-", value.strip())
+
+
+def get_consumer_group(base_name: str, tenant_id: str) -> str:
+    """Return tenant-scoped consumer group name."""
+    return f"ipe.{_sanitize_group_component(tenant_id)}.{_sanitize_group_component(base_name)}"
+
+
+def resolve_consumer_tenant_id(explicit: str | None = None) -> str | None:
+    """Resolve tenant ID for Kafka consumer group scoping."""
+    if explicit and str(explicit).strip():
+        return str(explicit).strip()
+    configured = getattr(settings, "KAFKA_CONSUMER_TENANT_ID", "") or ""
+    if configured.strip():
+        return configured.strip()
+    for key in ("IPE_KAFKA_CONSUMER_TENANT_ID", "IPE_TENANT_ID", "TENANT_ID"):
+        val = os.getenv(key, "").strip()
+        if val:
+            return val
+    return None
 
 
 def _try_avro_deserialize(data: bytes) -> dict | None:
@@ -55,8 +82,23 @@ class KafkaConsumer:
         handler: Callable,
         service_name: str = "unknown",
         use_session: bool = False,
+        tenant_id: str | None = None,
+        tenant_scoped: bool = True,
     ):
         self.service_name = service_name
+        self.base_group_id = group_id
+        self.consumer_tenant_id = resolve_consumer_tenant_id(tenant_id)
+        if tenant_scoped and self.consumer_tenant_id:
+            self.group_id = get_consumer_group(group_id, self.consumer_tenant_id)
+        else:
+            self.group_id = group_id
+            if tenant_scoped and not self.consumer_tenant_id:
+                logger.warning(
+                    "Kafka consumer %s using shared group %s — set IPE_KAFKA_CONSUMER_TENANT_ID",
+                    service_name,
+                    group_id,
+                )
+        self.bootstrap_servers = settings.KAFKA_BOOTSTRAP_SERVERS
         self.handler = handler
         self._avro_topics = set()
         self._use_session = use_session
@@ -74,8 +116,8 @@ class KafkaConsumer:
 
         self.consumer = AIOKafkaConsumer(
             *topics,
-            bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
-            group_id=group_id,
+            bootstrap_servers=self.bootstrap_servers,
+            group_id=self.group_id,
             value_deserializer=lambda v: v,
             enable_auto_commit=False,
             auto_offset_reset="earliest",
@@ -90,9 +132,35 @@ class KafkaConsumer:
         async for msg in self.consumer:
             await self._process_message(msg)
 
+    async def _report_consumer_lag(self, topic: str, consumer_group: str | None = None) -> None:
+        """Report current consumer lag to Prometheus."""
+        group = consumer_group or self.group_id
+        try:
+            assigned = self.consumer.assignment()
+            partitions = [tp for tp in assigned if tp.topic == topic]
+            if not partitions:
+                return
+
+            end_offsets = await self.consumer.end_offsets(partitions)
+            max_lag = 0
+            for tp in partitions:
+                committed = await self.consumer.committed(tp)
+                current = committed if committed is not None else await self.consumer.position(tp)
+                lag = end_offsets.get(tp, 0) - current
+                max_lag = max(max_lag, max(0, lag))
+
+            KAFKA_CONSUMER_LAG.labels(
+                service=self.service_name,
+                topic=topic,
+                consumer_group=group,
+            ).set(max_lag)
+        except Exception:
+            pass  # Non-critical — don't break consumer loop
+
     async def _process_message(self, msg: Any):
         raw_value = msg.value if hasattr(msg, "value") else msg
         topic = msg.topic if hasattr(msg, "topic") else ""
+        await self._report_consumer_lag(topic)
 
         if isinstance(raw_value, bytes) and topic in self._avro_topics:
             deserialized = _try_avro_deserialize(raw_value)

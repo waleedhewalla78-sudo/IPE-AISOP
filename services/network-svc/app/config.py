@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
     REDIS_URL: str = "redis://localhost:6379"
     LOG_LEVEL: str = "INFO"
-    CORS_ORIGINS: list[str] = ["*"]
+    CORS_ORIGINS: list[str] = ["http://localhost:8082", "http://localhost:3000"]
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

@@ -146,7 +146,7 @@ def record_kafka_consumer_lag(service: str, topic: str, consumer_group: str, lag
     ).set(lag)
 
 
-def setup_prometheus_metrics(app: FastAPI, service_name: str, version: str = "unknown") -> None:
+def setup_metrics(app: FastAPI, service_name: str, version: str = "unknown") -> None:
     """Attach metrics middleware and /metrics endpoint to a FastAPI app."""
     app.add_middleware(MetricsMiddleware, service_name=service_name)
 
@@ -162,3 +162,7 @@ def setup_prometheus_metrics(app: FastAPI, service_name: str, version: str = "un
             content=generate_latest(REGISTRY),
             media_type=CONTENT_TYPE_LATEST,
         )
+
+
+# Backward-compatible alias
+setup_prometheus_metrics = setup_metrics

@@ -1,0 +1,76 @@
+# IPE Phase 2 — Alertmanager rules (spec 015 Stream 1)
+# Metric names from ipe_shared.metrics.middleware
+
+groups:
+  - name: ipe-api-slo
+    interval: 30s
+    rules:
+      - alert: IPEHighP95Latency
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le, service) (rate(ipe_http_request_duration_seconds_bucket[5m]))
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "{{ $labels.service }} P95 latency exceeds 500ms"
+          description: "P95 for {{ $labels.service }} is {{ $value | humanizeDuration }} (SLO: 500ms)."
+          runbook: "docs/runbooks/incident-response.md"
+
+      - alert: IPEHighErrorRate
+        expr: |
+          (
+            sum by (service) (rate(ipe_http_requests_total{status_code=~"5.."}[5m]))
+            /
+            sum by (service) (rate(ipe_http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "{{ $labels.service }} error rate exceeds 5%"
+          description: "5xx error rate for {{ $labels.service }} is {{ $value | humanizePercentage }}."
+          runbook: "docs/runbooks/incident-response.md"
+
+  - name: ipe-infra
+    interval: 30s
+    rules:
+      - alert: IPEDbPoolHighUtilization
+        expr: |
+          (
+            ipe_db_pool_checked_out
+            /
+            clamp_min(ipe_db_pool_size, 1)
+          ) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "{{ $labels.service }} DB pool utilization above 80%"
+          description: "Pool utilization is {{ $value | humanizePercentage }} for {{ $labels.service }}."
+          runbook: "docs/runbooks/incident-response.md#alert-4-database-connection-pool-exhaustion"
+
+      - alert: IPEKafkaConsumerLag
+        expr: ipe_kafka_consumer_lag > 1000
+        for: 10m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Kafka lag > 1000 for {{ $labels.consumer_group }}"
+          description: "Topic {{ $labels.topic }} lag is {{ $value }} messages (service: {{ $labels.service }})."
+          runbook: "docs/runbooks/incident-response.md#alert-1-kafka-consumer-lag--5-minutes"
+
+      - alert: IPEServiceDown
+        expr: up{job="ipe-services"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "IPE service {{ $labels.instance }} is down"
+          description: "Prometheus cannot scrape /metrics on {{ $labels.instance }}."

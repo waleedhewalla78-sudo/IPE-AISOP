@@ -10,7 +10,7 @@ from ipe_shared.observability.tracing import (
     instrument_asyncpg,
     instrument_redis,
 )
-from ipe_shared.observability.metrics import setup_metrics
+from ipe_shared.observability.metrics import setup_health_probes
 from ipe_shared.observability.middleware import (
     CorrelationIdMiddleware,
     RequestLoggingMiddleware,
@@ -55,7 +55,7 @@ def setup_observability(app, service_name: str | None = None) -> None:
         app.add_middleware(AuditRequestMiddleware)
         logger.info("Audit request middleware enabled for service=%s", name)
 
-    setup_metrics(app, service_name=name)
+    setup_health_probes(app)
 
     try:
         instrument_asyncpg()

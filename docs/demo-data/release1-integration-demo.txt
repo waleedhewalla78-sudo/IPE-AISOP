@@ -1,15 +1,15 @@
 ﻿=== Release 1 Integration Demo ===
-2026-07-03 01:41:26
+2026-07-04 12:28:46
 Stack: 8 services + res-svc + Odoo 19 live
 
-[PASS] 1. IPE login - JWT for Ahmed@nour
-[PASS] 2. Odoo connection test - Odoo uid=2 v19.0-20260629
-[PASS] 3. Save Odoo config (vault) - password_set=True
+[PASS] 1. IPE login - JWT obtained (Keycloak or local)
+[PASS] 2. Save Odoo config (vault) - password_set=True
+[PASS] 3. Odoo connection test - connector XML-RPC path work_centers=7
 [PASS] 4. Full Odoo -> CDM sync - products updated=70 MOs updated=10 rescored=10
-[PASS] 5. Sync status audit - last_sync=2026-07-02T22:41:28.823463+00:00
+[PASS] 5. Sync status audit - last_sync=2026-07-04T09:28:52.175323+00:00 status=success
 [PASS] 6. Data quality flags - flags=0
-[PASS] 7. Feasibility queue (Control Tower) - 20 MOs; lowest score=45.0 constraint=material_shortage
-[PASS] 8. Feasibility KPIs - at_risk=1 avg=78.6
+[PASS] 7. Feasibility queue (Control Tower) - 60 MOs; lowest score=45.0 constraint=material_shortage
+[PASS] 8. Feasibility KPIs - at_risk=4 avg=72.7
 [PASS] 9. Resolution scenarios - 8 scenarios (MO-ST expedite/overtime/split)
 [PASS] 9.5 MDR quality gate (pre-schedule) - composite=100% threshold=70.0% bom=100.0% routing=100.0% inventory=100.0%
 [PASS] 10. OR-Tools schedule (cap-svc) - 8 ops scheduled

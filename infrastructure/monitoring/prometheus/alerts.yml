@@ -1,0 +1,94 @@
+groups:
+  - name: ipe_api_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(ipe_http_requests_total{status_code=~"5.."}[5m])) by (service)
+            /
+            sum(rate(ipe_http_requests_total[5m])) by (service)
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "{{ $labels.service }} error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      - alert: HighP95Latency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(ipe_http_request_duration_seconds_bucket[5m])) by (le, service)
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High P95 latency on {{ $labels.service }}"
+          description: "{{ $labels.service }} P95 is {{ $value }}s (threshold: 0.5s)"
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.instance }} has been down for more than 1 minute"
+
+  - name: ipe_infrastructure_alerts
+    rules:
+      - alert: DBPoolExhausted
+        expr: |
+          ipe_db_pool_checked_out / ipe_db_pool_size > 0.8
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DB pool near exhaustion on {{ $labels.service }}"
+          description: "{{ $labels.service }} is using {{ $value | humanizePercentage }} of DB pool"
+
+      - alert: KafkaConsumerLag
+        expr: ipe_kafka_consumer_lag > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "{{ $labels.service }} lag on {{ $labels.topic }} is {{ $value }} messages"
+
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is unreachable"
+
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is unreachable"
+
+  - name: ipe_business_alerts
+    rules:
+      - alert: MDRScoreBelowThreshold
+        expr: ipe_mdr_composite_score < 0.7
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "MDR composite score below threshold"
+          description: "MDR score is {{ $value }}, below 70% quality gate"
+
+      - alert: FeasibilityQueueBacklog
+        expr: ipe_feasibility_queue_size > 50
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: "Feasibility queue backlog growing"
+          description: "{{ $value }} items in feasibility queue"

@@ -11,6 +11,7 @@ from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.models.tenant import Tenant
 from ipe_shared.integrations.odoo_credentials import decrypt_odoo_password
+from ipe_shared.events.odoo_sync_monitor import odoo_sync_monitor
 from ipe_shared.schemas.common import APIResponse
 
 from app.odoo.client import OdooClient
@@ -112,7 +113,15 @@ async def sync_status(session: AsyncSession = Depends(get_db_session)):
     )
     last = row.fetchone()
     if not last:
-        return APIResponse(success=True, data={"last_sync": None, "next_sync_estimate_minutes": 15}, error=None)
+        return APIResponse(
+            success=True,
+            data={
+                "last_sync": None,
+                "next_sync_estimate_minutes": 15,
+                "monitor": odoo_sync_monitor.get_sync_status(),
+            },
+            error=None,
+        )
 
     return APIResponse(
         success=True,
@@ -126,6 +135,7 @@ async def sync_status(session: AsyncSession = Depends(get_db_session)):
                 "error_summary": last[5],
             },
             "next_sync_estimate_minutes": 15,
+            "monitor": odoo_sync_monitor.get_sync_status(),
         },
         error=None,
     )

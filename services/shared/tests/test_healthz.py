@@ -3,14 +3,16 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from ipe_shared.observability.metrics import setup_metrics
+from ipe_shared.metrics import setup_metrics
+from ipe_shared.observability.metrics import setup_health_probes
 from fastapi import FastAPI
 
 
 @pytest.fixture
 def health_app():
     app = FastAPI()
-    setup_metrics(app, "test-svc")
+    setup_metrics(app, "test-svc", version="9.3.0-p2")
+    setup_health_probes(app)
     return app
 
 

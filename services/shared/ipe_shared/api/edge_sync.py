@@ -20,6 +20,7 @@ from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.models.edge_sync import EdgeSyncBatch, EdgeSyncRecord, EdgeScheduleDelta
 from ipe_shared.schemas.common import APIResponse
+from ipe_shared.tenant.quotas import count_tenant_resource, enforce_quota
 
 logger = logging.getLogger(__name__)
 
@@ -218,6 +219,8 @@ async def _create_entity(
     from ipe_shared.models.work_order import WorkOrder
 
     if entity_type in ("manufacturing_order", "edge_operations"):
+        mo_count = await count_tenant_resource(session, tenant_id, "manufacturing_orders")
+        await enforce_quota(str(tenant_id), "manufacturing_orders", mo_count)
         mo = ManufacturingOrder(
             id=UUID(entity_id) if len(entity_id) == 36 else uuid4(),
             tenant_id=tenant_id,

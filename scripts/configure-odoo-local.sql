@@ -11,7 +11,7 @@ SET
   config = COALESCE(config, '{}'::jsonb) || jsonb_build_object(
     'odoo_url', 'http://host.docker.internal:8069',
     'odoo_db', 'starttrans1',
-    'odoo_username', 'admin',
+    'odoo_username', 'whewalla@gmail.com',
     'odoo_password', 'admin'
   )
 WHERE id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';

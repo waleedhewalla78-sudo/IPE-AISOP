@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.odoo.client import OdooClient
 from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
+from ipe_shared.events.odoo_sync_monitor import odoo_sync_monitor
+from ipe_shared.integrations.odoo_credentials import decrypt_odoo_password
 from ipe_shared.models.manufacturing_order import ManufacturingOrder
 from ipe_shared.models.tenant import Tenant
 from ipe_shared.schemas.common import APIResponse
@@ -19,12 +21,28 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/sync/odoo", tags=["sync-odoo"])
 
 
+def _resolve_odoo_mo_id(client: OdooClient, erp_mo_id: str) -> int | None:
+    try:
+        return int(erp_mo_id)
+    except ValueError:
+        pass
+    rows = client.execute(
+        "mrp.production",
+        "search_read",
+        args=[[["name", "=", erp_mo_id]]],
+        kwargs={"fields": ["id"], "limit": 1},
+    )
+    if rows:
+        return int(rows[0]["id"])
+    return None
+
+
 class ActivateRequest(BaseModel):
     mo_ids: list[UUID]
-    odoo_url: str
-    odoo_db: str
-    odoo_username: str
-    odoo_password: str
+    odoo_url: str | None = None
+    odoo_db: str | None = None
+    odoo_username: str | None = None
+    odoo_password: str | None = None
     approved_by: str = "system"
 
 
@@ -48,8 +66,27 @@ async def activate_schedule(
             "total": 0, "activated_count": 0, "failed_count": 0,
         }, error=None)
 
+    result = await session.execute(select(Tenant).where(Tenant.id == tid))
+    tenant = result.scalar_one_or_none()
+    if not tenant:
+        return APIResponse(
+            success=False, data=None,
+            error={"code": "NOT_FOUND", "message": "Tenant not found"},
+        )
+
+    cfg = tenant.config or {}
+    odoo_url = req.odoo_url or tenant.erp_base_url or cfg.get("odoo_url")
+    odoo_db = req.odoo_db or cfg.get("odoo_db")
+    odoo_username = req.odoo_username or cfg.get("odoo_username")
+    odoo_password = req.odoo_password or decrypt_odoo_password(cfg)
+    if not all([odoo_url, odoo_db, odoo_username, odoo_password]):
+        return APIResponse(
+            success=False, data=None,
+            error={"code": "ODOO_CREDS", "message": "Configure tenant Odoo creds or pass request body"},
+        )
+
     try:
-        client = OdooClient(req.odoo_url, req.odoo_db, req.odoo_username, req.odoo_password)
+        client = OdooClient(odoo_url, odoo_db, odoo_username, odoo_password)
         client.authenticate()
     except Exception as e:
         return APIResponse(
@@ -81,9 +118,8 @@ async def activate_schedule(
             continue
 
         erp_mo_id = mo.erp_mo_id
-        try:
-            erp_id = int(erp_mo_id)
-        except ValueError:
+        erp_id = _resolve_odoo_mo_id(client, erp_mo_id)
+        if erp_id is None:
             failed.append({"mo_id": str(mo_id), "reason": "INVALID_ERP_MO_ID"})
             continue
 
@@ -146,6 +182,7 @@ async def activate_schedule(
                 "new_planned_start": new_start,
                 "new_planned_end": new_end,
             })
+            odoo_sync_monitor.record_sync("ipe_to_odoo", "schedule_activate", erp_mo_id, True)
 
         except Exception as e:
             error_str = str(e)
@@ -154,6 +191,12 @@ async def activate_schedule(
             else:
                 reason = f"ODOO_ERROR: {error_str[:200]}"
             failed.append({"mo_id": str(mo_id), "reason": reason})
+            odoo_sync_monitor.record_sync(
+                "ipe_to_odoo",
+                "schedule_activate",
+                erp_mo_id if "erp_mo_id" in locals() else str(mo_id),
+                False,
+            )
             logger.error("Failed to activate MO %s: %s", mo_id, error_str)
 
     await session.commit()

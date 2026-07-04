@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
@@ -89,7 +89,7 @@ async def test_sync_inventory_aggregates_stock_quants():
 
 
 async def test_sync_mo_detects_sync_conflict():
-    """T025 partial: date change in Odoo after IPE sync sets sync_conflict."""
+    """T025: date change in Odoo after IPE sync resolves via LWW (Odoo wins)."""
     session = AsyncMock()
     tenant_id = uuid4()
     product_id = uuid4()
@@ -103,8 +103,12 @@ async def test_sync_mo_detects_sync_conflict():
     existing_mo = MagicMock()
     existing_mo.id = uuid4()
     existing_mo.planned_start = datetime(2026, 7, 1, 8, 0, tzinfo=UTC)
+    existing_mo.planned_end = datetime(2026, 7, 1, 17, 0, tzinfo=UTC)
     existing_mo.erp_synced_at = datetime(2026, 6, 28, 8, 0, tzinfo=UTC)
-    existing_mo.sync_conflict = None
+    existing_mo.updated_at = datetime(2026, 6, 29, 8, 0, tzinfo=UTC)
+    existing_mo.version = 1
+    existing_mo.ai_schedule_version = 2
+    existing_mo.sync_conflict = {"prior": True}
     existing_mo.quantity = 1
 
     mo_result = MagicMock()
@@ -122,22 +126,22 @@ async def test_sync_mo_detects_sync_conflict():
     engine._validate_mo = AsyncMock()
     engine._set_flag = AsyncMock()
 
-    client = MagicMock()
-    client.search_read = MagicMock(return_value=[{
-        "id": 501,
-        "product_id": [10, "Test"],
-        "bom_id": [20, "BOM"],
-        "product_qty": 5,
-        "date_start": "2026-07-05 08:00:00",
-        "date_finished": "2026-07-06 17:00:00",
-        "state": "confirmed",
-        "write_date": "2026-06-30 09:00:00",
-    }])
-    engine.client = client
+    with patch("app.odoo.sync_engine.count_tenant_resource", AsyncMock(return_value=0)):
+        client = MagicMock()
+        client.search_read = MagicMock(return_value=[{
+            "id": 501,
+            "product_id": [10, "Test"],
+            "bom_id": [20, "BOM"],
+            "product_qty": 5,
+            "date_start": "2026-07-05 08:00:00",
+            "date_finished": "2026-07-06 17:00:00",
+            "state": "confirmed",
+            "write_date": "2026-06-30 09:00:00",
+        }])
+        engine.client = client
 
-    result = await engine.sync_manufacturing_orders()
+        result = await engine.sync_manufacturing_orders()
 
     assert result["updated"] == 1
-    assert existing_mo.sync_conflict is not None
-    engine._set_flag.assert_awaited()
-    assert engine._set_flag.await_args[0][1] == "SYNC_CONFLICT"
+    assert existing_mo.sync_conflict is None
+    engine._set_flag.assert_not_awaited()

@@ -38,14 +38,16 @@ INSERT INTO cdm_customer (tenant_id, erp_source_id, name, tier)
 VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'CUST001', 'Acme Corp', 1),
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'CUST002', 'Globex Inc', 2),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'CUST003', 'Initech', 3);
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'CUST003', 'Initech', 3)
+ON CONFLICT (tenant_id, erp_source_id) DO NOTHING;
 
 -- Seed suppliers
 INSERT INTO cdm_supplier (tenant_id, erp_source_id, name, reliability_score, avg_delay_days, delay_std_dev_days)
 VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'SUPP001', 'Parts R Us', 0.95, 1.5, 0.8),
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'SUPP002', 'Global Materials Ltd', 0.88, 3.2, 2.1),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'SUPP003', 'QuickShip Logistics', 0.75, 5.0, 4.0);
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'SUPP003', 'QuickShip Logistics', 0.75, 5.0, 4.0)
+ON CONFLICT (tenant_id, erp_source_id) DO NOTHING;
 
 -- Seed work centers
 INSERT INTO cdm_work_center (tenant_id, erp_source_id, name, capacity_hours_per_day, oee, cost_per_hour, status)

@@ -4,6 +4,9 @@
 x-jwt-public-volume: &jwt-public-volume
   - ../../config/keys/jwt-public.pem:/app/config/keys/jwt-public.pem:ro
 
+x-quota-config-mount: &quota-config-mount
+  ../../config/tenant-quotas.json:/app/config/tenant-quotas.json:ro
+
 services:
   db:
     image: postgres:16
@@ -45,10 +48,13 @@ services:
       IPE_RELEASE_PROFILE: release1
       IPE_KMS_KEY_DIR: /data/kms
       KEYCLOAK_URL: http://keycloak:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - r1_kms_data:/data/kms
       - ../../config/keys/jwt-private.pem:/app/config/keys/jwt-private.pem:ro
       - ../../config/keys/jwt-public.pem:/app/config/keys/jwt-public.pem:ro
+      - *quota-config-mount
     depends_on:
       db:
         condition: service_healthy
@@ -148,6 +154,7 @@ services:
     volumes:
       - r1_kms_data:/data/kms
       - ../../config/keys/jwt-public.pem:/app/config/keys/jwt-public.pem:ro
+      - *quota-config-mount
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -169,21 +176,31 @@ services:
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_PROXY_LISTEN: "0.0.0.0:8000, 0.0.0.0:8443 ssl"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
       KONG_SSL_CERT: /etc/kong/certs/tls.crt
       KONG_SSL_CERT_KEY: /etc/kong/certs/tls.key
+      KONG_PLUGINS: "bundled,ipe-tenant-strip"
     ports:
       - "8000:8000"
       - "8443:8443"
     volumes:
       - ../kong/kong.release1.yml:/opt/kong/kong.release1.yml:ro
+      - ../kong/plugins/ipe-tenant-strip:/usr/local/share/lua/5.1/kong/plugins/ipe-tenant-strip
       - ../../infrastructure/certs/ipe-dev.crt:/etc/kong/certs/tls.crt:ro
       - ../../infrastructure/certs/ipe-dev.key:/etc/kong/certs/tls.key:ro
     depends_on:
-      - dpe-svc
-      - fea-svc
-      - res-svc
-      - cap-svc
-      - connector
+      redis:
+        condition: service_healthy
+      dpe-svc:
+        condition: service_started
+      fea-svc:
+        condition: service_started
+      res-svc:
+        condition: service_started
+      cap-svc:
+        condition: service_started
+      connector:
+        condition: service_healthy
 
   web-ui:
     build:
@@ -285,6 +302,10 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+
+networks:
+  default:
+    name: ipe-network
 
 volumes:
   r1_db_data:

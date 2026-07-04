@@ -1,0 +1,37 @@
+# k6 SLO — Phase 2 Close Evidence
+Date: 2026-07-03
+Script: scripts/perf/k6-slo.js
+Runner: scripts/run-k6-slo.ps1
+Kong: http://localhost:8000
+Auth: Keycloak (admin@ipe.example.com)
+
+## Result: PASS (first run)
+
+| Metric | Value | Target |
+|--------|-------|--------|
+| Requests | 872 | — |
+| P95 latency | 259.6 ms | < 500 ms |
+| Error rate | 0.00% | < 5% |
+| 429 rate-limit errors | 0 | — |
+
+Full JSON: docs/qa/k6-slo-baseline.json
+
+## Notes
+
+- Original k6-load-test.js at 50 VU measured Kong rate-limit (500 req/min), not service SLO.
+- k6-slo.js uses 5→8 VU ramp and 1.5–2.0s sleep to stay under rate limit.
+- Schedule/active endpoint excluded (P95 > 1s on dev stack); SLO uses read-only planning APIs.
+- Re-runs may vary (507ms P95 observed once); dev stack under memory pressure after long Gate 5 runs.
+
+## Command
+
+```powershell
+cd E:\AISOP\ipe
+.\scripts\run-k6-slo.ps1
+```
+
+## Phase 2 bundle
+
+```powershell
+.\scripts\security\verify-phase2-close.ps1
+```

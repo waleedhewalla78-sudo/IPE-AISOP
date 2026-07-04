@@ -6,19 +6,23 @@
 |-------|-------|
 | **Document ID** | PRD-IPE-2026-COMPREHENSIVE |
 | **Product version (full stack)** | **v8.2.0** |
-| **Customer release profile** | **Release 1** (target tag `v9.0.0-r1`) |
-| **Status** | As-is development reference — staging/UAT ready (full); Release 1 UAT in progress |
-| **Author** | Product Management (consolidated from specs, codebase, and integration sessions) |
-| **Last updated** | 2026-06-30 |
+| **Customer release profiles** | **Release 1** (`v9.0.0-r1` target) · **Release 2** (`v9.1.0-r2` target) · **Enterprise Phase 2** (`v9.3.0-p2` target) |
+| **Status** | As-is development reference — full stack 32/32; R1/R2 HTTPS demos validated locally; enterprise Gates 1–5 pass except k6 SLO + git tag |
+| **Author** | Product Management (consolidated from specs, codebase, Speckit 000–015, and gate verification sessions) |
+| **Last updated** | **2026-07-03** |
 | **Primary vertical** | Discrete manufacturing — electrical transformers (Star Trans, Egypt/MENA) |
+| **Product scope boundary** | **IPE AISOP only** — NEXUS Social / external marketing scaffolds are **explicitly out of scope** (spec 005) |
 | **Supersedes / extends** | `docs/PRD-IPE-v8.2.0-ENTERPRISE.md` (partial overlap; this document is authoritative for as-is scope) |
 
 > **Scope statement:** This PRD documents IPE **as it currently exists in development**, including what is implemented, what is scaffolded, what is validated in demo vs. live ERP, and what remains blocked. It does **not** describe a future ideal state unless explicitly marked **POST-B** (post–business-blocker) or **Deferred (R2/R3)**.
+>
+> **Terminology note:** IPE is an **AI-assisted manufacturing planning platform** (APS), not an AI marketing platform. Competitive context in Section 15 compares IPE to **SAP IBP, Kinaxis, o9**, and **Excel + Odoo MRP** — not MarTech vendors.
 
 ---
 
 ## Table of Contents
 
+0. [Project Definition & Background](#0-project-definition--background)
 1. [Executive Summary](#1-executive-summary)
 2. [Product Vision & Scope](#2-product-vision--scope)
 3. [Problem Statement & Business Context](#3-problem-statement--business-context)
@@ -39,6 +43,59 @@
 18. [Risks & Mitigation](#18-risks--mitigation)
 19. [Assumptions & Constraints](#19-assumptions--constraints)
 20. [Appendices](#20-appendices)
+21. [Last 24 Hours — Engineering Activity Log](#21-last-24-hours--engineering-activity-log-2026-07-02--2026-07-03)
+
+---
+
+## 0. Project Definition & Background
+
+### 0.1 Why IPE Exists (Business Purpose)
+
+Discrete manufacturers (100–1,000 employees, 1–2 sites) running **Odoo MRP** or similar ERPs often plan production in **parallel spreadsheets** while ERP holds master data. Planners discover material shortages and capacity overloads **on the shop floor**, not at the start of the shift. Leadership sees OTD and margin impact **after month-end close**. IPE was initiated to provide a **feasibility-first planning layer** that sits above ERP: ingest master data, score manufacturing orders before scheduling, offer structured resolution scenarios, run finite-capacity optimization, and optionally write approved plans back to ERP — with AI in **shadow mode** until trust is established.
+
+### 0.2 Project Definition (As-Is)
+
+| Attribute | Definition |
+|-----------|------------|
+| **Product name** | Intelligent Planning Engine (IPE) |
+| **Workspace** | `E:\AISOP\ipe` (monorepo); Spec Kit at `E:\AISOP\.specify\` |
+| **Architecture** | Event-driven microservices (22 in full profile; 8 in Release 1) + React hub UI + Kong gateway |
+| **Primary ERP (live-validated)** | Odoo 17–19 via XML-RPC (`connector-svc`) |
+| **Reference customer** | Star Trans — electrical transformers, Egypt/MENA |
+| **Constitution** | `.specify/memory/constitution.md` v1.0.1 — six binding principles (RLS, auth, tests, events, service architecture, observability) |
+| **Speckit program** | Features `000`–`015` under `ipe/specs/`; active rollup `005-ipe-program-status`; enterprise track `015-enterprise-production-readiness` |
+
+### 0.3 Objectives (Measurable, Current Phase)
+
+| ID | Objective | Target | As-is (2026-07-03) |
+|----|-----------|--------|---------------------|
+| OBJ-01 | Full product demo reliability | 32/32 checkpoints | ✅ Achieved (`run-full-demo.ps1`) |
+| OBJ-02 | Release 1 Odoo closed loop | 14/14 integration demo over HTTPS | ✅ Achieved locally (`run-release1-integration-demo.ps1 -BaseUrl https://localhost:8443`) |
+| OBJ-03 | Release 2 commercial features | 5/5 R2 demo | ✅ Achieved locally (`run-release2-demo.ps1`) |
+| OBJ-04 | Enterprise Phase 2 gates | Gates 1–5 PASS + k6 SLO + tag `v9.3.0-p2` | 🟡 Gates 1–5 pass individually; **k6 FAIL**; **tag pending**; changes **uncommitted** |
+| OBJ-05 | Star Trans customer UAT | Signed acceptance on live Odoo | ⬜ Blocked on customer IT / SOW |
+| OBJ-06 | Enterprise contract readiness | Phase 0–2 of spec 015 | 🟡 Phase 0 activated in stack; Phase 1 K8s not started |
+
+### 0.4 Scope Summary
+
+**In scope (as deployed in development today):**
+
+- Hub-based web app (Planning, Command Center, Supply Chain, AI & Governance, Platform, Shop Floor)
+- Feasibility scoring, Resolution Center, OR-Tools scheduling, Excel plan upload
+- Odoo bidirectional sync (ingest + activate write-back) with conflict detection
+- v8 streams U1–U8 (copilot sessions, demand, scenario, supply, orders, equipment, design AI, procurement, sustain, quality)
+- Release 1 profile (8-service compose, 3 planning tabs)
+- Release 2 streams A–D (auto-propose, Outcomes dashboard, Copilot Lite, Odoo resolution write-back — code complete; demo validated)
+- Enterprise stack overlay: Keycloak OIDC, HashiCorp Vault, Kong TLS :8443, Prometheus/Grafana (6 dashboards), audit middleware, network isolation, tenant quotas
+
+**Explicitly out of scope:**
+
+- NEXUS Social / AI marketing platform (separate product; not in `ipe/` program scope)
+- Full MES replacement; autonomous schedule release without human approval
+- Production SAP S/4 or D365 connectors (scaffold only)
+- WCAG 2.1 AA certification; SOC 2 Type I audit engagement
+- Kafka in Release 1 compose profile
+- 22-service Kubernetes production for first customer (Release 1 = 8 GB VM compose)
 
 ---
 
@@ -68,9 +125,10 @@
 | **Backend tests** | **870+** (180 in dpe-svc) | Connector Odoo mapper/adapter tests (16/16) |
 | **Chaos experiments** | **6/6** (C1–C6 documented) | Not in release1 compose |
 | **Microservices** | 22 Kong-routed | **8** (db, redis, kong, dpe-svc, fea-svc, cap-svc, mat-svc, connector) |
-| **Live ERP sync** | Scaffold for SAP/D365; **Odoo path implemented** | **Odoo XML-RPC sync validated locally** (Odoo 19); customer UAT pending |
-| **Production deployment** | POST-B blockers (Keycloak, vault, Stripe live) | Manual auth; Odoo creds in tenant JSONB (security gap flagged) |
-| **Readiness scores** | Speckit **100/100**; audit ~92/100 | Spec 013: **78/100** (code complete; live UAT blocked) → **local integration ~85%** after Odoo 19 sync |
+| **Live ERP sync** | Odoo XML-RPC validated (Odoo 19 local); bidirectional + conflict resolver | **Odoo path implemented** | Gate 4 PASS; `sync_engine.py` fixes applied |
+| **Enterprise overlay** | Keycloak + Vault + TLS + Grafana + audit | Activated in dev stack (Gate 5) | POST-B scaffolds now **live in enterprise compose** |
+| **Production deployment** | Gates 1–5 pass; k6 SLO blocked | Enterprise Phase 2 close pending | Tag `v9.3.0-p2` not created |
+| **Readiness scores** | Speckit **100/100** (32/32); audit ~92/100 | Spec 013: local integration **14/14 HTTPS** | Customer UAT still blocked |
 
 ### 1.4 Product Evolution Summary
 
@@ -81,7 +139,9 @@
 | **V6 AI-First** | v6.0.0 / spec 004 | IPE V6.0 | Tariff shock, visual CPM, cost of chaos, war room, predictive maintenance |
 | **v7.x** | v7.0.0 / spec 006 | Hub consolidation | 6 navigation hubs; Ollama/OpenRouter LLM backbone |
 | **v8.0–v8.2** | v8.2.0 (tag pending) / specs 007–010 | SAP-gap upgrade | U1–U8 streams: copilot sessions, demand, scenario, supply, orders, equipment, design AI, procurement; 32/32 demo |
-| **Release 1** | v9.0.0-r1 (target) / spec 013 | Odoo + MENA customer | 8-service profile, Odoo sync engine, Arabic MVP, customer playbooks |
+| **Release 1** | v9.0.0-r1 (target) / spec 013 | Odoo + MENA customer | 8-service profile; **14/14 HTTPS demo** |
+| **Release 2** | v9.1.0-r2 (target) / spec 014 | Commercial growth | Outcomes, Copilot Lite, auto-propose; **5/5 demo** |
+| **Enterprise P2** | v9.3.0-p2 (target) / spec 015 | Observability + security gates | Gates 1–5 PASS; k6 + tag pending |
 
 ### 1.5 Key Success Metrics (Executive View)
 
@@ -241,8 +301,31 @@ IPE competes **against Excel + Odoo MRP** for Release 1, and **against Kinaxis /
 | R1-M4 | Stack deploy time on 8GB VM | ≤10 minutes | 🟡 Compose documented; T037 manual validation pending |
 | R1-M5 | Arabic planner path | Control Tower + nav | 🟡 Keys exist; native speaker QA pending |
 | R1-M6 | Customer UAT sign-off | Signed acceptance checklist | ⬜ Pending |
-| R1-M7 | Write-back to Odoo | Approved schedule updates MO dates | 🟡 Code complete (`/sync/odoo/activate`); live UAT pending |
+| R1-M7 | Write-back to Odoo | Approved schedule updates MO dates | ✅ Gate 4/5 + activate.py tenant fallback |
 | R1-M8 | Zero unresolved P0 data quality flags on go-live MOs | 0 flags | ✅ 0 flags on synced MOs |
+| R1-M9 | HTTPS + Keycloak enterprise demo | 14/14 over `https://localhost:8443` | ✅ 2026-07-03 |
+
+### 4.5 Enterprise Phase 2 Gate Metrics (Spec 015 — 2026-07-03)
+
+| Gate | Script | Criterion | Status |
+|------|--------|-----------|--------|
+| **Gate 1** Observability | `scripts/monitoring/verify-gate1.sh` | 6 Grafana dashboards; 9/9 Prometheus targets UP | ✅ PASS |
+| **Gate 2** Security | `scripts/security/verify-gate2.sh` | Network isolation; rate limit; CORS; SAST docs | ✅ PASS (Gate 2 smoke may fail intermittently in Gate 5 bundle) |
+| **Gate 3** Multi-tenant quotas | `scripts/security/verify-gate3.sh` | Tenant quotas; Kafka consumer groups scoped | ✅ PASS |
+| **Gate 4** Odoo bidirectional sync | `scripts/odoo/verify-gate4.sh` | Inbound sync + activate + conflict resolution | ✅ PASS |
+| **Gate 5** Full E2E | `scripts/security/verify-gate5.ps1` | R1 14/14 + R2 5/5 HTTPS; enterprise flags ON; audit ≥3 rows | 🟡 **R1/R2 pass when run standalone**; bundle run had SSL alias bug (fixed); re-verify recommended |
+| **k6 SLO** | `scripts/perf/k6-load-test.js` | P95 < 500ms; error rate < 5% | ❌ **FAIL** — Kong global 500 req/min vs high-VU load → mass 429 |
+| **Git tag** | `v9.3.0-p2` | All gate fixes committed + tagged | ⬜ Pending (uncommitted changes; git safe.directory blocker) |
+
+### 4.6 Release 2 Success Metrics (Spec 014)
+
+| ID | Metric | Target | As-is (2026-07-03) |
+|----|--------|--------|---------------------|
+| R2-M1 | Outcomes OTD baseline API | 200 + valid payload | ✅ R2 demo step 1 |
+| R2-M2 | ROI metrics API | 200 + valid payload | ✅ R2 demo step 2 |
+| R2-M3 | Auto-propose after sync | `scenarios_proposed` in sync response | ✅ R2 demo step 3 |
+| R2-M4 | Resolution scenarios available | ≥1 scenario | ✅ R2 demo step 4 |
+| R2-M5 | Copilot Lite / planner-assist | Structured response < 3s | ✅ R2 demo step 5 |
 
 ---
 
@@ -571,6 +654,7 @@ App
 
 | Route | Page | R1 nav |
 |-------|------|--------|
+| `/command-center/outcomes` | Outcomes (R2) | Visible R1 | dpe-svc analytics |
 | `/command-center/dashboard` | Command dashboard | Visible |
 | `/command-center/war-room` | War Room | Visible |
 | `/command-center/executive` | Executive | Visible |
@@ -757,11 +841,13 @@ Copilot, Design AI, AI Trust, MDR, Compliance, Quality, Sustainability.
 
 | Item | Value |
 |------|-------|
-| Gateway | Kong 3.x @ `:8000` |
+| Gateway | Kong 3.x @ `:8000` (HTTP) / `:8443` (HTTPS TLS) |
 | Auth headers | `Authorization: Bearer <JWT>`, `X-Tenant-ID: <uuid>` |
-| Rate limit | 200 req/min (global plugin) |
+| Auth modes | `AUTH_MODE=local` (dev) \| `AUTH_MODE=keycloak` (enterprise stack) |
+| Rate limit | **500 req/min** global (enterprise); 200 req/min documented in earlier profiles — **⚠️ conflicts with high-VU k6** |
 | Max body | 10 MB |
 | Release 1 routes | `kong.release1.yml` — subset of services |
+| Enterprise CORS | HTTPS origins configured in `ipe-common.env` when audit middleware ON |
 
 ### 13.2 Connector API (Odoo)
 
@@ -936,6 +1022,8 @@ Browser → Kong (:8000) → dpe-svc | fea-svc | cap-svc | mat-svc | connector
 
 ## 15. Competitive Context
 
+> **Market clarification:** IPE competes in **Advanced Planning & Scheduling (APS) / S&OP** for discrete manufacturing — **not** the AI marketing / MarTech space. References to "NEXUS" in external templates refer to a **separate out-of-scope product** (NEXUS Social). IPE competitive set = **SAP IBP + PP/DS, Kinaxis Maestro, o9, Blue Yonder, Oracle SCM Cloud**, and **Excel + Odoo MRP** for Release 1.
+
 ### 15.1 Competitor Set
 
 | Vendor | Product | Primary strength |
@@ -1017,9 +1105,21 @@ Browser → Kong (:8000) → dpe-svc | fea-svc | cap-svc | mat-svc | connector
 | 5 | v7.0 hub + LLM | ✅ | spec 006, Ollama |
 | 6–8 | v8 U1–U8 | ✅ | migrations 029–031, 32/32 |
 | 9 | v8.2 validation | ✅ | spec 010, QA-001–010 |
-| 10 | Release 1 engineering | 🟡 85% | spec 013; local Odoo sync validated |
+| 10 | Release 1 engineering | 🟡 90% | spec 013; **14/14 HTTPS demo**; customer UAT blocked |
+| 11 | Release 2 commercial | 🟡 85% | spec 014; **5/5 demo**; Odoo write-back C+D |
+| 12 | Enterprise Phase 0–2 | 🟡 70% | spec 015; Gates 1–5 pass; k6 + tag pending |
 
-### 17.2 Active Phase — Release 1 Go-Live (Star Trans)
+### 17.2 Active Phase — Enterprise Phase 2 Close (`v9.3.0-p2`)
+
+| Milestone | Dependencies | Owner | Target | Status |
+|-----------|--------------|-------|--------|--------|
+| E2-M1 | Gate 1–5 scripts green | Eng | 2026-07-03 | 🟡 Individual gates pass; full Gate 5 re-run after `demo-http.ps1` fix |
+| E2-M2 | k6 SLO profile under rate limit | Eng | Phase 2 close | ❌ Blocked — design: SLO profile ≤8 req/s vs stress profile |
+| E2-M3 | Commit gate fixes + tag `v9.3.0-p2` | Eng + PO | After E2-M1/M2 | ⬜ Uncommitted |
+| E2-M4 | Sync Speckit artifacts (`015/tasks.md`, `feature.json`) | PM | Post-tag | ⬜ Stale |
+| E2-M5 | OTel + Loki (T063–T064) | Eng | Phase 2 remainder | ⬜ Not started |
+
+### 17.3 Active Phase — Release 1 Go-Live (Star Trans)
 
 | Milestone | Dependencies | Owner | Target |
 |-----------|--------------|-------|--------|
@@ -1032,17 +1132,18 @@ Browser → Kong (:8000) → dpe-svc | fea-svc | cap-svc | mat-svc | connector
 | M7: Admin Odoo config UI (R1.1) | Eng | Eng | Post-UAT |
 | M8: Tag `v9.0.0-r1` | M3 + M5 + sign-off | Eng | Pending |
 
-### 17.3 Future Phases (Deferred — Not As-Is)
+### 17.4 Future Phases (Deferred — Not As-Is)
 
 | Phase | Scope | Rationale |
 |-------|-------|-----------|
-| R2 | Copilot, demand, scenarios in customer nav | Not in Star Trans SOW |
-| R2 | Keycloak SSO, Stripe live | POST-B |
-| R2 | SAP B1 / D365 connectors | Customer #2+ |
-| R3 | 22-service K8s production | After 3 customers |
+| R2 nav expansion | Copilot, demand, scenarios in customer nav | Not in Star Trans SOW v1 |
+| R2 Stream E | Managed SaaS self-service | Moved to 015 Phase 4 |
+| POST-B | Stripe live | Mock + adapter scaffold |
+| Phase 1 (015) | Helm/K8s HA all 22 services | After Phase 2 close |
+| Phase 3 (015) | SAP S/4 + D365 connectors | Customer #2+ |
 | R3 | Full Arabic (15 screens) | R2 |
 
-### 17.4 Resource Requirements (Release 1)
+### 17.5 Resource Requirements (Release 1)
 
 | Role | Effort |
 |------|--------|
@@ -1069,6 +1170,10 @@ Browser → Kong (:8000) → dpe-svc | fea-svc | cap-svc | mat-svc | connector
 | R-10 | Keycloak POST-B blocks enterprise IT | Medium | Deal friction | Local auth acceptable for R1 contract |
 | R-11 | fea-svc rescore before commit (fixed) | Low | Null scores | ✅ Commit-before-rescore in sync_engine |
 | R-12 | Documentation version drift (README vs READINESS) | Medium | Onboarding confusion | This PRD as single reference; update README |
+| R-13 | k6 SLO vs Kong rate limit (500/min) | High | Phase 2 close blocked | Separate SLO vs stress profiles; perf-test exemption |
+| R-14 | `demo-http.ps1` alias recursion on PS 5.1 | Medium | Gate 5 R1 fail | ✅ Fixed — removed `Invoke-DemoRequest` alias |
+| R-15 | Git dubious ownership on `E:/AISOP/ipe` | Medium | Cannot commit/tag | User must approve `safe.directory` |
+| R-16 | Docker compose network label conflicts | Medium | Manual container recreate | Document runbook or fix compose labels |
 
 ---
 
@@ -1124,7 +1229,9 @@ Browser → Kong (:8000) → dpe-svc | fea-svc | cap-svc | mat-svc | connector
 | v8.0.0 | 2026-06-27 | 007 | U1–U3 copilot, demand, scenario |
 | v8.1.0 | 2026-06-27 | 008 | U4–U6 supply, orders, equipment |
 | **v8.2.0** | 2026-06-28 | 009–010 | U7–U8 design/procurement; **32/32 demo** |
-| v9.0.0-r1 | pending | 013 | Release 1 Odoo live; 8-service profile |
+| v9.0.0-r1 | pending | 013 | Release 1 Odoo live; 8-service profile; **14/14 HTTPS** |
+| v9.1.0-r2 | pending | 014 | R2 Outcomes + Copilot Lite; **5/5 demo** |
+| **v9.3.0-p2** | pending | 015 | Enterprise Phase 2 gates; **uncommitted** |
 
 **Naming note:** Product **“V5.0”** = git tag **v1.0.0**, not v5.0.0.
 
@@ -1154,6 +1261,10 @@ cdm_tenant
 | `VITE_RELEASE_PROFILE` | web env | `full` \| `release1` |
 | `IPE_RELEASE_PROFILE` | compose | same |
 | `AUTH_PROVIDER` | dpe-svc | `local` \| `keycloak` |
+| `AUTH_MODE` | `ipe-common.env` | `local` \| `keycloak` |
+| `VAULT_ENABLED` / `IPE_VAULT_*` | compose | HashiCorp Vault integration |
+| `IPE_AUDIT_REQUEST_MIDDLEWARE` | dpe-svc | `true` for enterprise audit trail |
+| `IPE_JWT_SIGNING_MODE` | dpe-svc | `rs256` for enterprise |
 | `JWT_SECRET_KEY` | compose | dev placeholder |
 | `FEA_SVC_URL` | connector | `http://fea-svc:8004` |
 | `ERP_SYNC_MODE` | cap-svc | `direct` for Odoo activate |
@@ -1203,6 +1314,8 @@ cdm_tenant
 | **Star Trans** | Reference customer — electrical transformers, Egypt |
 | **Sync run** | Audited Odoo→CDM import execution (`cdm_sync_run`) |
 | **U1–U8** | v8 feature streams (copilot through procurement) |
+| **Gate 1–5** | Enterprise Phase 2 verification scripts (observability, security, quotas, Odoo sync, full E2E) |
+| **NEXUS** | Separate social/marketing product — **not in IPE program scope** |
 | **V5.0** | Product convergence spec 003 — shipped as git v1.0.0 |
 | **War Room** | Disruption aggregation dashboard |
 | **WC** | Work Center |
@@ -1220,6 +1333,9 @@ cdm_tenant
 | OQ-6 | Copilot session retention / GDPR policy | Legal |
 | OQ-7 | Commercial pricing confirmation ($18K–30K/yr) | Sales |
 | OQ-8 | Second prospect parallel to Star Trans (R-B4) | Sales |
+| OQ-9 | k6 SLO test design vs rate-limit stress test | Eng + PM |
+| OQ-10 | Tag naming: `v9.3.0-p2` vs `v10.0.0-e2` | PM |
+| OQ-11 | Canonical Odoo version for customer docs (17 vs 19) | Product + Customer IT |
 
 ### Appendix H — Reference Documents
 
@@ -1236,8 +1352,11 @@ cdm_tenant
 | Star Trans demo guide | `docs/demo-data/STARTRANS-DEMO-GUIDE.md` |
 | R1 training curriculum | `docs/implementation/R1-TRAINING-CURRICULUM.md` |
 | R1 customer support | `docs/runbooks/R1-CUSTOMER-SUPPORT-GUIDE.md` |
-| Architecture | `docs/architecture.md` |
-| Data model | `docs/architecture/data-model.md` |
+| Enterprise spec | `specs/015-enterprise-production-readiness/spec.md` |
+| Release 2 spec | `specs/014-release2-growth/spec.md` |
+| Constitution | `.specify/memory/constitution.md` |
+| Gate 5 verifier | `scripts/security/verify-gate5.ps1` |
+| Shared HTTP helper | `scripts/demo-http.ps1` |
 
 ### Appendix I — Document Approval
 
@@ -1249,4 +1368,33 @@ cdm_tenant
 
 ---
 
-*End of document — PRD-IPE-2026-COMPREHENSIVE (As-Is)*
+## 21. Last 24 Hours — Engineering Activity Log (2026-07-02 → 2026-07-03)
+
+| # | Workstream | Task / deliverable | Files / scripts | Status | Evidence / notes |
+|---|------------|-------------------|-----------------|--------|------------------|
+| 1 | **Gate 1 — Observability** | Prometheus scrape fix; Grafana 6 dashboards; verify script | `scripts/monitoring/verify-gate1.sh`, monitoring compose | ✅ **PASS** | 9/9 Prometheus targets UP |
+| 2 | **Gate 2 — Security** | Network isolation (remove monitoring from backend nets); rate-limit probe; CORS | `scripts/security/verify-gate2.sh`, `rate-limit-burst.sh`, Kong config | ✅ **PASS** | Intermittent fail when bundled in Gate 5 |
+| 3 | **Gate 3 — Quotas** | Tenant quotas JSON mount; Kafka consumer tenant scoping | `verify-gate3.sh`, `quota-probe.py`, `IPE_KAFKA_CONSUMER_TENANT_ID` | ✅ **PASS** | fea-svc + consumer groups verified after rebuild |
+| 4 | **Gate 4 — Odoo sync** | Bidirectional sync; conflict resolver; MO ID resolution | `sync_engine.py`, `activate.py`, `verify-gate4.sh` | ✅ **PASS** | Fixed dead `sync_bom_details` code after unreachable return |
+| 5 | **Gate 5 — Full E2E** | HTTPS demos + enterprise flags + audit trail | `verify-gate5.ps1`, `ipe-common.env`, `demo-http.ps1` | 🟡 **Partial** | R1 **14/14** + R2 **5/5** standalone; bundle run failed on SSL alias bug (fixed) |
+| 6 | **Audit middleware** | JSON serialize `before_state`/`after_state` for asyncpg | `ipe_shared/audit/service.py` | ✅ **Done** | Audit export 102+ rows in Gate 5 session |
+| 7 | **Enterprise env** | Keycloak, Vault, RS256, audit middleware, HTTPS CORS | `infrastructure/docker/ipe-common.env` | ✅ **Activated** | `AUTH_MODE=keycloak`, `VAULT_ENABLED=true` |
+| 8 | **Demo scripts HTTPS** | Keycloak JWT + curl-based PS 5.1 TLS bypass | `demo-http.ps1`, `run-release1-integration-demo.ps1`, `run-release2-demo.ps1` | ✅ **Done** | Removed `Invoke-DemoRequest` alias — fixed call-depth overflow |
+| 9 | **Connector networking** | Odoo access via `host.docker.internal:8069` | connector on `ipe-public` network | ✅ **Done** | Manual `docker run` when compose label conflicts |
+| 10 | **k6 load test** | Phase 2 close SLO re-run | `scripts/perf/k6-load-test.js` (`health-only` profile) | ❌ **FAIL** | 429 from Kong 500 req/min; P95 > 500ms at 50 VU |
+| 11 | **Unit tests** | Odoo conflict resolver + sync monitor | connector tests | ✅ **PASS** | `verify-gate4` supporting tests |
+| 12 | **MO sync conflict test** | Integration test for conflict path | test script (task 684710) | ❌ → ✅ | Failed initially; **passed after patch** (task 225871) |
+| 13 | **JWT for Kong auth** | Token obtain for auth probes | Keycloak password grant | ❌ → ✅ | Initial curl exit 3; resolved via `demo-http.ps1` / Keycloak realm |
+| 14 | **Rate limit probe** | 510 requests to `/api/v1/health` | rate-limit scripts (tasks 897797, 2226) | 🟡 Mixed | One run success; one exit 1 — confirms 429 behavior at limit |
+| 15 | **Kafka tenant groups** | Consumer rebuild + group verification | fea-svc, mat-svc, etc. redeploy | ✅ **PASS** | Tasks 332728, 527879, 746418, 208457, 754768, 778105 |
+| 16 | **IPE→Odoo push prep** | Find MO IDs + AI schedule for activate | DB queries (tasks 509076, 896604) | ✅ **Done** | MO-ST-002 `d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002` |
+| 17 | **Speckit synthesis** | Full pipeline status (constitution → converge) | `.specify/`, specs 000–015 | ✅ **Doc** | Program rollup; artifact drift flagged |
+| 18 | **Git tag `v9.3.0-p2`** | Phase 2 milestone tag | git | ⬜ **Pending** | Uncommitted changes; dubious ownership on `E:/AISOP/ipe` |
+| 19 | **PRD update** | Comprehensive as-is PRD refresh | `docs/PRD-IPE-COMPREHENSIVE-AS-IS.md` | ✅ **This doc** | 2026-07-03 |
+| 20 | **Speckit artifact sync** | `feature.json`, `015/tasks.md` reflect gates | `.specify/feature.json`, `015/tasks.md` | ⬜ **Pending** | `/speckit.converge` recommended |
+
+**Summary (24h):** Enterprise Gates **1–4 PASS**; Gate **5 PASS** for R1/R2 when run standalone after `demo-http.ps1` fix; **k6 FAIL** blocks Phase 2 close; **git commit + tag pending**.
+
+---
+
+*End of document — PRD-IPE-2026-COMPREHENSIVE (As-Is) — Updated 2026-07-03*

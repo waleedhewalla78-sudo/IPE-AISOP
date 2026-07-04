@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from ipe_shared.middleware.cors import setup_cors
 
 from app.api.v1.router import api_router
 from app.config import settings
@@ -9,6 +9,7 @@ from app.consumers.supply_feedback_consumer import start_consumers, stop_consume
 from ipe_shared.database.connection import close_database, init_database
 from ipe_shared.middleware.error_handler import register_exception_handlers
 from ipe_shared.middleware.tenant_context import TenantContextMiddleware
+from ipe_shared.metrics import setup_metrics
 from ipe_shared.observability import setup_observability
 
 
@@ -28,14 +29,9 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
     setup_observability(app, service_name=settings.SERVICE_NAME)
+    setup_metrics(app, service_name=settings.SERVICE_NAME, version="9.3.0-p2")
     app.add_middleware(TenantContextMiddleware)
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type", "X-Tenant-ID"],
-    )
+    setup_cors(app)
     register_exception_handlers(app)
     app.include_router(api_router, prefix="/api/v1")
     return app

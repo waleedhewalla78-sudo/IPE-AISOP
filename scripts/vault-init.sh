@@ -2,17 +2,24 @@
 # Seed HashiCorp Vault KV v2 secrets for IPE Release 1 (dev mode).
 set -euo pipefail
 
-VAULT_ADDR="${VAULT_ADDR:-http://vault:8200}"
+# Compose sets VAULT_ADDR=http://vault:8200; host-side runs use localhost.
+VAULT_ADDR="${VAULT_ADDR:-http://localhost:8200}"
 VAULT_TOKEN="${VAULT_TOKEN:-ipe-dev-root}"
 MOUNT="${VAULT_KV_MOUNT:-ipe}"
 
 echo "Waiting for Vault at ${VAULT_ADDR} ..."
+ready=0
 for i in $(seq 1 30); do
   if vault status >/dev/null 2>&1; then
+    ready=1
     break
   fi
   sleep 2
 done
+if [[ "$ready" -ne 1 ]]; then
+  echo "ERROR: Vault not reachable at ${VAULT_ADDR} (set VAULT_ADDR for in-network runs)" >&2
+  exit 1
+fi
 
 export VAULT_ADDR VAULT_TOKEN
 

@@ -22,6 +22,9 @@ from ipe_shared.models.supplier import Supplier
 from ipe_shared.models.supply import SupplyOrder
 from ipe_shared.models.sync_run import SyncRun
 from ipe_shared.models.work_center import WorkCenter
+from ipe_shared.tenant.quotas import QuotaExceededError, assert_quota, count_tenant_resource
+from ipe_shared.events.odoo_sync_monitor import odoo_sync_monitor
+from ipe_shared.events.odoo_conflict_resolver import ConflictRecord, odoo_conflict_resolver
 
 from app.core.mapper import (
     ODOO_TO_CDM_BOM,
@@ -49,6 +52,10 @@ BOM_SYNC_FIELDS = [k for k in ODOO_TO_CDM_BOM.keys() if k not in ("bom_line_ids"
 BOM_DETAIL_FIELDS = ["id", "bom_line_ids", "operation_ids"]
 
 
+def _coerce_datetime(value: datetime | None, fallback: datetime) -> datetime:
+    return value if isinstance(value, datetime) else fallback
+
+
 class OdooSyncEngine:
     def __init__(self, client: OdooClient, tenant_id: UUID, session: AsyncSession):
         self.client = client
@@ -57,6 +64,23 @@ class OdooSyncEngine:
         self._product_cache: dict[str, UUID] = {}
         self._bom_cache: dict[str, UUID] = {}
         self._touched_mo_ids: list[UUID] = []
+
+    async def _ensure_can_create(self, resource_type: str, current_count: int) -> bool:
+        try:
+            await assert_quota(str(self.tenant_id), resource_type, current_count)
+            return True
+        except QuotaExceededError as exc:
+            logger.warning("Skipping create — %s", exc)
+            return False
+
+    @staticmethod
+    def _report_odoo_to_ipe(entity_type: str, result: dict[str, Any]) -> None:
+        success = int(result.get("errors", 0)) == 0 and "error" not in result
+        odoo_sync_monitor.record_sync("odoo_to_ipe", entity_type, "batch", success)
+
+    def _finish_odoo_to_ipe(self, entity_type: str, result: dict[str, Any]) -> dict[str, Any]:
+        self._report_odoo_to_ipe(entity_type, result)
+        return result
 
     async def run_full_sync(self, *, trigger: str = "manual") -> dict[str, Any]:
         run = SyncRun(
@@ -107,6 +131,10 @@ class OdooSyncEngine:
                     entity_counts=counts,
                 )
 
+            for entity_type, value in counts.items():
+                if isinstance(value, dict) and entity_type not in {"rescored"}:
+                    self._report_odoo_to_ipe(entity_type, value)
+
             return {"sync_run_id": str(run.id), "status": run.status, **counts}
         except Exception as exc:
             logger.exception("Full sync failed for tenant %s", self.tenant_id)
@@ -135,9 +163,9 @@ class OdooSyncEngine:
             )
         except Exception as e:
             logger.error("Odoo product fetch failed: %s", e)
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
-
+            return self._finish_odoo_to_ipe("products", {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)})
         synced, updated = 0, 0
+        product_count = await count_tenant_resource(self.session, self.tenant_id, "products")
         for rec in records:
             mapped = map_odoo_to_cdm(rec, ODOO_TO_CDM_PRODUCT)
             erp_id = mapped.get("erp_source_id")
@@ -153,6 +181,8 @@ class OdooSyncEngine:
                 existing.updated_at = datetime.now(UTC)
                 updated += 1
             else:
+                if not await self._ensure_can_create("products", product_count):
+                    continue
                 self.session.add(Product(
                     tenant_id=self.tenant_id,
                     erp_source_id=erp_id,
@@ -164,10 +194,11 @@ class OdooSyncEngine:
                     standard_cost=mapped.get("standard_cost"),
                     safety_stock=mapped.get("qty_available") or 0,
                 ))
+                product_count += 1
                 synced += 1
         await self.session.flush()
         self._product_cache.clear()
-        return {"synced": synced, "updated": updated, "total": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe("products", {"synced": synced, "updated": updated, "total": len(records), "errors": 0})
 
     async def sync_inventory(self) -> dict[str, Any]:
         """Sync stock.quant levels into product.safety_stock (available qty proxy for R1)."""
@@ -179,7 +210,7 @@ class OdooSyncEngine:
             )
         except Exception as e:
             logger.error("Odoo stock.quant fetch failed: %s", e)
-            return {"updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe("inventory", {"updated": 0, "total": 0, "errors": 1, "error": str(e)})
 
         by_product: dict[str, float] = {}
         for rec in records:
@@ -201,7 +232,7 @@ class OdooSyncEngine:
                 updated += 1
 
         await self.session.flush()
-        return {"updated": updated, "total": len(by_product), "errors": 0}
+        return self._finish_odoo_to_ipe("inventory", {"updated": updated, "total": len(by_product), "errors": 0})
 
     async def sync_work_centers(self) -> dict[str, Any]:
         try:
@@ -212,7 +243,7 @@ class OdooSyncEngine:
             )
         except Exception as e:
             logger.error("Odoo workcenter fetch failed: %s", e)
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe("work_centers", {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)})
 
         synced, updated = 0, 0
         for rec in records:
@@ -242,7 +273,7 @@ class OdooSyncEngine:
                 ))
                 synced += 1
         await self.session.flush()
-        return {"synced": synced, "updated": updated, "total": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe("work_centers", {"synced": synced, "updated": updated, "total": len(records), "errors": 0})
 
     async def sync_boms(self) -> dict[str, Any]:
         try:
@@ -253,9 +284,10 @@ class OdooSyncEngine:
             )
         except Exception as e:
             logger.error("Odoo BOM fetch failed: %s", e)
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe("boms", {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)})
 
         synced, updated, skipped = 0, 0, 0
+        bom_count = await count_tenant_resource(self.session, self.tenant_id, "boms")
         for rec in records:
             mapped = map_odoo_to_cdm(rec, ODOO_TO_CDM_BOM)
             erp_id = mapped.get("erp_source_id")
@@ -280,21 +312,30 @@ class OdooSyncEngine:
                 bom.is_active = True
                 updated += 1
             else:
+                if not await self._ensure_can_create("boms", bom_count):
+                    skipped += 1
+                    continue
                 self.session.add(BillOfMaterial(
                     tenant_id=self.tenant_id,
                     product_id=product.id,
                     erp_source_id=erp_id,
                     is_active=True,
                 ))
+                bom_count += 1
                 synced += 1
         await self.session.flush()
         self._bom_cache.clear()
-        return {"synced": synced, "updated": updated, "skipped": skipped, "total": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe(
+            "boms",
+            {"synced": synced, "updated": updated, "skipped": skipped, "total": len(records), "errors": 0},
+        )
 
     async def sync_bom_details(self) -> dict[str, Any]:
         """Sync BOM lines and routing operations (Odoo mrp.bom.line + mrp.routing.workcenter)."""
         from sqlalchemy import delete
 
+        lines_synced = 0
+        ops_synced = 0
         try:
             records = self.client.search_read(
                 "mrp.bom",
@@ -302,10 +343,8 @@ class OdooSyncEngine:
                 fields=BOM_DETAIL_FIELDS,
             )
         except Exception as e:
-            logger.error("Odoo BOM detail fetch failed: %s", e)
-            return {"lines": 0, "operations": 0, "errors": 1, "error": str(e)}
-
-        lines_synced, ops_synced = 0, 0
+            return self._finish_odoo_to_ipe("bom_details", {"lines": 0, "operations": 0, "errors": 1, "error": str(e)})
+        routing_count = await count_tenant_resource(self.session, self.tenant_id, "routings")
         for rec in records:
             bom_erp_id = str(rec.get("id"))
             result = await self.session.execute(
@@ -330,6 +369,8 @@ class OdooSyncEngine:
                     RoutingOperation.bom_id == bom.id,
                 )
             )
+            await self.session.flush()
+            routing_count = await count_tenant_resource(self.session, self.tenant_id, "routings")
 
             line_ids = rec.get("bom_line_ids") or []
             if line_ids:
@@ -364,6 +405,8 @@ class OdooSyncEngine:
                     wc = await self._get_work_center(mapped.get("work_center_erp_id", ""))
                     if not wc:
                         continue
+                    if not await self._ensure_can_create("routings", routing_count):
+                        continue
                     self.session.add(RoutingOperation(
                         tenant_id=self.tenant_id,
                         bom_id=bom.id,
@@ -372,10 +415,14 @@ class OdooSyncEngine:
                         operation_name=mapped.get("operation_name") or "Operation",
                         duration_planned_mins=mapped.get("duration_planned_mins") or 60,
                     ))
+                    routing_count += 1
                     ops_synced += 1
 
         await self.session.flush()
-        return {"lines": lines_synced, "operations": ops_synced, "boms": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe(
+            "bom_details",
+            {"lines": lines_synced, "operations": ops_synced, "boms": len(records), "errors": 0},
+        )
 
     async def sync_customers(self) -> dict[str, Any]:
         try:
@@ -385,7 +432,7 @@ class OdooSyncEngine:
                 fields=list(ODOO_TO_CDM_PARTNER.keys()),
             )
         except Exception as e:
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe("customers", {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)})
 
         synced, updated = 0, 0
         for rec in records:
@@ -406,7 +453,7 @@ class OdooSyncEngine:
                 ))
                 synced += 1
         await self.session.flush()
-        return {"synced": synced, "updated": updated, "total": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe("customers", {"synced": synced, "updated": updated, "total": len(records), "errors": 0})
 
     async def sync_suppliers(self) -> dict[str, Any]:
         try:
@@ -416,7 +463,7 @@ class OdooSyncEngine:
                 fields=list(ODOO_TO_CDM_PARTNER.keys()),
             )
         except Exception as e:
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe("suppliers", {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)})
 
         synced, updated = 0, 0
         for rec in records:
@@ -437,7 +484,7 @@ class OdooSyncEngine:
                 ))
                 synced += 1
         await self.session.flush()
-        return {"synced": synced, "updated": updated, "total": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe("suppliers", {"synced": synced, "updated": updated, "total": len(records), "errors": 0})
 
     async def sync_manufacturing_orders(self) -> dict[str, Any]:
         try:
@@ -448,11 +495,15 @@ class OdooSyncEngine:
             )
         except Exception as e:
             logger.error("Odoo MO fetch failed: %s", e)
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe(
+                "manufacturing_orders",
+                {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)},
+            )
 
         synced, updated, skipped, errors = 0, 0, 0, 0
         now = datetime.now(UTC)
         self._touched_mo_ids: list[UUID] = []
+        mo_count = await count_tenant_resource(self.session, self.tenant_id, "manufacturing_orders")
 
         for rec in records:
             mapped = normalize_mo_mapped(map_odoo_to_cdm(rec, ODOO_TO_CDM_MO))
@@ -484,21 +535,60 @@ class OdooSyncEngine:
             odoo_last_update = mapped.get("erp_last_update")
 
             if mo:
+                apply_odoo_schedule = True
                 if mo.planned_start and odoo_last_update and mo.erp_synced_at:
                     if odoo_last_update > mo.erp_synced_at and mo.planned_start != mapped.get("planned_start"):
-                        mo.sync_conflict = {
-                            "ipe_planned_start": mo.planned_start.isoformat() if mo.planned_start else None,
-                            "odoo_planned_start": mapped.get("planned_start").isoformat()
-                            if mapped.get("planned_start") else None,
-                            "detected_at": now.isoformat(),
-                        }
-                        await self._set_flag(mo.id, "SYNC_CONFLICT", "Odoo dates changed after IPE sync")
+                        ipe_updated = _coerce_datetime(
+                            getattr(mo, "updated_at", None),
+                            _coerce_datetime(getattr(mo, "erp_synced_at", None), now),
+                        )
+                        ipe_version = int(getattr(mo, "version", None) or 1)
+                        odoo_version = int(getattr(mo, "ai_schedule_version", None) or 1)
+                        conflict = ConflictRecord(
+                            entity_type="manufacturing_order",
+                            entity_id=str(mo.id),
+                            ipe_version=ipe_version,
+                            ipe_updated_at=ipe_updated,
+                            odoo_version=odoo_version,
+                            odoo_updated_at=odoo_last_update,
+                            ipe_data={
+                                "planned_start": mo.planned_start.isoformat() if mo.planned_start else None,
+                                "planned_end": mo.planned_end.isoformat() if mo.planned_end else None,
+                            },
+                            odoo_data={
+                                "planned_start": mapped.get("planned_start").isoformat()
+                                if mapped.get("planned_start") else None,
+                                "planned_end": mapped.get("planned_end").isoformat()
+                                if mapped.get("planned_end") else None,
+                            },
+                        )
+                        if odoo_conflict_resolver.detect_conflict(
+                            "manufacturing_order",
+                            conflict.ipe_version,
+                            conflict.ipe_updated_at,
+                            conflict.odoo_version,
+                            conflict.odoo_updated_at,
+                        ):
+                            winner, merged = odoo_conflict_resolver.resolve("manufacturing_order", conflict)
+                            if winner == "manual":
+                                mo.sync_conflict = {
+                                    **merged,
+                                    "detected_at": now.isoformat(),
+                                    "resolution": "manual",
+                                }
+                                await self._set_flag(mo.id, "SYNC_CONFLICT", "Odoo dates changed after IPE sync")
+                                apply_odoo_schedule = False
+                            elif winner == "ipe":
+                                apply_odoo_schedule = False
+                            else:
+                                mo.sync_conflict = None
 
                 mo.product_id = product.id
                 mo.bom_id = bom.id
                 mo.quantity = mapped.get("quantity") or mo.quantity
-                mo.planned_start = mapped.get("planned_start") or mo.planned_start
-                mo.planned_end = mapped.get("planned_end") or mo.planned_end
+                if apply_odoo_schedule:
+                    mo.planned_start = mapped.get("planned_start") or mo.planned_start
+                    mo.planned_end = mapped.get("planned_end") or mo.planned_end
                 mo.status = mapped.get("status") or mo.status
                 mo.erp_last_update = odoo_last_update
                 mo.erp_synced_at = now
@@ -507,6 +597,9 @@ class OdooSyncEngine:
                 await self._validate_mo(mo, bom.id)
                 self._touched_mo_ids.append(mo.id)
             else:
+                if not await self._ensure_can_create("manufacturing_orders", mo_count):
+                    skipped += 1
+                    continue
                 mo = ManufacturingOrder(
                     tenant_id=self.tenant_id,
                     erp_mo_id=erp_mo_id,
@@ -521,18 +614,22 @@ class OdooSyncEngine:
                 )
                 self.session.add(mo)
                 await self.session.flush()
+                mo_count += 1
                 synced += 1
                 await self._validate_mo(mo, bom.id)
                 self._touched_mo_ids.append(mo.id)
 
         await self.session.flush()
-        return {
-            "synced": synced,
-            "updated": updated,
-            "skipped": skipped,
-            "total": len(records),
-            "errors": errors,
-        }
+        return self._finish_odoo_to_ipe(
+            "manufacturing_orders",
+            {
+                "synced": synced,
+                "updated": updated,
+                "skipped": skipped,
+                "total": len(records),
+                "errors": errors,
+            },
+        )
 
     async def sync_demands(self) -> dict[str, Any]:
         try:
@@ -542,7 +639,7 @@ class OdooSyncEngine:
                 fields=list(ODOO_TO_CDM_DEMAND.keys()),
             )
         except Exception as e:
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe("demands", {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)})
 
         synced, updated, skipped = 0, 0, 0
         for rec in records:
@@ -574,7 +671,10 @@ class OdooSyncEngine:
                 ))
                 synced += 1
         await self.session.flush()
-        return {"synced": synced, "updated": updated, "skipped": skipped, "total": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe(
+            "demands",
+            {"synced": synced, "updated": updated, "skipped": skipped, "total": len(records), "errors": 0},
+        )
 
     async def sync_supply(self) -> dict[str, Any]:
         try:
@@ -584,7 +684,7 @@ class OdooSyncEngine:
                 fields=list(ODOO_TO_CDM_SUPPLY.keys()),
             )
         except Exception as e:
-            return {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)}
+            return self._finish_odoo_to_ipe("supply", {"synced": 0, "updated": 0, "total": 0, "errors": 1, "error": str(e)})
 
         synced, updated, skipped = 0, 0, 0
         for rec in records:
@@ -617,7 +717,10 @@ class OdooSyncEngine:
                 ))
                 synced += 1
         await self.session.flush()
-        return {"synced": synced, "updated": updated, "skipped": skipped, "total": len(records), "errors": 0}
+        return self._finish_odoo_to_ipe(
+            "supply",
+            {"synced": synced, "updated": updated, "skipped": skipped, "total": len(records), "errors": 0},
+        )
 
     async def _get_product(self, erp_id: str) -> Product | None:
         if erp_id in self._product_cache:

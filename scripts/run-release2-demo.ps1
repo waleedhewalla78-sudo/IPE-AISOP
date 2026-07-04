@@ -11,6 +11,8 @@ param(
 
 $ErrorActionPreference = "Continue"
 $Root = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot "demo-http.ps1")
+Enable-DemoTlsBypass -BaseUrl $BaseUrl
 $Pass = 0; $Fail = 0; $Skip = 0
 $Lines = @()
 
@@ -26,33 +28,33 @@ Log "=== Release 2 Demo (014) ==="
 Log "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Log ""
 
-$login = Invoke-RestMethod -Method POST -Uri "$BaseUrl/api/v1/auth/login" -ContentType "application/json" -Body '{"email":"Ahmed@nour","password":"admin"}'
-$h = @{ Authorization = "Bearer $($login.data.access_token)"; "X-Tenant-ID" = $TenantId; "Content-Type" = "application/json" }
+$token = Get-DemoJwt -BaseUrl $BaseUrl
+$h = @{ Authorization = "Bearer $token"; "X-Tenant-ID" = $TenantId; "Content-Type" = "application/json" }
 
 Step "1. Outcomes - OTD baseline API" {
-    $r = Invoke-RestMethod -Uri "$BaseUrl/api/v1/analytics/otd-baseline" -Headers $h
+    $r = Invoke-IpeDemoRequest -Uri "$BaseUrl/api/v1/analytics/otd-baseline" -Headers $h -BaseUrl $BaseUrl
     $r.success
 }
 
 Step "2. Outcomes - ROI metrics API" {
-    $r = Invoke-RestMethod -Uri "$BaseUrl/api/v1/analytics/roi-metrics" -Headers $h
+    $r = Invoke-IpeDemoRequest -Uri "$BaseUrl/api/v1/analytics/roi-metrics" -Headers $h -BaseUrl $BaseUrl
     $r.success
 }
 
 Step "3. Auto-propose - sync returns scenarios_proposed" {
-    $s = Invoke-RestMethod -Method POST -Uri "$BaseUrl/api/v1/sync/run" -Headers $h -Body '{"entity":"all"}' -TimeoutSec 180
+    $s = Invoke-IpeDemoRequest -Method POST -Uri "$BaseUrl/api/v1/sync/run" -Headers $h -Body '{"entity":"all"}' -TimeoutSec 180 -BaseUrl $BaseUrl
     $null -ne $s.data.rescored
 }
 
 Step "4. Resolution scenarios still available" {
-    $r = Invoke-RestMethod -Uri "$BaseUrl/api/v1/resolution/scenarios" -Headers $h -TimeoutSec 60
+    $r = Invoke-IpeDemoRequest -Uri "$BaseUrl/api/v1/resolution/scenarios" -Headers $h -TimeoutSec 60 -BaseUrl $BaseUrl
     @($r.data.scenarios).Count -ge 1
 }
 
 Step "5. Copilot Lite / planner-assist" {
     try {
         $body = '{"query":"Which manufacturing orders are at risk?"}'
-        $r = Invoke-RestMethod -Method POST -Uri "$BaseUrl/api/v1/planner-assist/query" -Headers $h -Body $body -TimeoutSec 10
+        $r = Invoke-IpeDemoRequest -Method POST -Uri "$BaseUrl/api/v1/planner-assist/query" -Headers $h -Body $body -TimeoutSec 10 -BaseUrl $BaseUrl
         $r.success
     } catch {
         if ($_.Exception.Response.StatusCode.value__ -eq 404) {

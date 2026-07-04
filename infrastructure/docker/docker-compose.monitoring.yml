@@ -1,79 +1,139 @@
-# REL-PROD Wave 2D — Loki + Grafana + Prometheus MVP overlay.
-# Usage:
-#   docker compose -f docker-compose.yml -f docker-compose.demo.yml -f docker-compose.monitoring.yml up -d
-# Or: .\scripts\run-monitoring-stack.ps1
+# IPE Phase 2 — Prometheus + Grafana + Alertmanager overlay
+# Requires segmented networks from docker-compose.network.yml (or legacy flat ipe-network).
+#
+# Release 1 (segmented):
+#   docker compose -f docker-compose.release1.yml -f docker-compose.network.yml \
+#     -f docker-compose.monitoring.yml up -d
+#
+# Release 1 (legacy flat network):
+#   docker compose -f docker-compose.release1.yml -f docker-compose.monitoring.yml up -d
+#
+# Full hybrid (22 services):
+#   docker compose -f docker-compose.yml -f docker-compose.network.yml \
+#     -f docker-compose.monitoring.yml up -d
+#
+# Optional Loki (legacy MVP): see infrastructure/monitoring/loki-config.yaml
+#   docker compose -f docker-compose.yml -f docker-compose.demo.yml -f docker-compose.monitoring.legacy.yml up -d
 
 services:
   prometheus:
-    image: prom/prometheus:v2.51.0
-    ports:
-      - "9091:9090"
+    image: prom/prometheus:v2.54.1
+    container_name: ipe-prometheus
     volumes:
-      - ../monitoring/prometheus.demo.yml:/etc/prometheus/prometheus.yml:ro
-      - ../monitoring/rules:/etc/prometheus/rules:ro
-      - prometheus_data:/prometheus
+      - ../monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
     command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
-      - --web.enable-lifecycle
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    networks:
+      - ipe-monitoring
+      - ipe-internal
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/ready"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-  loki:
-    image: grafana/loki:2.9.4
-    ports:
-      - "3100:3100"
-    volumes:
-      - ../monitoring/loki-config.yaml:/etc/loki/local-config.yaml:ro
-      - loki_data:/loki
-    command: -config.file=/etc/loki/local-config.yaml
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3100/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  promtail:
-    image: grafana/promtail:2.9.4
-    volumes:
-      - ../monitoring/promtail-config.yml:/etc/promtail/config.yml:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - promtail_positions:/tmp
-    command: -config.file=/etc/promtail/config.yml
-    depends_on:
-      loki:
-        condition: service_healthy
+    restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:10.4.0
-    ports:
-      - "3002:3000"
+    image: grafana/grafana:11.3.0
+    container_name: ipe-grafana
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: ipe_admin
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: "${GRAFANA_ROOT_URL:-http://localhost:3000}"
       GF_AUTH_ANONYMOUS_ENABLED: "false"
     volumes:
-      - ../monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
-      - ../monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
-      - ../monitoring/dashboards:/etc/grafana/provisioning/dashboards/json:ro
-      - grafana_data:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
+      - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - ipe-monitoring
+      - ipe-public
     depends_on:
       prometheus:
-        condition: service_healthy
-      loki:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: ipe-alertmanager
+    environment:
+      ALERTMANAGER_SLACK_URL: ${ALERTMANAGER_SLACK_URL:-}
+    volumes:
+      - ../monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ../monitoring/alertmanager/entrypoint.sh:/etc/alertmanager/entrypoint.sh:ro
+    entrypoint: ["/bin/sh", "/etc/alertmanager/entrypoint.sh"]
+    ports:
+      - "9093:9093"
+    networks:
+      - ipe-monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9093/-/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.16.0
+    container_name: ipe-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://ipe:${IPE_DB_PASSWORD:-ipe_test_pass}@db:5432/ipe_test?sslmode=disable"
+    networks:
+      - ipe-monitoring
+      - ipe-data
+    restart: unless-stopped
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.62.0
+    container_name: ipe-redis-exporter
+    environment:
+      REDIS_ADDR: "redis:6379"
+    networks:
+      - ipe-monitoring
+      - ipe-data
+    restart: unless-stopped
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:v1.7.0
+    container_name: ipe-kafka-exporter
+    command:
+      - "--kafka.server=kafka:9092"
+    networks:
+      - ipe-monitoring
+      - ipe-data
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: ipe-node-exporter
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - ipe-monitoring
+    restart: unless-stopped
 
 volumes:
-  prometheus_data:
-  loki_data:
-  promtail_positions:
-  grafana_data:
+  prometheus-data:
+  grafana-data:

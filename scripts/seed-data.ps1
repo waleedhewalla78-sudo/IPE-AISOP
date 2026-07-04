@@ -21,7 +21,10 @@ if ($content -notmatch "(?s)<<'SQL'\r?\n(.*)\r?\nSQL") {
 }
 
 $sql = "CREATE EXTENSION IF NOT EXISTS pgcrypto;`n" + $Matches[1]
-$sql | docker exec -i $Container psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1
+$prevEap = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+$sql | docker exec -i $Container psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1 | ForEach-Object { Write-Host $_ }
+$ErrorActionPreference = $prevEap
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "Seed data loaded successfully." -ForegroundColor Green

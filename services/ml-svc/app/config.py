@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     MODEL_CACHE_DIR: str = "/tmp/ml-models"
     DEFAULT_MODEL_VERSION: str = "production"
     FALLBACK_ENABLED: bool = True
-    CORS_ORIGINS: list[str] = ["*"]
+    CORS_ORIGINS: list[str] = ["http://localhost:8082", "http://localhost:3000"]
 
 
 settings = Settings()

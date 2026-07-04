@@ -160,6 +160,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.12"
+      - name: Python SAST (bandit)
+        run: |
+          pip install bandit
+          bandit -r services/shared/ipe_shared/ apps/ -f json -o bandit-report.json || true
+          bandit -r services/shared/ipe_shared/ apps/ -f screen
+        continue-on-error: true
+      - name: Dependency audit (pip-audit)
+        run: |
+          pip install pip-audit
+          uv sync --frozen
+          uv export --frozen --no-dev --no-emit-workspace --no-emit-project -o requirements-audit.txt
+          pip-audit -r requirements-audit.txt --desc
+        working-directory: services/shared
+        continue-on-error: true
       - name: Trivy filesystem scan
         uses: aquasecurity/trivy-action@0.28.0
         with:

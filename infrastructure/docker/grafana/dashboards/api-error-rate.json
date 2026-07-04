@@ -1,0 +1,77 @@
+{
+  "title": "IPE API Error Rate",
+  "uid": "ipe-api-errors",
+  "version": 1,
+  "tags": ["ipe", "phase2", "api"],
+  "schemaVersion": 39,
+  "timezone": "utc",
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "5xx Error Rate (SLO: 5%)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0.05 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (rate(ipe_http_requests_total{status_code=~\"5..\"}[5m])) / sum by (service) (rate(ipe_http_requests_total[5m]))",
+          "legendFormat": "{{ service }}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Request Rate by Status",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (service, status_code) (rate(ipe_http_requests_total[5m]))",
+          "legendFormat": "{{ service }} {{ status_code }}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Total Request Rate",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(ipe_http_requests_total[5m]))",
+          "legendFormat": "req/s"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Services Reporting Metrics",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+      "targets": [
+        {
+          "expr": "count(count by (service) (ipe_http_requests_total))",
+          "legendFormat": "services"
+        }
+      ]
+    }
+  ]
+}

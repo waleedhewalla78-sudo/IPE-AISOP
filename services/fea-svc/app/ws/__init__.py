@@ -7,6 +7,7 @@ from aiokafka import AIOKafkaConsumer
 from fastapi import WebSocket
 
 from ipe_shared.config import settings
+from ipe_shared.events.consumer import get_consumer_group, resolve_consumer_tenant_id
 
 logger = logging.getLogger(__name__)
 
@@ -51,10 +52,13 @@ manager = ConnectionManager()
 
 
 async def ws_feasibility_broadcaster():
+    base_group = "fea-svc-ws"
+    tenant_id = resolve_consumer_tenant_id()
+    group_id = get_consumer_group(base_group, tenant_id) if tenant_id else base_group
     consumer = AIOKafkaConsumer(
         _AVRO_TOPIC,
         bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
-        group_id="fea-svc-ws",
+        group_id=group_id,
         value_deserializer=lambda v: v,
     )
     await consumer.start()

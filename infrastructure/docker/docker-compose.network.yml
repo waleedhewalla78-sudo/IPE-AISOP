@@ -1,0 +1,127 @@
+# Network segmentation overlay for the Release 1 stack (+ monitoring when merged).
+#
+# Usage:
+#   docker compose -f docker-compose.release1.yml -f docker-compose.network.yml up -d
+#   docker compose -f docker-compose.release1.yml -f docker-compose.network.yml \
+#     -f docker-compose.monitoring.yml up -d
+#
+# Tiers:
+#   ipe-public     — browser-facing (Kong, web-ui, Grafana, Keycloak redirects)
+#   ipe-internal   — service mesh (no direct internet)
+#   ipe-data       — Postgres, Redis, Kafka, object storage
+#   ipe-monitoring — Prometheus, Grafana, exporters
+
+x-backend-networks: &backend-networks
+  networks:
+    - ipe-internal
+    - ipe-data
+
+networks:
+  ipe-public:
+    driver: bridge
+  ipe-internal:
+    driver: bridge
+    internal: true
+  ipe-data:
+    driver: bridge
+    internal: true
+  ipe-monitoring:
+    driver: bridge
+
+services:
+  kong:
+    networks:
+      - ipe-public
+      - ipe-internal
+      - ipe-data
+
+  keycloak:
+    networks:
+      - ipe-public
+      - ipe-data
+
+  keycloak-db:
+    networks:
+      - ipe-data
+
+  web-ui:
+    networks:
+      - ipe-public
+
+  # Release 1 backend services (repeat ipe-internal + ipe-data + ipe-monitoring)
+  dpe-svc:
+    <<: *backend-networks
+  fea-svc:
+    <<: *backend-networks
+  res-svc:
+    <<: *backend-networks
+  cap-svc:
+    <<: *backend-networks
+  connector:
+    networks:
+      - ipe-internal
+      - ipe-data
+      - ipe-public
+
+  db:
+    networks:
+      - ipe-data
+      - ipe-monitoring
+
+  redis:
+    networks:
+      - ipe-data
+      - ipe-monitoring
+
+  # Full hybrid stack only (docker-compose.yml):
+  # kafka:
+  #   networks:
+  #     - ipe-data
+  #     - ipe-monitoring
+
+  vault:
+    networks:
+      - ipe-internal
+      - ipe-data
+
+  vault-init:
+    networks:
+      - ipe-internal
+
+  minio:
+    networks:
+      - ipe-data
+      - ipe-internal
+
+  prometheus:
+    networks:
+      - ipe-monitoring
+      - ipe-internal
+
+  grafana:
+    networks:
+      - ipe-monitoring
+      - ipe-public
+
+  alertmanager:
+    networks:
+      - ipe-monitoring
+
+  postgres-exporter:
+    networks:
+      - ipe-monitoring
+      - ipe-data
+
+  redis-exporter:
+    networks:
+      - ipe-monitoring
+      - ipe-data
+
+  kafka-exporter:
+    networks:
+      - ipe-monitoring
+      - ipe-data
+
+  node-exporter:
+    networks:
+      - ipe-monitoring

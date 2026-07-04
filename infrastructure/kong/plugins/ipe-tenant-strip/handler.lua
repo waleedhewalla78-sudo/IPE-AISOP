@@ -51,7 +51,15 @@ function IpeTenantStripHandler:access(conf)
   local payload = decode_jwt_payload(auth_header)
 
   if payload and payload.tenant_id then
-    kong.service.request.set_header("X-Tenant-ID", tostring(payload.tenant_id))
+    local tenant_id = tostring(payload.tenant_id)
+    kong.service.request.set_header("X-Tenant-ID", tenant_id)
+
+    local consumer = kong.db.consumers:select_by_custom_id(tenant_id)
+    if consumer then
+      kong.client.authenticate(consumer)
+    else
+      kong.log.debug("ipe-tenant-strip: no Kong consumer for tenant custom_id=", tenant_id)
+    end
   else
     kong.log.warn("ipe-tenant-strip: no tenant_id claim in JWT payload or token missing")
   end

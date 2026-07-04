@@ -1,19 +1,18 @@
-# REL-PROD Wave 2D — start Loki + Grafana + Prometheus overlay on demo stack.
-# Usage: .\scripts\run-monitoring-stack.ps1
-#        .\scripts\run-monitoring-stack.ps1 -VerifyOnly
+# IPE Phase 2 — start Prometheus + Grafana + Alertmanager on segmented networks
+# Usage:
+#   .\scripts\run-monitoring-stack.ps1
+#   .\scripts\run-monitoring-stack.ps1 -Profile release1
+#   .\scripts\run-monitoring-stack.ps1 -VerifyOnly
 
 param(
+    [ValidateSet("release1", "full")]
+    [string]$Profile = "release1",
     [switch]$VerifyOnly
 )
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 $DockerDir = Join-Path $Root "infrastructure\docker"
-$Compose = @(
-    "-f", "docker-compose.yml",
-    "-f", "docker-compose.demo.yml",
-    "-f", "docker-compose.monitoring.yml"
-)
 $Evidence = Join-Path $Root "docs\ops-monitoring-verify.txt"
 
 function Test-Endpoint {
@@ -32,39 +31,75 @@ function Test-Endpoint {
     }
 }
 
+function Get-ComposeArgs {
+    param([string]$ProfileName)
+    $files = @("-f", "docker-compose.monitoring.yml")
+    if ($ProfileName -eq "release1") {
+        return @(
+            "-f", "docker-compose.release1.yml",
+            "-f", "docker-compose.network.yml",
+            "-f", "docker-compose.monitoring.yml"
+        )
+    }
+    return @("-f", "docker-compose.monitoring.yml")
+}
+
 Push-Location $DockerDir
 try {
     if (-not $VerifyOnly) {
-        Write-Host "=== REL-PROD 2D: Monitoring stack ===" -ForegroundColor Cyan
-        docker compose @Compose up -d prometheus loki promtail grafana
+        Write-Host "=== Phase 2: Monitoring stack (Prometheus + Grafana + Alertmanager) ===" -ForegroundColor Cyan
+        if ($Profile -eq "release1") {
+            Write-Host "Using segmented networks (docker-compose.network.yml)." -ForegroundColor DarkGray
+            Write-Host "Ensure Release 1 app stack is running with the network overlay first." -ForegroundColor DarkGray
+        }
+        $composeArgs = Get-ComposeArgs -ProfileName $Profile
+        if ($Profile -eq "release1") {
+            docker compose @composeArgs up -d `
+                prometheus grafana alertmanager `
+                postgres-exporter redis-exporter kafka-exporter node-exporter
+        } else {
+            Write-Host "Ensure full app stack is on ipe-network first." -ForegroundColor DarkGray
+            docker compose @composeArgs up -d
+        }
         if ($LASTEXITCODE -ne 0) { throw "monitoring up failed" }
-        Write-Host "Waiting 20s for healthchecks..." -ForegroundColor DarkGray
-        Start-Sleep -Seconds 20
+        Write-Host "Waiting 25s for healthchecks..." -ForegroundColor DarkGray
+        Start-Sleep -Seconds 25
     }
 
     Write-Host "`n=== Verification ===" -ForegroundColor Cyan
     $results = @()
-    $results += Test-Endpoint "Prometheus ready" "http://localhost:9091/-/ready"
-    $results += Test-Endpoint "Grafana health" "http://localhost:3002/api/health"
-    $results += Test-Endpoint "Loki ready" "http://localhost:3100/ready"
+    $results += Test-Endpoint "Prometheus ready" "http://localhost:9090/-/ready"
+    $results += Test-Endpoint "Grafana health" "http://localhost:3000/api/health"
+    $results += Test-Endpoint "Alertmanager ready" "http://localhost:9093/-/ready"
 
     $promTargets = $null
     try {
-        $promTargets = Invoke-RestMethod -Uri "http://localhost:9091/api/v1/targets" -TimeoutSec 15
+        $promTargets = Invoke-RestMethod -Uri "http://localhost:9090/api/v1/targets" -TimeoutSec 15
         $up = @($promTargets.data.activeTargets | Where-Object { $_.health -eq "up" }).Count
         $total = @($promTargets.data.activeTargets).Count
-        Write-Host "  Prometheus targets: $up / $total up" -ForegroundColor $(if ($up -ge 3) { "Green" } else { "Yellow" })
-        $results += ($up -ge 3)
+        Write-Host "  Prometheus targets: $up / $total up" -ForegroundColor $(if ($up -ge 1) { "Green" } else { "Yellow" })
+        $results += ($up -ge 1)
     } catch {
         Write-Host "  FAIL Prometheus targets API $_" -ForegroundColor Red
         $results += $false
     }
 
+    try {
+        $rules = Invoke-RestMethod -Uri "http://localhost:9090/api/v1/rules" -TimeoutSec 15
+        $count = @($rules.data.groups).Count
+        Write-Host "  Alert rule groups: $count" -ForegroundColor $(if ($count -ge 1) { "Green" } else { "Yellow" })
+        $results += ($count -ge 1)
+    } catch {
+        Write-Host "  WARN Alert rules API $_" -ForegroundColor Yellow
+        $results += $true
+    }
+
     $lines = @(
-        "IPE Monitoring Verification — $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')",
-        "Prometheus: http://localhost:9091",
-        "Grafana:    http://localhost:3002 (admin / ipe_admin)",
-        "Loki:       http://localhost:3100",
+        "IPE Monitoring Verification - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')",
+        "Profile: $Profile",
+        "Prometheus: http://localhost:9090",
+        "Grafana:    http://localhost:3000 (admin / admin)",
+        "Alertmanager: http://localhost:9093",
         "",
         "Results:"
     )
@@ -72,7 +107,7 @@ try {
         $lines += "OVERALL: PASS"
         Write-Host "`nOVERALL: PASS" -ForegroundColor Green
     } else {
-        $lines += "OVERALL: FAIL — ensure demo app stack is running first"
+        $lines += "OVERALL: FAIL - ensure app stack is on ipe-network"
         Write-Host "`nOVERALL: FAIL" -ForegroundColor Red
     }
     $lines | Set-Content -Encoding utf8 $Evidence

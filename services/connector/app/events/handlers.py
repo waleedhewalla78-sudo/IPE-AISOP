@@ -9,6 +9,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from ipe_shared.database.connection import get_engine
+from ipe_shared.events.odoo_sync_monitor import odoo_sync_monitor
 from ipe_shared.events.schemas import EventEnvelope
 from ipe_shared.models.tenant import Tenant
 
@@ -65,8 +66,20 @@ async def _post_to_odoo(
                     "Odoo %s success: action=%s status=%s",
                     action_type, action_type, resp.status_code,
                 )
+                odoo_sync_monitor.record_sync(
+                    "ipe_to_odoo",
+                    action_type,
+                    str(data.get("id") or data.get("mo_id") or "unknown"),
+                    True,
+                )
         except httpx.RequestError as e:
             logger.error("Failed to send %s to Odoo: %s", action_type, e)
+            odoo_sync_monitor.record_sync(
+                "ipe_to_odoo",
+                action_type,
+                str(data.get("id") or data.get("mo_id") or "unknown"),
+                False,
+            )
 
 
 def _parse_event(event: dict) -> EventEnvelope | None:

@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://ipe:ipe_dev_pass@localhost:5432/ipe_dev"
     DATABASE_URL_SYNC: str = "postgresql://ipe:ipe_dev_pass@localhost:5432/ipe_dev"
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
+    KAFKA_CONSUMER_TENANT_ID: str = ""
     SCHEMA_REGISTRY_URL: str = "http://localhost:8083"
     REDIS_URL: str = "redis://localhost:6379/0"
     JWT_SECRET_KEY: str = ""
@@ -27,7 +28,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: str = ""
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "DEBUG"
-    CORS_ORIGINS: str = "http://localhost:3000"
+    CORS_ORIGINS: str = "http://localhost:8082,http://localhost:3000"
     SERVICE_NAME: str = "unknown"
     VERSION: str = "0.1.0"
     OTEL_EXPORTER_OTLP_ENDPOINT: str = ""
@@ -48,6 +49,8 @@ class Settings(BaseSettings):
     MINIO_ACCESS_KEY: str = ""
     MINIO_SECRET_KEY: str = ""
     MINIO_AUDIT_BUCKET: str = "ipe-audit-archive"
+    TENANT_QUOTA_OVERRIDES: str = "config/tenant-quotas.json"
+    ODOO_CONFLICT_STRATEGIES: str = "config/odoo-conflict-strategies.json"
 
     model_config = {"env_prefix": "IPE_", "case_sensitive": False}
 

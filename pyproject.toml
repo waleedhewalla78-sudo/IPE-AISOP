@@ -34,4 +34,5 @@ members = [
 asyncio_mode = "auto"
 markers = [
     "integration: Integration tests (requires PostgreSQL/Kafka/Redis/fea-svc)",
+    "security: Cross-tenant isolation and security regression tests",
 ]

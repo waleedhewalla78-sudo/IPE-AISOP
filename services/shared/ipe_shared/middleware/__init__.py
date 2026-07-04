@@ -1,4 +1,5 @@
 from ipe_shared.middleware.correlation_id import CorrelationIdMiddleware
+from ipe_shared.middleware.cors import setup_cors
 from ipe_shared.middleware.error_handler import register_exception_handlers
 from ipe_shared.middleware.pii_strip import PIIStripMiddleware
 from ipe_shared.middleware.request_logging import RequestLoggingMiddleware
@@ -10,4 +11,5 @@ __all__ = [
     "RequestLoggingMiddleware",
     "TenantContextMiddleware",
     "register_exception_handlers",
+    "setup_cors",
 ]

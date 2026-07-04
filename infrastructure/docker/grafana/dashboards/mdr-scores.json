@@ -1,0 +1,53 @@
+{
+  "title": "IPE MDR & Feasibility",
+  "uid": "ipe-mdr-scores",
+  "version": 1,
+  "tags": ["ipe", "phase2", "business"],
+  "schemaVersion": 39,
+  "timezone": "utc",
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Feasibility API P95 (fea-svc)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(ipe_http_request_duration_seconds_bucket{service=\"fea-svc\"}[5m])))",
+          "legendFormat": "fea-svc p95"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "DPE Analytics API P95 (dpe-svc outcomes)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, endpoint) (rate(ipe_http_request_duration_seconds_bucket{service=\"dpe-svc\", endpoint=~\"/api/v1/outcomes.*|/api/v1/analytics.*\"}[5m])))",
+          "legendFormat": "{{ endpoint }}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Resolution API Traffic (res-svc)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (endpoint) (rate(ipe_http_requests_total{service=\"res-svc\"}[5m]))",
+          "legendFormat": "{{ endpoint }}"
+        }
+      ]
+    }
+  ]
+}

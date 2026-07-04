@@ -13,6 +13,7 @@ Immutability enforcement (P9-006):
 """
 from __future__ import annotations
 
+import json
 import logging
 from datetime import datetime, timezone
 from typing import Any
@@ -71,8 +72,8 @@ async def log_audit_event(
                     "action": action,
                     "entity_type": entity_type,
                     "entity_id": UUID(str(entity_id)) if isinstance(entity_id, str) else entity_id,
-                    "before_state": before_state,
-                    "after_state": after_state,
+                    "before_state": json.dumps(before_state) if before_state is not None else None,
+                    "after_state": json.dumps(after_state) if after_state is not None else None,
                     "rationale": rationale,
                     "timestamp": datetime.now(timezone.utc),
                 },

@@ -1,0 +1,10 @@
+{
+  "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11": {
+    "max_users": 1,
+    "max_boms": 5
+  },
+  "tenant-aaa-111": {
+    "max_manufacturing_orders": 2000,
+    "max_boms": 1000
+  }
+}
