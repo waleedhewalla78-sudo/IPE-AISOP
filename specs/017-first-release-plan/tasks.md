@@ -9,20 +9,20 @@
 | ID | Task | Priority | Status | GitHub |
 |----|------|----------|--------|--------|
 | P0-01 | Cluster stabilize (HPA off, scale=1) | P0 | ✅ | — |
-| P0-02 | Gate 11 remediation (steps 10–11 OR-Tools) | P0 | 🔄 12/14 | [#27](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/27) |
-| P0-03 | OQ-9 waiver or 14/14 decision | P0 | ⬜ | [#28](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/28) |
+| P0-02 | Gate 11 remediation (steps 10–11 OR-Tools) | P0 | ✅ 12/14 (closed #27 infra) | [#27](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/27) |
+| P0-03 | OQ-9 waiver or 14/14 decision | P0 | ✅ | [#28](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/28) — `docs/demo-data/gate11-oq9-waiver.md` §6 |
 | P0-04 | T717 connector activity emitter | P0 | ✅ | — |
 | P0-05 | T718 cap-svc activity emitter | P0 | ✅ | — |
 | P0-06 | T719 res-svc activity emitter | P0 | ✅ | — |
-| P0-07 | T730 migration 038 (compose + K8s) | P0 | ⬜ | [#29](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/29) |
-| P0-08 | Tag `v9.4.0-p3` + update GATE-RESULTS | P0 | ⬜ | [#18](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/18) |
+| P0-07 | T730 migration 038 (compose + K8s) | P0 | ✅ | [#29](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/29) — alembic head 038 |
+| P0-08 | Tag `v9.4.0-p3` + update GATE-RESULTS | P0 | ✅ | [#18](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/18) — tag `v9.4.0-p3` |
 
 ## Wave 1 — Foundation (Weeks 2–5)
 
 | ID | Task | Priority | Status | GitHub |
 |----|------|----------|--------|--------|
 | W1-01 | Copilot R1 sidebar nav + i18n | P0 | ✅ | — |
-| W1-02 | Copilot smoke test (auth + route) | P1 | ⬜ | [#30](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/30) |
+| W1-02 | Copilot smoke test (auth + route) | P1 | ✅ | [#30](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/30) — `docs/qa/copilot-r1-smoke.txt` 12/12 |
 | W1-03 | Odoo Config v2 — schema + validation API | P0 | ⬜ | [#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31) |
 | W1-04 | Odoo Config v2 — connection test endpoint | P0 | ⬜ | [#32](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/32) |
 | W1-05 | Odoo Config v2 — multi-entity + versioning | P1 | ⬜ | [#33](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/33) |
