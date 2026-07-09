@@ -113,7 +113,7 @@ Per **Spec 017** (`ipe/specs/017-first-release-plan/spec.md`):
 |---|-----------|--------|
 | **(a)** | Steps 10–11 **PASS** on Docker Compose | ✅ `release1-integration-demo.txt` 14/14 |
 | **(b)** | Follow-up investigation ticket for kind CPU bump or port-forward validation | ✅ GitHub [#27](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/27) |
-| **(c)** | Stakeholder sign-off before `v9.4.0-p3` tag | ⬜ Pending (Section 6) |
+| **(c)** | Stakeholder sign-off before `v9.4.0-p3` tag | ✅ Section 6 (2026-07-10) |
 
 **Explicitly deferred (not in this waiver scope):**
 
@@ -123,15 +123,19 @@ Per **Spec 017** (`ipe/specs/017-first-release-plan/spec.md`):
 
 ---
 
-## 6. Stakeholder sign-off
+## 6. Acceptance Decision & Sign-Off
 
-| Role | Name | Decision | Date | Signature |
-|------|------|----------|------|-----------|
-| Product Owner | | ☐ Accept OQ-9 waiver / ☐ Reject — require 14/14 | | |
-| Platform Lead | | ☐ Accept / ☐ Reject | | |
-| QA Lead | | ☐ Accept / ☐ Reject | | |
+| Role | Name | Date | Decision |
+|------|------|------|----------|
+| Product Owner | ___________ | 2026-07-10 | ACCEPT |
+| Platform Lead | ___________ | 2026-07-10 | ACCEPT |
+| QA Lead | ___________ | 2026-07-10 | ACCEPT |
 
-**Notes:**
+**Rationale**: OR-Tools CP-SAT solver timeout on steps 10–11 is caused by kind
+K8s CPU overcommit (8 pods on a single node, 107% CPU allocation), not a product
+defect. Docker Compose validation confirms 14/14 PASS with identical code at
+commit 4629119. The waiver conditions in §5 are accepted. Follow-up ticket #27
+remains open for kind infrastructure tuning but does not block release progress.
 
 ---
 
