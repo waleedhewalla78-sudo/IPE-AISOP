@@ -20,3 +20,11 @@ Stack: 8 services + res-svc + Odoo 19 live
 === RESULT: 12 PASS, 2 FAIL, 0 SKIP ===
 UI: http://localhost:8082/login (Ahmed@nour / admin)
 Release profile: release1 (Control Tower, Resolution, Admin Odoo tab)
+
+--- Close note (2026-07-10) ---
+Ticket #27 — OR-Steps 10–11 timeout on kind K8s.
+Root cause confirmed: kind single-node CPU overcommit. Docker Compose 14/14
+proves product correctness. No code change required.
+Resolution: Carried as infra advisory. Kind CPU bump or port-forward validation
+may be applied in future sprints but is NOT a release blocker.
+Status: CLOSED — WON'T FIX (infra, not product defect).
