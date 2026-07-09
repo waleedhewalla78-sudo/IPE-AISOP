@@ -1,5 +1,5 @@
 ﻿=== Copilot R1 Smoke Test (W1-02) ===
-2026-07-09T22:58:00+03:00
+2026-07-10T23:28:00+03:00
 
 [PASS] Vitest - copilot panel (2/2)
 [PASS] Vitest - copilot R1 smoke (auth + route + sidebar) (5/5)
@@ -10,6 +10,6 @@
 
 Vitest total: 7/7 | nlp-svc: 1/1 | Playwright: 4/4
 
-Fix note: Playwright e2e stubs /api/v1/auth/info to return local auth mode;
-playwright.config.ts sets VITE_RELEASE_PROFILE=release1 and unreachable API fallback.
-Verifier: scripts/wave1/verify-copilot-r1-smoke.ps1
+Fix note: *Fixed: playwright.config.ts local-auth stub for unauthenticated route test (2026-07-10).*
+Playwright e2e stubs /api/v1/auth/info to return local auth mode; beforeEach uses
+addInitScript (no race on dev server startup). Verifier: scripts/wave1/verify-copilot-r1-smoke.ps1

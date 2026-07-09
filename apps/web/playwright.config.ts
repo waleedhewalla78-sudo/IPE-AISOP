@@ -27,6 +27,7 @@ export default defineConfig({
     command: 'npm run dev',
     port: 8082,
     reuseExistingServer: false,
+    timeout: 120_000,
     env: {
       ...process.env,
       VITE_RELEASE_PROFILE: process.env.VITE_RELEASE_PROFILE ?? 'release1',

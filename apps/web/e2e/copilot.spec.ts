@@ -25,8 +25,7 @@ async function stubLocalAuth(page: import('@playwright/test').Page) {
 test.describe('Copilot R1 smoke', () => {
   test.beforeEach(async ({ page }) => {
     await stubLocalAuth(page);
-    await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
+    await page.addInitScript(() => localStorage.clear());
   });
 
   test('unauthenticated copilot route redirects to login', async ({ page }) => {
