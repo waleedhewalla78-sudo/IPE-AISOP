@@ -134,8 +134,12 @@ Per **Spec 017** (`ipe/specs/017-first-release-plan/spec.md`):
 **Rationale**: OR-Tools CP-SAT solver timeout on steps 10–11 is caused by kind
 K8s CPU overcommit (8 pods on a single node, 107% CPU allocation), not a product
 defect. Docker Compose validation confirms 14/14 PASS with identical code at
-commit 4629119. The waiver conditions in §5 are accepted. Follow-up ticket #27
-remains open for kind infrastructure tuning but does not block release progress.
+commit 4629119. Waiver conditions in §5 are accepted. Follow-up ticket #27
+carries infra advisory only — does not block release progress.
+
+**Strategy alignment**: Per IPE-Strategy-Assessment (July 2026) §3.2, K8s
+enterprise tier is deferred to Phase 4. Phase 0 kind gates (G6–G10) are
+already satisfied; G11 12/14 with waiver meets Spec 015 requirements.
 
 ---
 
