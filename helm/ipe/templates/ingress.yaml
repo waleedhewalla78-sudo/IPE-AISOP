@@ -21,7 +21,35 @@ spec:
   rules:
     - http:
         paths:
+          - path: /api/v1/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: dpe-svc
+                port:
+                  number: {{ (index .Values.services "dpe-svc").port }}
           - path: /api/v1/health
+            pathType: Prefix
+            backend:
+              service:
+                name: dpe-svc
+                port:
+                  number: {{ (index .Values.services "dpe-svc").port }}
+          - path: /api/v1/admin
+            pathType: Prefix
+            backend:
+              service:
+                name: dpe-svc
+                port:
+                  number: {{ (index .Values.services "dpe-svc").port }}
+          - path: /api/v1/analytics
+            pathType: Prefix
+            backend:
+              service:
+                name: dpe-svc
+                port:
+                  number: {{ (index .Values.services "dpe-svc").port }}
+          - path: /api/v1/dashboard
             pathType: Prefix
             backend:
               service:
@@ -35,6 +63,34 @@ spec:
                 name: fea-svc
                 port:
                   number: {{ (index .Values.services "fea-svc").port }}
+          - path: /api/v1/resolution
+            pathType: Prefix
+            backend:
+              service:
+                name: res-svc
+                port:
+                  number: {{ (index .Values.services "res-svc").port }}
+          - path: /api/v1/capacity
+            pathType: Prefix
+            backend:
+              service:
+                name: cap-svc
+                port:
+                  number: {{ (index .Values.services "cap-svc").port }}
+          - path: /api/v1/sync
+            pathType: Prefix
+            backend:
+              service:
+                name: connector
+                port:
+                  number: {{ (index .Values.services "connector").port }}
+          - path: /api/v1/erp
+            pathType: Prefix
+            backend:
+              service:
+                name: connector
+                port:
+                  number: {{ (index .Values.services "connector").port }}
           - path: /api/v1/material
             pathType: Prefix
             backend:

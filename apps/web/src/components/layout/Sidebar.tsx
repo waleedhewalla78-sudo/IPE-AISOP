@@ -6,15 +6,21 @@ import { t } from '@/lib/i18n';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const ALL_NAV = [
+  { to: ROUTES.WORKSPACE, labelKey: 'nav.workspace', icon: '🧩', match: ROUTES.WORKSPACE },
   { to: ROUTES.PLANNING, labelKey: 'nav.planning', icon: '📊', match: ROUTES.PLANNING },
   { to: ROUTES.COMMAND_CENTER, labelKey: 'nav.commandCenter', icon: '🎯', match: ROUTES.COMMAND_CENTER },
+  { to: ROUTES.AI_COPILOT, labelKey: 'nav.copilot', icon: '💬', match: ROUTES.AI_COPILOT, release1Only: true },
   { to: ROUTES.SUPPLY_CHAIN, labelKey: 'nav.supplyChain', icon: '🌐', match: ROUTES.SUPPLY_CHAIN, release1: false },
   { to: ROUTES.AI_GOVERNANCE, labelKey: 'nav.aiGovernance', icon: '🤖', match: ROUTES.AI_GOVERNANCE, release1: false },
   { to: ROUTES.SHOP_FLOOR, labelKey: 'nav.shopFloor', icon: '🏭', match: ROUTES.SHOP_FLOOR, release1: false },
   { to: ROUTES.PLATFORM, labelKey: 'nav.platform', icon: '⚙️', match: ROUTES.PLATFORM },
 ];
 
-const NAV_ITEMS = ALL_NAV.filter((item) => !IS_RELEASE1 || item.release1 !== false);
+const NAV_ITEMS = ALL_NAV.filter((item) => {
+  if (IS_RELEASE1 && item.release1 === false) return false;
+  if (!IS_RELEASE1 && item.release1Only) return false;
+  return true;
+});
 
 export function Sidebar() {
   const location = useLocation();

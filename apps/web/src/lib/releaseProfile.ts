@@ -2,4 +2,4 @@
 export const RELEASE_PROFILE = import.meta.env.VITE_RELEASE_PROFILE ?? 'full';
 export const IS_RELEASE1 = RELEASE_PROFILE === 'release1';
 
-export const RELEASE1_HUBS = ['planning', 'command-center', 'platform'] as const;
+export const RELEASE1_HUBS = ['planning', 'command-center', 'platform', 'copilot'] as const;

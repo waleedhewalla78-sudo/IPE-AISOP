@@ -1,14 +1,11 @@
 # IPE Platform Constitution
 
 <!--
-Sync Impact Report (Enterprise Phase 2 close — 2026-07-04)
-Version: 1.1.0 → 1.2.0 (MINOR)
-Added: Principle VIII — Enterprise Gate Verification
-Added: Phase 3 K8s deployment doctrine (Helm-first, compose parity)
-Updated: Principle VI — Phase 2 observability gates PASS (metrics, Grafana, k6)
-Updated: Principle VII — R1 customer package ready; UAT blocked on SOW
-Templates: plan-template ✅ aligned | spec-template ✅ aligned | tasks-template ✅ aligned
-Deferred: SOC 2 Type I evidence collection (Phase 3 task, not principle change)
+Sync Impact Report (Speckit converge — 2026-07-09)
+Version: 1.2.3 (unchanged)
+Updated: Principle VIII — Gate 11 12/14 confirmed 2026-07-09 (stable cluster)
+Updated: Development Workflow — Spec 017 First Release Plan (15-week waves)
+Updated: Sprint 7 T717–T719 emitters complete; T730 pending
 -->
 
 IPE (Intelligent Planning Engine) is a microservices-based, event-driven platform for **feasibility-first manufacturing planning** in MENA mid-market discrete manufacturing. These principles are binding on all changes.
@@ -61,7 +58,7 @@ Every behavioral change MUST be accompanied by automated tests.
 The event bus is the backbone of inter-service communication in the **full platform**.
 
 - **Full stack (22 services):** Kafka topics, Avro schemas, producer/consumer pairs as documented.
-- **Release 1 profile (`docker-compose.release1.yml`):** Kafka MAY be omitted if sync is batch-driven via connector cron. If omitted, MUST document synchronous call paths and MUST NOT silently drop events required for feasibility scoring.
+- **Release 1 profile (`docker-compose.release1.yml` and Helm `values-dev.yaml`):** Kafka MAY be omitted. Set `IPE_KAFKA_BOOTSTRAP_SERVERS=""` so health probes return `not_configured` instead of probing `localhost:9092`.
 - **Consumer resilience:** Idempotent processing, deserialization error handling, 30s timeout.
 
 **Rationale:** Event mesh is v3.0 architecture. Customer #1 needs reliability over architectural purity.
@@ -119,7 +116,9 @@ Every **deployed** service MUST be observable.
 
 - **Gates 1–5 are mandatory** before `v9.3.0-p2`-class tags: observability, security, multi-tenant, Odoo sync, full E2E (R1+R2+audit).
 - **Option B (Phase 0 combined)** MUST pass when enterprise flags are ON: Keycloak, Vault, TLS, Audit, Combined demo.
-- **Phase 3 gates (6–11)** MUST pass before `v9.4.0-p3`: Helm lint/render, kind deploy health, compose–K8s parity, HPA smoke, ERP scaffold imports, R1 demo on K8s ingress.
+- **Phase 3 gates (6–11)** MUST pass before `v9.4.0-p3`: Helm lint/render, kind deploy health, compose–K8s parity, HPA smoke, ERP scaffold imports, R1 demo on K8s ingress. As of **2026-07-09**: Gates **6, 7, 8, 9, 10 PASS**; **Gate 11 PARTIAL (12/14)** — OR-Tools schedule + approve timeout on kind (`docs/qa/GATE-RESULTS-PHASE3.md`, `docs/demo-data/gate11-k8s-demo.txt`). Tag `v9.4.0-p3` remains blocked until Gate 11 is **14/14** unless stakeholders waive via documented **OQ-9** decision.
+- **Phase 4 gates** (GTM): Stripe sandbox billing, tenant self-service API, developer portal — MUST NOT start until Phase 3 tag `v9.4.0-p3` is applied.
+- **Phase 5** (enterprise maturity, SOC 2 Type II, v8 SAP gap features): post-GTM backlog; MUST NOT block Phase 3 close-out or Star Trans R1 compose go-live.
 - **Gate scripts are the source of truth.** Markdown status tables MUST reference script paths and last PASS output; manual claims without script evidence do not satisfy this principle.
 - **Regression:** R1 14/14 HTTPS and R2 5/5 MUST re-run after each phase gate that touches auth, networking, or connector paths.
 
@@ -160,6 +159,8 @@ Every **deployed** service MUST be observable.
   4. Implementation playbook + support runbook published
   5. 90-day ROI metrics instrumented
 - **Enterprise gate (015):** Gates 1–5 + k6 profiles + Option B before Phase 2 tag; Gates 6–11 before Phase 3 tag.
+- **Sprint 7 cohesion (016):** Tier 1 activity emitters (T717–T719) complete; migration 038 apply (T730) pending before `v9.5.0-s7`.
+- **First Release Plan (017):** Phase 0 closes `v9.4.0-p3`; Waves 1–3 deliver nine priority features per `specs/017-first-release-plan/`. Wave 1 Copilot R1 nav unhide is permitted without diluting Principle VII three-screen minimum.
 - **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
 
 ---
@@ -171,4 +172,21 @@ Every **deployed** service MUST be observable.
 - **Versioning.** MAJOR = principled removal; MINOR = new principle or materially expanded doctrine; PATCH = clarifications.
 - **Compliance review.** Every PR MUST verify compliance.
 
-**Version**: 1.2.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-04
+## Phase Naming Map (Roadmap vs Spec 015)
+
+External **Enterprise Deployment Roadmap** (36-week) and internal **Spec 015** use overlapping but not identical phase numbers:
+
+| Roadmap | Spec 015 | Focus |
+|---------|----------|-------|
+| Phase 0 Security | Phase 0 | Keycloak, Vault, TLS, audit |
+| Phase 1 K8s/Obs | Phase 1–2 | CI/CD, metrics, Gates 1–5 |
+| Phase 2 ERP | Phase 3 Stream 2 | Odoo live; SAP/D365 scaffold |
+| Phase 3 Scale | Phase 3 Streams 1, 3 | Helm, K8s gates, compliance prep |
+| Phase 4 GTM | Phase 4 | SaaS, Stripe, SDKs, onboarding |
+| — | **Phase 5** (Gap Audit) | SOC 2 II, WCAG, Copilot prod, live SAP/D365 |
+
+All `/speckit.analyze` reports MUST use this map when comparing downloaded roadmap documents to executed program status.
+
+---
+
+**Version**: 1.2.3 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-09

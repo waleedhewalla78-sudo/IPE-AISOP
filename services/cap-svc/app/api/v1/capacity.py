@@ -12,6 +12,7 @@ from sqlalchemy import select as sa_select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
+from app.core.activity_emit import emit_schedule_created_activity
 from app.core.bottleneck import detect_bottlenecks
 from app.core.maintenance_blocks import inject_maintenance_block_operations
 from app.core.priority_resolver import resolve_mo_priority, resolve_mo_priority_margin_aware
@@ -102,6 +103,18 @@ async def _publish_capacity_scored(
             tenant_id,
             mo_id,
         )
+
+
+async def _emit_schedule_created_activity(
+    session: AsyncSession,
+    *,
+    tenant_id: UUID,
+    mo_count: int,
+    schedule: dict,
+) -> None:
+    await emit_schedule_created_activity(
+        session, tenant_id=tenant_id, mo_count=mo_count, schedule=schedule
+    )
 
 
 class ScheduleRequest(BaseModel):
@@ -427,6 +440,13 @@ async def schedule_production(
             schedule.get("assignments", []),
         )
 
+        await _emit_schedule_created_activity(
+            session,
+            tenant_id=tid,
+            mo_count=len(mos),
+            schedule=schedule,
+        )
+
         return APIResponse(success=True, data={
             "schedule": schedule,
             "bottlenecks": bottlenecks,
@@ -601,6 +621,13 @@ async def schedule_production(
         session,
         tid,
         schedule.get("assignments", []),
+    )
+
+    await _emit_schedule_created_activity(
+        session,
+        tenant_id=tid,
+        mo_count=len(mos),
+        schedule=schedule,
     )
 
     return APIResponse(success=True, data={

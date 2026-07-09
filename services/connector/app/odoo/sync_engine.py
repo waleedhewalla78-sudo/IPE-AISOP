@@ -25,6 +25,8 @@ from ipe_shared.models.work_center import WorkCenter
 from ipe_shared.tenant.quotas import QuotaExceededError, assert_quota, count_tenant_resource
 from ipe_shared.events.odoo_sync_monitor import odoo_sync_monitor
 from ipe_shared.events.odoo_conflict_resolver import ConflictRecord, odoo_conflict_resolver
+from ipe_shared.activity.emit import record_from_kafka_topic
+from ipe_shared.events.producer import kafka_producer
 
 from app.core.mapper import (
     ODOO_TO_CDM_BOM,
@@ -134,6 +136,32 @@ class OdooSyncEngine:
             for entity_type, value in counts.items():
                 if isinstance(value, dict) and entity_type not in {"rescored"}:
                     self._report_odoo_to_ipe(entity_type, value)
+
+            if run.status in ("success", "partial"):
+                products = counts.get("products", {})
+                mos = counts.get("manufacturing_orders", {})
+                summary = (
+                    f"Odoo sync {run.status}: "
+                    f"products updated={products.get('updated', 0) if isinstance(products, dict) else 0} "
+                    f"MOs updated={mos.get('updated', 0) if isinstance(mos, dict) else 0}"
+                )
+                envelope = kafka_producer.build_envelope(
+                    event_type="ipe.sync.completed",
+                    tenant_id=str(self.tenant_id),
+                    payload={
+                        "summary": summary,
+                        "sync_run_id": str(run.id),
+                        "status": run.status,
+                        "trigger": trigger,
+                        "entity_counts": counts,
+                    },
+                )
+                await record_from_kafka_topic(
+                    self.session,
+                    "ipe.sync.completed",
+                    envelope,
+                    tenant_id=str(self.tenant_id),
+                )
 
             return {"sync_run_id": str(run.id), "status": run.status, **counts}
         except Exception as exc:

@@ -1,13 +1,18 @@
 # Feature Specification: Enterprise Production Readiness (015)
 
 **Feature**: `015-enterprise-production-readiness`  
-**Version**: 1.1  
-**Date**: 2026-07-04  
-**Status**: Phase 2 complete — Phase 3 in progress  
+**Version**: 1.3  
+**Date**: 2026-07-05  
+**Status**: Phase 2 complete — Phase 3 ~60% (Gates 6–7, 10 PASS; Gate 8 partial)  
 **Depends on**: `014-release2-growth` (commercial R2), `013-release1-odoo-mena` (Odoo R1), platform `v8.2.0`  
-**Release target**: `v9.4.0-p3` (Phase 3) after Gates 6–11; Phase 2 tagged `v9.3.0-p2`  
+**Release target**: `v9.4.0-p3` (Phase 3) after Gates 8–9, 11; Phase 2 tagged `v9.3.0-p2`; Phase 4 target `v10.0.0-e4`  
 **Source documents**:
 - `docs/strategy/IPE_Enterprise_Deployment_Roadmap.md` (36-week Phases 0–4)
+- `IPE_Enterprise_Deployment_Roadmap (4).md` (Downloads — canonical checklist SEC/INF/OBS)
+- `PHASE3-VERIFICATION-PROMPT (3).md`
+- `IPE-Phase4-Proposal (1).docx` — GTM/SaaS scope
+- `IPE-Phase5-Proposal-Gap-Audit.docx` — 131-gap audit + Phase 5 streams
+- `IPE_v8_Upgrade_Proposal_SAP_Gap_Analysis (4).md` — v8 Tier 1–3 → Phase 5 Stream B
 - `docs/strategy/ENTERPRISE-PROGRAM-STATUS.md`
 - `docs/PRD-IPE-COMPREHENSIVE-AS-IS.md`
 - Customer readiness: `docs/customer/star-trans/`
@@ -23,6 +28,22 @@
 - Q: When do SAP/D365 connectors go live? → A: **Scaffold only until customer #2**; Odoo path MUST remain default and fully tested.
 - Q: What evidence closes Phase 3? → A: **Gates 6–11 PASS** + git tag `v9.4.0-p3` (see tasks.md).
 - Q: How is performance validated post–profile split? → A: **k6-slo.js** for latency SLO; **k6-stress.js** for rate limiter — never combined.
+
+### Session 2026-07-04-b (Phase 4/5 proposals + roadmap v4)
+
+- Q: When does Phase 4 engineering start? → A: **After Gate 11 PASS and tag `v9.4.0-p3`**; PM may parallelize wireframes/pricing (AD-08, OQ-7).
+- Q: Terraform or Pulumi for managed SaaS? → A: **Terraform primary** under `infra/terraform/` (AD-07); Pulumi optional later.
+- Q: Mobile app in Phase 4? → A: **Responsive web only** (Vite/Tailwind); native apps out of scope (AD-04).
+- Q: Where do GDPR/WCAG/SOC2 land? → A: **Phase 5 Stream A** (Gap Audit); Phase 3 closes on K8s gates only.
+- Q: Phase 5 vs roadmap Phase 4? → A: **Phase 5 is post-GTM** (compliance cert, Copilot prod, live SAP/D365); not in original 36-week roadmap title but in Gap Audit doc.
+- Q: Phase 3 % complete? → A: **~60%** — Gates 6, 7, 10 PASS; Gate 8 partial (`/health` only); 9, 11 pending.
+
+### Session 2026-07-05 (v8 gap doc + Helm R1 fix)
+
+- Q: Where do v8 SAP gap upgrades (Copilot, demand sensing, scenario workbench) land? → A: **Phase 5 Stream B** (FR-015-53–56); Tier 1 = post-GTM priority backlog, not Phase 3 blockers.
+- Q: Why did K8s cap-svc CrashLoop? → A: Default `KAFKA_BOOTSTRAP_SERVERS=localhost:9092` — fixed via `IPE_KAFKA_BOOTSTRAP_SERVERS=""` in `values-dev.yaml`.
+- Q: What closes Gate 8 feasibility 500? → A: **`scripts/k8s/migrate-k8s-db.ps1 -Seed`** then re-run parity script.
+- Q: Is Gate 9 required for R1 tag? → A: **Yes per Constitution VIII** — use `values-prod.yaml` HPA profile; P1 if time-constrained but tag policy says all 6–11.
 
 ---
 
@@ -105,8 +126,8 @@
 | FR-015-34 | SAP S/4HANA connector (5 entities) | 🔄 Scaffold |
 | FR-015-35 | D365 connector (5 entities) | 🔄 Scaffold |
 | FR-015-36 | API versioning v1/v2 | ⬜ |
-| FR-015-37 | Helm chart lint + kind deploy (Gate 6–7) | 🔄 |
-| FR-015-38 | Compose–K8s parity (Gate 8) | 🔄 Script ready |
+| FR-015-37 | Helm chart lint + kind deploy (Gate 6–7) | ✅ Gates 6–7 PASS |
+| FR-015-38 | Compose–K8s parity (Gate 8) | ✅ Gate 8 PASS 2026-07-05 |
 | FR-015-39 | HPA smoke + R1 on K8s (Gate 9–11) | ⬜ |
 
 ### Phase 4 — GTM & Growth ⬜ NOT STARTED
@@ -119,6 +140,28 @@
 | FR-015-43 | Python + JS SDKs | ⬜ |
 | FR-015-44 | Knowledge base (50 articles) | ⬜ |
 | FR-015-45 | Customer health dashboard | ⬜ |
+| FR-015-46 | Managed SaaS Terraform module (<30 min deploy) | ⬜ |
+| FR-015-47 | Mobile-responsive web (dashboard + approvals) | ⬜ |
+| FR-015-48 | On-prem Ansible / air-gap automation package | ⬜ |
+
+### Phase 5 — Enterprise Maturity ⬜ PROPOSED (post-GTM)
+
+**User story:** As a **regulated enterprise buyer**, I need SOC 2 evidence, WCAG compliance, and advanced planning capabilities **so that** IPE competes credibly with SAP IBP in enterprise RFPs.
+
+| ID | Requirement | Status | Stream |
+|----|-------------|--------|--------|
+| FR-015-50 | SOC 2 Type II evidence path | ⬜ | A |
+| FR-015-51 | GDPR export/erasure production-hardened | ⬜ | A |
+| FR-015-52 | WCAG 2.1 AA remediation (core screens) | ⬜ | A |
+| FR-015-53 | S&OP collaboration workflow | ⬜ | B |
+| FR-015-54 | Copilot production (v8 U1) | ⬜ | B |
+| FR-015-55 | Scenario workbench + demand sensing (v8 U2–U3) | ⬜ | B |
+| FR-015-55a | Supply orchestration + order mgmt (v8 U4–U5) | ⬜ | B |
+| FR-015-55b | Predictive maintenance + design AI (v8 U6–U7) | ⬜ | B |
+| FR-015-56 | Event sourcing / CQRS / GraphQL (architectural) | ⬜ | B |
+| FR-015-57 | Live SAP S/4HANA connector (customer #2+) | ⬜ | C |
+| FR-015-58 | Live D365 connector (customer #2+) | ⬜ | C |
+| FR-015-59 | Partner program + advanced analytics | ⬜ | C |
 
 ---
 
@@ -172,8 +215,10 @@
 | SC-015-04 | Load test | k6 SLO P95 read < 500ms; stress confirms 429 | ✅ |
 | SC-015-05 | Compliance | GDPR export < 10 min for 1M rows | ⬜ |
 | SC-015-06 | No R1/R2 regression | 14/14 + 5/5 after each phase gate | ✅ |
-| SC-015-07 | Phase 3 gates | Gates 6–11 PASS | 🔄 |
+| SC-015-07 | Phase 3 gates | Gates 6–8, 10 PASS; 9, 11 pending | 🔄 ~70% |
 | SC-015-08 | Customer readiness | Track B package complete | ✅ |
+| SC-015-09 | Phase 4 GTM | Self-service + Stripe sandbox | ⬜ |
+| SC-015-10 | Phase 5 maturity | SOC 2 path + WCAG critical fixes | ⬜ |
 
 ---
 
@@ -186,4 +231,4 @@
 
 ---
 
-*Spec version 1.1 — `/speckit.specify` + `/speckit.clarify` 2026-07-04*
+*Spec version 1.3 — `/speckit.specify` 2026-07-05*

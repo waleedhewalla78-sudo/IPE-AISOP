@@ -2,14 +2,14 @@
     {
         "detail":  "JWT obtained (Keycloak or local)",
         "step":  "1. IPE login",
-        "timestamp":  "2026-07-04T12:28:47.7895126+03:00",
+        "timestamp":  "2026-07-09T11:50:01.9522726+03:00",
         "status":  "PASS",
         "response":  null
     },
     {
         "detail":  "password_set=True",
         "step":  "2. Save Odoo config (vault)",
-        "timestamp":  "2026-07-04T12:28:48.3381059+03:00",
+        "timestamp":  "2026-07-09T11:50:09.8342970+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -26,33 +26,30 @@
                      }
     },
     {
-        "detail":  "connector XML-RPC path work_centers=7",
+        "detail":  "Odoo uid=2 v19.0-20260629",
         "step":  "3. Odoo connection test",
-        "timestamp":  "2026-07-04T12:28:51.9846737+03:00",
+        "timestamp":  "2026-07-09T11:50:14.0187738+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
-                                      "work_centers":  {
-                                                           "synced":  0,
-                                                           "updated":  7,
-                                                           "total":  7,
-                                                           "errors":  0
-                                                       }
+                                      "connected":  true,
+                                      "uid":  2,
+                                      "server_version":  "19.0-20260629"
                                   },
                          "error":  null,
                          "meta":  null
                      }
     },
     {
-        "detail":  "products updated=70 MOs updated=10 rescored=10",
+        "detail":  "products updated=70 MOs updated=2 rescored=2",
         "step":  "4. Full Odoo -\u003e CDM sync",
-        "timestamp":  "2026-07-04T12:29:03.6187185+03:00",
+        "timestamp":  "2026-07-09T11:51:01.3187022+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
-                                      "sync_run_id":  "897a6ff0-6d41-4d1c-a90a-f96b068abe09",
+                                      "sync_run_id":  "07f66a7f-574c-4794-ab6d-ae0fbbadfeb4",
                                       "status":  "success",
                                       "products":  {
                                                        "synced":  0,
@@ -98,8 +95,8 @@
                                                     },
                                       "manufacturing_orders":  {
                                                                    "synced":  0,
-                                                                   "updated":  10,
-                                                                   "skipped":  0,
+                                                                   "updated":  2,
+                                                                   "skipped":  8,
                                                                    "total":  10,
                                                                    "errors":  0
                                                                },
@@ -118,8 +115,8 @@
                                                      "errors":  0
                                                  },
                                       "rescored":  {
-                                                       "attempted":  10,
-                                                       "success":  10,
+                                                       "attempted":  2,
+                                                       "success":  2,
                                                        "scenarios_proposed":  0
                                                    }
                                   },
@@ -128,17 +125,17 @@
                      }
     },
     {
-        "detail":  "last_sync=2026-07-04T09:28:52.175323+00:00 status=success",
+        "detail":  "last_sync=2026-07-09T08:50:16.540990+00:00 status=success",
         "step":  "5. Sync status audit",
-        "timestamp":  "2026-07-04T12:29:03.7188394+03:00",
+        "timestamp":  "2026-07-09T11:51:01.5100587+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
                                       "last_sync":  {
-                                                        "id":  "897a6ff0-6d41-4d1c-a90a-f96b068abe09",
-                                                        "started_at":  "2026-07-04T09:28:52.175323+00:00",
-                                                        "finished_at":  "2026-07-04T09:29:00.251072+00:00",
+                                                        "id":  "07f66a7f-574c-4794-ab6d-ae0fbbadfeb4",
+                                                        "started_at":  "2026-07-09T08:50:16.540990+00:00",
+                                                        "finished_at":  "2026-07-09T08:50:50.723943+00:00",
                                                         "status":  "success",
                                                         "entity_counts":  {
                                                                               "boms":  {
@@ -201,8 +198,8 @@
                                                                                                            "total":  10,
                                                                                                            "errors":  0,
                                                                                                            "synced":  0,
-                                                                                                           "skipped":  0,
-                                                                                                           "updated":  10
+                                                                                                           "skipped":  8,
+                                                                                                           "updated":  2
                                                                                                        }
                                                                           },
                                                         "error_summary":  null
@@ -212,71 +209,71 @@
                                                       "odoo_to_ipe:products":  {
                                                                                    "direction":  "odoo_to_ipe",
                                                                                    "entity_type":  "products",
-                                                                                   "last_sync":  "2026-07-04T09:29:00.257900+00:00",
-                                                                                   "seconds_since_sync":  3.437011,
+                                                                                   "last_sync":  "2026-07-09T08:50:50.807045+00:00",
+                                                                                   "seconds_since_sync":  10.648844,
                                                                                    "healthy":  true
                                                                                },
                                                       "odoo_to_ipe:work_centers":  {
                                                                                        "direction":  "odoo_to_ipe",
                                                                                        "entity_type":  "work_centers",
-                                                                                       "last_sync":  "2026-07-04T09:29:00.257963+00:00",
-                                                                                       "seconds_since_sync":  3.436948,
+                                                                                       "last_sync":  "2026-07-09T08:50:50.807157+00:00",
+                                                                                       "seconds_since_sync":  10.648732,
                                                                                        "healthy":  true
                                                                                    },
                                                       "odoo_to_ipe:customers":  {
                                                                                     "direction":  "odoo_to_ipe",
                                                                                     "entity_type":  "customers",
-                                                                                    "last_sync":  "2026-07-04T09:29:00.257986+00:00",
-                                                                                    "seconds_since_sync":  3.436925,
+                                                                                    "last_sync":  "2026-07-09T08:50:50.807207+00:00",
+                                                                                    "seconds_since_sync":  10.648682,
                                                                                     "healthy":  true
                                                                                 },
                                                       "odoo_to_ipe:suppliers":  {
                                                                                     "direction":  "odoo_to_ipe",
                                                                                     "entity_type":  "suppliers",
-                                                                                    "last_sync":  "2026-07-04T09:29:00.258005+00:00",
-                                                                                    "seconds_since_sync":  3.436906,
+                                                                                    "last_sync":  "2026-07-09T08:50:50.807259+00:00",
+                                                                                    "seconds_since_sync":  10.64863,
                                                                                     "healthy":  true
                                                                                 },
                                                       "odoo_to_ipe:boms":  {
                                                                                "direction":  "odoo_to_ipe",
                                                                                "entity_type":  "boms",
-                                                                               "last_sync":  "2026-07-04T09:29:00.258024+00:00",
-                                                                               "seconds_since_sync":  3.436887,
+                                                                               "last_sync":  "2026-07-09T08:50:50.807320+00:00",
+                                                                               "seconds_since_sync":  10.648569,
                                                                                "healthy":  true
                                                                            },
                                                       "odoo_to_ipe:bom_details":  {
                                                                                       "direction":  "odoo_to_ipe",
                                                                                       "entity_type":  "bom_details",
-                                                                                      "last_sync":  "2026-07-04T09:29:00.258044+00:00",
-                                                                                      "seconds_since_sync":  3.436867,
+                                                                                      "last_sync":  "2026-07-09T08:50:50.807406+00:00",
+                                                                                      "seconds_since_sync":  10.648483,
                                                                                       "healthy":  true
                                                                                   },
                                                       "odoo_to_ipe:inventory":  {
                                                                                     "direction":  "odoo_to_ipe",
                                                                                     "entity_type":  "inventory",
-                                                                                    "last_sync":  "2026-07-04T09:29:00.258064+00:00",
-                                                                                    "seconds_since_sync":  3.436847,
+                                                                                    "last_sync":  "2026-07-09T08:50:50.807457+00:00",
+                                                                                    "seconds_since_sync":  10.648432,
                                                                                     "healthy":  true
                                                                                 },
                                                       "odoo_to_ipe:manufacturing_orders":  {
                                                                                                "direction":  "odoo_to_ipe",
                                                                                                "entity_type":  "manufacturing_orders",
-                                                                                               "last_sync":  "2026-07-04T09:29:00.258083+00:00",
-                                                                                               "seconds_since_sync":  3.436828,
+                                                                                               "last_sync":  "2026-07-09T08:50:50.807503+00:00",
+                                                                                               "seconds_since_sync":  10.648386,
                                                                                                "healthy":  true
                                                                                            },
                                                       "odoo_to_ipe:demands":  {
                                                                                   "direction":  "odoo_to_ipe",
                                                                                   "entity_type":  "demands",
-                                                                                  "last_sync":  "2026-07-04T09:29:00.258102+00:00",
-                                                                                  "seconds_since_sync":  3.436809,
+                                                                                  "last_sync":  "2026-07-09T08:50:50.807545+00:00",
+                                                                                  "seconds_since_sync":  10.648344,
                                                                                   "healthy":  true
                                                                               },
                                                       "odoo_to_ipe:supply":  {
                                                                                  "direction":  "odoo_to_ipe",
                                                                                  "entity_type":  "supply",
-                                                                                 "last_sync":  "2026-07-04T09:29:00.258121+00:00",
-                                                                                 "seconds_since_sync":  3.43679,
+                                                                                 "last_sync":  "2026-07-09T08:50:50.807582+00:00",
+                                                                                 "seconds_since_sync":  10.648307,
                                                                                  "healthy":  true
                                                                              }
                                                   }
@@ -288,7 +285,7 @@
     {
         "detail":  "flags=0",
         "step":  "6. Data quality flags",
-        "timestamp":  "2026-07-04T12:29:03.8290802+03:00",
+        "timestamp":  "2026-07-09T11:51:01.9773754+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -303,9 +300,9 @@
                      }
     },
     {
-        "detail":  "60 MOs; lowest score=45.0 constraint=material_shortage",
+        "detail":  "12 MOs; lowest score=45.0 constraint=material_shortage",
         "step":  "7. Feasibility queue (Control Tower)",
-        "timestamp":  "2026-07-04T12:29:04.0183831+03:00",
+        "timestamp":  "2026-07-09T11:51:02.4411221+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -314,94 +311,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380007",
                                           "feasibility_score":  45.0,
                                           "primary_constraint":  "material_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  "2026-07-04T10:08:03.184302+00:00",
-                                          "customer_name":  "Great Lakes Utility",
-                                          "erp_mo_id":  "MO-ST-007",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000024",
-                                          "feasibility_score":  47.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-036",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000001d",
-                                          "feasibility_score":  48.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-029",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000016",
-                                          "feasibility_score":  49.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-022",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000000f",
-                                          "feasibility_score":  50.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-015",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000008",
-                                          "feasibility_score":  51.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-008",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000001",
-                                          "feasibility_score":  52.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-001",
+                                          "product_name":  "Widget A",
+                                          "required_date":  "2026-07-11T03:32:40.463773+00:00",
+                                          "customer_name":  "Acme Corp",
+                                          "erp_mo_id":  "MO-DEMO-007",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -412,108 +325,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
                                           "feasibility_score":  52.0,
                                           "primary_constraint":  "material_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  "2026-07-05T10:08:03.184302+00:00",
-                                          "customer_name":  "Great Lakes Utility",
-                                          "erp_mo_id":  "MO-ST-001",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000025",
-                                          "feasibility_score":  54.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-037",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000001e",
-                                          "feasibility_score":  55.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-030",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000017",
-                                          "feasibility_score":  56.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-023",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000010",
-                                          "feasibility_score":  57.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-016",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000009",
-                                          "feasibility_score":  58.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-009",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000002",
-                                          "feasibility_score":  59.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-002",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000026",
-                                          "feasibility_score":  61.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-038",
+                                          "product_name":  "Widget A",
+                                          "required_date":  "2026-07-12T03:32:40.463773+00:00",
+                                          "customer_name":  "Acme Corp",
+                                          "erp_mo_id":  "MO-DEMO-001",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -524,80 +339,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380008",
                                           "feasibility_score":  62.0,
                                           "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  "2026-07-11T10:08:03.184302+00:00",
-                                          "customer_name":  "Midwest Grid Co",
-                                          "erp_mo_id":  "MO-ST-008",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000001f",
-                                          "feasibility_score":  62.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-031",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000018",
-                                          "feasibility_score":  63.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-024",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000011",
-                                          "feasibility_score":  64.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-017",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000000a",
-                                          "feasibility_score":  65.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-010",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000003",
-                                          "feasibility_score":  66.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-003",
+                                          "product_name":  "Gadget B",
+                                          "required_date":  "2026-07-18T03:32:40.463773+00:00",
+                                          "customer_name":  "Globex Inc",
+                                          "erp_mo_id":  "MO-DEMO-008",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -608,94 +353,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
                                           "feasibility_score":  68.0,
                                           "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  "2026-07-07T10:08:03.184302+00:00",
-                                          "customer_name":  "Midwest Grid Co",
-                                          "erp_mo_id":  "MO-ST-002",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000027",
-                                          "feasibility_score":  68.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-039",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000020",
-                                          "feasibility_score":  69.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-032",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000019",
-                                          "feasibility_score":  70.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-025",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000012",
-                                          "feasibility_score":  71.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-018",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000000b",
-                                          "feasibility_score":  72.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-011",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000004",
-                                          "feasibility_score":  73.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-004",
+                                          "product_name":  "Gadget B",
+                                          "required_date":  "2026-07-14T03:32:40.463773+00:00",
+                                          "customer_name":  "Globex Inc",
+                                          "erp_mo_id":  "MO-DEMO-002",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -706,108 +367,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
                                           "feasibility_score":  74.0,
                                           "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  "2026-07-09T10:08:03.184302+00:00",
-                                          "customer_name":  "Regional Power Authority",
-                                          "erp_mo_id":  "MO-ST-003",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000028",
-                                          "feasibility_score":  75.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-040",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000021",
-                                          "feasibility_score":  76.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-033",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000001a",
-                                          "feasibility_score":  77.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-026",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000013",
-                                          "feasibility_score":  78.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-019",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000000c",
-                                          "feasibility_score":  79.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-012",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000005",
-                                          "feasibility_score":  80.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-005",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "4d05a216-98ef-4504-8abb-382e2cb217b7",
-                                          "feasibility_score":  80.0,
-                                          "primary_constraint":  "demand",
-                                          "product_name":  "Table",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "2",
+                                          "product_name":  "Assembly D",
+                                          "required_date":  "2026-07-16T03:32:40.463773+00:00",
+                                          "customer_name":  "Initech",
+                                          "erp_mo_id":  "MO-DEMO-003",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -818,10 +381,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380004",
                                           "feasibility_score":  81.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Distribution Transformer 500 kVA",
+                                          "product_name":  "Widget A",
                                           "required_date":  null,
                                           "customer_name":  null,
-                                          "erp_mo_id":  "MO-ST-004",
+                                          "erp_mo_id":  "MO-DEMO-004",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -829,91 +392,7 @@
                                           "unscorable":  false
                                       },
                                       {
-                                          "mo_id":  "0a0eda93-661b-4d41-afd7-19947a20acf5",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Transformer 1000 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "10",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "9459addc-6ea9-46f9-8083-8aed1626f7aa",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Drawer",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "4",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "0efea564-b321-41d9-8da0-60b020d1df7b",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Drawer",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "7",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "6808f2a7-1008-4c15-a768-fbf126336c23",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Dining Table",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "8",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "7bf60330-fa17-4f34-b9f5-6f17dd621f72",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Drawer",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "6",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "05ceb218-477b-4805-b432-b580b6aa8dbc",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Drawer",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "5",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "3b03cd83-df39-47e0-a2b9-e4eda664c819",
+                                          "mo_id":  "6edba172-4a04-4989-b40e-37234f77e40f",
                                           "feasibility_score":  82.5,
                                           "primary_constraint":  "material",
                                           "product_name":  "Transformer 500 kVA",
@@ -927,97 +406,13 @@
                                           "unscorable":  false
                                       },
                                       {
-                                          "mo_id":  "74fa1e04-ae11-464e-9aa8-3bb8ff1df061",
+                                          "mo_id":  "de2abcf0-a937-4b7f-bc5b-548ef68dfca0",
                                           "feasibility_score":  82.5,
                                           "primary_constraint":  "material",
-                                          "product_name":  "Desk Combination",
+                                          "product_name":  "Transformer 1000 kVA",
                                           "required_date":  null,
                                           "customer_name":  null,
-                                          "erp_mo_id":  "1",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "d2369359-c236-4bf6-b6ae-4ad976414ffa",
-                                          "feasibility_score":  82.5,
-                                          "primary_constraint":  "material",
-                                          "product_name":  "Table Top",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "3",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000022",
-                                          "feasibility_score":  83.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-034",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000001b",
-                                          "feasibility_score":  84.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-027",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000014",
-                                          "feasibility_score":  85.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-020",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000000d",
-                                          "feasibility_score":  86.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-013",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000006",
-                                          "feasibility_score":  87.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-006",
+                                          "erp_mo_id":  "10",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -1028,24 +423,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
                                           "feasibility_score":  88.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
+                                          "product_name":  "Gadget B",
                                           "required_date":  null,
                                           "customer_name":  null,
-                                          "erp_mo_id":  "MO-ST-005",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000023",
-                                          "feasibility_score":  90.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-035",
+                                          "erp_mo_id":  "MO-DEMO-005",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -1056,52 +437,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
                                           "feasibility_score":  91.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
+                                          "product_name":  "Assembly D",
                                           "required_date":  null,
                                           "customer_name":  null,
-                                          "erp_mo_id":  "MO-ST-006",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000001c",
-                                          "feasibility_score":  91.0,
-                                          "primary_constraint":  "material_shortage",
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-028",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000015",
-                                          "feasibility_score":  92.0,
-                                          "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Distribution Transformer 500 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-021",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-00000000000e",
-                                          "feasibility_score":  93.0,
-                                          "primary_constraint":  "labor_shortage",
-                                          "product_name":  "Power Transformer 50 MVA Core-Coil",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-014",
+                                          "erp_mo_id":  "MO-DEMO-006",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -1112,24 +451,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380010",
                                           "feasibility_score":  93.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
+                                          "product_name":  "Gadget B",
                                           "required_date":  null,
                                           "customer_name":  null,
-                                          "erp_mo_id":  "MO-ST-010",
-                                          "sync_conflict":  null,
-                                          "data_quality_flags":  [
-
-                                                                 ],
-                                          "unscorable":  false
-                                      },
-                                      {
-                                          "mo_id":  "e2eebc99-9c0b-4ef8-bb6d-000000000007",
-                                          "feasibility_score":  94.0,
-                                          "primary_constraint":  null,
-                                          "product_name":  "Pad-Mount Transformer 250 kVA",
-                                          "required_date":  null,
-                                          "customer_name":  null,
-                                          "erp_mo_id":  "MO-MASS-007",
+                                          "erp_mo_id":  "MO-DEMO-010",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -1140,10 +465,10 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380009",
                                           "feasibility_score":  95.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Distribution Transformer 500 kVA",
+                                          "product_name":  "Widget A",
                                           "required_date":  null,
                                           "customer_name":  null,
-                                          "erp_mo_id":  "MO-ST-009",
+                                          "erp_mo_id":  "MO-DEMO-009",
                                           "sync_conflict":  null,
                                           "data_quality_flags":  [
 
@@ -1156,16 +481,16 @@
                      }
     },
     {
-        "detail":  "at_risk=4 avg=72.7",
+        "detail":  "at_risk=1 avg=76.2",
         "step":  "8. Feasibility KPIs",
-        "timestamp":  "2026-07-04T12:29:04.1277561+03:00",
+        "timestamp":  "2026-07-09T11:51:02.5632818+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
-                                      "avg_feasibility_score":  72.7,
-                                      "active_bottlenecks":  19,
-                                      "orders_at_risk":  4,
+                                      "avg_feasibility_score":  76.2,
+                                      "active_bottlenecks":  4,
+                                      "orders_at_risk":  1,
                                       "otd_pct":  null
                                   },
                          "error":  null,
@@ -1175,7 +500,7 @@
     {
         "detail":  "8 scenarios (MO-ST expedite/overtime/split)",
         "step":  "9. Resolution scenarios",
-        "timestamp":  "2026-07-04T12:29:04.2464326+03:00",
+        "timestamp":  "2026-07-09T11:51:05.7826407+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -1189,7 +514,7 @@
                                                             "business_score":  0.82,
                                                             "delivery_impact_days":  1.0,
                                                             "cost_impact":  4200.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         },
                                                         {
                                                             "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
@@ -1199,7 +524,7 @@
                                                             "business_score":  0.74,
                                                             "delivery_impact_days":  2.0,
                                                             "cost_impact":  1800.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         },
                                                         {
                                                             "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
@@ -1209,7 +534,7 @@
                                                             "business_score":  0.68,
                                                             "delivery_impact_days":  3.0,
                                                             "cost_impact":  950.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         },
                                                         {
                                                             "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380004",
@@ -1219,7 +544,7 @@
                                                             "business_score":  0.79,
                                                             "delivery_impact_days":  0.5,
                                                             "cost_impact":  5600.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         },
                                                         {
                                                             "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
@@ -1229,7 +554,7 @@
                                                             "business_score":  0.71,
                                                             "delivery_impact_days":  1.5,
                                                             "cost_impact":  2100.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         },
                                                         {
                                                             "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
@@ -1239,7 +564,7 @@
                                                             "business_score":  0.85,
                                                             "delivery_impact_days":  null,
                                                             "cost_impact":  8900.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         },
                                                         {
                                                             "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380007",
@@ -1249,7 +574,7 @@
                                                             "business_score":  0.55,
                                                             "delivery_impact_days":  5.0,
                                                             "cost_impact":  12000.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         },
                                                         {
                                                             "id":  "c1eebc99-9c0b-4ef8-bb6d-6bb9bd380008",
@@ -1259,7 +584,7 @@
                                                             "business_score":  0.76,
                                                             "delivery_impact_days":  1.0,
                                                             "cost_impact":  4800.0,
-                                                            "created_at":  "2026-06-30T10:08:03.192401+00:00"
+                                                            "created_at":  "2026-07-07T03:32:40.523536+00:00"
                                                         }
                                                     ]
                                   },
@@ -1268,19 +593,19 @@
                      }
     },
     {
-        "detail":  "composite=100% threshold=70.0% bom=100.0% routing=100.0% inventory=100.0%",
+        "detail":  "composite=92% threshold=70.0% bom=80.0% routing=100.0% inventory=100.0%",
         "step":  "9.5 MDR quality gate (pre-schedule)",
-        "timestamp":  "2026-07-04T12:29:04.3820983+03:00",
+        "timestamp":  "2026-07-09T11:51:06.7134818+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
                                       "tenant_id":  "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-                                      "composite_score":  100.0,
+                                      "composite_score":  92.0,
                                       "threshold":  70.0,
                                       "passing":  true,
                                       "dimensions":  {
-                                                         "bom_coverage":  100.0,
+                                                         "bom_coverage":  80.0,
                                                          "routing_coverage":  100.0,
                                                          "inventory_coverage":  100.0,
                                                          "lead_time_coverage":  100.0
@@ -1288,316 +613,28 @@
                                       "recommendations":  [
 
                                                           ],
-                                      "formula":  "composite = 0.40├ùBOM + 0.35├ùrouting + 0.25├ùinventory"
+                                      "formula":  "composite = 0.40ÃBOM + 0.35Ãrouting + 0.25Ãinventory"
                                   },
                          "error":  null,
                          "meta":  null
                      }
     },
     {
-        "detail":  "8 ops scheduled",
         "step":  "10. OR-Tools schedule (cap-svc)",
-        "timestamp":  "2026-07-04T12:29:04.6717283+03:00",
-        "status":  "PASS",
-        "response":  {
-                         "success":  true,
-                         "data":  {
-                                      "schedule":  {
-                                                       "status":  "OPTIMAL",
-                                                       "assignments":  [
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c05",
-                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                                               "start_minute":  300,
-                                                                               "end_minute":  365,
-                                                                               "duration":  65,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
-                                                                               "sequence":  20,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Final Electrical Test (FPY)",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c04",
-                                                                               "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
-                                                                               "start_minute":  105,
-                                                                               "end_minute":  280,
-                                                                               "duration":  175,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
-                                                                               "sequence":  10,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Fabricate Pad-Mount Tank",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c06",
-                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                                               "start_minute":  245,
-                                                                               "end_minute":  455,
-                                                                               "duration":  210,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                               "sequence":  10,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Build 50 MVA Core-Coil",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c07",
-                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                                               "start_minute":  455,
-                                                                               "end_minute":  595,
-                                                                               "duration":  140,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                               "sequence":  20,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Install Cooling Radiators",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c08",
-                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                                               "start_minute":  595,
-                                                                               "end_minute":  700,
-                                                                               "duration":  105,
-                                                                               "on_time":  true,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                               "sequence":  30,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Final HV Test \u0026 OLTC Commission",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c01",
-                                                                               "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
-                                                                               "start_minute":  0,
-                                                                               "end_minute":  105,
-                                                                               "duration":  105,
-                                                                               "on_time":  false,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
-                                                                               "sequence":  10,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Wind LV/HV Coils",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c02",
-                                                                               "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                                               "start_minute":  105,
-                                                                               "end_minute":  245,
-                                                                               "duration":  140,
-                                                                               "on_time":  false,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
-                                                                               "sequence":  20,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Core \u0026 Coil Assembly",
-                                                                               "worker_id":  null
-                                                                           },
-                                                                           {
-                                                                               "operation_id":  "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c03",
-                                                                               "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                                               "start_minute":  245,
-                                                                               "end_minute":  300,
-                                                                               "duration":  55,
-                                                                               "on_time":  false,
-                                                                               "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
-                                                                               "sequence":  30,
-                                                                               "bom_level":  0,
-                                                                               "parent_operation_id":  null,
-                                                                               "operation_name":  "Tank Fit-Up \u0026 Vacuum Test",
-                                                                               "worker_id":  null
-                                                                           }
-                                                                       ],
-                                                       "mo_tardiness":  [
-                                                                            {
-                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
-                                                                                "due_date_minute":  2918,
-                                                                                "completion_minute":  365,
-                                                                                "tardiness_minutes":  0,
-                                                                                "on_time":  true
-                                                                            },
-                                                                            {
-                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003",
-                                                                                "due_date_minute":  5798,
-                                                                                "completion_minute":  700,
-                                                                                "tardiness_minutes":  0,
-                                                                                "on_time":  true
-                                                                            },
-                                                                            {
-                                                                                "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
-                                                                                "due_date_minute":  38,
-                                                                                "completion_minute":  300,
-                                                                                "tardiness_minutes":  262,
-                                                                                "on_time":  false
-                                                                            }
-                                                                        ],
-                                                       "solver_status":  "OPTIMAL",
-                                                       "skill_relaxed":  false
-                                                   },
-                                      "bottlenecks":  [
-                                                          {
-                                                              "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
-                                                              "work_center_name":  "Winding Station",
-                                                              "total_load_hours":  4.67,
-                                                              "capacity_hours":  56.0,
-                                                              "utilization_pct":  8.3,
-                                                              "is_bottleneck":  false,
-                                                              "severity":  "low"
-                                                          },
-                                                          {
-                                                              "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                              "work_center_name":  "Core \u0026 Coil Assembly",
-                                                              "total_load_hours":  8.17,
-                                                              "capacity_hours":  112.0,
-                                                              "utilization_pct":  7.3,
-                                                              "is_bottleneck":  false,
-                                                              "severity":  "low"
-                                                          },
-                                                          {
-                                                              "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                              "work_center_name":  "Tank Fabrication \u0026 Test Bay",
-                                                              "total_load_hours":  3.75,
-                                                              "capacity_hours":  56.0,
-                                                              "utilization_pct":  6.7,
-                                                              "is_bottleneck":  false,
-                                                              "severity":  "low"
-                                                          }
-                                                      ],
-                                      "labor_gaps":  [
-                                                         {
-                                                             "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                             "work_center_name":  "Tank Fabrication \u0026 Test Bay",
-                                                             "required_count":  2,
-                                                             "available_count":  3,
-                                                             "has_gap":  false,
-                                                             "recommendation":  "Sufficient coverage"
-                                                         },
-                                                         {
-                                                             "work_center_id":  "ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
-                                                             "work_center_name":  "Winding Station",
-                                                             "required_count":  2,
-                                                             "available_count":  3,
-                                                             "has_gap":  false,
-                                                             "recommendation":  "Sufficient coverage"
-                                                         },
-                                                         {
-                                                             "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                             "work_center_name":  "Core \u0026 Coil Assembly",
-                                                             "required_count":  2,
-                                                             "available_count":  3,
-                                                             "has_gap":  false,
-                                                             "recommendation":  "Sufficient coverage"
-                                                         },
-                                                         {
-                                                             "work_center_id":  "ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                             "work_center_name":  "Core \u0026 Coil Assembly",
-                                                             "required_count":  2,
-                                                             "available_count":  3,
-                                                             "has_gap":  false,
-                                                             "recommendation":  "Sufficient coverage"
-                                                         },
-                                                         {
-                                                             "work_center_id":  "2d47ecd1-69b1-4e4b-9ed0-421efffd0066",
-                                                             "work_center_name":  "Tank Fabrication \u0026 Test Bay",
-                                                             "required_count":  2,
-                                                             "available_count":  3,
-                                                             "has_gap":  false,
-                                                             "recommendation":  "Sufficient coverage"
-                                                         }
-                                                     ],
-                                      "total_operations":  8,
-                                      "persisted":  {
-                                                        "updated_mos":  3,
-                                                        "updated_work_orders":  8
-                                                    },
-                                      "mo_versions":  {
-                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002":  1,
-                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380003":  1,
-                                                          "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001":  1
-                                                      },
-                                      "xai_explanation":  {
-                                                              "constraints":  [
-                                                                                  "no_overlap_per_work_center",
-                                                                                  "precedence_within_mo_groups",
-                                                                                  "bottleneck_ff3719d5-1609-42e8-93f3-edf13d1c2bf3",
-                                                                                  "bottleneck_ec1ac1dd-be2c-47e0-91fa-a693f22b8233",
-                                                                                  "bottleneck_2d47ecd1-69b1-4e4b-9ed0-421efffd0066"
-                                                                              ],
-                                                              "assumptions":  [
-                                                                                  "30s_solver_timeout",
-                                                                                  "oee_applied"
-                                                                              ],
-                                                              "confidence_score":  1.0,
-                                                              "contributing_factors":  {
-                                                                                           "ff3719d5-1609-42e8-93f3-edf13d1c2bf3":  0.083,
-                                                                                           "ec1ac1dd-be2c-47e0-91fa-a693f22b8233":  0.073,
-                                                                                           "2d47ecd1-69b1-4e4b-9ed0-421efffd0066":  0.067
-                                                                                       }
-                                                          }
-                                  },
-                         "error":  null,
-                         "meta":  null
-                     }
+        "timestamp":  "2026-07-09T12:01:12.5583827+03:00",
+        "error":  "The operation has timed out",
+        "status":  "FAIL"
     },
     {
-        "detail":  "activated=2 erp_mode=direct",
         "step":  "11. Schedule approve -\u003e Odoo activate",
-        "timestamp":  "2026-07-04T12:29:05.3563884+03:00",
-        "status":  "PASS",
-        "response":  {
-                         "success":  false,
-                         "data":  {
-                                      "activated":  [
-                                                        {
-                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
-                                                            "erp_mo_id":  "MO-ST-005",
-                                                            "new_planned_start":  "2026-07-04T09:29:05.004111+00:00",
-                                                            "new_planned_end":  "2026-07-04T13:29:05.004111+00:00",
-                                                            "version":  24,
-                                                            "ai_schedule_version":  23,
-                                                            "feasibility_score":  88.0
-                                                        },
-                                                        {
-                                                            "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006",
-                                                            "erp_mo_id":  "MO-ST-006",
-                                                            "new_planned_start":  "2026-07-04T09:29:05.004111+00:00",
-                                                            "new_planned_end":  "2026-07-04T17:04:05.004111+00:00",
-                                                            "version":  24,
-                                                            "ai_schedule_version":  23,
-                                                            "feasibility_score":  91.0
-                                                        }
-                                                    ],
-                                      "failed":  [
-
-                                                 ],
-                                      "total":  2,
-                                      "activated_count":  2,
-                                      "failed_count":  0,
-                                      "erp_event_published":  false,
-                                      "erp_direct_result":  null
-                                  },
-                         "error":  {
-                                       "code":  "ERP_EVENT_PUBLISH_FAILED",
-                                       "message":  "Schedule saved in IPE but ERP sync event failed to publish. Retry or contact ops.",
-                                       "details":  null
-                                   },
-                         "meta":  null
-                     }
+        "timestamp":  "2026-07-09T12:06:12.7254504+03:00",
+        "error":  "The operation has timed out",
+        "status":  "FAIL"
     },
     {
         "detail":  "baseline captured=False",
         "step":  "12. OTD baseline API",
-        "timestamp":  "2026-07-04T12:29:05.5573592+03:00",
+        "timestamp":  "2026-07-09T12:06:19.5854640+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
@@ -1618,19 +655,19 @@
     {
         "detail":  "mos_saved=",
         "step":  "13. ROI metrics API",
-        "timestamp":  "2026-07-04T12:29:05.6735898+03:00",
+        "timestamp":  "2026-07-09T12:06:19.7917117+03:00",
         "status":  "PASS",
         "response":  {
                          "success":  true,
                          "data":  {
                                       "weekly":  [
                                                      {
-                                                         "week_start":  "2026-06-29",
-                                                         "completed_mos":  14,
+                                                         "week_start":  "2026-07-06",
+                                                         "completed_mos":  2,
                                                          "on_time":  1,
-                                                         "otd_pct":  7.1,
-                                                         "avg_feasibility":  72.7,
-                                                         "at_risk_count":  24
+                                                         "otd_pct":  50.0,
+                                                         "avg_feasibility":  76.2,
+                                                         "at_risk_count":  4
                                                      }
                                                  ],
                                       "mos_saved_total":  0

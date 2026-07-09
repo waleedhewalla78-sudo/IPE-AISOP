@@ -1,0 +1,18 @@
+=== T169 Release 1 health probe evidence ===
+Date: 2026-07-05
+
+Changes:
+- ipe_shared/health/probes.py: kafka_required(), vault_required(), skip Kafka/Vault in release1
+- ipe_shared/health/endpoints.py: /ready honors skipped optional deps
+- docker-compose.release1.yml: IPE_KAFKA_BOOTSTRAP_SERVERS="" on connector
+- helm/ipe/values-dev.yaml: IPE_KAFKA_BOOTSTRAP_SERVERS=""
+
+Unit tests (services/shared):
+  uv run pytest tests/test_health_probes_release1.py -q
+  Result: 5 passed (2026-07-05)
+
+Compose verify (requires Docker Desktop):
+  docker compose -f infrastructure/docker/docker-compose.release1.yml up -d --build
+  curl http://localhost:8016/api/v1/ready
+
+Constitution: Principle VII (R1 Kafka optional), V (/ready for probes)

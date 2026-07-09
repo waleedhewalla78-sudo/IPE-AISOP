@@ -11,6 +11,7 @@ export const ROUTES = {
   AI_GOVERNANCE: '/ai-governance',
   PLATFORM: '/platform',
   SHOP_FLOOR: '/shop-floor',
+  WORKSPACE: '/workspace',
 
   // Planning Hub tabs
   PLANNING_DASHBOARD: '/planning/dashboard',

@@ -50,6 +50,26 @@ async def probe_redis() -> dict[str, Any]:
     return await _timed_probe(_check)
 
 
+def release_profile() -> str:
+    return os.getenv("IPE_RELEASE_PROFILE", "").lower()
+
+
+def kafka_required() -> bool:
+    """Return True when Kafka connectivity must pass for a healthy service."""
+    if release_profile() == "release1":
+        return False
+    kafka_enabled = os.getenv("IPE_KAFKA_ENABLED", "true").lower()
+    if kafka_enabled in ("false", "0", "no"):
+        return False
+    return bool(settings.KAFKA_BOOTSTRAP_SERVERS)
+
+
+def vault_required() -> bool:
+    if release_profile() == "release1":
+        return False
+    return settings.VAULT_ENABLED
+
+
 async def probe_kafka() -> dict[str, Any]:
     if not settings.KAFKA_BOOTSTRAP_SERVERS:
         return {"status": "not_configured"}
@@ -86,21 +106,29 @@ async def collect_dependencies(session: AsyncSession | None = None) -> dict[str,
         deps["database"] = {"status": "unknown"}
 
     deps["redis"] = await probe_redis()
-    deps["kafka"] = await probe_kafka()
-    deps["vault"] = await probe_vault()
+    if kafka_required():
+        deps["kafka"] = await probe_kafka()
+    else:
+        reason = "release1_profile" if release_profile() == "release1" else "not_configured"
+        deps["kafka"] = {"status": "skipped", "reason": reason}
+    if vault_required():
+        deps["vault"] = await probe_vault()
+    else:
+        reason = "release1_profile" if release_profile() == "release1" else "disabled"
+        deps["vault"] = {"status": "skipped", "reason": reason}
     return deps
 
 
 def overall_status(deps: dict[str, Any]) -> str:
     critical = ("database", "redis")
+    ok_statuses = ("up", "disabled", "not_configured", "skipped")
     for key in critical:
         dep = deps.get(key, {})
-        if dep.get("status") not in ("up", "disabled", "not_configured"):
+        if dep.get("status") not in ok_statuses:
             return "degraded"
     optional_down = any(
         deps.get(k, {}).get("status") == "down"
         for k in ("kafka", "vault")
-        if deps.get(k, {}).get("status") not in ("disabled", "not_configured")
     )
     if optional_down:
         return "degraded"

@@ -1,0 +1,6 @@
+﻿=== Gate 8 Compose-K8s Parity ===
+2026-07-07T06:16:08.0518338+03:00
+
+OK   /health: equivalent structure (200)
+OK   /feasibility/queue: equivalent structure (200)
+OK   /feasibility/kpis: equivalent structure (200)

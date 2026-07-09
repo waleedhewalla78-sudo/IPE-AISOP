@@ -30,6 +30,8 @@ def upgrade():
     bind = op.get_bind()
     inspector = inspect(bind)
 
+    op.execute(sa.text("CREATE EXTENSION IF NOT EXISTS pgcrypto"))
+
     if not _column_exists(inspector, "cdm_user", "password_hash"):
         op.add_column(
             "cdm_user",

@@ -33,6 +33,8 @@ from app.api.v1 import (
     mdr,
     outcomes,
     planner_assist,
+    activity,
+    unified_dashboard,
 )
 
 api_router = APIRouter()
@@ -69,3 +71,5 @@ api_router.include_router(stripe_billing.router)
 api_router.include_router(sla_monitoring.router)
 api_router.include_router(feature_store.router)
 api_router.include_router(planner_assist.router)
+api_router.include_router(activity.router)
+api_router.include_router(unified_dashboard.router)

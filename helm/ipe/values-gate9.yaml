@@ -1,0 +1,62 @@
+# Gate 9 HPA smoke — overlay on values-dev.yaml:
+#   helm upgrade ipe ./helm/ipe -n ipe -f ./helm/ipe/values-dev.yaml -f ./helm/ipe/values-gate9.yaml
+global:
+  environment: "development"
+  imageRegistry: ipe
+  imageTag: "dev"
+  imagePullPolicy: Never
+
+releaseProfile: "release1"
+
+kafka:
+  enabled: false
+
+commonEnv:
+  HOME: "/tmp"
+  UV_CACHE_DIR: "/tmp/uv-cache"
+  IPE_JWT_SECRET_KEY: "dev-only-change-in-production-min-32-chars-long!!"
+  IPE_JWT_SIGNING_MODE: "hs256"
+  IPE_ENVIRONMENT: "development"
+  IPE_RELEASE_PROFILE: "release1"
+  IPE_KAFKA_BOOTSTRAP_SERVERS: ""
+  IPE_KAFKA_ENABLED: "false"
+  VAULT_ENABLED: "false"
+  IPE_KMS_KEY_DIR: "/tmp/.kms_keys"
+
+services:
+  dpe-svc:
+    enabled: true
+    replicaCount: 2
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilization: 70
+  fea-svc:
+    enabled: true
+    replicaCount: 2
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilization: 70
+  cap-svc:
+    enabled: true
+    replicaCount: 2
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilization: 70
+  mat-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  connector:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  res-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }

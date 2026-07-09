@@ -20,6 +20,10 @@ export const AIGovernanceHub = lazyNamed(
   'AIGovernanceHub',
 );
 export const PlatformHub = lazyNamed(() => import('@/features/hubs/platform/PlatformHub'), 'PlatformHub');
+export const UnifiedWorkspacePage = lazyNamed(
+  () => import('@/features/hubs/workspace/UnifiedWorkspacePage'),
+  'UnifiedWorkspacePage',
+);
 
 // Planning Hub tabs
 export const PlanningDashboardPage = lazyNamed(

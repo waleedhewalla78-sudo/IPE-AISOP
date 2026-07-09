@@ -1,8 +1,10 @@
 {
   "app.title": "IPE - محرك التخطيط الذكي",
+  "nav.workspace": "مساحة العمل الموحدة",
   "nav.planning": "مركز التخطيط",
   "nav.commandCenter": "غرفة العمليات",
   "nav.platform": "المنصة",
+  "nav.copilot": "المساعد الذكي",
   "nav.language": "اللغة",
   "login.title": "تسجيل الدخول إلى IPE",
   "login.email": "البريد الإلكتروني",

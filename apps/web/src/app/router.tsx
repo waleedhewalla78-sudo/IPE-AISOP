@@ -37,6 +37,7 @@ import {
   OnboardingWizard,
   MLOpsDashboard,
   ShopFloorPage,
+  UnifiedWorkspacePage,
 } from '@/app/lazyRoutes';
 import { ROUTES } from '@/lib/constants';
 
@@ -52,7 +53,9 @@ export function AppRouter() {
       <Route path="/login" element={<LoginForm />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to={ROUTES.PLANNING_DASHBOARD} replace />} />
+          <Route path="/" element={<Navigate to={ROUTES.WORKSPACE} replace />} />
+
+          <Route path={ROUTES.WORKSPACE} element={<UnifiedWorkspacePage />} />
 
           {/* Planning Hub */}
           <Route path={ROUTES.PLANNING} element={<PlanningHub />}>

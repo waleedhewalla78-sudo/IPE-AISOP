@@ -4,6 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.scorer import _compute_capacity_gate, _compute_labor_gate, calculate_feasibility
+from ipe_shared.activity.emit import record_from_kafka_topic
 from ipe_shared.database.connection import get_engine
 from ipe_shared.events.producer import kafka_producer
 from ipe_shared.middleware.tenant_context import tenant_ctx
@@ -81,6 +82,13 @@ async def _score_and_publish(session, mo_id: str, tenant_id: str, mat_score: flo
         topic="ipe.mo.feasibility_scored",
         key=str(mo_id),
         envelope=envelope,
+    )
+
+    await record_from_kafka_topic(
+        session,
+        "ipe.feasibility.scored",
+        envelope,
+        tenant_id=tenant_id,
     )
 
 

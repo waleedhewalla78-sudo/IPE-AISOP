@@ -1,0 +1,57 @@
+# Gate 9 HPA smoke — R1 subset on kind with minReplicas=2 for stateless services
+releaseProfile: "release1"
+
+global:
+  environment: "development"
+  imageRegistry: ipe
+  imageTag: "dev"
+  imagePullPolicy: Never
+
+kafka:
+  enabled: false
+
+commonEnv:
+  IPE_RELEASE_PROFILE: "release1"
+  IPE_KAFKA_BOOTSTRAP_SERVERS: ""
+  IPE_KAFKA_ENABLED: "false"
+  VAULT_ENABLED: "false"
+  HOME: "/tmp"
+  UV_CACHE_DIR: "/tmp/uv-cache"
+
+services:
+  dpe-svc:
+    enabled: true
+    replicaCount: 2
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilization: 70
+  fea-svc:
+    enabled: true
+    replicaCount: 2
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilization: 70
+  cap-svc:
+    enabled: true
+    replicaCount: 2
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilization: 70
+  mat-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  connector:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }
+  res-svc:
+    enabled: true
+    replicaCount: 1
+    hpa: { enabled: false, minReplicas: 1, maxReplicas: 1, targetCPUUtilization: 70 }

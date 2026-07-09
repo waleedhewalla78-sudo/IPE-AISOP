@@ -83,22 +83,36 @@ function Invoke-IpeDemoRequest {
     }
 }
 
+function Get-IpeAuthMode {
+    param(
+        [string]$BaseUrl,
+        [int]$TimeoutSec = 10
+    )
+    try {
+        $info = Invoke-IpeDemoRequest -Uri "$BaseUrl/api/v1/auth/info" -TimeoutSec $TimeoutSec -BaseUrl $BaseUrl
+        if ($info.data.mode) { return $info.data.mode }
+    } catch {
+        # Fall back to workstation env when target stack auth/info is unreachable.
+    }
+    $ipeRoot = Split-Path $PSScriptRoot -Parent
+    $envPath = Join-Path $ipeRoot "infrastructure\docker\ipe-common.env"
+    if ((Test-Path $envPath) -and ((Get-Content $envPath -Raw) -match 'AUTH_MODE=keycloak')) {
+        return "keycloak"
+    }
+    return "local"
+}
+
 function Get-IpeDemoJwt {
     param(
         [string]$BaseUrl,
         [string]$Email = "Ahmed@nour",
         [string]$Password = "admin",
         [string]$KeycloakUrl = "http://localhost:8180",
+        [string]$AuthMode = "",
         [int]$TimeoutSec = 30
     )
 
-    $authMode = "local"
-    $ipeRoot = Split-Path $PSScriptRoot -Parent
-    $envPath = Join-Path $ipeRoot "infrastructure\docker\ipe-common.env"
-    if (Test-Path $envPath) {
-        $envText = Get-Content $envPath -Raw
-        if ($envText -match 'AUTH_MODE=keycloak') { $authMode = "keycloak" }
-    }
+    $authMode = if ($AuthMode) { $AuthMode } else { Get-IpeAuthMode -BaseUrl $BaseUrl -TimeoutSec $TimeoutSec }
 
     if ($authMode -eq "keycloak") {
         $realm = Invoke-RestMethod -Uri "$KeycloakUrl/realms/ipe/.well-known/openid-configuration" -TimeoutSec $TimeoutSec

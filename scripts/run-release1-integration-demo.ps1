@@ -26,6 +26,27 @@ $ResponsesJsonPath = Join-Path $Root "docs\demo-data\release1-step-responses.jso
 
 function Log($msg) { Write-Host $msg; $script:Lines += $msg }
 
+function Invoke-MdrBoostSql {
+    param([string]$SqlPath)
+    if (-not (Test-Path $SqlPath)) { return }
+    $sql = Get-Content $SqlPath -Raw
+    $dockerDb = docker ps --filter "name=docker-db-1" --filter "status=running" -q 2>$null
+    if ($dockerDb) {
+        $sql | docker exec -i docker-db-1 psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1 | Out-Null
+        return
+    }
+    $pgPod = kubectl get pods -n ipe -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}' 2>$null
+    if (-not $pgPod) {
+        $pgPod = kubectl get pods -n ipe --field-selector metadata.name=postgresql -o jsonpath='{.items[0].metadata.name}' 2>$null
+    }
+    if (-not $pgPod) {
+        $pgPod = (kubectl get pods -n ipe -o name 2>$null | Select-String 'postgresql' | Select-Object -First 1) -replace '^pod/', ''
+    }
+    if ($pgPod) {
+        $sql | kubectl exec -i -n ipe deploy/postgresql -- psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1 | Out-Null
+    }
+}
+
 function Save-StepResponse {
     param([string]$Step, [hashtable]$Entry)
     [void]$script:StepResponses.Add(@{ step = $Step; timestamp = (Get-Date -Format 'o') } + $Entry)
@@ -87,25 +108,36 @@ Log ""
 $token = Get-DemoJwt -BaseUrl $BaseUrl -TimeoutSec 20
 $h = @{ Authorization = "Bearer $token"; "X-Tenant-ID" = $TenantId; "Content-Type" = "application/json" }
 
+$odooCreds = @{
+    odoo_url      = "http://host.docker.internal:8069"
+    odoo_db       = "starttrans1"
+    odoo_username = "whewalla@gmail.com"
+    odoo_password = "admin"
+}
+$odooConfigBody = ($odooCreds + @{ enabled = $true } | ConvertTo-Json -Compress)
+$odooTestBody = ($odooCreds | ConvertTo-Json -Compress)
+$odooSyncBody = ($odooCreds + @{ entity = "all" } | ConvertTo-Json -Compress)
+$odooWcBody = ($odooCreds + @{ entity = "work_centers" } | ConvertTo-Json -Compress)
+# OR-Tools on kind is CPU-bound; allow longer than compose defaults.
+$scheduleTimeoutSec = if ($BaseUrl -match '^https?://localhost(:\d+)?$' -and $BaseUrl -notmatch ':8000') { 300 } else { 120 }
+
 Step "1. IPE login" { @{ ok = ($null -ne $token); detail = "JWT obtained (Keycloak or local)" } }
 
 Step "2. Save Odoo config (vault)" {
-    $body = '{"odoo_url":"http://host.docker.internal:8069","odoo_db":"starttrans1","odoo_username":"whewalla@gmail.com","odoo_password":"admin","enabled":true}'
-    $u = Invoke-DemoRequest -Method PUT -Uri "$BaseUrl/api/v1/admin/erp/odoo" -Headers $h -Body $body
+    $u = Invoke-DemoRequest -Method PUT -Uri "$BaseUrl/api/v1/admin/erp/odoo" -Headers $h -Body $odooConfigBody
     @{ ok = $u.success; detail = "password_set=$($u.data.password_set)"; response = $u }
 }
 
 Step "3. Odoo connection test" {
-    $body = '{"odoo_url":"http://host.docker.internal:8069","odoo_db":"starttrans1","odoo_username":"whewalla@gmail.com","odoo_password":"admin"}'
     $t = $null
     try {
-        $t = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/admin/erp/odoo/test" -Headers $h -Body $body
+        $t = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/admin/erp/odoo/test" -Headers $h -Body $odooTestBody
     } catch { }
     if ($t -and $t.data.connected) {
         if ($VerboseSteps) { Log "  response: $($t | ConvertTo-Json -Compress -Depth 5)" }
         @{ ok = $true; detail = "Odoo uid=$($t.data.uid) v$($t.data.server_version)"; response = $t }
     } else {
-        $probe = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/sync/run" -Headers $h -Body '{"entity":"work_centers"}' -TimeoutSec 90
+        $probe = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/sync/run" -Headers $h -Body $odooWcBody -TimeoutSec 90
         $wc = $probe.data.work_centers
         $count = if ($wc.updated) { $wc.updated } elseif ($wc.synced) { $wc.synced } else { 0 }
         @{ ok = $probe.success; detail = "connector XML-RPC path work_centers=$count"; response = $probe }
@@ -113,13 +145,10 @@ Step "3. Odoo connection test" {
 }
 
 Step "4. Full Odoo -> CDM sync" -TimeoutSec 180 {
-    $syncBody = (@{ entity = "all" } | ConvertTo-Json -Compress)
-    $s = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/sync/run" -Headers $h -Body $syncBody -TimeoutSec 180
-    Start-Sleep -Seconds 3
-    $mdrSql = Join-Path $Root "scripts\seed-startrans-mdr-boost.sql"
-    if (Test-Path $mdrSql) {
-        Get-Content $mdrSql -Raw | docker exec -i docker-db-1 psql -U ipe -d ipe_test -v ON_ERROR_STOP=1 2>&1 | Out-Null
-    }
+    $s = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/sync/run" -Headers $h -Body $odooSyncBody -TimeoutSec 180
+    Start-Sleep -Seconds 5
+    Invoke-MdrBoostSql -SqlPath (Join-Path $Root "scripts\seed-startrans-mdr-boost.sql")
+    Start-Sleep -Seconds 2
     $mo = $s.data.manufacturing_orders
     $prod = $s.data.products
     $prodUpd = if ($prod.updated) { $prod.updated } else { $prod.synced }
@@ -174,16 +203,16 @@ $demoMoIds = @(
 )
 $schedBody = (@{ mo_ids = $demoMoIds } | ConvertTo-Json -Compress)
 
-Step "10. OR-Tools schedule (cap-svc)" -TimeoutSec 120 {
-    $sch = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/capacity/schedule" -Headers $h -Body $schedBody -TimeoutSec 120
+Step "10. OR-Tools schedule (cap-svc)" -TimeoutSec $scheduleTimeoutSec {
+    $sch = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/capacity/schedule" -Headers $h -Body $schedBody -TimeoutSec $scheduleTimeoutSec
     @{ ok = ($sch.data.total_operations -ge 1); detail = "$($sch.data.total_operations) ops scheduled"; response = $sch }
 }
 
 $approveIds = @("d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005", "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006")
 $approveBody = (@{ mo_ids = $approveIds } | ConvertTo-Json -Compress)
 
-Step "11. Schedule approve -> Odoo activate" -TimeoutSec 120 {
-    Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/capacity/schedule" -Headers $h -Body $approveBody -TimeoutSec 120 | Out-Null
+Step "11. Schedule approve -> Odoo activate" -TimeoutSec $scheduleTimeoutSec {
+    Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/capacity/schedule" -Headers $h -Body $approveBody -TimeoutSec $scheduleTimeoutSec | Out-Null
     $ap = Invoke-DemoRequest -Method POST -Uri "$BaseUrl/api/v1/capacity/schedule/approve" -Headers $h -Body $approveBody -TimeoutSec 60
     @{ ok = ($ap.data.activated_count -ge 1); detail = "activated=$($ap.data.activated_count) erp_mode=direct"; response = $ap }
 }

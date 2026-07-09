@@ -14,8 +14,9 @@
 | 0 Security | T001–T020 | ✅ Complete (Option B E2E) |
 | 1 Hardening / K8s prep | T030–T050 | ✅ Phase 1 close (k6 profiles; Helm remainder deferred to Phase 3+) |
 | **2 Gates / Observability** | **T060–T068 + T081–T130** | ✅ **Complete** |
-| 3 Scale/Compliance | T090–T110 | 🔄 In progress (Helm + SAP/D365 scaffolds) |
-| 4 GTM | T120–T140 | ⬜ Not started |
+| 3 Scale/Compliance | T090–T110, T140–T157 | 🔄 ~85% (Gates 6–10, 8–9 PASS; Gate 11 partial) |
+| 4 GTM | T120–T128, T170–T179 | ⬜ Specified; blocked on v9.4.0-p3 |
+| 5 Maturity | T200a–T209a | ⬜ Proposed (Gap Audit) |
 | Hygiene | T000 | ✅ |
 
 ---
@@ -109,8 +110,8 @@
 | T032 | PDB minAvailable | P0 | 🔄 | `templates/pdb.yaml` |
 | T039 | NetworkPolicy zero-trust | P1 | 🔄 | `templates/networkpolicy.yaml` |
 | T140 | K8s deployment guide | P0 | ✅ | `docs/operations/K8S-DEPLOYMENT-GUIDE.md` |
-| T141 | `deploy-kind.sh` + `verify-k8s.sh` | P0 | 🔄 | `scripts/k8s/` |
-| T142 | Compose–K8s parity script | P0 | 🔄 | `scripts/k8s/test-compose-k8s-parity.py` |
+| T141 | `deploy-kind.sh` + `verify-k8s.sh` | P0 | ✅ | `scripts/k8s/` — Gate 7 PASS |
+| T142 | Compose–K8s parity script | P0 | ✅ | Gate 8 PASS 2026-07-05 |
 
 ### Phase 3 verification gates (Gates 6–11)
 
@@ -118,10 +119,10 @@
 |----|------|----------|--------|----------|
 | T150 | **Gate 6** — `helm lint` + `helm template` (release1 + prod) | P0 | ✅ | `scripts/k8s/verify-gate6.ps1` — 2026-07-04 |
 | T151 | **Gate 7** — kind deploy; all pods Ready; health 200 | P0 | ✅ | kind `ipe-dev`; 6/6 pods 200 — 2026-07-04 |
-| T152 | **Gate 8** — Compose–K8s parity (structure match) | P0 | ⬜ | `test-compose-k8s-parity.py` |
-| T153 | **Gate 9** — HPA smoke (scale on CPU) | P1 | ⬜ | full profile only |
+| T152 | **Gate 8** — Compose–K8s parity (structure match) | P0 | ✅ | `evidence/gate8-parity.txt` — 2026-07-07 |
+| T153 | **Gate 9** — HPA smoke (scale on CPU) | P1 | ✅ | `evidence/gate9-hpa.txt` — 2026-07-07 |
 | T154 | **Gate 10** — SAP/D365 scaffold unit tests | P0 | ✅ | `tests/test_erp_scaffolds.py` |
-| T155 | **Gate 11** — R1 demo 14/14 via K8s ingress | P0 | ⬜ | adapt `demo-http.ps1` base URL |
+| T155 | **Gate 11** — R1 demo 14/14 via K8s ingress | P0 | 🔄 | 12/14 PASS — cap-svc schedule timeout |
 | T156 | k6 SLO re-run on K8s ingress | P1 | ⬜ | P95 < 500ms |
 | T157 | Git tag `v9.4.0-p3` after Gates 6–11 | P0 | ⬜ | |
 
@@ -161,6 +162,39 @@
 | T126 | Customer health dashboard | P2 | ⬜ |
 | T127 | Terraform one-click SaaS module | P1 | ⬜ |
 | T128 | On-prem Ansible guide | P2 | ⬜ |
+| T128a | Mobile-responsive web (dashboard + approvals) | P2 | ⬜ |
+
+### Phase 4 sprint breakdown (proposed — AD-01)
+
+| ID | Task | Sprint | Priority | Status |
+|----|------|--------|----------|--------|
+| T170 | PM: onboarding UX wireframes + pricing tiers (OQ-7) | Pre-S1 | P0 | ⬜ |
+| T171 | Stripe sandbox account + metered products | S1 | P0 | ⬜ |
+| T172 | Tenant self-service provision API (T120a) | S1 | P0 | ⬜ |
+| T173 | Terraform `ipe-saas` module skeleton (EKS/AKS) | S1 | P1 | ⬜ |
+| T174 | Developer portal + OpenAPI aggregator (T122a) | S2 | P1 | ⬜ |
+| T175 | Python SDK package (T123) | S2 | P2 | ⬜ |
+| T176 | JavaScript SDK package (T124) | S2 | P2 | ⬜ |
+| T177 | Knowledge base 50 articles (T125) | S2 | P2 | ⬜ |
+| T178 | Customer health dashboard (T126) | S3 | P2 | ⬜ |
+| T179 | Stripe live mode + webhooks (T121a) | S3 | P1 | ⬜ |
+
+---
+
+## Phase 5 — Enterprise Maturity (Weeks 37–50) — ⬜ Proposed
+
+| ID | Task | Stream | Priority | Status |
+|----|------|--------|----------|--------|
+| T200a | SOC 2 Type II evidence collection | A | P1 | ⬜ |
+| T201a | GDPR export/erasure production (T090a/T091a) | A | P1 | ⬜ |
+| T202a | WCAG 2.1 AA audit + critical fixes (T092) | A | P1 | ⬜ |
+| T203a | k6 500 VU CI job (T094) | A | P2 | ⬜ |
+| T204a | S&OP collaboration workflow | B | P2 | ⬜ |
+| T205a | Copilot production deployment | B | P2 | ⬜ |
+| T206a | Scenario workbench + demand sensing (v8 gaps) | B | P2 | ⬜ |
+| T207a | Registry dispatch in live sync API (P3-15) | C | P2 | ⬜ |
+| T208a | Live SAP connector (customer #2 trigger) | C | P2 | ⬜ |
+| T209a | Live D365 connector (customer #2 trigger) | C | P2 | ⬜ |
 
 ---
 
@@ -174,13 +208,13 @@
 
 ---
 
-*Tasks version 2.1 — Phase 3 Speckit pipeline 2026-07-04*
+*Tasks version 2.3 — Gate 8 PASS 2026-07-05*
 
 ---
 
-## Phase 4: Convergence (2026-07-04)
+## Phase 4: Convergence (2026-07-04-b)
 
-Assessment after `/speckit.implement` partial Phase 3 run. Remaining work appended for next implement cycle.
+Assessment after `/speckit.converge` following Downloads synthesis (roadmap v4, Phase 4/5 proposals).
 
 | ID | Task | Priority | Status | Notes |
 |----|------|----------|--------|-------|
@@ -190,3 +224,15 @@ Assessment after `/speckit.implement` partial Phase 3 run. Remaining work append
 | T161 | Add `pytest` to connector dev deps; run Gate 10 in CI | P1 | ⬜ | Tests written; pytest not in local env |
 | T162 | Create GitHub issues from ISSUES.md | P2 | ✅ | Issues #12-#24 |
 | T163 | Star Trans UAT execution on customer Odoo staging | P0 | ⬜ | Business-blocked: SOW + staging access |
+| T164 | Gate 8: seed K8s DB + fix feasibility parity | P0 | ✅ | `seed-k8s-db.ps1`; parity PASS 2026-07-07 |
+| T165 | Gate 9: HPA smoke with prod values + CPU load | P1 | ✅ | `verify-gate9.ps1` 2026-07-07 |
+| T166 | Gate 11: R1 demo 14/14 via K8s ingress | P0 | 🔄 | 12/14; OR-Tools timeout on kind |
+| T167 | Create Phase 4 GitHub issues (T170–T179) | P2 | 🔄 | #25, #26 created; remainder after Gate 11 |
+| T168 | Sync `analyze.md` to `ENTERPRISE-PROGRAM-STATUS.md` | P2 | ⬜ | |
+| T169 | Compose R1: relax connector healthcheck (Kafka optional) | P1 | ✅ | probes + compose env + 5 unit tests; evidence/t169-health-probes.txt |
+| T171b | Re-run Gate 8 after Docker restart | P0 | ⬜ | verify-gate8.ps1 |
+| T172b | Execute Gate 9 (values-gate9 overlay) | P0 | ⬜ | verify-gate9.ps1 |
+| T173b | Execute Gate 11 on K8s ingress | P0 | ⬜ | verify-gate11.ps1 |
+| T174b | Commit Phase 3 close-out bundle | P0 | ⬜ | |
+| T175b | Tag v9.4.0-p3 | P0 | ⬜ | **Blocked** — Constitution VIII |
+| T170b | Document `IPE_KAFKA_BOOTSTRAP_SERVERS=""` in K8S guide | P2 | ✅ | values-dev.yaml + constitution IV |

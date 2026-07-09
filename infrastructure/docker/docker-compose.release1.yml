@@ -142,7 +142,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
       REDIS_URL: redis://redis:6379/0
       IPE_RELEASE_PROFILE: release1
-      ODOO_SYNC_SCHEDULER: "true"
+      IPE_KAFKA_BOOTSTRAP_SERVERS: ""
+      IPE_KAFKA_ENABLED: "false"
       ODOO_SYNC_INTERVAL_SEC: "900"
       FEA_SVC_URL: http://fea-svc:8004
       RES_SVC_URL: http://res-svc:8005

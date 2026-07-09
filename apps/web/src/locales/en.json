@@ -1,8 +1,10 @@
 {
   "app.title": "IPE - Intelligent Planning Engine",
+  "nav.workspace": "Unified Workspace",
   "nav.planning": "Planning Hub",
   "nav.commandCenter": "Command Center",
   "nav.platform": "Platform",
+  "nav.copilot": "Copilot",
   "nav.language": "Language",
   "login.title": "IPE Login",
   "login.email": "Email",

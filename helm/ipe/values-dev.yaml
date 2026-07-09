@@ -12,6 +12,9 @@ global:
       enabled: false
     annotations:
       nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
 
 releaseProfile: "release1"
 
@@ -73,6 +76,8 @@ commonEnv:
   VAULT_ENABLED: "false"
   IPE_AUDIT_REQUEST_MIDDLEWARE: "false"
   IPE_AUDIT_KAFKA_ENABLED: "false"
+  IPE_KAFKA_BOOTSTRAP_SERVERS: ""   # R1 profile: no Kafka in kind dev (probe returns not_configured)
+  IPE_KMS_KEY_DIR: "/tmp/.kms_keys"  # writable local KMS for Odoo credential encryption in kind
 
 services:
   dpe-svc:

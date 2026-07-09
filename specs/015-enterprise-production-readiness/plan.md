@@ -2,8 +2,8 @@
 
 **Feature**: `015-enterprise-production-readiness`  
 **Date**: 2026-07-04  
-**Plan version**: 2.0  
-**Tech stack**: FastAPI, React/Vite, PostgreSQL 16 + RLS, Redis, Kafka, Kong, Keycloak, Vault, Prometheus/Grafana, Helm 3, Kubernetes 1.28+
+**Plan version**: 2.2  
+**Tech stack**: FastAPI, React/Vite, PostgreSQL 16 + RLS, Redis, Kafka, Kong, Keycloak, Vault, Prometheus/Grafana, Helm 3, Kubernetes 1.28+, Terraform (Phase 4)
 
 ---
 
@@ -28,8 +28,9 @@
 | 0 Security | — | Option B B1–B5 | ✅ |
 | 1 Hardening | — | SIGTERM, pybreaker, network isolation | ✅ |
 | 2 Observability + Gates | `v9.3.0-p2` | Gates 1–5, k6, R1 14/14, R2 5/5 | ✅ |
-| 3 Scale/Compliance | `v9.4.0-p3` | Gates 6–11 | 🔄 |
-| 4 GTM | `v10.0.0-e4` (TBD) | Stripe sandbox, tenant API | ⬜ |
+| 3 Scale/Compliance | `v9.4.0-p3` | Gates 6–8, 10 PASS; 9, 11 pending | 🔄 ~70% |
+| 4 GTM | `v10.0.0-e4` (TBD) | Stripe sandbox, tenant API, Terraform SaaS | ⬜ |
+| 5 Maturity | post-GTM | SOC 2 II, WCAG, Copilot prod, live ERP | ⬜ proposed |
 
 ---
 
@@ -61,14 +62,37 @@
 
 **Gate 10:** pytest scaffold tests green; no live ERP network
 
-### Stream 3 — Compliance (deferred within Phase 3)
+### Stream 3 — Compliance (moved to Phase 5 Stream A)
 
-| Workstream | Touch points |
-|------------|--------------|
-| GDPR | Harden `dpe-svc/dsar.py`, retention jobs |
-| WCAG | Audit `apps/web` core R1 screens |
-| SOC 2 | Gap doc under `docs/compliance/` |
-| k6 500 VU CI | `.github/workflows/` job on staging |
+GDPR hardening, WCAG, SOC 2 Type II path, and k6 500 VU CI are **Phase 5** per Gap Audit — not Phase 3 gate blockers. Phase 3 closes on Gates 6–11 only.
+
+---
+
+## 7. Phase 4 implementation (planned — after v9.4.0-p3)
+
+| Stream | Component | Path / service |
+|--------|-----------|----------------|
+| Onboarding | Tenant self-service API | `dpe-svc` tenant provisioning routes |
+| Billing | Stripe metered webhooks | new `billing-svc` or dpe module |
+| Portal | OpenAPI aggregator + sandbox keys | `docs/api/` + Kong consumer |
+| IaC | Terraform EKS/AKS module | `infra/terraform/ipe-saas/` |
+| SDKs | Python + JS clients | `packages/ipe-sdk-py`, `packages/ipe-sdk-js` |
+| KB | GitBook / docs site | 50+ articles from training curriculum |
+| Mobile | Responsive web pass | `apps/web` breakpoints |
+
+**Dependencies**: Phase 3 tag; Stripe sandbox; Terraform Cloud account (AD-02, AD-03).
+
+---
+
+## 8. Phase 5 implementation (proposed — post-GTM)
+
+| Stream | Focus | Duration (proposal) |
+|--------|-------|---------------------|
+| A Compliance | SOC 2 II, GDPR prod, WCAG AA | 6 weeks |
+| B Platform | S&OP, Copilot prod, scenario workbench, CQRS/GraphQL eval | 8 weeks |
+| C Ecosystem | Live SAP/D365, partner program | customer-triggered |
+
+See `analyze.md` §6 and spec FR-015-50–59.
 
 ### Stream 4 — Customer Track B (parallel) ✅
 
@@ -110,9 +134,9 @@ Deliverables under `docs/customer/star-trans/` — complete; UAT waits on SOW.
 |-----------|-----|------|
 | E2 Observability + Security | `v9.3.0-p2` | Gates 1–5 ✅ |
 | E3 K8s + ERP scaffolds | `v9.4.0-p3` | Gates 6–11 |
-| E4 Compliance hardening | `v9.5.0-p3b` | GDPR + SOC2 gap close |
+| E4 Compliance hardening | `v9.5.0-p5a` | Phase 5 Stream A |
 | E5 GTM | `v10.0.0-e4` | Stripe + tenant API |
 
 ---
 
-*Plan version 2.0 — `/speckit.plan` 2026-07-04*
+*Plan version 2.2 — Gate 8 PASS 2026-07-05*

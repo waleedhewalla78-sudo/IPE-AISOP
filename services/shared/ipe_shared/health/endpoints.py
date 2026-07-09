@@ -36,7 +36,12 @@ def register_health_routes(router: APIRouter, service_settings: ServiceSettings)
     async def readiness(session: AsyncSession = Depends(get_session)):
         deps = await collect_dependencies(session)
         db_ok = deps.get("database", {}).get("status") == "up"
-        status = "ok" if db_ok else "degraded"
+        redis_ok = deps.get("redis", {}).get("status") in ("up", "disabled", "not_configured", "skipped")
+        optional_ok = all(
+            deps.get(k, {}).get("status") in ("up", "disabled", "not_configured", "skipped")
+            for k in ("kafka", "vault")
+        )
+        status = "ok" if (db_ok and redis_ok and optional_ok) else "degraded"
         return HealthResponse(
             status=status,
             service=service_settings.SERVICE_NAME,

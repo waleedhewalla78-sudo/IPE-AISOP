@@ -10,6 +10,7 @@ from app.core.business_score import score_scenario
 from app.core.odoo_notify import notify_odoo_resolution
 from app.core.strategy import generate_strategies
 from ipe_shared.audit.service import log_audit_event
+from ipe_shared.activity.emit import record_from_kafka_topic
 from ipe_shared.auth.jwt import TokenPayload
 from ipe_shared.auth.rbac import require_roles
 from ipe_shared.database.session import get_session as get_db_session
@@ -203,6 +204,13 @@ async def approve_scenario(
         topic="ipe.resolution.approved",
         key=str(scenario.mo_id),
         envelope=envelope,
+    )
+
+    await record_from_kafka_topic(
+        session,
+        "ipe.resolution.approved",
+        envelope,
+        tenant_id=str(tid),
     )
 
     await log_audit_event(

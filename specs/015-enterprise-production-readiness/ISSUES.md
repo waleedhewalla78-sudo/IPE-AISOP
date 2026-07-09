@@ -28,7 +28,14 @@ gh label create enterprise-phase-3 --description "Enterprise Phase 3 — K8s/com
 | T097 | T097: API v2 Kong routes | Version prefix pattern |
 
 **Completed (no issue needed):** T154 Gate 10 — `tests/test_erp_scaffolds.py`  
-**Completed:** T099 Track B, T140 K8s guide, T095a registry, **T150 Gate 6**, **T162 issues #12-24**
+**Completed:** T150 Gate 6, **T151 Gate 7**, **T152 Gate 8**, T154 Gate 10, T099 Track B, T140 K8s guide, T162 issues #12-24 (closed #12-14)
+
+## Phase 4 issues (2026-07-05)
+
+| Task | Issue |
+|------|-------|
+| T172 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/25 |
+| T173 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/26 |
 
 ## Created issues (2026-07-04)
 
