@@ -24,8 +24,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    command: 'npm run dev',
     port: 8082,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
+    env: {
+      ...process.env,
+      VITE_RELEASE_PROFILE: process.env.VITE_RELEASE_PROFILE ?? 'release1',
+      VITE_API_BASE_URL: process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:9',
+    },
   },
 });
