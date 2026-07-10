@@ -1,4 +1,4 @@
-﻿=== Release 2 smoke test ===
+﻿=== Release 2 smoke test (final re-verify 2026-07-10) ===
 [PASS] nlp-svc container
 [PASS] demand-svc container
 [PASS] scenario-svc container
@@ -16,6 +16,3 @@
 [PASS] Kong demand route
 
 Result: 15 passed, 0 failed
-Date: 2026-07-10
-Stack: infrastructure/docker/docker-compose.release2.yml
-Migrations: alembic upgrade head (035->042) on r2 db

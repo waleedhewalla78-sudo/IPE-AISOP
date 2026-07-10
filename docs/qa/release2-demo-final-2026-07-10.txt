@@ -1,0 +1,13 @@
+﻿=== Release 2 Demo - Gate G-R2-05 (final re-verify 2026-07-10 12:52) ===
+BaseUrl=http://localhost:8000 Namespace=ipe AuthMode=local
+
+[PASS] G-R2-05.1 Outcomes - OTD baseline API
+[PASS] G-R2-05.2 Outcomes - ROI metrics API
+[PASS] G-R2-05.3 Auto-propose - sync returns rescored
+[PASS] G-R2-05.4 Resolution scenarios available
+[PASS] G-R2-05.5 Copilot Lite / planner-assist
+[PASS] G-R2-05.6 Kind - all ipe app pods Ready
+[PASS] G-R2-05.7 Kind - postgresql + redis Ready
+
+=== G-R2-05 RESULT: 7 PASS, 0 FAIL, 0 SKIP ===
+G-R2-05 gate verdict: PASS (compose=True)

@@ -1,0 +1,7 @@
+﻿=== k6 SLO (Phase 2 close) 2026-07-10 AUTH_MODE=local ===
+Kong: http://localhost:8000
+Requests: 601
+P95: 669.0658ms (target < 500ms)
+Error rate: 0.00% (target < 5%)
+SLO: FAIL (latency only; thresholds api_latency + http_req_duration{api:health})
+Evidence also: docs/qa/k6-slo-baseline.json

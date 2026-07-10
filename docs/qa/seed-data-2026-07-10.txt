@@ -1,0 +1,4 @@
+﻿=== Seed 2026-07-10 ===
+Container: 63c7c80cc535_docker-db-1
+Result: partial — duplicate key cdm_operator (OP001) already present; demo data already loaded.
+CREATE EXTENSION / INSERT succeeded until operator unique constraint.

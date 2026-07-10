@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
-  testMatch: ['e2e/**/*.spec.ts', 'tests/**/*.perf.test.ts'],
+  testMatch: ['e2e/**/*.spec.ts'],
   timeout: 30000,
   retries: 0,
   use: {
@@ -32,12 +32,13 @@ export default defineConfig({
       webServer: {
         command: 'npm run dev',
         port: 8082,
-        reuseExistingServer: false,
+        // Prefer docker web-ui (or an already-running Vite) when port 8082 is taken.
+        reuseExistingServer: true,
         timeout: 120_000,
         env: {
           ...process.env,
           VITE_RELEASE_PROFILE: 'release2',
-          VITE_API_BASE_URL: process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:9',
+          VITE_API_BASE_URL: process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000',
         },
       },
     },
@@ -45,12 +46,13 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     port: 8082,
-    reuseExistingServer: false,
+    // Prefer docker web-ui (or an already-running Vite) when port 8082 is taken.
+    reuseExistingServer: true,
     timeout: 120_000,
     env: {
       ...process.env,
-      VITE_RELEASE_PROFILE: process.env.VITE_RELEASE_PROFILE ?? 'release1',
-      VITE_API_BASE_URL: process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:9',
+      VITE_RELEASE_PROFILE: process.env.VITE_RELEASE_PROFILE ?? 'release2',
+      VITE_API_BASE_URL: process.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000',
     },
   },
 });

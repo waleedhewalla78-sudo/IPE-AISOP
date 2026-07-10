@@ -66,14 +66,14 @@
 
 | Item | Status | Needed action |
 |------|--------|---------------|
-| G-R2-01 release2-smoke | **PASS 15/15** (this session) | Keep evidence `docs/qa/release2-smoke-2026-07-10.txt` |
+| G-R2-01 release2-smoke | **PASS 15/15** (re-verified) | `docs/qa/release2-smoke-final-2026-07-10.txt` + full report `docs/qa/E2E-K6-PRODUCTION-READINESS-REPORT.md` |
 | G-R2-02 Copilot live tools | PASS | None |
 | G-R2-03 Wave 1 W1-03–08 | PASS eng; live Odoo staging open | PH1-02 for full integration proof |
 | G-R2-04 Arabic native QA | Eng ✅; human sign-off ⬜ | Native reviewer; cannot fake |
 | G-R2-05 run-release2-demo | Kind PASS; compose APIs failing (auth) | Fix dpe AUTH_MODE + re-run demo (Section B) |
 | G-R2-TAG `v9.1.0-r2` | Tag **exists locally** from prior cut; remote TBD | Do not retag until G-R2-05 green + policy on G-R2-04; push existing tag only if intentional |
 | FR-R1-05 stock.quant | OPEN | See C-15 |
-| Keycloak SSO (Spec 011) | Container **unhealthy** | Fix Keycloak health; keep local RS256 login as R2 path |
+| Keycloak SSO (Spec 011) | Healthcheck **fixed** 2026-07-10 (realm probe; was perpetual unhealthy) | Keep `AUTH_MODE=local` for R2 smoke until SSO E2E re-proven; Keycloak now reports healthy |
 | RLS on migrations 039–043 | Chain applied to **042** | Verify 043 applied or document head=042 |
 
 ### A5. Scripts

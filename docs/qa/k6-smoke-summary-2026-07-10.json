@@ -1,0 +1,258 @@
+{
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "setup": {
+                "name": "setup",
+                "path": "::setup",
+                "id": "5c0f8025f7e0b6654089e5b00e950f1a",
+                "groups": {},
+                "checks": {
+                        "login status 200": {
+                            "name": "login status 200",
+                            "path": "::setup::login status 200",
+                            "id": "17a4a3f3d5dbad586fefc48e40f4a9ab",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "login success": {
+                            "id": "7cfb8f8c2c02094174a14df718814c1e",
+                            "passes": 1,
+                            "fails": 0,
+                            "name": "login success",
+                            "path": "::setup::login success"
+                        }
+                    }
+            }
+        },
+        "checks": {
+            "health ok": {
+                "name": "health ok",
+                "path": "::health ok",
+                "id": "c42ae2f6b425daab202696e0780b9a01",
+                "passes": 0,
+                "fails": 10
+            },
+            "health not 5xx": {
+                "name": "health not 5xx",
+                "path": "::health not 5xx",
+                "id": "b603492841933172999495de4e834f4b",
+                "passes": 10,
+                "fails": 0
+            },
+            "feasibility_queue ok": {
+                "path": "::feasibility_queue ok",
+                "id": "56bd85f75878723511e11d34461a5352",
+                "passes": 10,
+                "fails": 0,
+                "name": "feasibility_queue ok"
+            },
+            "feasibility_queue not 5xx": {
+                "path": "::feasibility_queue not 5xx",
+                "id": "de5b0089aa7ff95a2ab914f220616d6c",
+                "passes": 10,
+                "fails": 0,
+                "name": "feasibility_queue not 5xx"
+            },
+            "inventory_summary ok": {
+                "name": "inventory_summary ok",
+                "path": "::inventory_summary ok",
+                "id": "fdd7ea9e05d26b44cd7616fe0553681c",
+                "passes": 0,
+                "fails": 10
+            },
+            "inventory_summary not 5xx": {
+                "id": "ed46b690d4d797d06a4cdaff10b70c1c",
+                "passes": 10,
+                "fails": 0,
+                "name": "inventory_summary not 5xx",
+                "path": "::inventory_summary not 5xx"
+            },
+            "schedule_active ok": {
+                "name": "schedule_active ok",
+                "path": "::schedule_active ok",
+                "id": "1670ab871319e7c2ede2f4b47f3e358d",
+                "passes": 0,
+                "fails": 10
+            },
+            "schedule_active not 5xx": {
+                "passes": 10,
+                "fails": 0,
+                "name": "schedule_active not 5xx",
+                "path": "::schedule_active not 5xx",
+                "id": "1995d3f27a080ea5762eacece0836f58"
+            },
+            "check_availability ok": {
+                "id": "3ab527d90f8f96b4b41a5769943a97c7",
+                "passes": 0,
+                "fails": 10,
+                "name": "check_availability ok",
+                "path": "::check_availability ok"
+            },
+            "check_availability not 5xx": {
+                "name": "check_availability not 5xx",
+                "path": "::check_availability not 5xx",
+                "id": "f6b55585a12053ec19c6f2e001a281a7",
+                "passes": 10,
+                "fails": 0
+            },
+            "ctp_evaluate ok": {
+                "name": "ctp_evaluate ok",
+                "path": "::ctp_evaluate ok",
+                "id": "a5e64d9255d3344e32d5aa64ebe4bc95",
+                "passes": 0,
+                "fails": 10
+            },
+            "ctp_evaluate not 5xx": {
+                "passes": 10,
+                "fails": 0,
+                "name": "ctp_evaluate not 5xx",
+                "path": "::ctp_evaluate not 5xx",
+                "id": "2f710b5909a01e947836198fcae49242"
+            },
+            "capacity_schedule ok": {
+                "fails": 10,
+                "name": "capacity_schedule ok",
+                "path": "::capacity_schedule ok",
+                "id": "50ad853d66d47bb0eaa978c0ded60483",
+                "passes": 0
+            },
+            "capacity_schedule not 5xx": {
+                "name": "capacity_schedule not 5xx",
+                "path": "::capacity_schedule not 5xx",
+                "id": "dcd6b8c4475f062aa761e2e639a3059e",
+                "passes": 10,
+                "fails": 0
+            }
+        },
+        "name": ""
+    },
+    "metrics": {
+        "data_sent": {
+            "count": 90331,
+            "rate": 1238.4783117475408
+        },
+        "http_req_connecting": {
+            "max": 2.3234,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.049583098591549295,
+            "min": 0,
+            "med": 0
+        },
+        "vus": {
+            "value": 1,
+            "min": 0,
+            "max": 1
+        },
+        "iterations": {
+            "count": 10,
+            "rate": 0.13710446156331058
+        },
+        "http_reqs": {
+            "count": 71,
+            "rate": 0.973441677099505
+        },
+        "http_req_receiving": {
+            "avg": 1.9455450704225348,
+            "min": 0,
+            "med": 0,
+            "max": 86.873,
+            "p(90)": 1.4441,
+            "p(95)": 2.62605
+        },
+        "http_req_blocked": {
+            "med": 0,
+            "max": 110.3322,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 1.5940929577464789,
+            "min": 0
+        },
+        "http_req_failed": {
+            "passes": 60,
+            "fails": 11,
+            "thresholds": {
+                "rate<0.2": true
+            },
+            "value": 0.8450704225352113
+        },
+        "http_req_sending": {
+            "avg": 0.23700281690140848,
+            "min": 0,
+            "med": 0,
+            "max": 9.513,
+            "p(90)": 0.3409,
+            "p(95)": 0.61825
+        },
+        "data_received": {
+            "count": 48877,
+            "rate": 670.1254767829931
+        },
+        "iteration_duration": {
+            "avg": 6793.34863,
+            "min": 3939.2229,
+            "med": 4241.0725999999995,
+            "max": 27129.3269,
+            "p(90)": 8139.564679999992,
+            "p(95)": 17634.445789999976
+        },
+        "http_req_duration": {
+            "avg": 498.49217746478877,
+            "min": 2.6515,
+            "med": 53.3468,
+            "max": 23076.1556,
+            "p(90)": 266.656,
+            "p(95)": 763.6135999999999,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        },
+        "http_req_duration{expected_response:true}": {
+            "avg": 426.82578181818184,
+            "min": 23.2878,
+            "med": 137.8624,
+            "max": 3438.2552,
+            "p(90)": 239.4811,
+            "p(95)": 1838.86815
+        },
+        "http_req_tls_handshaking": {
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0
+        },
+        "checks": {
+            "passes": 82,
+            "fails": 60,
+            "thresholds": {
+                "rate>0.85": true
+            },
+            "value": 0.5774647887323944
+        },
+        "http_req_waiting": {
+            "p(95)": 763.6135999999999,
+            "avg": 496.30962957746476,
+            "min": 1.1213,
+            "med": 53.3468,
+            "max": 23075.3817,
+            "p(90)": 266.656
+        },
+        "vus_max": {
+            "value": 1,
+            "min": 1,
+            "max": 1
+        }
+    },
+    "setup_data": {
+        "headers": {
+            "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImlwZS1yczI1Ni12MSIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMGVlYmM5OS05YzBiLTRlZjgtYmI2ZC02YmI5YmQzODBjMDMiLCJ0ZW5hbnRfaWQiOiJhMGVlYmM5OS05YzBiLTRlZjgtYmI2ZC02YmI5YmQzODBhMTEiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3ODM2Nzk5NDYsImlhdCI6MTc4MzY3NjM0NiwianRpIjoiNTdiOGI1ODUtYzQzYS00MDJmLThiMjMtYzQ1MzgxYmU0ZTc4IiwidHlwZSI6ImFjY2VzcyJ9.kNj4pkieEtsERtJ93kvBvsycAo_vhp-yEb7V8Zpovuu7zpr4LOCi1TGNe3hESfxteK_g6vp9MH1Jwvk6C70Pc5CO1kvRi8w27fucVE7qqLAwExVTZQ1rH50fcF_vloMf_qUjA8w4zVvgFAwYYpzc7jEUmxaXLoygyd4b4IngtKwE4_ApeLiYxoxiTsTf-k4ElCtEvYaiMcU4C3CJYfZPzTaJmeh2-Wt9Y5hr7z1iBaYF6fqQk33YD1Hv9__7LND10nQoT23gZeah6lFmUS1y0e4bYkUf-cpfVgPNNfJ0UsQi7OHq1Bnk-gGuszvVzimvP2vZhDNllOFpHe2fkTvY_qDXE5lZSVZ4aywxHCzOD1ahXNHR2bNqsveSMDzYCL48UuiPEsIM_4se0aO3L1-24QcxGRW-zHvUweFsWqHJ9vLFzdT-I2nL_78eNvuufYPT4VXJc0pscvf31sNAI1XMxV9b9hJrQhlwvlYrFeeSJRN92ptvVaKXFNlSli1gdo18mzI0Blgu_feVDwWbSy3iLnaHvhMpHW7CVz2lKgIw6irPkubUbPjfeGWkwGa7faE-tHFIBNnxTcUNpyH0j1-Br6jQGTfKJ4uslOquiNl38asHd6mV7s1kDHBOhNWmTSHTwONo9vw-8ecRsEKQUQKTrbLYoqvfZG4j2pOTTw8HVMA",
+            "Content-Type": "application/json",
+            "X-Tenant-ID": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+        },
+        "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImlwZS1yczI1Ni12MSIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMGVlYmM5OS05YzBiLTRlZjgtYmI2ZC02YmI5YmQzODBjMDMiLCJ0ZW5hbnRfaWQiOiJhMGVlYmM5OS05YzBiLTRlZjgtYmI2ZC02YmI5YmQzODBhMTEiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3ODM2Nzk5NDYsImlhdCI6MTc4MzY3NjM0NiwianRpIjoiNTdiOGI1ODUtYzQzYS00MDJmLThiMjMtYzQ1MzgxYmU0ZTc4IiwidHlwZSI6ImFjY2VzcyJ9.kNj4pkieEtsERtJ93kvBvsycAo_vhp-yEb7V8Zpovuu7zpr4LOCi1TGNe3hESfxteK_g6vp9MH1Jwvk6C70Pc5CO1kvRi8w27fucVE7qqLAwExVTZQ1rH50fcF_vloMf_qUjA8w4zVvgFAwYYpzc7jEUmxaXLoygyd4b4IngtKwE4_ApeLiYxoxiTsTf-k4ElCtEvYaiMcU4C3CJYfZPzTaJmeh2-Wt9Y5hr7z1iBaYF6fqQk33YD1Hv9__7LND10nQoT23gZeah6lFmUS1y0e4bYkUf-cpfVgPNNfJ0UsQi7OHq1Bnk-gGuszvVzimvP2vZhDNllOFpHe2fkTvY_qDXE5lZSVZ4aywxHCzOD1ahXNHR2bNqsveSMDzYCL48UuiPEsIM_4se0aO3L1-24QcxGRW-zHvUweFsWqHJ9vLFzdT-I2nL_78eNvuufYPT4VXJc0pscvf31sNAI1XMxV9b9hJrQhlwvlYrFeeSJRN92ptvVaKXFNlSli1gdo18mzI0Blgu_feVDwWbSy3iLnaHvhMpHW7CVz2lKgIw6irPkubUbPjfeGWkwGa7faE-tHFIBNnxTcUNpyH0j1-Br6jQGTfKJ4uslOquiNl38asHd6mV7s1kDHBOhNWmTSHTwONo9vw-8ecRsEKQUQKTrbLYoqvfZG4j2pOTTw8HVMA"
+    }
+}
