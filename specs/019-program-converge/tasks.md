@@ -70,7 +70,7 @@
 - [x] T050 Run scenario-svc + mock-odoo unit tests
 - [x] T051 Write `implement.md` log
 - [x] T052 Run converge assessment → append Phase Convergence tasks if needed
-- [ ] T053 Commit Speckit + implementation (no secrets / no kms keys)
+- [x] T053 Commit Speckit + implementation (no secrets / no kms keys) — `fcd2545`
 
 ---
 
