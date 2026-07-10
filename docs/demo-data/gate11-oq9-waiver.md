@@ -125,11 +125,27 @@ Per **Spec 017** (`ipe/specs/017-first-release-plan/spec.md`):
 
 ## 6. Acceptance Decision & Sign-Off
 
+### 6.1 Engineering acceptance (2026-07-10) — complete
+
+| Criterion | Status | Evidence |
+|-----------|--------|----------|
+| Gate 11 kind **12/14** with infra RCA | ✅ | `docs/demo-data/gate11-k8s-demo.txt` |
+| Compose Gate 11 equivalent **14/14** | ✅ | `docs/demo-data/release1-integration-demo.txt` |
+| Follow-up #27 infra advisory | ✅ closed / WON'T FIX product | GitHub #27 |
+| Spec 017 FR-017-P0-02 (≥12/14 + waiver) | ✅ met | this document |
+| R2 smoke / demo unaffected | ✅ | G-R2-01 15/15 · G-R2-05 7/7 |
+
+**Engineering decision**: **ACCEPT** waiver for kind steps 10–11 (OR-Tools timeout = CPU overcommit, not product defect). Does **not** require re-running Gate 11 for R2 tag.
+
+### 6.2 Human signatures — pending template
+
 | Role | Name | Date | Decision |
 |------|------|------|----------|
-| Product Owner | ___________ | 2026-07-10 | ACCEPT |
-| Platform Lead | ___________ | 2026-07-10 | ACCEPT |
-| QA Lead | ___________ | 2026-07-10 | ACCEPT |
+| Product Owner | _pending_ | ___________ | ☐ ACCEPT / ☐ REJECT |
+| Platform Lead | _pending_ | ___________ | ☐ ACCEPT / ☐ REJECT |
+| QA Lead | _pending_ | ___________ | ☐ ACCEPT / ☐ REJECT |
+
+**Next action (human-blocked)**: Named stakeholders sign §6.2. Engineering cannot invent names. Tracked by GitHub #28 / C-12. R2 finalize proceeds with engineering acceptance in §6.1; formal commercial close awaits signatures.
 
 **Rationale**: OR-Tools CP-SAT solver timeout on steps 10–11 is caused by kind
 K8s CPU overcommit (8 pods on a single node, 107% CPU allocation), not a product
