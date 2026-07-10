@@ -1,52 +1,18 @@
-{
-  "feature_directory": "specs/015-enterprise-production-readiness",
-  "active_implementation": "specs/015-enterprise-production-readiness",
-  "active_plan": "specs/015-enterprise-production-readiness/plan.md",
-  "readiness_score": 100,
-  "readiness_note": "Phase 2 complete (v9.3.0-p2); Phase 3 Gates 6-11 in progress",
-  "release_target": "v9.4.0-p3",
-  "phase": "015-enterprise-production-readiness",
-  "phase_status": {
-    "phase_0_security": "complete",
-    "phase_1_hardening": "complete",
-    "phase_2_gates": "complete",
-    "phase_3_scale_compliance": "in_progress",
-    "phase_4_gtm": "not_started"
-  },
-  "gates": {
-    "gate_1_observability": "PASS",
-    "gate_2_security": "PASS",
-    "gate_3_multi_tenant": "PASS",
-    "gate_4_odoo_sync": "PASS",
-    "gate_5_full_e2e": "PASS",
-    "option_b_phase0_combined": "PASS",
-    "gate_6_helm_lint": "PASS",
-    "gate_7_kind_deploy": "PASS",
-    "gate_8_compose_k8s_parity": "PENDING",
-    "gate_9_hpa_smoke": "PENDING",
-    "gate_10_erp_scaffolds": "PASS",
-    "gate_11_r1_on_k8s": "PENDING"
-  },
-  "k6": {
-    "slo_profile": "PASS",
-    "slo_script": "scripts/perf/k6-slo.js",
-    "slo_baseline": "docs/qa/k6-slo-baseline.json",
-    "slo_p95_ms": 293,
-    "slo_error_rate": 0.0,
-    "stress_profile": "PASS",
-    "stress_script": "scripts/perf/k6-stress.js",
-    "stress_baseline": "docs/qa/k6-stress-baseline.json",
-    "stress_429_rate_pct": 73.8
-  },
-  "demos": {
-    "r1_https": "14/14",
-    "r2_https": "5/5"
-  },
-  "git_tag": "v9.3.0-p2",
-  "customer": "Star Trans — Electrical Transformer Technology",
-  "prior_phase": "specs/014-release2-growth",
-  "platform_release": "v8.2.0",
-  "last_speckit_run": "2026-07-04-full-pipeline",
+﻿{
+  "feature_directory": "specs/019-program-converge",
+  "active_implementation": "specs/019-program-converge",
+  "active_plan": "specs/019-program-converge/tasks.md",
+  "readiness_score": 82,
+  "readiness_note": "019 program converge: mat-svc R2 + scenario promote + stock.quant mock; PH1 commercial + Arabic human still OPEN",
+  "release_target": "v9.1.1-r2-hold",
+  "phase": "019-program-converge",
+  "prior_specs": [
+    "005-ipe-program-status",
+    "017-first-release-plan",
+    "018-phase2-release2"
+  ],
+  "constitution_version": "1.2.5",
+  "last_speckit_run": "2026-07-10-019-full-pipeline",
   "speckit_phases_complete": [
     "constitution",
     "specify",
@@ -55,20 +21,20 @@
     "plan",
     "tasks",
     "taskstoissues",
-    "implement-014",
-    "implement-015-phase0",
-    "implement-015-phase1",
-    "implement-015-phase2",
-    "implement-015-phase3-partial",
-    "converge-phase3"
+    "implement",
+    "converge"
   ],
-  "speckit_phases_pending": [
-    "implement-015-phase3-gates",
-    "implement-015-phase4",
-    "uat-r1"
+  "commercial_blockers_open": [
+    "PH1-01-SOW",
+    "PH1-02-odoo-staging",
+    "G-R2-04-arabic-native-signoff"
   ],
-  "phase2_tasks": "T081-T130 — done",
-  "phase3_tasks": "T030-T157 — Gates 6-11 pending cluster/helm",
-  "speckit_artifacts_version": "2.5",
-  "constitution_version": "1.2.0"
+  "github_issues": {
+    "closed_do_not_duplicate": "27-36,39,41",
+    "open_wave2_wave3": "37,38,40,42-46",
+    "mapping": "specs/019-program-converge/taskstoissues.md"
+  },
+  "out_of_scope_products": [
+    "nexus-social/docs/PRD-NEXUS-AUTHORITATIVE.md"
+  ]
 }

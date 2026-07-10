@@ -267,6 +267,8 @@
   "scenarios.none": "No scenarios yet.",
   "scenarios.compare": "Compare",
   "scenarios.resimulate": "Re-simulate",
+  "scenarios.promote": "Promote",
+  "scenarios.promoted": "Promoted",
   "scenarios.baselineCompare": "Baseline vs scenarios",
   "scenarios.kpi": "KPI",
   "scenarios.baseline": "Baseline",

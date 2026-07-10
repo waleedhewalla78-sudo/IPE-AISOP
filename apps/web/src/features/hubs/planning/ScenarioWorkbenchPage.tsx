@@ -102,6 +102,17 @@ export function ScenarioWorkbenchPage() {
     }
   };
 
+  const promoteScenario = async (id: string) => {
+    setBusy(true);
+    try {
+      await api.post(`/api/v1/scenario/${id}/promote`);
+      await load();
+      await loadDetail(id);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const kpiValue = (detail: ScenarioDetail, key: string) =>
     detail.results.find((r) => r.kpi_key === key)?.kpi_value ?? null;
 
@@ -143,6 +154,14 @@ export function ScenarioWorkbenchPage() {
                   <Button size="sm" onClick={() => void simulateExisting(s.id)} disabled={busy}>
                     {t('scenarios.resimulate')}
                   </Button>
+                  {s.status !== 'promoted' && (
+                    <Button size="sm" variant="secondary" onClick={() => void promoteScenario(s.id)} disabled={busy}>
+                      {t('scenarios.promote')}
+                    </Button>
+                  )}
+                  {s.status === 'promoted' && (
+                    <span className="text-xs font-medium text-green-700">{t('scenarios.promoted')}</span>
+                  )}
                 </div>
               </li>
             ))}

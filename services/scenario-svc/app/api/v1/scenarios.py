@@ -246,7 +246,10 @@ async def list_scenarios(
     rows = (
         await session.execute(
             select(PlanningScenario)
-            .where(PlanningScenario.tenant_id == tenant_id, PlanningScenario.status == "active")
+            .where(
+                PlanningScenario.tenant_id == tenant_id,
+                PlanningScenario.status != "archived",
+            )
             .order_by(PlanningScenario.created_at.desc())
             .limit(50)
         )
@@ -367,3 +370,24 @@ async def simulate_scenario(
     scenario.completed_at = datetime.now(UTC)
     await session.commit()
     return APIResponse(success=True, data={"scenario_id": str(scenario_id), "kpis": kpis}, error=None)
+
+
+@router.post("/{scenario_id}/promote")
+async def promote_scenario(
+    scenario_id: UUID,
+    session: AsyncSession = Depends(get_db_session),
+    _user=Depends(require_roles(["planner", "admin", "manager"])),
+):
+    """Mark a what-if scenario as the preferred plan (does not mutate live ERP schedule)."""
+    tenant_id = tenant_ctx.get()
+    scenario = await session.get(PlanningScenario, scenario_id)
+    if not scenario or str(scenario.tenant_id) != tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "Scenario not found"})
+
+    scenario.status = "promoted"
+    await session.commit()
+    return APIResponse(
+        success=True,
+        data={"scenario_id": str(scenario.id), "status": scenario.status, "name": scenario.name},
+        error=None,
+    )

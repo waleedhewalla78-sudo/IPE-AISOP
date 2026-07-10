@@ -1,11 +1,12 @@
 # IPE Platform Constitution
 
 <!--
-Sync Impact Report (Speckit converge — 2026-07-09)
-Version: 1.2.3 (unchanged)
-Updated: Principle VIII — Gate 11 12/14 confirmed 2026-07-09 (stable cluster)
-Updated: Development Workflow — Spec 017 First Release Plan (15-week waves)
-Updated: Sprint 7 T717–T719 emitters complete; T730 pending
+Sync Impact Report (Speckit — 2026-07-10 program converge)
+Version: 1.2.4 → 1.2.5 (PATCH)
+Updated: Development Workflow — Spec 019-program-converge is active Speckit feature for remaining whole-project work
+Updated: Principle VIII — R2 eng gates PASS; G-R2-04 Arabic human sign-off and PH1 commercial remain open (not faked)
+Clarified: Do not dilute Principle VII three-screen minimum; Wave 2/3 features stay POST-R1 unless contracted
+Templates: no structural change (PATCH only)
 -->
 
 IPE (Intelligent Planning Engine) is a microservices-based, event-driven platform for **feasibility-first manufacturing planning** in MENA mid-market discrete manufacturing. These principles are binding on all changes.
@@ -116,7 +117,7 @@ Every **deployed** service MUST be observable.
 
 - **Gates 1–5 are mandatory** before `v9.3.0-p2`-class tags: observability, security, multi-tenant, Odoo sync, full E2E (R1+R2+audit).
 - **Option B (Phase 0 combined)** MUST pass when enterprise flags are ON: Keycloak, Vault, TLS, Audit, Combined demo.
-- **Phase 3 gates (6–11)** MUST pass before `v9.4.0-p3`: Helm lint/render, kind deploy health, compose–K8s parity, HPA smoke, ERP scaffold imports, R1 demo on K8s ingress. As of **2026-07-09**: Gates **6, 7, 8, 9, 10 PASS**; **Gate 11 PARTIAL (12/14)** — OR-Tools schedule + approve timeout on kind (`docs/qa/GATE-RESULTS-PHASE3.md`, `docs/demo-data/gate11-k8s-demo.txt`). Tag `v9.4.0-p3` remains blocked until Gate 11 is **14/14** unless stakeholders waive via documented **OQ-9** decision.
+- **Phase 3 gates (6–11)** MUST pass before `v9.4.0-p3`: Helm lint/render, kind deploy health, compose–K8s parity, HPA smoke, ERP scaffold imports, R1 demo on K8s ingress. As of **2026-07-10**: Gates **6–10 PASS**; **Gate 11: 12/14 PASS** with documented **OQ-9 waiver** (`docs/demo-data/gate11-oq9-waiver.md`, `docs/demo-data/gate11-k8s-demo.txt`). Compose validation **14/14** (`docs/demo-data/release1-integration-demo.txt`). Tag **`v9.4.0-p3`** applied at `4629119`; closure commits through `ad494e0` include W1-02 smoke and UAT corrections.
 - **Phase 4 gates** (GTM): Stripe sandbox billing, tenant self-service API, developer portal — MUST NOT start until Phase 3 tag `v9.4.0-p3` is applied.
 - **Phase 5** (enterprise maturity, SOC 2 Type II, v8 SAP gap features): post-GTM backlog; MUST NOT block Phase 3 close-out or Star Trans R1 compose go-live.
 - **Gate scripts are the source of truth.** Markdown status tables MUST reference script paths and last PASS output; manual claims without script evidence do not satisfy this principle.
@@ -159,8 +160,10 @@ Every **deployed** service MUST be observable.
   4. Implementation playbook + support runbook published
   5. 90-day ROI metrics instrumented
 - **Enterprise gate (015):** Gates 1–5 + k6 profiles + Option B before Phase 2 tag; Gates 6–11 before Phase 3 tag.
-- **Sprint 7 cohesion (016):** Tier 1 activity emitters (T717–T719) complete; migration 038 apply (T730) pending before `v9.5.0-s7`.
-- **First Release Plan (017):** Phase 0 closes `v9.4.0-p3`; Waves 1–3 deliver nine priority features per `specs/017-first-release-plan/`. Wave 1 Copilot R1 nav unhide is permitted without diluting Principle VII three-screen minimum.
+- **Sprint 7 cohesion (016):** Tier 1 activity emitters (T717–T719) complete; migration 038 (T730) applied compose + K8s.
+- **First Release Plan (017):** Phase 0 **closed** (`v9.4.0-p3`); Wave 1 engineering delivered (W1-01–08). Waves 2–3 tracked via open GitHub issues #37–#46.
+- **Phase 2 Release 2 (018):** Engineering gates G-R2-01/02/03/05 PASS; G-R2-04 Arabic **human** sign-off OPEN; tag HOLD pending policy.
+- **Program Converge (019):** Active Speckit feature for remaining whole-project gaps (compose parity, scenario promote, stock.quant mock fidelity, issue triage). Commercial blockers (PH1-01 SOW, PH1-02 Odoo staging, native Arabic sign-off) MUST remain OPEN until humans close them.
 - **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
 
 ---
@@ -189,4 +192,4 @@ All `/speckit.analyze` reports MUST use this map when comparing downloaded roadm
 
 ---
 
-**Version**: 1.2.3 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-09
+**Version**: 1.2.5 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-10

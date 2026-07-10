@@ -110,6 +110,26 @@ def _sample_workcenters() -> list[dict]:
     ]
 
 
+def _sample_quants() -> list[dict]:
+    """Internal stock.quant rows for connector sync_inventory E2E against mock Odoo."""
+    return [
+        {
+            "id": 501,
+            "product_id": [1, "Widget A"],
+            "quantity": 120.0,
+            "reserved_quantity": 20.0,
+            "location_id": [8, "WH/Stock"],
+        },
+        {
+            "id": 502,
+            "product_id": [2, "Widget B"],
+            "quantity": 75.0,
+            "reserved_quantity": 5.0,
+            "location_id": [8, "WH/Stock"],
+        },
+    ]
+
+
 def _execute_kw(model: str, method: str, args: list, kwargs: dict):
     if method == "search_read":
         if model == "product.product":
@@ -120,6 +140,8 @@ def _execute_kw(model: str, method: str, args: list, kwargs: dict):
             return _sample_boms()
         if model == "mrp.workcenter":
             return _sample_workcenters()
+        if model == "stock.quant":
+            return _sample_quants()
         if model == "sale.order":
             return [
                 {
@@ -133,7 +155,7 @@ def _execute_kw(model: str, method: str, args: list, kwargs: dict):
                     "scheduled_date": "2026-06-15 00:00:00",
                 }
             ]
-        if model in ("res.partner", "stock.quant", "purchase.order", "mrp.bom.line", "mrp.routing.workcenter"):
+        if model in ("res.partner", "purchase.order", "mrp.bom.line", "mrp.routing.workcenter"):
             return []
         return []
     if method == "read":

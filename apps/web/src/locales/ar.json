@@ -267,6 +267,8 @@
   "scenarios.none": "لا توجد سيناريوهات بعد.",
   "scenarios.compare": "مقارنة",
   "scenarios.resimulate": "إعادة المحاكاة",
+  "scenarios.promote": "ترقية",
+  "scenarios.promoted": "مُرقّى",
   "scenarios.baselineCompare": "خط الأساس مقابل السيناريوهات",
   "scenarios.kpi": "مؤشر الأداء",
   "scenarios.baseline": "خط الأساس",

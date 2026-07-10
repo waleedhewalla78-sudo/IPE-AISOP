@@ -21,7 +21,8 @@
 | Spec 015 Enterprise production readiness | Partial; issues #15–#24 open | Triage EP3 tasks; close or re-scope stale T09x/T15x |
 | Spec 016 Sprint 7 ecosystem cohesion | Emitters / migration 038 claimed done | Close related GH issues after push; verify Gate 11 waiver docs |
 | Spec 017 First release plan | Wave 1 eng ✅; C-08–C-16 + PH1-* still open | See A2; push commits; commercial PH1; stock.quant / mat-svc compose |
-| Spec 018 Phase 2 Release 2 | Engineering ~90%; gates in progress this session | See **Section B** |
+| Spec 018 Phase 2 Release 2 | Engineering ~90%; gates mostly PASS | See **Section B**; human Arabic + tag HOLD |
+| Spec 019 `program-converge` | **Active Speckit** (2026-07-10) | mat-svc R2 + promote + stock.quant mock done; #47–#49 closed; #50/#51 open |
 
 ### A2. Spec 017 converge carry-over (still open)
 
@@ -86,7 +87,8 @@
 | `scripts/demo-http.ps1` | Patched: Keycloak→local fallback | Commit |
 | `scripts/seed-data.ps1` | Available | Seed if demo APIs return empty business data |
 | Alembic upgrade | Compose DB at **042** | `alembic upgrade head` if 043 required |
-| Playwright `arabic-r2` / `release2-nav` | Port 8082 listening (web-ui) | `cd apps/web; npx playwright test e2e/arabic-r2.spec.ts --project=desktop` |
+| Playwright `arabic-r2` / `release2-nav` | **PASS** 2026-07-10 (serial workers; Vite release2 for hub-hide) | Evidence `docs/qa/playwright-serial-2026-07-10.txt`, `playwright-release2-vite-2026-07-10.txt`; Arabic APIs still mocked; rebuild docker web-ui release2 |
+| k6 SLO + R2 critical | **PASS** (local auth; critical paced under Kong 500/min) | `docs/qa/k6-slo-final-2026-07-10.txt`, `k6-r2-critical-rerun-2026-07-10.txt`; full report `docs/qa/E2E-K6-PRODUCTION-READINESS-REPORT.md` |
 | `git push origin master` | Ahead **6** + large dirty tree | Commit R2 deliverables then push |
 
 ### A6. Integrations / infra
@@ -162,7 +164,7 @@
 | S5 Arabic | Eng ✅; QA sign-off ⬜ | Native reviewer |
 | S12 SAP B1 | **CUT** | No action unless ARB revives |
 | C-019 Arabic sign-off | OPEN | Human |
-| C-020 Playwright arabic-r2 | Pending run | `npx playwright test e2e/arabic-r2.spec.ts --project=desktop` |
+| C-020 Playwright arabic-r2 | **PASS eng UI** (API mocked) | Native sign-off still C-019; remove mocks for live data E2E |
 | C-021 smoke | **DONE PASS** | — |
 | C-022 demo | **DONE PASS** | — |
 | C-023 / C-024 | P2 open | Optional or CUT |
