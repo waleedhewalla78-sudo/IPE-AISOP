@@ -1,13 +1,8 @@
 import os
-os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-for-testing-only-32chars!")
-
 from unittest.mock import AsyncMock, MagicMock
 from uuid import UUID, uuid4
 
 import pytest
-
-from ipe_shared.config import settings
-settings.JWT_SECRET_KEY = "test-secret-key-for-testing-only-32chars!"
 
 TENANT_ID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
 
@@ -16,9 +11,9 @@ skip_if_no_db = pytest.mark.skipif(not DB_AVAILABLE, reason="Database not availa
 
 
 def _auth_headers():
-    from ipe_shared.auth.jwt import create_access_token
-    token = create_access_token(uuid4(), UUID(TENANT_ID), "planner")
-    return {"Authorization": f"Bearer {token}", "X-Tenant-ID": TENANT_ID}
+    from uuid import UUID
+    from ipe_shared.testing.conftest_helpers import make_auth_headers
+    return make_auth_headers(role="planner", tenant_id=UUID(TENANT_ID))
 
 
 def _make_mock_session():
@@ -37,20 +32,24 @@ def _make_mock_session():
 @pytest.fixture
 def app_with_overrides():
     from app.main import create_app
-    from ipe_shared.auth.rbac import require_roles
     from ipe_shared.database.session import get_session as get_db_session
+    from ipe_shared.testing.conftest_helpers import (
+        apply_auth_and_session_overrides,
+        make_mock_session,
+    )
+    from uuid import UUID
 
     _app = create_app()
-
-    async def _mock_require_roles(*roles):
-        return {"sub": str(uuid4()), "tenant_id": TENANT_ID, "role": "planner"}
-
-    mock_session = _make_mock_session()
+    apply_auth_and_session_overrides(
+        _app,
+        role="planner",
+        user_id=None,
+        tenant_id=UUID(TENANT_ID),
+    )
 
     async def _mock_get_session():
-        yield mock_session
+        yield make_mock_session()
 
-    _app.dependency_overrides[require_roles] = _mock_require_roles
     _app.dependency_overrides[get_db_session] = _mock_get_session
 
     yield _app
@@ -109,8 +108,8 @@ async def test_material_ctp_invalid_uuid(client):
 
 
 @pytest.mark.asyncio
-async def test_material_ctp_no_auth(client):
-    response = await client.post(
+async def test_material_ctp_no_auth(rbac_client):
+    response = await rbac_client.post(
         "/api/v1/material/ctp",
         json={
             "order_id": str(uuid4()),
@@ -162,8 +161,8 @@ async def test_material_ctp_batch_empty(client):
 
 
 @pytest.mark.asyncio
-async def test_material_ctp_batch_no_auth(client):
-    response = await client.post(
+async def test_material_ctp_batch_no_auth(rbac_client):
+    response = await rbac_client.post(
         "/api/v1/material/ctp/batch",
         json={"orders": []},
     )

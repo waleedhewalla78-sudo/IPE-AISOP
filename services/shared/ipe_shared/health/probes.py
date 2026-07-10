@@ -132,7 +132,7 @@ def overall_status(deps: dict[str, Any]) -> str:
     )
     if optional_down:
         return "degraded"
-    return "healthy"
+    return "ok"
 
 
 def allow_hs256_without_jwt_keys() -> bool:

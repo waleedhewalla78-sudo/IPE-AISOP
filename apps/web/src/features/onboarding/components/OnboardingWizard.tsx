@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/lib/constants';
 
 interface OnboardingStep {
   id: string;
@@ -32,8 +34,17 @@ const PLANS = [
   { id: 'enterprise', name: 'Enterprise', price: '$50,000/mo', features: ['Everything in Professional', 'Custom Integrations', 'Dedicated Support', 'SLA'] },
 ];
 
+const ERP_OPTIONS = [
+  { id: 'odoo', name: 'Odoo', detail: 'Recommended — JSON-RPC sync with IPE connector', recommended: true },
+  { id: 'sap', name: 'SAP ERP', detail: 'Connect via RFC/BAPI (enterprise)', recommended: false },
+  { id: 'dynamics', name: 'Dynamics 365', detail: 'Connect via OData API', recommended: false },
+  { id: 'skip', name: 'Skip for now', detail: 'Configure ERP later in Admin → Odoo ERP', recommended: false },
+] as const;
+
 export function OnboardingWizard() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
+  const [selectedErp, setSelectedErp] = useState<string>('');
   const [config, setConfig] = useState<TenantConfig>({
     company_name: '',
     industry: '',
@@ -141,25 +152,36 @@ export function OnboardingWizard() {
 
         {currentStep === 4 && (
           <div className="space-y-4">
-            <p>Connect your ERP system to start importing data:</p>
-            <div className="grid grid-cols-2 gap-4">
-              <button className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 text-left">
-                <div className="font-bold">SAP ERP</div>
-                <div className="text-sm text-gray-500">Connect via RFC/BAPI</div>
-              </button>
-              <button className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 text-left">
-                <div className="font-bold">Dynamics 365</div>
-                <div className="text-sm text-gray-500">Connect via OData API</div>
-              </button>
-              <button className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 text-left">
-                <div className="font-bold">Odoo</div>
-                <div className="text-sm text-gray-500">Connect via JSON-RPC</div>
-              </button>
-              <button className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 text-left">
-                <div className="font-bold">Skip for now</div>
-                <div className="text-sm text-gray-500">Set up later</div>
-              </button>
+            <p>Connect your ERP system to start importing manufacturing data. Odoo is the supported path for Release 1.</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {ERP_OPTIONS.map((erp) => (
+                <button
+                  key={erp.id}
+                  type="button"
+                  className={`rounded-lg border-2 p-4 text-left transition-colors ${
+                    selectedErp === erp.id
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                  onClick={() => setSelectedErp(erp.id)}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-bold">{erp.name}</div>
+                    {erp.recommended ? (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        Recommended
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="mt-1 text-sm text-gray-500">{erp.detail}</div>
+                </button>
+              ))}
             </div>
+            {selectedErp === 'odoo' ? (
+              <p className="text-sm text-blue-700">
+                After onboarding, open <strong>Admin → Odoo ERP</strong> to run the connection wizard and first sync.
+              </p>
+            ) : null}
           </div>
         )}
 
@@ -168,8 +190,12 @@ export function OnboardingWizard() {
             <div className="text-6xl mb-4">🎉</div>
             <h3 className="text-xl font-bold mb-2">You're all set!</h3>
             <p className="text-gray-500 mb-6">Your IPE workspace is ready. Start by exploring the Control Tower.</p>
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold">
-              Go to Control Tower →
+            <button
+              type="button"
+              className="rounded-lg bg-blue-600 px-6 py-3 font-bold text-white"
+              onClick={() => navigate(selectedErp === 'odoo' ? ROUTES.PLATFORM_ADMIN : '/planning')}
+            >
+              {selectedErp === 'odoo' ? 'Open Odoo setup →' : 'Go to Control Tower →'}
             </button>
           </div>
         )}
@@ -178,8 +204,14 @@ export function OnboardingWizard() {
           <button onClick={prevStep} disabled={currentStep === 0}
             className="px-4 py-2 text-gray-500 disabled:opacity-50">← Back</button>
           {currentStep < STEPS.length - 1 && (
-            <button onClick={nextStep}
-              className="px-4 py-2 bg-blue-600 text-white rounded">Continue →</button>
+            <button
+              type="button"
+              onClick={nextStep}
+              disabled={currentStep === 4 && !selectedErp}
+              className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+            >
+              Continue →
+            </button>
           )}
         </div>
       </div>

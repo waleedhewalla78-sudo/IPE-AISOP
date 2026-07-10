@@ -1,4 +1,4 @@
-﻿# Phase 2 Release 2 — Program Gates (G-R2)
+# Phase 2 Release 2 — Program Gates (G-R2)
 
 **Feature**: `018-phase2-release2`  
 **Date**: 2026-07-10 (live re-verified)  
@@ -7,7 +7,7 @@
 
 | Gate | Criteria | Status | Evidence |
 |------|----------|--------|----------|
-| **G-R2-01** | `scripts/release2-smoke.ps1` — R1+R2 container health + Kong login/routes | **PASS** (15/15) | `docs/qa/release2-smoke-2026-07-10.txt` — AUTH_MODE=local on demand/scenario/dpe; Kong demand+scenario 200 |
+| **G-R2-01** | `scripts/release2-smoke.ps1` - R1+R2 container health + Kong login/routes | **PASS** | `docs/qa/release2-smoke-2026-07-10.txt` — 15/15 PASS (2026-07-10) after release2 compose up --build, alembic head, seed |
 | **G-R2-02** | Copilot live-data tools (S2): unit `services/nlp-svc/tests/test_copilot_tools_r2.py` | **PASS** | CI/local pytest; smoke: `docs/qa/copilot-r1-smoke.txt` |
 | **G-R2-03** | Wave 1 bridge W1-03–W1-08 (Odoo v2 + OTD) | **PASS (engineering)** | Live Odoo staging still PH1-02; mock-odoo XML-RPC wired for local sync E2E |
 | **G-R2-04** | Arabic 8+ screens (S5) | **PASS (engineering)** · native sign-off ⬜ | `docs/qa/arabic-qa-r2.md` — **human native reviewer required** (cannot fake) |
@@ -15,10 +15,10 @@
 
 ## Gate notes
 
-### G-R2-01 (smoke) — FIXED 2026-07-10
-- Root cause: `AUTH_MODE=keycloak` verified local RS256 login tokens (`kid=ipe-rs256-v1`) against Keycloak JWKS → 401.
-- Fix: `AUTH_MODE=local` on demand-svc, scenario-svc, dpe-svc in `docker-compose.release2.yml`; dual-mode JWT resolve in `ipe_shared.auth.dependencies`.
-
+### G-R2-01 (smoke)
+- Smoke requires Release 2 compose (`infrastructure/docker/docker-compose.release2.yml`).
+- **2026-07-10**: **PASS** — `scripts/release2-smoke.ps1` Result: 15 passed, 0 failed. Evidence: `docs/qa/release2-smoke-2026-07-10.txt`.
+- Deploy notes: stopped conflicting keycloak/minio/vault on 8180/9000/8200; compose up --build (PyPI retries); alembic upgrade head (036–042); seed via running db container; `AUTH_MODE=local` for R2 JWT smoke path.
 ### G-R2-05 (demo) — FIXED 2026-07-10
 - mock-odoo-api XML-RPC added to R2 compose; sync/run returns real `rescored`.
 - Resolution step proposes from feasibility queue `mo_id` when list empty.

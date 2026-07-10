@@ -7,4 +7,10 @@
   body {
     @apply antialiased;
   }
+
+  [dir='rtl'] .tabular-nums,
+  [dir='rtl'] .font-mono {
+    direction: ltr;
+    unicode-bidi: embed;
+  }
 }

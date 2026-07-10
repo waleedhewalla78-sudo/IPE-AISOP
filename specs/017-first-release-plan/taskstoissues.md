@@ -1,16 +1,24 @@
 # GitHub Issues — Spec 017 (`/speckit.taskstoissues`)
 
 **Repo**: [waleedhewalla78-sudo/IPE-AISOP](https://github.com/waleedhewalla78-sudo/IPE-AISOP)  
-**Created**: 2026-07-09
+**Updated**: 2026-07-10
+
+## Closure status (2026-07-10)
+
+| Task ID | Issue | Status | Close commit / evidence |
+|---------|-------|--------|-------------------------|
+| P0-02 | [#27](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/27) | **CLOSED** infra | `6b8c08f` — WON'T FIX |
+| P0-03 | [#28](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/28) | **CLOSED** doc | `e5b00f4` — §6 template |
+| P0-07 | [#29](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/29) | **CLOSED** | alembic 038 |
+| P0-08 | [#18](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/18) | **CLOSED** | tag `v9.4.0-p3` |
+| W1-02 | [#30](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/30) | **CLOSED** | `43d55b1` — 12/12 smoke |
+
+> **Action**: Close issues on GitHub after `git push origin master`.
+
+## Open issues (execution)
 
 | Task ID | Issue | Title |
 |---------|-------|-------|
-| P0-02 | [#27](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/27) | Gate 11 remediation — OR-Tools steps 10–11 |
-| P0-03 | [#28](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/28) | OQ-9 stakeholder decision |
-| P0-07 | [#29](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/29) | T730 migration 038 |
-| P0-08 | [#18](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/18) | T157 tag v9.4.0-p3 (existing) |
-| W1-01 | — | Copilot R1 nav — **implemented** (no issue) |
-| W1-02 | [#30](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/30) | Copilot smoke test |
 | W1-03 | [#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31) | Odoo Config v2 schema |
 | W1-04 | [#32](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/32) | Odoo connection test |
 | W1-05 | [#33](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/33) | Odoo multi-entity/versioning |
@@ -28,4 +36,6 @@
 | W3-03 | [#45](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/45) | Supplier rules/templates |
 | W3-04 | [#46](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/46) | Supplier email/audit |
 
-**Phase 4 (existing)**: [#25](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/25) T172 tenant API, [#26](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/26) T173 Terraform
+**Phase 4 (existing)**: [#25](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/25), [#26](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/26)
+
+**New issues needed**: PH1-01–07 (commercial + R1.1) — create when SOW unblocks.

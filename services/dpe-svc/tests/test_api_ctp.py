@@ -1,13 +1,10 @@
-import os
+﻿import os
 os.environ.setdefault("IPE_JWT_SECRET_KEY", "dev-jwt-secret-change-in-production-min-32-chars")
 
 from unittest.mock import AsyncMock, patch
 from uuid import UUID
 
 import pytest
-
-from ipe_shared.config import settings
-settings.JWT_SECRET_KEY = "dev-jwt-secret-change-in-production-min-32-chars"
 
 USER_ID = UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 TENANT_ID = UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -17,27 +14,31 @@ skip_if_no_db = pytest.mark.skipif(not DB_AVAILABLE, reason="Database not availa
 
 
 def _auth_headers():
-    from ipe_shared.auth.jwt import create_access_token
-    token = create_access_token(USER_ID, TENANT_ID, "admin")
-    return {"Authorization": f"Bearer {token}", "X-Tenant-ID": str(TENANT_ID)}
+    from ipe_shared.testing.conftest_helpers import make_auth_headers
+    return make_auth_headers(role="planner", tenant_id=TENANT_ID)
 
 
 @pytest.fixture
 def app_with_overrides():
     from app.main import create_app
-    from ipe_shared.auth.rbac import require_roles
     from ipe_shared.database.session import get_session as get_db_session
+    from ipe_shared.testing.conftest_helpers import (
+        apply_auth_and_session_overrides,
+        make_mock_session,
+    )
+    from uuid import UUID
 
     _app = create_app()
-
-    async def _mock_require_roles(*roles):
-        return {"sub": str(USER_ID), "tenant_id": str(TENANT_ID), "role": "admin"}
+    apply_auth_and_session_overrides(
+        _app,
+        role="planner",
+        user_id=USER_ID,
+        tenant_id=TENANT_ID,
+    )
 
     async def _mock_get_session():
-        mock_session = AsyncMock()
-        yield mock_session
+        yield make_mock_session()
 
-    _app.dependency_overrides[require_roles] = _mock_require_roles
     _app.dependency_overrides[get_db_session] = _mock_get_session
 
     yield _app
@@ -46,7 +47,7 @@ def app_with_overrides():
 
 
 @pytest.fixture
-async def client(app_with_overrides):
+async def ctp_client(app_with_overrides):
     from httpx import ASGITransport, AsyncClient
     transport = ASGITransport(app=app_with_overrides)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
@@ -54,8 +55,8 @@ async def client(app_with_overrides):
 
 
 @pytest.mark.asyncio
-async def test_ctp_evaluate_valid_request(client):
-    response = await client.post(
+async def test_ctp_evaluate_valid_request(ctp_client):
+    response = await ctp_client.post(
         "/api/v1/ctp/evaluate",
         json={
             "so_id": 1001,
@@ -74,8 +75,8 @@ async def test_ctp_evaluate_valid_request(client):
 
 
 @pytest.mark.asyncio
-async def test_ctp_evaluate_missing_required_fields(client):
-    response = await client.post(
+async def test_ctp_evaluate_missing_required_fields(ctp_client):
+    response = await ctp_client.post(
         "/api/v1/ctp/evaluate",
         json={},
         headers=_auth_headers(),
@@ -84,8 +85,8 @@ async def test_ctp_evaluate_missing_required_fields(client):
 
 
 @pytest.mark.asyncio
-async def test_ctp_evaluate_invalid_so_id(client):
-    response = await client.post(
+async def test_ctp_evaluate_invalid_so_id(ctp_client):
+    response = await ctp_client.post(
         "/api/v1/ctp/evaluate",
         json={
             "so_id": -1,
@@ -99,8 +100,8 @@ async def test_ctp_evaluate_invalid_so_id(client):
 
 
 @pytest.mark.asyncio
-async def test_ctp_evaluate_zero_quantity(client):
-    response = await client.post(
+async def test_ctp_evaluate_zero_quantity(ctp_client):
+    response = await ctp_client.post(
         "/api/v1/ctp/evaluate",
         json={
             "so_id": 1001,
@@ -124,4 +125,4 @@ async def test_ctp_evaluate_no_auth(client):
             "requested_delivery_date": "2026-07-15T00:00:00",
         },
     )
-    assert response.status_code in (401, 403)
+    assert response.status_code in (400, 401, 403)

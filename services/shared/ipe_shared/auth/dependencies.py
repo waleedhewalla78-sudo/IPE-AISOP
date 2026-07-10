@@ -21,20 +21,31 @@ security = HTTPBearer()
 
 
 def _resolve_token_payload(token: str) -> TokenPayload:
-    """Verify JWT: local RS256 (login) first when kid matches, else Keycloak JWKS."""
+    """Verify JWT for hybrid stacks: local RS256 login and Keycloak SSO.
+
+    - Tokens with the platform key id always use local RS256 verification.
+    - AUTH_MODE=keycloak: verify other tokens via JWKS, with local fallback.
+    - AUTH_MODE=local: try local first, then Keycloak JWKS so SSO still works.
+    """
     header = jwt.get_unverified_header(token)
     kid = header.get("kid")
     local_kid = get_key_id()
 
-    # Platform login issues RS256 with IPE_JWT_KEY_ID even when AUTH_MODE=keycloak.
-    if kid == local_kid or auth_provider() != "keycloak":
+    if kid == local_kid:
         return decode_token(token)
 
+    if auth_provider() == "keycloak":
+        try:
+            return keycloak_token_to_payload(token)
+        except Exception:
+            # Hybrid stacks: fall back to local public key when Keycloak JWKS lacks the kid.
+            return decode_token(token)
+
+    # AUTH_MODE=local (R2 compose): accept platform login, then Keycloak SSO tokens.
     try:
-        return keycloak_token_to_payload(token)
-    except Exception:
-        # Hybrid stacks: fall back to local public key when Keycloak JWKS lacks the kid.
         return decode_token(token)
+    except Exception:
+        return keycloak_token_to_payload(token)
 
 
 async def get_current_user(

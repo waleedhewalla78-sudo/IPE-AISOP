@@ -412,6 +412,8 @@ services:
       - name: connector-sync-route
         paths:
           - /api/v1/sync
+          - /api/v1/admin/odoo-config
+          - /api/v1/erp/odoo
         strip_path: false
 
 consumers:

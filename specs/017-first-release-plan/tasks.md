@@ -1,6 +1,20 @@
 # Tasks: IPE First Release Plan (017)
 
-**Version**: 1.0 | **Date**: 2026-07-09
+**Version**: 1.1 | **Date**: 2026-07-10
+
+---
+
+## Phase 1 — Star Trans UAT (commercial track)
+
+| ID | Task | Priority | Status | Notes |
+|----|------|----------|--------|-------|
+| PH1-01 | Signed SOW | P0 | ⬜ | Commercial blocker |
+| PH1-02 | Odoo staging access | P0 | ⬜ | Commercial blocker |
+| PH1-03 | FR-R1-05 stock.quant sync | P0 | ⬜ | R1.1 ~2–3 days |
+| PH1-04 | FR-R1-16 OTD baseline API | P0 | ⬜ | Overlaps W1-07 |
+| PH1-05 | Arabic native speaker QA | P0 | ⬜ | RTL sign-off |
+| PH1-06 | Phase 1 UAT execution | P0 | ⬜ | Sprint 5 gate |
+| PH1-07 | Production go-live `v9.0.0-r1` | P0 | ⬜ | Sprint 6 gate |
 
 ---
 
@@ -23,12 +37,12 @@
 |----|------|----------|--------|--------|
 | W1-01 | Copilot R1 sidebar nav + i18n | P0 | ✅ | — |
 | W1-02 | Copilot smoke test (auth + route) | P1 | ✅ | [#30](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/30) — `docs/qa/copilot-r1-smoke.txt` 12/12 |
-| W1-03 | Odoo Config v2 — schema + validation API | P0 | ⬜ | [#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31) |
-| W1-04 | Odoo Config v2 — connection test endpoint | P0 | ⬜ | [#32](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/32) |
-| W1-05 | Odoo Config v2 — multi-entity + versioning | P1 | ⬜ | [#33](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/33) |
-| W1-06 | Odoo Config v2 — React UI | P1 | ⬜ | [#34](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/34) |
-| W1-07 | OTD dashboard — aggregation service | P0 | ⬜ | [#35](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/35) |
-| W1-08 | OTD dashboard — React 5 KPI cards | P0 | ⬜ | [#36](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/36) |
+| W1-03 | Odoo Config v2 — schema + validation API | P0 | ✅ | [#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31) — migration 043, connector API |
+| W1-04 | Odoo Config v2 — connection test endpoint | P0 | ✅ | [#32](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/32) — 5s timeout |
+| W1-05 | Odoo Config v2 — multi-entity + versioning | P1 | ✅ | [#33](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/33) — rollback + v1 bootstrap |
+| W1-06 | Odoo Config v2 — React UI | P1 | ✅ | [#34](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/34) — Platform hub, en+ar |
+| W1-07 | OTD dashboard — aggregation service | P0 | ✅ | [#35](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/35) |
+| W1-08 | OTD dashboard — React 5 KPI cards | P0 | ✅ | [#36](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/36) |
 
 ## Wave 2 — Intelligence (Weeks 6–11)
 
@@ -58,6 +72,20 @@
 | T732 | mat-svc in release1 compose (OQ-8) | P1 | ⬜ |
 | T720–T722 | Sprint 7 Tier 2 AI stretch | P2 | ⬜ deferred |
 
+## Converge carry-over (2026-07-10)
+
+| ID | Task | Priority | Status | Notes |
+|----|------|----------|--------|-------|
+| C-08 | Push 6 commits to origin | P0 | ⬜ | `ad494e0` ahead of tag |
+| C-09 | Restabilize kind cluster | P0 | ⬜ | HPA delete + scale=1 |
+| C-10 | Update `wave1-readiness.md` | P2 | ✅ | 2026-07-10 |
+| C-11 | Regenerate UAT docx from corrections | P2 | ⬜ | `UAT-PHASES-0-3-CORRECTIONS.md` |
+| C-12 | OQ-9 stakeholder names on waiver §6 | P2 | ⬜ | #28 |
+| C-13 | T731 activity API integration tests | P1 | ⬜ | — |
+| C-14 | T732 mat-svc release1 compose | P1 | ⬜ | OQ-8 |
+| C-15 | FR-R1-05 stock.quant (Phase 1) | P0 | ⬜ | overlaps PH1-03 |
+| C-16 | FR-R1-16 OTD baseline API (Phase 1) | P0 | ⬜ | overlaps W1-07 |
+
 ---
 
-*Tasks v1.0 — issue numbers assigned via `/speckit.taskstoissues` 2026-07-09*
+*Tasks v1.2 — `/speckit.tasks` 2026-07-10*

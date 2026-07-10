@@ -6,17 +6,13 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from ipe_shared.config import settings
-settings.JWT_SECRET_KEY = "dev-jwt-secret-change-in-production-min-32-chars"
-
 USER_ID = UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 TENANT_ID = UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 
 
 def _auth_headers():
-    from ipe_shared.auth.jwt import create_access_token
-    token = create_access_token(USER_ID, TENANT_ID, "admin")
-    return {"Authorization": f"Bearer {token}", "X-Tenant-ID": str(TENANT_ID)}
+    from ipe_shared.testing.conftest_helpers import make_auth_headers
+    return make_auth_headers(role="planner", tenant_id=TENANT_ID)
 
 
 def _make_mock_session():
@@ -37,20 +33,24 @@ def _make_mock_session():
 @pytest.fixture
 def app_with_overrides():
     from app.main import create_app
-    from ipe_shared.auth.rbac import require_roles
     from ipe_shared.database.session import get_session as get_db_session
+    from ipe_shared.testing.conftest_helpers import (
+        apply_auth_and_session_overrides,
+        make_mock_session,
+    )
+    from uuid import UUID
 
     _app = create_app()
-
-    async def _mock_require_roles(*roles):
-        return {"sub": str(USER_ID), "tenant_id": str(TENANT_ID), "role": "admin"}
-
-    mock_session = _make_mock_session()
+    apply_auth_and_session_overrides(
+        _app,
+        role="planner",
+        user_id=USER_ID,
+        tenant_id=TENANT_ID,
+    )
 
     async def _mock_get_session():
-        yield mock_session
+        yield make_mock_session()
 
-    _app.dependency_overrides[require_roles] = _mock_require_roles
     _app.dependency_overrides[get_db_session] = _mock_get_session
 
     yield _app

@@ -1,17 +1,33 @@
-"""LLM API client - delegates to TieredRouter or LLMTierRouter based on config."""
+"""LLM API client - delegates to TieredRouter or LLMTierRouter based on config.
+
+R2 fallback chain (via LLMTierRouter when LLM_ROUTING_ENABLED=false):
+Anthropic -> OpenRouter -> Ollama -> LLMUnavailableError.
+"""
 
 from collections.abc import AsyncGenerator
 
 from app.config import settings
 from app.core.llm_errors import LLMUnavailableError
-from app.core.llm_router import LLMProvider, LLMTierRouter
+from app.core.llm_router import LLMProvider, LLMTierRouter, R2_CLOUD_FALLBACK
 from app.core.tiered_router import TieredRouter
 from app.core.tool_agent_backend import _get_client, get_tool_agent_backend
 
 _router = LLMTierRouter()
 _tiered_router = TieredRouter()
 
-__all__ = ["query_llm", "get_llm_status", "stream_llm", "_get_client", "get_tool_agent_backend"]
+__all__ = [
+    "query_llm",
+    "get_llm_status",
+    "stream_llm",
+    "get_r2_fallback_chain",
+    "_get_client",
+    "get_tool_agent_backend",
+]
+
+
+def get_r2_fallback_chain() -> list[str]:
+    """Return configured R2 cloud fallback provider order."""
+    return [provider.value for provider in R2_CLOUD_FALLBACK]
 
 
 async def query_llm(prompt: str, system_prompt: str = "") -> str:

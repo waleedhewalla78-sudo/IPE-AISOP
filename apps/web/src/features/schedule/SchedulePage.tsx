@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { t } from '@/lib/i18n';
 import { GanttChart } from './components/GanttChart';
 import { ProjectPlanUpload } from './components/ProjectPlanUpload';
 import { ScheduleControlPanel } from './components/ScheduleControlPanel';
@@ -121,7 +122,7 @@ export function SchedulePage() {
     try {
       const result = await approveSchedule(moIds, moVersions);
       if (result.activated.length) {
-        setMessage(`Approved ${result.activated.length} manufacturing order(s). Schedule persisted.`);
+        setMessage(t('schedule.approved', undefined, { count: result.activated.length }));
         setRows(prev =>
           prev.map(r =>
             result.activated.includes(r.mo_id) ? { ...r, approved: true } : r,
@@ -130,10 +131,10 @@ export function SchedulePage() {
         await loadSolverSchedule();
       }
       if (result.failed.length) {
-        setMessage(`Some approvals failed: ${result.failed.map(f => f.reason).join(', ')}`);
+        setMessage(`${t('schedule.approvalPartial')}: ${result.failed.map(f => f.reason).join(', ')}`);
       }
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Approval failed');
+      setMessage(err instanceof Error ? err.message : t('errors.approvalFailed'));
     }
   };
 
@@ -163,9 +164,9 @@ export function SchedulePage() {
     try {
       const moIds = rows.map((r) => r.mo_id);
       await downloadMsProjectExport(moIds.length ? moIds : undefined);
-      setMessage('MS Project XML export downloaded.');
+      setMessage(t('schedule.exportDone'));
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Export failed');
+      setMessage(err instanceof Error ? err.message : t('errors.exportFailed'));
     } finally {
       setExporting(false);
     }
@@ -175,10 +176,8 @@ export function SchedulePage() {
     <div className="p-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-ipe-text">Schedule</h1>
-          <p className="text-sm text-ipe-text-muted">
-            Compare planned vs AI-suggested schedule, upload Excel project plans, and approve changes
-          </p>
+          <h1 className="text-2xl font-bold text-ipe-text">{t('schedule.title')}</h1>
+          <p className="text-sm text-ipe-text-muted">{t('schedule.subtitle')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ProjectPlanUpload onUploadSuccess={handleUploadSuccess} />
@@ -187,13 +186,13 @@ export function SchedulePage() {
             onClick={handleExportMsProject}
             disabled={exporting || !rows.length}
           >
-            {exporting ? 'Exporting...' : 'Download MS Project'}
+            {exporting ? t('schedule.exporting') : t('schedule.export')}
           </button>
           <button
             className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             onClick={handleRefresh}
           >
-            Refresh
+            {t('schedule.refresh')}
           </button>
         </div>
       </div>
@@ -203,7 +202,7 @@ export function SchedulePage() {
       )}
 
       <div className="flex flex-wrap items-center gap-4 rounded-lg border border-ipe-border bg-white p-3">
-        <span className="text-sm font-medium text-ipe-text">View:</span>
+        <span className="text-sm font-medium text-ipe-text">{t('schedule.view')}:</span>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="radio"
@@ -211,7 +210,7 @@ export function SchedulePage() {
             checked={source === 'solver'}
             onChange={() => setSource('solver')}
           />
-          AI / solver schedule
+          {t('schedule.sourceSolver')}
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input
@@ -220,7 +219,7 @@ export function SchedulePage() {
             checked={source === 'uploaded'}
             onChange={() => setSource('uploaded')}
           />
-          Uploaded project plan
+          {t('schedule.sourceUploaded')}
         </label>
         {source === 'uploaded' && (
           <select
@@ -228,7 +227,7 @@ export function SchedulePage() {
             value={activePlanCode}
             onChange={e => setActivePlanCode(e.target.value)}
           >
-            <option value="">Select plan...</option>
+            <option value="">{t('schedule.selectPlan')}</option>
             {planOptions.map(code => (
               <option key={code} value={code}>
                 {code}

@@ -10,6 +10,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 vi.mock('@/features/auth/hooks/useAuth');
 vi.mock('@/lib/releaseProfile', () => ({
   IS_RELEASE1: true,
+  IS_RELEASE2: false,
   RELEASE_PROFILE: 'release1',
   RELEASE1_HUBS: ['planning', 'command-center', 'platform', 'copilot'],
 }));

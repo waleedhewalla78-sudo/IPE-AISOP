@@ -29,6 +29,7 @@ async def test_handle_demand_created_sets_priority(monkeypatch):
             MagicMock(),
             MagicMock(one_or_none=MagicMock(return_value=(demand_line, product))),
             MagicMock(fetchone=MagicMock(return_value=(uuid4(),))),
+            MagicMock(scalar=MagicMock(return_value=0)),
         ]
     )
     mock_session.add = MagicMock()

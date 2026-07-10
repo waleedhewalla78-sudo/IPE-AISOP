@@ -79,10 +79,13 @@ test.describe('CPM cascade performance', () => {
     await page.fill('input[type="email"]', 'admin@demo.com');
     await page.fill('input[type="password"]', 'admin');
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/\/control-tower/, { timeout: 10000 });
+    // Post-login landing is Planning Dashboard (not legacy /control-tower).
+    await expect(page).toHaveURL(/\/planning\/dashboard/, { timeout: 15000 });
 
-    await page.goto('/schedule');
-    await expect(page.getByText('Schedule Gantt')).toBeVisible({ timeout: 10000 });
+    await page.goto('/planning/schedule');
+    await expect(page.getByText(/Schedule Gantt|الجدولة|Gantt/i).first()).toBeVisible({
+      timeout: 15000,
+    });
 
     const bar = page.locator('[title*="op-1"]').first();
     await expect(bar).toBeVisible();

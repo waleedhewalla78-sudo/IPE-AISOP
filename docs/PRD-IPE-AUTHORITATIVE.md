@@ -5,17 +5,27 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | PRD-IPE-AUTHORITATIVE-2026 |
-| **Product** | **IPE** (Intelligent Planning Engine) — **not NEXUS** |
-| **Product version (full stack)** | **v8.2.0** (code complete; git tag pending — see OQ-4) |
-| **Customer release profiles** | Release 1 (`v9.0.0-r1`) · Release 2 (`v9.1.0-r2`) · Enterprise P2 (`v9.3.0-p2` ✅) · Enterprise P3 (`v9.4.0-p3` blocked) · Sprint 7 (`v9.5.0-s7` in progress) |
-| **Status** | **As-is development reference** — documents what exists, what is scaffolded, what is validated, and what is blocked |
-| **Last updated** | **2026-07-07** |
+| **Product** | **IPE** (Intelligent Planning Engine / AISOP IPE) — **not NEXUS Social** |
+| **Document status** | **As-is development reference** — living platform, not idealized future state |
+| **Last updated** | **2026-07-10** |
 | **Workspace** | `E:\AISOP\ipe` |
-| **Supersedes** | `docs/PRD-IPE-COMPREHENSIVE-AS-IS.md` (retained as historical snapshot through 2026-07-04) |
-| **Primary vertical** | Discrete manufacturing — electrical transformers (Star Trans, Egypt/MENA) |
-| **Scope boundary** | **IPE AISOP only** — NEXUS Social / external marketing products are **out of scope** |
+| **Constitution** | `ipe/.specify/memory/constitution.md` **v1.2.4** |
+| **Supersedes** | Prior draft of this file (2026-07-07); `docs/PRD-IPE-COMPREHENSIVE-AS-IS.md` (historical snapshot) |
+| **Primary vertical** | Discrete manufacturing — electrical transformers (Star Trans, Egypt / MENA) |
+| **Scope boundary** | **IPE only** — NEXUS Social is out of scope (one-line note in §1.4) |
 
-> **How to read this document:** Sections describe IPE **as it currently exists in development**, not an idealized future state. Items marked **POST-B** require business activation (credentials, contracts). Items marked **⬜** or **🟡** are gaps or partial implementations. **Stakeholder decisions** are flagged as **OQ-*** rather than assumed.
+> **How to read this document:** Capabilities are tagged **SHIPPED** / **PARTIAL** / **PLANNED** / **CUT** / **BLOCKED** / **UNKNOWN**. Items needing stakeholder input are **OQ-*** or listed in §18 / Appendix G. Do not treat inferred competitive claims as validated research.
+
+### Status labeling convention
+
+| Tag | Meaning |
+|-----|---------|
+| **SHIPPED** | In codebase and verified by tests, smoke, and/or demo evidence |
+| **PARTIAL** | Implemented with named gaps |
+| **PLANNED** | In spec/tasks; not built (or not verified) |
+| **CUT** | Explicitly removed from scope (e.g. SAP B1 S12) |
+| **BLOCKED** | Commercial / human / external dependency |
+| **UNKNOWN** | Insufficient repo evidence — needs stakeholder input |
 
 ---
 
@@ -39,9 +49,7 @@
 16. [Implementation Roadmap](#16-implementation-roadmap)
 17. [Risks & Mitigation](#17-risks--mitigation)
 18. [Assumptions & Constraints](#18-assumptions--constraints)
-19. [Task Tool & Cursor Integration](#19-task-tool--cursor-integration)
-20. [Full Integration Testing Requirements](#20-full-integration-testing-requirements)
-21. [Appendices](#21-appendices)
+19. [Appendices](#19-appendices)
 
 ---
 
@@ -49,7 +57,7 @@
 
 ### 1.1 Vision Statement
 
-> Enable discrete manufacturers to **see which orders are at risk before the shift starts**, **choose among structured resolution options**, and **publish feasible schedules** — grounded in ERP master data, not manually maintained spreadsheets — with AI in **shadow mode** until trust is established.
+> Enable discrete manufacturers to **see which manufacturing orders (MOs) are at risk before the shift starts**, **choose among structured resolution options**, and **publish feasible schedules** — grounded in live ERP master data (Odoo first), not manually maintained spreadsheets — with AI in **shadow mode** until trust is established.
 
 ### 1.2 Product Definition (As-Is)
 
@@ -57,81 +65,93 @@
 |-----------|------------|
 | **Product name** | Intelligent Planning Engine (IPE) |
 | **Product type** | AI-assisted Advanced Planning & Scheduling (APS) layer above ERP |
-| **Architecture** | Event-driven microservices (22 in full profile; 7–9 in Release 1 compose) + React hub UI + Kong gateway |
-| **Primary ERP (live-validated)** | Odoo 17–19 via XML-RPC (`connector`) |
-| **Reference customer** | Star Trans — electrical transformers, Egypt/MENA |
-| **Constitution** | `ipe/.specify/memory/constitution.md` v1.2.2 — binding principles (RLS, auth, tests, events, service architecture, observability, release gates) |
-| **Spec Kit program** | Features `000`–`016` under `ipe/specs/`; active feature `016-sprint7-ecosystem-cohesion` |
+| **Architecture** | Microservices + React hub UI + Kong gateway; Kafka event mesh in **full** profile; batch sync in **Release 1/2** profiles |
+| **Primary ERP** | Odoo 17–19 via XML-RPC (`connector`); mock-odoo for local E2E |
+| **Reference customer** | Star Trans — Electrical Transformer Technology (Egypt / MENA) |
+| **Buyer persona (R1)** | CEO / Operations Director — not IT steering committee |
+| **Spec Kit program** | Features `000`–`018` under `ipe/specs/`; active rollup `005`; active R2 `018`; first-release plan `017` |
 
-### 1.3 In Scope (As-Is — 2026-07-07)
+### 1.3 In Scope (As-Is — 2026-07-10)
 
 #### Full profile (`VITE_RELEASE_PROFILE=full`)
 
-| Area | Capabilities |
-|------|--------------|
-| **Unified Workspace** | Cross-tool KPIs + activity feed (`/workspace`) — Sprint 7 Tier 1 |
-| **Planning** | Control Tower, Resolution, Schedule (OR-Tools + Excel), Demand, Scenarios |
-| **Command** | Executive, War Room, Cost of Chaos, Outcomes (R2), Equipment health |
-| **Supply Chain** | Supply network, orders/ATP, procurement, tariff, SCN portal, inventory |
-| **AI & Governance** | Copilot, Design AI, AI Trust, MDR, Compliance, Quality, Sustainability |
-| **Platform** | Admin, onboarding wizard, MLOps |
-| **Shop Floor** | Operator PWA (barcode, work orders) |
-| **Integrations** | Kafka event mesh; LLM (Ollama/OpenRouter/Anthropic); Odoo; SAP/D365 scaffolds |
-| **Enterprise overlay** | Keycloak, Vault, Kong TLS :8443, Prometheus/Grafana, audit, tenant quotas |
+| Area | Capabilities | Status |
+|------|--------------|--------|
+| **Unified Workspace** | Cross-tool KPIs + activity feed (`/workspace`) | **SHIPPED** (Sprint 7 / spec 016) |
+| **Planning** | Control Tower, Resolution, Schedule, Demand, Scenarios | **SHIPPED** (depth varies by module) |
+| **Command Center** | Executive, War Room, Outcomes, OTD, Cost of Chaos, Equipment, S&OP | **SHIPPED** / **PARTIAL** (some mock-backed UI) |
+| **Supply Chain** | Supply planning, orders, procurement, tariff, SCN, inventory | **SHIPPED** (demo/full stack) |
+| **AI & Governance** | Copilot, Design AI, AI Trust, MDR, Compliance, Quality, Sustainability | **SHIPPED** / **PARTIAL** |
+| **Platform** | Admin, Odoo Config, Onboarding, MLOps, Ops | **SHIPPED** / **PARTIAL** |
+| **Shop Floor** | Operator PWA | **SHIPPED** (full profile) |
+| **Integrations** | Kafka mesh; LLM tiers; Odoo; SAP/D365 scaffolds | **PARTIAL** (scaffolds not live ERP) |
 
 #### Release 1 profile (`VITE_RELEASE_PROFILE=release1`)
 
-| Area | Capabilities |
-|------|--------------|
-| **Unified Workspace** | Visible; aggregates planning + command KPIs |
-| **Planning (trimmed)** | Control Tower, Resolution, Schedule only (hub tabs) |
-| **Command (partial)** | Command Center hub; Outcomes tab (R2) |
-| **Platform** | Admin (Odoo config, autonomy mode) |
-| **Integrations** | Odoo XML-RPC sync + activate write-back; **no Kafka** |
-| **Hidden from nav** | Supply Chain, AI & Governance, Shop Floor, Demand, Scenarios |
+| Area | Capabilities | Status |
+|------|--------------|--------|
+| **Compose** | `db`, `redis`, `dpe-svc`, `fea-svc`, `res-svc`, `cap-svc`, `connector`, `kong`, `web-ui` (+ Keycloak/Vault/MinIO optional) | **SHIPPED** |
+| **Planning** | Control Tower, Resolution, Schedule | **SHIPPED** |
+| **Command** | Outcomes, OTD Analytics (Wave 1) | **SHIPPED** |
+| **Platform** | Admin / Odoo config | **SHIPPED** |
+| **Copilot** | Nav entry permitted (W1-01); live tools deepen in R2 | **PARTIAL** |
+| **Integrations** | Odoo XML-RPC sync + activate; **Kafka omitted** | **SHIPPED** (local/mock); **BLOCKED** live staging |
+| **Hidden** | Supply Chain hub, most AI Governance, Shop Floor, Demand, Scenarios | By design (Principle VII) |
 
-### 1.4 Explicitly Out of Scope (As-Is)
+#### Release 2 profile (`VITE_RELEASE_PROFILE=release2`)
 
-| Item | Status | Notes |
-|------|--------|-------|
-| **NEXUS Social** / AI marketing platform | Out | Separate product; not in `ipe/` program |
-| Full MES replacement | Out | Shop Floor is monitoring-light |
-| Autonomous schedule without human approval | Out | `autonomy_mode=shadow` default |
-| Production SAP S/4HANA / D365 connectors | POST-B | Scaffold + registry factory only |
-| WCAG 2.1 AA certification | POST-B | Spec 015 Phase 5 |
-| SOC 2 Type I/II audit engagement | POST-B | Spec 015 Phase 5 |
-| Kafka in Release 1 | Never for R1 | Constitution Principle IV |
-| 22-service K8s for first customer | Deferred | R1 = 8 GB VM Docker Compose |
-| `stock.quant` live inventory sync | R1.1 | FR-R1-05 not implemented |
-| Email ↔ PM bidirectional sync (Microsoft Graph) | Sprint 8+ | Spec 016 Tier 1 stretch deferred |
-| Copilot in Release 1 primary nav | Deferred R2 | Hidden by release profile |
+| Area | Capabilities | Status |
+|------|--------------|--------|
+| **Compose adds** | `nlp-svc`, `demand-svc`, `scenario-svc`, `mock-odoo-api` | **SHIPPED** |
+| **Planning adds** | Demand sensing (SES), Scenario workbench | **SHIPPED** |
+| **Copilot** | Live planning tools + shadow mode | **SHIPPED** |
+| **Arabic** | 8+ screens engineering | **PARTIAL** — native sign-off **BLOCKED** |
+| **Ops** | Multi-tenant ops dashboard | **PARTIAL** (provision/quotas incomplete) |
+| **SAP B1** | Sprint 12 | **CUT** |
 
-### 1.5 Scope Evolution by Version
+### 1.4 Explicitly Out of Scope
 
-| Decision | Version / spec | Reasoning |
-|----------|----------------|-----------|
-| Closed-loop schedule persist | V5 / v1.0.0 (spec 003) | Credibility: approved plans survive refresh |
-| Hub consolidation (6 hubs) | v7.0.0 (spec 006) | Reduce 15+ flat routes to 6 hubs |
-| U1–U8 v8 streams | v8.0–v8.2 (specs 007–010) | SAP IBP gap closure for enterprise demos |
-| Release 1 slice | spec 013 | 8 GB VM; sell vs Excel+Odoo |
-| Release 2 growth | spec 014 | Outcomes, Copilot Lite, auto-propose |
-| Enterprise gates + K8s | spec 015 | Multi-customer scale path |
-| Ecosystem cohesion (EIB) | spec 016 / Sprint 7 | Unified workspace; cross-tool activity |
-| Product transition from NEXUS | 2026 program | IPE is canonical manufacturing APS; NEXUS out of repo scope |
+| Item | Notes |
+|------|-------|
+| **NEXUS Social** / AI marketing platform | Separate product; not in `ipe/` program |
+| Full MES replacement | Shop Floor is monitoring-light |
+| Autonomous schedule without human approval | Default `autonomy_mode=shadow` |
+| Production SAP S/4HANA / D365 connectors | Scaffold only until customer #2 |
+| SAP B1 connector | **CUT** (`specs/018-phase2-release2/sprints/S12-CUT.md`) |
+| Design AI as R1/R2 paid scope | Strategy cut unless contracted |
+| Enterprise K8s as Star Trans R1 go-live requirement | Compose 8GB VM is R1 path |
+| Gate 11 14/14 on kind without infra investment | **WON'T FIX** (#27); OQ-9 waiver accepted for `v9.4.0-p3` |
 
-### 1.6 Open Scope Decisions (Stakeholder Input Required)
+### 1.5 Version Evolution (with reasoning)
+
+| Tag / milestone | Spec | Reasoning | Status |
+|-----------------|------|-----------|--------|
+| `v1.0.0` → `v6.x` | 000–004 | Foundation → AI-first closed loop | **SHIPPED** (historical) |
+| `v7.0.0` | 006 | Hub consolidation (6 hubs) | **SHIPPED** |
+| `v8.2.0` | 007–010 | U1–U8 streams + sustain/quality demo (32/32) | **SHIPPED** (code); tag exists |
+| `v9.0.0-r1` / R1 | 013 | Customer #1 Odoo MENA slice | **SHIPPED** eng; UAT **BLOCKED** |
+| `v9.1.0-r2` | 014 / 018 | R2 growth (Copilot, demand, scenarios, Arabic) | Eng ~92%; **G-R2-TAG HOLD** |
+| `v9.2.0-p1` / `v9.3.0-p2` | 015 | Enterprise Gates 1–5 + Option B | **SHIPPED** |
+| `v9.4.0-p3` | 015 / 017 | Phase 3 K8s gates 6–10 PASS; Gate 11 12/14 + OQ-9 waiver | **SHIPPED** @ `4629119` |
+| Sprint 7 / 016 | 016 | Ecosystem cohesion (activity / workspace) | **SHIPPED** Tier 1 |
+| Spec 017 Waves 1–3 | 017 | First release plan post-P3 | Wave 1 eng largely done; PH1 **BLOCKED** |
+| Spec 018 | 018 | Phase 2 R2 program gates | In progress finalize |
+
+### 1.6 Open Scope Decisions (Stakeholder Input)
 
 | ID | Question | Impact |
 |----|----------|--------|
-| **OQ-1** | Canonical Odoo version for R1: **17** (spec 013) vs **19** (local dev validated)? | Field mapping, customer install guide |
-| **OQ-2** | Demo SQL overlay vs **Odoo-only** as production source of truth? | Seed scripts vs live sync only |
+| **OQ-1** | Canonical Odoo version for R1: **17** vs **19**? | Field mapping, install guide |
+| **OQ-2** | Demo SQL overlay vs **Odoo-only** as production SoT? | Seed vs live sync |
 | **OQ-3** | Enforce **route-level RBAC** in UI? | Any authenticated user reaches all routes today |
-| **OQ-4** | When to tag **v8.2.0** in git/CHANGELOG? | READINESS says ready; CHANGELOG stops at v7.0.0 |
-| **OQ-5** | Formal MAPE / triage time baseline study? | G-01/G-02 metrics unmeasured in production |
-| **OQ-6** | Copilot session retention / GDPR erasure policy? | nlp-svc session storage |
-| **OQ-7** | Confirm R1 pricing **$18K–30K/yr** + implementation? | spec 013 commercial model |
-| **OQ-8** | R1 compose service count: **mat-svc** in or out? | Constitution lists mat-svc; current `docker-compose.release1.yml` may omit it — **doc drift** |
-| **OQ-9** | Accept Gate 11 **12/14** for `v9.4.0-p3` tag or require **14/14**? | Constitution VIII says all Gates 6–11 |
+| **OQ-5** | Formal MAPE / triage-time baseline study? | G-01/G-02 unmeasured in production |
+| **OQ-6** | Copilot session retention / GDPR erasure policy? | nlp-svc storage |
+| **OQ-7** | Confirm R1 pricing **$18K–30K/yr** + **$12K–25K** implementation? | Commercial model |
+| **OQ-8** | Include **mat-svc** in R1/R2 compose? | Constitution lists it; compose omits (URL-only in R2) |
+| **OQ-9** | Gate 11 waiver — **accepted** (2026-07-10); confirm stakeholder names in waiver §6 | Release governance |
+| **OQ-10** | Cut or implement **scenario promotion UI** (#40)? | R2 completeness |
+| **OQ-11** | Cut or implement true **`stock.quant`** sync (C-15) vs safety_stock proxy? | Material gate honesty |
+| **OQ-12** | Tag policy: push `v9.1.0-r2` vs cut `v9.1.1-r2` after Arabic sign-off? | Release management |
 
 ---
 
@@ -139,75 +159,106 @@
 
 ### 2.1 Problems IPE Solves
 
-| Problem | User pain | IPE response (as-is) |
-|---------|-----------|---------------------|
-| **Invisible infeasibility** | Material/capacity conflicts discovered on shop floor | Feasibility scoring + Control Tower queue |
-| **Spreadsheet parallel to ERP** | Dual maintenance; stale MO dates | Odoo sync → CDM; write-back on approve |
-| **Unstructured firefighting** | No comparable scenarios | Resolution Center (≥8 scenarios demo tenant) |
-| **Capacity blindness** | Overloaded work centers discovered late | Bottleneck map; OR-Tools scheduling |
-| **Leadership lag** | OTD seen after month-end | Command Center, Cost of Chaos, Outcomes |
-| **Tool fragmentation** | Context-switching across modules | Hub consolidation + Unified Workspace (Sprint 7) |
-| **AI distrust** | Black-box recommendations rejected | Shadow autonomy; XAI; AI Trust dashboard |
+| Problem | User pain | IPE response (as-is) | Status |
+|---------|-----------|----------------------|--------|
+| **Invisible infeasibility** | Material/capacity conflicts found on shop floor | Feasibility G1–G5 scoring + Control Tower queue | **SHIPPED** |
+| **Spreadsheet parallel to ERP** | Dual maintenance; stale MO dates | Odoo sync → CDM; write-back on approve | **SHIPPED** (local); **BLOCKED** staging |
+| **Unstructured firefighting** | No comparable options | Resolution Center scenarios | **SHIPPED** |
+| **Capacity blindness** | Overloaded WCs discovered late | Bottleneck map; OR-Tools CP-SAT | **SHIPPED** |
+| **Leadership lag** | OTD after month-end | Outcomes, OTD dashboard, Cost of Chaos | **SHIPPED** / **PARTIAL** |
+| **Tool fragmentation** | Context switching | Hub IA + Unified Workspace | **SHIPPED** |
+| **AI distrust** | Black-box recommendations | Shadow autonomy; XAI; AI Trust | **PARTIAL** |
+| **Data quality lies** | Misleading scores on incomplete BOM/routing | Unscorable flags; DQ badges | **SHIPPED** |
 
 ### 2.2 Target Market
 
 | Segment | Characteristics | IPE fit |
-|---------|-----------------|---------|
+|---------|-----------------|--------|
 | **Primary (R1)** | Mid-market discrete on **Odoo** (MENA) | 8-service compose; feasibility-first |
-| **Secondary (full)** | $50M–$500M discrete without SAP IBP rollout | 32/32 demo; faster PoC |
+| **Secondary (R2)** | Same + Copilot / demand / scenarios | `release2` profile |
+| **Enterprise demo** | Prospects evaluating vs Kinaxis/SAP IBP | Full 22-service + 32/32 demo |
 | **Not primary** | Fortune 500 multi-site SAP IBP replacement | No live SAP/D365 connector |
 
-### 2.3 Competitive Positioning (Summary)
+### 2.3 Business Context (Star Trans)
 
-IPE competes **against Excel + Odoo MRP** for Release 1 and **against Kinaxis / SAP IBP / o9** for full-profile demos. See [Section 14](#14-competitive-context).
+| Item | Value | Status |
+|------|-------|--------|
+| Customer | Star Trans (Egypt) | Reference |
+| ERP | Odoo 17/19 compatible | **OQ-1** |
+| Deployment | Diligent cloud VM **or** customer on-prem 8GB compose | **SHIPPED** docs |
+| Commercial | SOW + staging Odoo | **BLOCKED** PH1-01 / PH1-02 |
+| ROI window | Measurable within 90 days | Instrumented; not customer-proven |
+| Competition in pitch | Excel + Odoo MRP | Constitution MENA constraints |
+
+### 2.4 Competitive Positioning (Summary)
+
+Sell R1 against **Excel + Odoo MRP**. Full-profile demos may reference Kinaxis / SAP IBP / o9 feature breadth — see §14 (**provisional**; no formal competitor research dossier in repo).
 
 ---
 
 ## 3. Goals & Success Metrics
 
-### 3.1 Platform Success Metrics (Executive)
+### 3.1 Platform KPIs (Executive)
 
-| Metric | Target | As-is (2026-07-07) | Evidence |
-|--------|--------|---------------------|----------|
-| Full demo checkpoints | **32/32** | ✅ | `scripts/run-full-demo.ps1` |
-| Release 1 HTTPS demo | **14/14** | ✅ Compose; 🟡 **12/14** on K8s | `run-release1-integration-demo.ps1`; `gate11-r1-k8s.txt` |
-| Release 2 demo | **5/5** | ✅ | `run-release2-demo.ps1` |
-| Backend tests | **870+** pass | ✅ | READINESS.md |
-| Enterprise Gates 1–5 | PASS | ✅ | `v9.3.0-p2` |
-| Enterprise Gates 6–10 | PASS | ✅ | `GATE-RESULTS-PHASE3.md` |
-| Enterprise Gate 11 | PASS | 🟡 **12/14** | OR-Tools timeout on kind |
-| k6 SLO P95 | <500ms | ✅ **293ms** | `k6-slo.js` |
-| Customer UAT (Star Trans) | Signed | ⬜ | Business-blocked |
-| Sprint 7 cohesion | Tier 1 APIs live | ✅ Foundation | spec 016 T701–T714 |
+| Metric | Target | As-is (2026-07-10) | Evidence | Status |
+|--------|--------|---------------------|----------|--------|
+| Full demo checkpoints | 32/32 | Documented PASS | `scripts/run-full-demo.ps1`, READINESS | **SHIPPED** |
+| R1 compose demo | 14/14 | PASS | `docs/demo-data/release1-integration-demo.txt` | **SHIPPED** |
+| R1 K8s Gate 11 | ≥12/14 + waiver | 12/14 + OQ-9 | `gate11-k8s-demo.txt`, waiver | **SHIPPED** (waived) |
+| R2 smoke | 15/15 | PASS | `docs/qa/release2-smoke-2026-07-10.txt` | **SHIPPED** |
+| R2 demo | 7/7 | PASS | `docs/demo-data/release2-demo-g-r2-05.txt` | **SHIPPED** |
+| Backend pytest | Green | **860/860** (018 TEST-RESULTS) | Spec 018 | **SHIPPED** |
+| Frontend Vitest | Green | **41/41** | Spec 018 | **SHIPPED** |
+| Enterprise Gates 1–5 | PASS | `v9.3.0-p2` | Spec 015 | **SHIPPED** |
+| Enterprise Gates 6–10 | PASS | GATE-RESULTS-PHASE3 | Spec 015 | **SHIPPED** |
+| k6 SLO P95 | <500ms | **293ms**, 0% err | `PERFORMANCE-BASELINE-v9.1.0.md` | **SHIPPED** |
+| Star Trans UAT | Signed | Open | PH1-01/02 | **BLOCKED** |
+| Arabic native QA | Signed | Eng done | `docs/qa/arabic-qa-r2.md` | **BLOCKED** |
+| G-R2-TAG | `v9.1.0-r2` / `v9.1.1-r2` | HOLD | GATES.md | **BLOCKED** |
 
-### 3.2 V5 Convergence Goals (Embedded — spec 003)
+### 3.2 Product Outcome Goals
 
-| ID | Goal | Acceptance | Status |
-|----|------|------------|--------|
-| V5-G1 | Closed-loop planning | Approve persists to CDM <60s | ✅ |
-| V5-G2 | Planner trust (XAI) | Explanation on schedule/rescore | ✅ UI; no formal study |
-| V5-G3 | MDR gate | Block schedule if composite <70% | ✅ cap-svc 503 |
-| V5-G4 | War Room mitigations | ≥3 recovery options | ✅ |
-| V5-G5 | Financial clarity on scenarios | $ impact on cards | ✅ |
+| ID | Goal | Acceptance criteria | Status |
+|----|------|---------------------|--------|
+| G-01 | Planners triage at-risk MOs before shift | Top 3 at-risk MOs in ≤5 min | **SHIPPED** (demo); **UNKNOWN** production |
+| G-02 | Structured resolution | ≥1 comparable scenario per at-risk MO | **SHIPPED** |
+| G-03 | Feasible schedule published | Approve persists CDM; Odoo dates match on activate | **SHIPPED** local |
+| G-04 | Data quality honesty | Unscorable MOs never silent-scored | **SHIPPED** |
+| G-05 | 90-day ROI | Adoption + 2+ MOs saved + OTD trend | **PARTIAL** (instrumented) |
+| G-06 | Arabic planner path | CT + Resolution + nav + alerts | **PARTIAL** (sign-off open) |
 
-### 3.3 Release 1 Metrics (spec 013)
+### 3.3 Spec-Aligned Goal Sets
 
-| ID | Metric | Target | As-is |
-|----|--------|--------|-------|
-| R1-M1 | MOs in Control Tower from Odoo | 100% syncable MOs | ✅ Locally validated |
-| R1-M2 | Sync success rate | >95% | ✅ |
-| R1-M3 | Post-sync feasibility score | Non-null | ✅ |
-| R1-M7 | Write-back to Odoo | Dates match | ✅ Gate 4 |
-| R1-M9 | HTTPS + Keycloak demo | 14/14 | ✅ Compose |
-| R1-M6 | Customer sign-off | Signed UAT | ⬜ Blocked |
+#### V5 Convergence (spec 003)
 
-### 3.4 Sprint 7 Cohesion Metrics (spec 016)
+| ID | Goal | Status |
+|----|------|--------|
+| V5-G1 | Closed-loop planning (approve persists <60s) | **SHIPPED** |
+| V5-G2 | Planner trust (XAI) | **PARTIAL** (UI; no formal study — OQ-5) |
+| V5-G3 | MDR gate (composite <70% blocks) | **SHIPPED** |
+| V5-G4 | War Room ≥3 mitigations | **SHIPPED** |
+| V5-G5 | Financial clarity on scenarios | **SHIPPED** |
 
-| Metric | Target | As-is |
-|--------|--------|-------|
-| Integration coverage (activity events) | 100% R1 tools emitting | 🟡 EIB consumer + POST ingest; not all services wired |
-| Unified dashboard engagement | 60% DAU | ⬜ Post-launch measurement |
-| AI recommendation acceptance | 40% | ⬜ Tier 2 not shipped |
+#### Release 1 (spec 013)
+
+| ID | Metric | Status |
+|----|--------|--------|
+| R1-M1 | MOs from Odoo in Control Tower | **SHIPPED** mock/local; **BLOCKED** staging |
+| R1-M2 | Sync success >95% | **SHIPPED** local |
+| R1-M3 | Post-sync feasibility non-null | **SHIPPED** |
+| R1-M7 | Write-back dates match | **SHIPPED** Gate 4 path |
+| R1-M6 | Customer sign-off | **BLOCKED** |
+
+#### Spec 017 / 018 program gates
+
+| Gate | Criteria | Status |
+|------|----------|--------|
+| **G-R2-01** | `release2-smoke.ps1` 15/15 | **PASS** |
+| **G-R2-02** | Copilot live tools | **PASS** |
+| **G-R2-03** | Wave 1 W1-03–08 eng | **PASS (eng)**; live Odoo = PH1-02 |
+| **G-R2-04** | Arabic 8+ screens | **PARTIAL** — native sign-off open |
+| **G-R2-05** | `run-release2-demo.ps1` 7/7 | **PASS** |
+| **G-R2-TAG** | Tag on green matrix | **HOLD** |
 
 ---
 
@@ -215,54 +266,68 @@ IPE competes **against Excel + Odoo MRP** for Release 1 and **against Kinaxis / 
 
 ### 4.1 Persona Catalog
 
-| Persona | RBAC role | Primary goals | R1 hub access |
-|---------|-----------|---------------|---------------|
-| **Production Planner** | `planner` | Triage MOs, resolve, schedule | Workspace, Planning (3 tabs) |
-| **Plant Manager** | `manager` | Approve schedules, trade-offs | Same as planner |
-| **Shop Supervisor** | `supervisor` | Monitor disruptions | Command Center |
-| **Shop Operator** | `operator` | Execute work orders | Shop Floor (hidden R1 nav) |
-| **Executive / VP Ops** | `executive` | OTD, margin, chaos cost | Command Center, Workspace KPIs |
-| **Procurement Analyst** | `procurement` | Supplier risk, spend | Supply Chain (hidden R1) |
-| **System Administrator** | `admin` | Tenant, Odoo, autonomy | Platform → Admin |
-| **Auditor** | `auditor` | Read-only compliance | Compliance (limited) |
-| **Demo Engineer** | `admin` | 32/32, 14/14 demos | All + scripts |
+| Persona | RBAC role | Primary goals | Typical hubs | Status |
+|---------|-----------|---------------|--------------|--------|
+| **Production Planner** | `planner` | Triage, resolve, schedule | Workspace, Planning, Copilot | Primary |
+| **Plant Manager** | `manager` | Approve schedules, trade-offs | Planning, Command | Primary |
+| **Shop Supervisor** | `supervisor` | Monitor disruptions | Command, Shop Floor | Full profile |
+| **Shop Operator** | `operator` | Execute work orders | Shop Floor | Full profile |
+| **Executive / VP Ops** | `executive` | OTD, margin, chaos cost | Command, Workspace | Primary |
+| **Procurement Analyst** | `procurement` | Supplier risk, spend | Supply Chain | Full / R2 stretch |
+| **System Administrator** | `admin` | Tenant, Odoo, autonomy, ops | Platform | Primary |
+| **Auditor** | `auditor` | Read-only compliance | Compliance | Enterprise |
+| **Demo Engineer** | `admin` | 32/32, R1/R2 demos | All + scripts | Internal |
 
-**Known gap (OQ-3):** UI does not enforce route-level RBAC.
+**Known gap (OQ-3):** UI does **not** enforce route-level RBAC — API RBAC is the enforcement layer.
 
-### 4.2 Planner Daily Workflow (Release 1)
+### 4.2 Planner Daily Journey (Release 1 / 2)
 
 ```
-Login → Unified Workspace (KPIs + activity)
-  → Planning → Control Tower (queue sort by score)
-       ├─[score < 70]→ Resolution (compare scenarios)
-       │                    └─→ Schedule (OR-Tools or Excel)
-       │                           └─→ Approve → Odoo activate
-       └─[sync stale]→ Admin sync OR wait 15-min scheduler
+Login (local JWT or Keycloak)
+  → /workspace (KPIs + activity)
+  → /planning/control-tower (queue by feasibility ASC)
+       ├─ unscorable → fix DQ / Admin sync
+       ├─ score < 70 → /planning/resolution → compare scenarios
+       │                    └─→ /planning/schedule → Approve → Odoo activate
+       └─ score ≥ 70 → Schedule directly → Approve
+  → [R2] /planning/demand | /planning/scenarios | /ai-governance/copilot
+  → [R2] /command-center/otd-analytics | /command-center/outcomes
 ```
 
 ### 4.3 Decision Tree — MO Triage
 
 ```
-MO in queue?
-├─ NO → Run Odoo sync OR seed data
-└─ YES → feasibility_score?
-    ├─ unscorable (data quality flag) → Fix data / MDR dashboard
-    ├─ < 70 → Resolution scenarios → Schedule (if MDR ≥70%)
-    └─ ≥ 70 → Schedule directly
-         └─ approve → activate Odoo
-              ├─ success → done
-              └─ MATERIAL_CONFLICT → Resolution / expedite
+MO in feasibility queue?
+├─ NO → Run Odoo sync (Admin / scheduler) OR seed / mock-odoo
+└─ YES → data_quality / unscorable?
+    ├─ YES → Fix BOM/routing/WC in Odoo → re-sync → rescore
+    └─ NO → feasibility_score?
+         ├─ < 70 → Resolution scenarios → pick → Schedule (if MDR ≥70%)
+         ├─ 70–89 → Schedule with caution / suggest mode
+         └─ ≥ 90 (+ autonomous) → auto-confirm path (shadow default: still queue)
+              └─ Approve → POST /sync/odoo/activate
+                   ├─ success → done
+                   └─ SYNC_CONFLICT / MATERIAL_CONFLICT → Resolution
 ```
 
-### 4.4 Administrator Workflow — Odoo Setup
+### 4.4 Administrator Journey — Odoo Setup
 
 ```
-Platform → Admin → ERP Odoo tab
+/platform/odoo-config (or Admin ERP tab)
   → Enter URL, DB, username, password
-  → Test connection (POST /admin/erp/odoo/test)
-  → Save (encrypted in tenant.config)
-  → Manual sync POST /sync/run {"entity":"all", ...creds}
-  → Verify /sync/status + Control Tower queue
+  → Test connection (<5s target — W1-04)
+  → Save (tenant config / encrypted)
+  → POST /api/v1/sync/run
+  → Verify /sync/status + Control Tower queue + DQ flags
+```
+
+### 4.5 Executive Journey — Morning Brief
+
+```
+/workspace → review unified KPIs
+  → /command-center/otd-analytics (5 KPIs)
+  → /command-center/outcomes (ROI / baseline)
+  → Drill to Control Tower if OTD down
 ```
 
 ---
@@ -271,57 +336,85 @@ Platform → Admin → ERP Odoo tab
 
 ### 5.1 Use Case Index
 
-| ID | Name | Actor | Profile |
-|----|------|-------|---------|
-| UC-01 | Daily production health triage | Planner | Full + R1 |
-| UC-02 | Constraint resolution | Planner, Manager | Full + R1 |
-| UC-03 | Finite-capacity scheduling | Planner | Full + R1 |
-| UC-04 | Excel project plan import | Planner | Full + R1 |
-| UC-05 | Demand sensing / forecast | Planner | Full only |
-| UC-06 | What-if scenario | Planner | Full only |
-| UC-07 | Supply network visibility | Planner, Executive | Full only |
-| UC-08 | Copilot NL query | Planner | Full only |
-| UC-09 | Executive disruption review | Executive | Full + R1 partial |
-| UC-10 | Shop floor execution | Supervisor, Operator | Full only |
-| UC-11 | Star Trans demo load | Demo engineer | Full demo |
-| UC-12 | Odoo ERP sync | Admin, System | R1 |
-| UC-13 | Schedule write-back | Planner | R1 |
-| UC-14 | Post-sync rescore | System | R1 |
-| UC-15 | Unified workspace review | All roles | Sprint 7 |
-| UC-16 | Cross-tool activity audit | Admin, Auditor | Sprint 7 |
+| ID | Name | Actor | Profile | Status |
+|----|------|-------|---------|--------|
+| UC-01 | Daily production health triage | Planner | R1/R2/Full | **SHIPPED** |
+| UC-02 | Constraint resolution | Planner, Manager | R1/R2/Full | **SHIPPED** |
+| UC-03 | Finite-capacity scheduling | Planner | R1/R2/Full | **SHIPPED** |
+| UC-04 | Excel project plan import | Planner | R1/Full | **SHIPPED** |
+| UC-05 | Demand sensing (SES) | Planner | R2/Full | **SHIPPED** |
+| UC-06 | Scenario simulate/compare | Planner | R2/Full | **SHIPPED** |
+| UC-07 | Scenario promotion to live plan | Planner | R2 | **PLANNED** (#40) |
+| UC-08 | Supply network visibility | Planner, Exec | Full | **SHIPPED** |
+| UC-09 | Copilot NL planning query | Planner | R2/Full | **SHIPPED** |
+| UC-10 | Executive disruption review | Executive | Full/R1 partial | **SHIPPED** |
+| UC-11 | Shop floor execution | Operator | Full | **SHIPPED** |
+| UC-12 | Odoo ERP sync | Admin, System | R1/R2 | **SHIPPED** mock; **BLOCKED** staging |
+| UC-13 | Schedule write-back | Planner | R1/R2 | **SHIPPED** |
+| UC-14 | Post-sync rescore | System | R1/R2 | **SHIPPED** |
+| UC-15 | Unified workspace review | All | Full/R1 | **SHIPPED** |
+| UC-16 | OTD baseline & trend | Manager | R1/R2 | **SHIPPED** |
+| UC-17 | Tenant provision (self-service) | Admin/Ops | Enterprise/R2 | **PARTIAL** (#37/#25) |
+| UC-18 | Predictive delay (XGBoost+SHAP) | Planner | Wave 2 | **PLANNED** / **UNKNOWN** (#42) |
+| UC-19 | NL schedule change | Planner | Wave 3 | **PLANNED** (#43–#44) |
+| UC-20 | Automated supplier comms | System | Wave 3 | **PLANNED** (#45–#46) |
 
 ### 5.2 UC-01 — Daily Production Health Triage
 
 | Attribute | Detail |
 |-----------|--------|
-| **Preconditions** | Authenticated; MOs in CDM; fea-svc healthy |
-| **Main flow** | Login → Control Tower → GET `/feasibility/kpis` + `/feasibility/queue` → sort by score → Resolve |
-| **Alternatives** | WebSocket refresh; manual sync if stale |
-| **Edge cases** | Empty queue; `unscorable=true` |
-| **Success criteria** | Top 3 at-risk MOs identified in **≤5 minutes** |
+| **Actor** | Planner |
+| **Preconditions** | Authenticated JWT; tenant set; MOs in CDM; fea-svc healthy |
+| **Main flow** | Login → Control Tower → `GET /feasibility/kpis` + `GET /feasibility/queue` → sort by score ASC → open Resolve |
+| **Alternatives** | WebSocket refresh; manual sync if stale; Copilot “show at-risk MOs” (R2) |
+| **Edge** | Empty queue; `unscorable=true`; Kong 401 if AUTH_MODE mismatch |
+| **Success** | Top 3 at-risk MOs identified in **≤5 minutes** |
 
-### 5.3 UC-12 — Odoo ERP Sync
-
-| Attribute | Detail |
-|-----------|--------|
-| **Preconditions** | `erp_type=odoo`; valid creds; Odoo reachable (`host.docker.internal:8069`) |
-| **Main flow** | Scheduler 900s OR POST `/sync/run` → upsert products/WC/BOM/MO → commit → rescore → `cdm_sync_run` |
-| **Edge cases** | Odoo v17 vs v19 field drift; MO skipped without BOM |
-| **Success criteria** | `status=success`; MO count > 0; rescored ≥1 |
-
-### 5.4 UC-13 — Schedule Write-Back
+### 5.3 UC-02 — Constraint Resolution
 
 | Attribute | Detail |
 |-----------|--------|
-| **Main flow** | Approve schedule → POST `/sync/odoo/activate` → XML-RPC updates Odoo dates |
-| **Success criteria** | Odoo dates match IPE; no unresolved SYNC_CONFLICT |
+| **Actor** | Planner / Manager |
+| **Preconditions** | MO with score <70 or primary_constraint set |
+| **Main flow** | Resolution Center → list constraints → generate/compare scenarios → select → navigate Schedule |
+| **Alt** | Auto-propose post-sync (FR-R1-14 partial) |
+| **Success** | Scenario selected with cost/delivery/risk visible; approval RBAC enforced |
 
-### 5.5 UC-15 — Unified Workspace Review (Sprint 7)
+### 5.4 UC-03 — Finite-Capacity Scheduling
 
 | Attribute | Detail |
 |-----------|--------|
-| **Main flow** | Login → `/workspace` → GET `/dashboard/unified` → review KPIs + activity + pending actions |
-| **Success criteria** | Page loads <3s; ≥3 KPI cards; activity feed returns (may be empty pre-EIB wiring) |
+| **Actor** | Planner |
+| **Preconditions** | MDR composite ≥70% (else 503); WC + routing present |
+| **Main flow** | `POST /capacity/schedule` (OR-Tools CP-SAT) → review Gantt → Approve → persist CDM |
+| **Edge** | Solver timeout (compose ~30–90s; K8s Gate 11 OR-Tools issues waived) |
+| **Success** | Assignments with no-overlap; approve survives refresh |
+
+### 5.5 UC-12 — Odoo ERP Sync
+
+| Attribute | Detail |
+|-----------|--------|
+| **Actor** | Admin / scheduler |
+| **Preconditions** | `erp_type=odoo`; creds; Odoo or mock-odoo reachable |
+| **Main flow** | 15-min job OR `POST /sync/run` → upsert products/WC/BOM/MO → `cdm_sync_run` → rescore |
+| **Edge** | Field drift v17/v19; MO without BOM skipped + DQ flag |
+| **Success** | `status=success` or `rescored`; MO count >0; last-synced visible in UI |
+
+### 5.6 UC-13 — Schedule Write-Back
+
+| Attribute | Detail |
+|-----------|--------|
+| **Main flow** | Approve → `POST /sync/odoo/activate` → XML-RPC update Odoo MO dates |
+| **Conflict policy** | Odoo wins master data; IPE wins approved schedule until next sync flags conflict |
+| **Success** | Odoo dates match IPE; no unresolved SYNC_CONFLICT |
+
+### 5.7 UC-09 — Copilot Live Query (R2)
+
+| Attribute | Detail |
+|-----------|--------|
+| **Preconditions** | nlp-svc up; AUTH; optional LLM keys (degrades gracefully) |
+| **Main flow** | `/ai-governance/copilot` → query → tools hit live feasibility/schedule APIs → response + sources |
+| **Success** | Unauthenticated → 401; authenticated tool path returns structured answer (smoke 12/12 W1-02) |
 
 ---
 
@@ -329,167 +422,271 @@ Platform → Admin → ERP Odoo tab
 
 ### 6.1 Authentication & Tenancy
 
-| ID | Requirement | Acceptance | Priority |
-|----|-------------|------------|----------|
-| FR-AUTH-01 | JWT local or Keycloak OIDC | 401 on bad creds | Must |
-| FR-AUTH-02 | Tenant on every API call | JWT claim or `X-Tenant-ID` | Must |
-| FR-AUTH-03 | PostgreSQL RLS per tenant | Cross-tenant blocked | Must |
-| FR-AUTH-04 | RBAC on state-changing APIs | 403 if role insufficient | Must |
-| FR-AUTH-05 | Password hash in `cdm_user` | No plaintext in prod | Must |
+| ID | Requirement | Acceptance | Priority | Status |
+|----|-------------|------------|----------|--------|
+| FR-AUTH-01 | JWT local (`AUTH_MODE=local`) or Keycloak OIDC | 401 on bad/missing token | Must | **SHIPPED** (dual-mode) |
+| FR-AUTH-02 | Tenant on every API call | JWT claim; Kong strips client `X-Tenant-ID` | Must | **SHIPPED** |
+| FR-AUTH-03 | PostgreSQL RLS per `tenant_id` | Cross-tenant blocked | Must | **SHIPPED** (legacy gaps waived via ADR) |
+| FR-AUTH-04 | RBAC on state-changing APIs | 403 if role insufficient | Must | **SHIPPED** |
+| FR-AUTH-05 | Zero open endpoints except health/ready/metrics | Scanner / constitution | Must | **SHIPPED** |
+| FR-AUTH-06 | Rate limiting (Kong) | 429 under stress profile | Must | **SHIPPED** |
 
 ### 6.2 Planning Hub
 
-| ID | Requirement | Acceptance | Priority |
-|----|-------------|------------|----------|
-| FR-PLN-01 | Feasibility queue | ≥1 MO when data present | Must |
-| FR-PLN-02 | KPI cards | fea-svc `/kpis` | Must |
-| FR-PLN-03 | Resolution scenarios | ≥1 per at-risk MO | Must |
-| FR-PLN-04 | OR-Tools schedule | ≤90s (3-MO compose); **300s K8s** | Must |
-| FR-PLN-05 | Approve persists CDM | Survives refresh | Must |
-| FR-PLN-06 | MDR gate before schedule | composite ≥70% or 503 | Must |
-| FR-PLN-07 | Sync status bar (R1) | `/sync/status` | Must |
-| FR-PLN-08 | Excel upload | .xlsx validation | Should (R1) |
+| ID | Requirement | Acceptance | Priority | Status |
+|----|-------------|------------|----------|--------|
+| FR-PLN-01 | Feasibility queue | ≥1 MO when data present | Must | **SHIPPED** |
+| FR-PLN-02 | KPI cards from fea-svc | `/feasibility/kpis` | Must | **SHIPPED** |
+| FR-PLN-03 | Resolution scenarios | ≥1 per at-risk MO | Must | **SHIPPED** |
+| FR-PLN-04 | OR-Tools schedule | Valid no-overlap assignments | Must | **SHIPPED** |
+| FR-PLN-05 | Approve persists CDM | Survives refresh | Must | **SHIPPED** |
+| FR-PLN-06 | MDR gate before schedule | composite ≥70% or 503 | Must | **SHIPPED** |
+| FR-PLN-07 | Sync status bar (R1) | `/sync/status` | Must | **SHIPPED** |
+| FR-PLN-08 | Excel upload | .xlsx validation | Should | **SHIPPED** |
+| FR-PLN-09 | Demand SES forecast (R2) | Forecast + intervals API | Should | **SHIPPED** |
+| FR-PLN-10 | Scenario simulate/compare (R2) | scenario-svc | Should | **SHIPPED** |
+| FR-PLN-11 | Scenario promotion UI | Promote to live plan | Should | **PLANNED** (#40) |
 
-**Business rules:** BR-PLN-01: autonomy_mode=shadow — no auto-apply. BR-PLN-02: unscorable MOs excluded from auto-confirm.
+**Business rules:** BR-PLN-01 shadow autonomy — no silent auto-apply. BR-PLN-02 unscorable MOs excluded from auto-confirm. BR-PLN-03 Odoo wins master data on conflict.
 
-### 6.3 Odoo Sync (Release 1)
+### 6.3 Odoo Sync (Release 1 — FR-R1-*)
+
+| ID | Requirement | Status | Notes |
+|----|-------------|--------|-------|
+| FR-R1-01 | MO upsert from `mrp.production` | **SHIPPED** | |
+| FR-R1-02 | BOM + BOM lines + routing | **SHIPPED** | |
+| FR-R1-03 | Work center sync | **SHIPPED** | |
+| FR-R1-04 | Product update path | **SHIPPED** | |
+| FR-R1-05 | Stock / material availability | **PARTIAL** | Spec 013 claims safety_stock proxy; **C-15** still open for true `stock.quant` — **OQ-11** |
+| FR-R1-06 | Scheduled sync 15 min | **SHIPPED** | |
+| FR-R1-07 | Sync run log | **SHIPPED** | `cdm_sync_run` |
+| FR-R1-08 | Data quality flags | **SHIPPED** | |
+| FR-R1-09 | Conflict detection | **SHIPPED** | |
+| FR-R1-10 | Activate write-back | **SHIPPED** | |
+| FR-R1-11 | Odoo install guide | **SHIPPED** | `docs/integration/` |
+| FR-R1-12 | Feasibility skip flagged MOs | **SHIPPED** | |
+| FR-R1-13 | Queue with DQ flags | **SHIPPED** | |
+| FR-R1-14 | Resolution scenarios | **PARTIAL** | Seed OK; auto-gen post-sync gap |
+| FR-R1-15 | Schedule approve → Odoo | **SHIPPED** | |
+| FR-R1-16 | OTD baseline capture | **SHIPPED** | Eng; verify via Kong |
+| FR-R1-17–19 | Sync widget / DQ / conflict badge | **SHIPPED** | |
+| FR-R1-20–21 | i18n ar/en + switcher | **PARTIAL** | Eng; native QA open |
+| FR-R1-22 | Hide POST-R1 hubs | **SHIPPED** | `releaseProfile.ts` |
+| FR-R1-23–26 | Ops docs + compose | **SHIPPED** | |
+
+### 6.4 Spec 017 Wave Features
+
+| ID | Feature | Status |
+|----|---------|--------|
+| FR-017-P0-01…06 | Phase 0 stabilization / `v9.4.0-p3` | **SHIPPED** |
+| FR-017-PH1-01 | Signed SOW | **BLOCKED** |
+| FR-017-PH1-02 | Odoo staging | **BLOCKED** |
+| FR-017-W1-01/02 | Copilot R1 nav + smoke | **SHIPPED** |
+| FR-017-W1-03…06 | Odoo Config v2 | **SHIPPED** eng (verify E2E) |
+| FR-017-W1-07/08 | OTD API + dashboard | **SHIPPED** |
+| FR-017-W2-01 | Tenant provision API | **PARTIAL** (#37) |
+| FR-017-W2-02 | Quotas/metering | **PARTIAL** (#38) |
+| FR-017-W2-03/04 | Scenario + demand | **SHIPPED** (promotion UI open) |
+| FR-017-W2-06 | Predictive delay ML | **PLANNED** (#42) |
+| FR-017-W3-* | NL schedule + supplier comms | **PLANNED** (#43–#46) |
+
+### 6.5 Sprint 7 Ecosystem Cohesion (spec 016)
 
 | ID | Requirement | Status |
 |----|-------------|--------|
-| FR-R1-01 | MO upsert from `mrp.production` | ✅ |
-| FR-R1-02 | BOM + routing sync | ✅ |
-| FR-R1-03 | 15-min scheduled sync | ✅ |
-| FR-R1-04 | Activate write-back | ✅ |
-| FR-R1-05 | `stock.quant` inventory | ⬜ R1.1 |
-| FR-R1-06 | SYNC_CONFLICT detection | ✅ |
-| FR-R1-07 | Post-sync rescore | ✅ |
-| FR-R1-08 | Odoo creds in sync body (K8s KMS gap) | ✅ Demo script fix 2026-07-07 |
+| FR-S7-01 | Unified dashboard API | **SHIPPED** |
+| FR-S7-02 | Activity feed | **SHIPPED** |
+| FR-S7-03 | Activity ingest (Kafka-off path) | **SHIPPED** |
+| FR-S7-04 | EIB → `cdm_activity_event` (mig 038) | **SHIPPED** |
+| FR-S7-05 | Pattern discovery | **PLANNED** |
+| FR-S7-06 | Email↔PM Graph sync | Deferred |
 
-### 6.4 Sprint 7 — Ecosystem Cohesion (spec 016)
+### 6.6 Feasibility Scoring Rules
 
-| ID | Requirement | Acceptance | Priority |
-|----|-------------|------------|----------|
-| FR-S7-01 | Unified dashboard API | `/dashboard/unified` role-aware KPIs | Must ✅ |
-| FR-S7-02 | Activity feed | `/activity/feed` paginated | Must ✅ |
-| FR-S7-03 | Activity ingest | POST `/activity/events` when Kafka off | Must ✅ |
-| FR-S7-04 | EIB normalizer | Kafka topic → `cdm_activity_event` | Must ✅ |
-| FR-S7-05 | Pattern discovery | 3 pattern types on activity stream | Should ⬜ |
-| FR-S7-06 | Email-PM sync | Microsoft Graph | Deferred Sprint 8 |
+| Gate | Weight | Input | Rule |
+|------|--------|-------|------|
+| G1 Demand | 5% | Demand classification | Low weight context |
+| G2 BOM | 5% | BOM completeness | Missing → unscorable / low |
+| G3 Material | 35% | pATP / inventory | Dominant material risk |
+| G4 Capacity | 30% | WC utilization | Real scoring when routing present |
+| G5 Labor | 25% | Operator absence | Real scoring when operators present |
 
-### 6.5 Integrations
-
-| ID | Requirement | Status |
-|----|-------------|--------|
-| FR-INT-01 | Odoo XML-RPC sync + activate | ✅ Live validated |
-| FR-INT-02 | SAP/D365 scaffold registry | ✅ Gate 10 |
-| FR-INT-03 | Kafka full stack | ✅ Disabled R1 |
-| FR-INT-04 | Stripe billing | Mock POST-B |
-| FR-INT-05 | LLM tiered routing | ✅ Full stack |
+| Score band | `action_taken` |
+|------------|----------------|
+| ≥90 + autonomous | `auto_confirmed` |
+| ≥70 | `queued_for_planner` |
+| <70 | `routed_to_resolution` |
 
 ---
 
 ## 7. Feature Specifications
 
-| Feature | Purpose | Acceptance criteria | Priority | Introduced |
-|---------|---------|---------------------|----------|------------|
-| **Unified Workspace** | Single-pane cohesion | `/workspace` + unified API | Must | spec 016 |
-| **Cross-tool activity feed** | Audit timeline | GET feed; events persisted | Must | spec 016 |
-| **Control Tower** | MO risk queue | Queue + KPIs + Resolve | Must | v1.0.0 |
-| **Resolution Center** | Scenario trade-offs | Cost/delivery on cards | Must | v1.0.0 |
-| **Schedule + OR-Tools** | Finite capacity Gantt | Approve + persist | Must | v1.0.0 |
-| **MDR Gate** | Data readiness | <70% blocks solver | Must | v1.0.0 |
-| **Odoo sync engine** | Live ERP ingest | Full sync success | Must R1 | spec 013 |
-| **Hub consolidation** | 6 hubs + legacy redirects | 6 sidebar items | Must | v7.0.0 |
-| **Outcomes / R2** | OTD baseline, ROI | 5/5 R2 demo | Must R2 | spec 014 |
-| **Copilot sessions** | NL planning assist | CP30 pass | Must full | v8.0.0 |
-| **Keycloak SSO** | Enterprise IdP | Gate 5 PASS | POST-B | spec 015 |
-| **Helm / K8s R1** | Scale path | Gates 6–10 PASS | Must ent | spec 015 |
+| Feature | Purpose | Benefit | Acceptance criteria | Deps | Priority | Version history | Status |
+|---------|---------|---------|---------------------|------|----------|-----------------|--------|
+| **Control Tower** | MO risk queue + KPIs | See risk before shift | Queue + KPIs + Resolve; WS optional | fea-svc | P0 | v1→v9 | **SHIPPED** |
+| **Resolution Center** | Scenario trade-offs | Structured firefighting | Cost/delivery/risk cards; approve RBAC | res-svc | P0 | v1→v9 | **SHIPPED** |
+| **Schedule + OR-Tools** | Finite capacity | Feasible plan | No-overlap; approve persist | cap-svc, MDR | P0 | v1→v9 | **SHIPPED** |
+| **MDR Gate** | Data readiness | Block bad solves | <70% → 503 | dpe/cap | P0 | v1 | **SHIPPED** |
+| **Odoo sync engine** | Live ERP ingest | SoT from factory | Sync run + rescore | connector | P0 R1 | spec 013 | **SHIPPED** |
+| **Activate write-back** | Close loop | ERP dates updated | Activate API success | connector | P0 R1 | spec 013 | **SHIPPED** |
+| **Unified Workspace** | Cross-tool briefing | Less context switch | `/workspace` + unified API | dpe | P1 | spec 016 | **SHIPPED** |
+| **Hub consolidation** | IA | 6 hubs + redirects | Sidebar matches profile | web | P0 | v7 | **SHIPPED** |
+| **Outcomes / OTD** | ROI story | Baseline + trend | 5 KPIs; filters | dpe | P0 R2 | 014/017 | **SHIPPED** |
+| **Copilot live tools** | NL assist | Faster triage | Tools + 401 smoke | nlp-svc | P1 R2 | 017/018 | **SHIPPED** |
+| **Demand SES** | Sensing | Forecast intervals | MAPE endpoint | demand-svc | P1 R2 | 018 S3 | **SHIPPED** |
+| **Scenario workbench** | What-if | Compare plans | Simulate + compare | scenario-svc | P1 R2 | 018 S4 | **SHIPPED** |
+| **Scenario promotion** | Commit what-if | Promote to live | UI + API | scenario-svc | P2 | #40 | **PLANNED** |
+| **Arabic 8+ screens** | MENA UX | Planner in AR | Native sign-off | i18n | P0 | 018 S5 | **PARTIAL** |
+| **Ops dashboard** | Multi-tenant health | Ops visibility | Admin-only APIs | dpe | P2 | 018 S8 | **PARTIAL** |
+| **Tenant provision** | Self-service | Scale customers | One-call provision | dpe | P2 | #37/#25 | **PARTIAL** |
+| **Keycloak SSO** | Enterprise IdP | SSO | Gate 5 / Option B | keycloak | P1 Ent | 011/015 | **PARTIAL** (R2 container often unhealthy; local JWT path) |
+| **Helm / K8s R1** | Scale path | Gates 6–10 | kind deploy | helm | P1 Ent | 015 | **SHIPPED** |
+| **SAP/D365 scaffold** | Future ERP | Registry no-op | Gate 10 imports | connector | P3 | 015 | **SHIPPED** scaffold |
+| **SAP B1** | ERP #2 | — | — | — | — | S12 | **CUT** |
+| **Predictive delay ML** | Delay risk | SHAP explain | AUC>0.80 | ml/del | P2 | #42 | **PLANNED** |
+| **NL schedule change** | Voice/text move MO | Preview+execute | >90% intent | nlp | P3 | #43–44 | **PLANNED** |
+| **Supplier comms** | Auto email | Audit trail | Rule+template | alert | P3 | #45–46 | **PLANNED** |
+| **Design AI** | Design assist | Demo | CP28 | full | Demo | v8 | **SHIPPED** demo; **CUT** paid R1 |
+| **Stripe billing** | SaaS | Metered license | Sandbox | billing | P4 | 015 Ph4 | **PLANNED** scaffold |
 
 ---
 
 ## 8. Business Scenarios
 
-### BS-01 — Star Trans: Copper delay (Full Demo)
+### BS-01 — Star Trans Full Demo (Copper Delay)
 
-| Step | Action | Success metric |
-|------|--------|----------------|
-| 1 | Planner sees low feasibility MO | <5 min identification |
+| Step | Action | Metric |
+|------|--------|--------|
+| 1 | Planner sees low-feasibility MO | <5 min ID |
 | 2 | Resolution scenarios compared | Scenario selected |
-| 3 | Re-schedule + approve | Gantt + Odoo updated |
-| 4 | Executive War Room cost view | $ impact shown |
+| 3 | Re-schedule + approve | Gantt + CDM persist |
+| 4 | Executive War Room / Cost of Chaos | $ impact shown |
 
-**Outcome:** 32/32 demo pass.
+**Outcome:** 32/32 demo path — **SHIPPED**.  
+**Customer production:** **BLOCKED** on SOW/staging.
 
-### BS-02 — Star Trans R1: Morning triage on live Odoo
+### BS-02 — R1 Morning Triage on Odoo
 
-| Step | Action | Success metric |
-|------|--------|----------------|
-| 1 | Overnight 15-min sync | `cdm_sync_run.status=success` |
+| Step | Action | Metric |
+|------|--------|--------|
+| 1 | Overnight 15-min sync | `cdm_sync_run` success |
 | 2 | Workspace + Control Tower | MOs scored |
 | 3 | Resolution + Schedule + activate | Odoo dates updated |
 
-**Outcome:** Locally validated; **customer UAT pending**.
+**Outcome:** Local/mock **SHIPPED**; live staging **BLOCKED** (PH1-02).
 
-### BS-03 — Sprint 7: Executive cross-tool briefing
+### BS-03 — R2 Demo (G-R2-05)
 
-| Step | Action | Success metric |
-|------|--------|----------------|
-| 1 | Executive opens `/workspace` | Unified KPIs load |
-| 2 | Reviews activity feed | Events from sync + planning |
-| 3 | Drills to War Room | Alert count matches |
+| Step | Action | Metric |
+|------|--------|--------|
+| 1 | Outcomes / OTD | API 200 |
+| 2 | mock-odoo sync → rescore | `rescored` |
+| 3 | Copilot tool query | Structured response |
+| 4 | Kind health | 8/8 pods |
 
-**Outcome:** Tier 1 foundation; Tier 2 insights deferred.
+**Evidence:** `docs/demo-data/release2-demo-g-r2-05.txt` — **PASS 7/7**.
+
+### BS-04 — Executive Cross-Tool Briefing (Sprint 7)
+
+| Step | Action | Metric |
+|------|--------|--------|
+| 1 | Open `/workspace` | Unified KPIs <3s |
+| 2 | Activity feed | Events present or empty-OK |
+| 3 | Drill to War Room / CT | Counts consistent |
+
+**Status:** Tier 1 **SHIPPED**; Tier 2 insights **PLANNED**.
+
+### BS-05 — Arabic Planner Path
+
+| Step | Action | Metric |
+|------|--------|--------|
+| 1 | Switch language to AR | RTL layout |
+| 2 | Triage → Resolve → Approve | Strings present |
+| 3 | Native reviewer sign-off | Signature in `arabic-qa-r2.md` |
+
+**Status:** Eng **PARTIAL**; human **BLOCKED**.
 
 ---
 
 ## 9. User Interface & Navigation
 
-### 9.1 Information Architecture (2026-07-07)
+### 9.1 Information Architecture (actual `apps/web` routes)
+
+Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `releaseProfile.ts`.
 
 ```
-App
-├── /login (public)
-└── Authenticated
-    ├── /workspace                    [default landing — Sprint 7]
-    ├── Planning Hub      /planning/*
-    ├── Command Center    /command-center/*
-    ├── Supply Chain      /supply-chain/*    [full nav only]
-    ├── AI & Governance   /ai-governance/*   [full nav only]
-    ├── Shop Floor        /shop-floor        [full nav only]
-    └── Platform          /platform/*
+/login
+/workspace                          → UnifiedWorkspacePage
+/planning
+  /dashboard | /demand | /scenarios | /control-tower | /resolution | /schedule
+/command-center
+  /dashboard | /war-room | /executive | /outcomes | /equipment
+  /cost-of-chaos | /otd-analytics | /sop-report
+/supply-chain
+  /supply-planning | /orders | /procurement | /tariff | /scn-portal | /inventory
+/ai-governance
+  /copilot | /design-ai | /ai-trust | /mdr | /compliance | /quality | /sustainability
+/platform
+  /admin | /odoo-config | /onboarding | /ml-ops | /ops
+/shop-floor
++ legacy redirects: /control-tower, /schedule, /resolution[-center], /copilot, …
 ```
 
-### 9.2 Release 1 Visible Routes
+### 9.2 Release Profile Visibility
 
-| Route | Page | Fields / interactions |
-|-------|------|------------------------|
-| `/workspace` | Unified Workspace | KPI cards (read-only); activity list; pending actions |
-| `/planning/control-tower` | Control Tower | MO table: score, constraint, product, ERP MO ID; KPI cards; sync bar |
-| `/planning/resolution` | Resolution | Scenario cards: strategy, cost, delivery impact; approve/reject |
-| `/planning/schedule` | Schedule | Gantt; MO multi-select; Approve button; Excel upload (file input) |
-| `/command-center/outcomes` | Outcomes | OTD baseline, ROI metrics (R2) |
-| `/platform/admin` | Admin | Odoo URL (text), DB (text), username (text), password (password), test/save buttons; autonomy mode (dropdown) |
-| `/login` | Login | Email (text), password (password); SSO button (Keycloak) |
+| Hub / tab | `full` | `release1` | `release2` |
+|-----------|--------|------------|------------|
+| Workspace | ✅ | ✅ | ✅ |
+| Planning: CT / Resolution / Schedule | ✅ | ✅ | ✅ |
+| Planning: Demand / Scenarios | ✅ | ❌ | ✅ |
+| Planning: Dashboard | ✅ | ❌ | ❌* |
+| Command: Outcomes / OTD | ✅ | ✅ | ✅ |
+| Command: War Room / Executive / … | ✅ | ❌ | ❌* |
+| Supply Chain | ✅ | ❌ | ❌ |
+| AI Governance (except Copilot path) | ✅ | ❌ | ❌* |
+| Copilot | ✅ | ✅ (W1-01) | ✅ |
+| Platform Admin / Odoo | ✅ | ✅ | ✅ |
+| Shop Floor | ✅ | ❌ | ❌ |
 
-### 9.3 Navigation Rules
+\*Exact tab filters follow `IS_RELEASE1` / `SHOW_R2_PLANNING_TABS` in hub components — verify before customer demos.
 
-| Rule | Implementation |
-|------|----------------|
-| Default route after login | `/workspace` (Sprint 7) |
-| R1 nav filter | `IS_RELEASE1` hides Supply, AI, Shop Floor tabs |
-| Legacy bookmarks | `/control-tower` → `/planning/control-tower` (etc.) |
-| i18n | `en.json` / `ar.json`; Arabic partial (Control Tower + nav) |
+### 9.3 Screen Catalog (field types — representative)
+
+| Screen | Route | Key fields / widgets | Status |
+|--------|-------|----------------------|--------|
+| Login | `/login` | email/password; language | **SHIPPED** |
+| Workspace | `/workspace` | KPI cards, activity feed, pending actions | **SHIPPED** |
+| Control Tower | `/planning/control-tower` | KPI cards, MO table (score colors), bottleneck bars, sync bar, Resolve CTA | **SHIPPED** |
+| Resolution | `/planning/resolution` | Constraint list, scenario cards (cost/OTD/risk) | **SHIPPED** |
+| Schedule | `/planning/schedule` | Gantt, solver status, Approve, Excel upload | **SHIPPED** |
+| Demand | `/planning/demand` | Forecast chart, intervals, accuracy | **SHIPPED** R2 |
+| Scenarios | `/planning/scenarios` | Simulate, compare; **no promote** | **PARTIAL** |
+| OTD | `/command-center/otd-analytics` | 5 KPIs, filters, charts | **SHIPPED** |
+| Outcomes | `/command-center/outcomes` | Baseline / ROI widgets | **SHIPPED** |
+| Copilot | `/ai-governance/copilot` | Chat, sources, tools | **SHIPPED** |
+| Odoo Config | `/platform/odoo-config` | URL/DB/user/pass, test, history | **SHIPPED** |
+| Ops | `/platform/ops` | Tenant health | **PARTIAL** |
+| Executive | `/command-center/executive` | P&L, S&OP gap, what-if | **SHIPPED** / mock gaps **UNKNOWN** |
+| War Room | `/command-center/war-room` | Disruptions, mitigations | **SHIPPED** |
+
+### 9.4 Navigation Rules
+
+| Rule | Detail |
+|------|--------|
+| Auth gate | `ProtectedRoute` / JWT expiry |
+| Default landing | `/` → `/workspace` |
+| Unknown routes | Redirect to planning dashboard |
+| i18n | `locales/en.json`, `locales/ar.json` |
+| Profile | `VITE_RELEASE_PROFILE` |
 
 ---
 
 ## 10. Authorization, Roles & Permissions
 
-### 10.1 Role → Permission Matrix
+### 10.1 Roles (`ipe_shared.auth.rbac.Role`)
 
-Source: `ipe_shared/auth/rbac.py`
-
-| Role | Permissions |
-|------|-------------|
+| Role | Permissions (set) |
+|------|-------------------|
 | `admin` | read, write, approve, admin, delete, run_solver, cost_optimize, manage_users |
 | `planner` | read, write, approve, run_solver, cost_optimize, view_copilot, run_scenario |
 | `manager` | read, write, approve, run_solver, cost_optimize |
@@ -499,24 +696,34 @@ Source: `ipe_shared/auth/rbac.py`
 | `executive` | read, view_kpis |
 | `procurement` | read, write, view_kpis |
 
-### 10.2 API Enforcement Examples
+### 10.2 Enforcement Matrix
 
-| Endpoint | Allowed roles |
-|----------|---------------|
-| POST `/capacity/schedule` | planner, admin, manager |
-| POST `/activity/events` | admin, planner, manager |
-| PUT `/admin/erp/odoo` | admin |
-| GET `/feasibility/queue` | authenticated + tenant |
+| Layer | Behavior | Status |
+|-------|----------|--------|
+| Kong JWT | Validates token; injects tenant; strips client tenant header | **SHIPPED** |
+| FastAPI `require_roles` | State-changing endpoints | **SHIPPED** |
+| FastAPI `require_any_permission` | Fine-grained | **SHIPPED** |
+| PostgreSQL RLS | `app.current_tenant` / `set_config` | **SHIPPED** |
+| UI route RBAC | Not enforced | **PARTIAL** — **OQ-3** |
+| Keycloak realm roles | Mapped when `AUTH_MODE=keycloak` | **PARTIAL** (health issues in R2) |
 
-### 10.3 Data Visibility
+### 10.3 API Enforcement Examples
 
-| Rule | Mechanism |
-|------|-----------|
-| Tenant isolation | PostgreSQL RLS on all `tenant_id` tables |
-| Cross-tenant access | **Forbidden** — Gate 3 validates |
-| Audit log | Append-only `cdm_audit_log`; auditor read |
+| Endpoint | Roles | Action |
+|----------|-------|--------|
+| `POST /capacity/schedule` | planner, admin, manager | run_solver |
+| `POST /resolution/approve` | planner, admin, manager | approve |
+| `POST /feasibility/auto-confirm` | planner, admin | write |
+| `POST /copilot/query` | planner, admin (+ view_copilot) | read/write |
+| Admin / ops APIs | admin | admin |
 
-**Gap:** UI route guard not implemented (OQ-3).
+### 10.4 Data Visibility
+
+| Principle | Rule |
+|-----------|------|
+| Tenant isolation | All CDM queries under tenant RLS |
+| Cross-tenant | Forbidden except platform ops with explicit break-glass (**UNKNOWN** if implemented) |
+| Audit | Append-only `cdm_audit_log` (migration 021 immutability) |
 
 ---
 
@@ -524,204 +731,271 @@ Source: `ipe_shared/auth/rbac.py`
 
 ### 11.1 Dashboard Catalog
 
-| Dashboard | Route / API | Metrics | Audience | Refresh |
-|-----------|-------------|---------|----------|---------|
-| **Unified Workspace** | `/workspace`; GET `/dashboard/unified` | MO count, at-risk, alerts, activity | All R1 roles | On load |
-| **Planning Dashboard** | `/planning/dashboard` | Queue size, avg feasibility, scenarios, scheduled ops | Planner | On load |
-| **Control Tower** | `/planning/control-tower` | Queue, KPIs, bottlenecks | Planner | WebSocket + manual |
-| **Command Dashboard** | `/command-center/dashboard` | Alerts, AI OTD, chaos $, recovery | Executive | On load |
-| **Outcomes (R2)** | `/command-center/outcomes` | OTD baseline, ROI | Executive | On load |
-| **MDR Gate** | `/ai-governance/mdr` | BOM/routing/inventory % | Planner, admin | On load |
-| **Executive** | `/command-center/executive` | OTD, delay breakdown | Executive | On load |
-| **War Room** | `/command-center/war-room` | Active alerts, recovery plan | Supervisor, Executive | On load |
-| **Cost of Chaos** | `/command-center/cost-of-chaos` | 7d Pareto $ | Executive | On load |
-| **Activity feed** | GET `/activity/feed` | Cross-tool events | Admin, exec | On load; paginated |
+| Dashboard | Route / API | Audience | Status |
+|-----------|-------------|----------|--------|
+| Unified Workspace | `/workspace`, `/api/v1/dashboard/unified` | All | **SHIPPED** |
+| Control Tower KPIs | fea `/feasibility/kpis` | Planner | **SHIPPED** |
+| Executive | `/command-center/executive` | Exec | **SHIPPED** / **PARTIAL** |
+| OTD Analytics | `/command-center/otd-analytics` | Manager | **SHIPPED** |
+| Outcomes | `/command-center/outcomes` | Exec/Manager | **SHIPPED** |
+| Cost of Chaos | `/command-center/cost-of-chaos` | Exec | **SHIPPED** |
+| S&OP Report | `/command-center/sop-report` | Manager | **SHIPPED** (mig 042) |
+| AI Trust | `/ai-governance/ai-trust` | Exec/Admin | **PARTIAL** (mock risk) |
+| MDR | `/ai-governance/mdr` | Planner/Admin | **SHIPPED** |
+| Compliance | `/ai-governance/compliance` | Auditor/Admin | **SHIPPED** |
+| Quality / Sustain | AI hub tabs | Specialist | **SHIPPED** demo |
+| Ops | `/platform/ops` | Admin | **PARTIAL** |
+| MLOps | `/platform/ml-ops` | Admin | **PARTIAL** |
+| Grafana / Prometheus | infra | SRE | **SHIPPED** enterprise |
 
-### 11.2 dpe-svc Dashboard APIs
+### 11.2 Key Analytics APIs (dpe-svc)
 
-| Endpoint | Payload |
-|----------|---------|
-| GET `/dashboard/demands` | Demand lines + priority |
-| GET `/dashboard/capacity` | WC utilization |
-| GET `/dashboard/alerts` | Delay events |
-| GET `/dashboard/unified` | KPIs + activity + pending actions |
+| API | Purpose | Status |
+|-----|---------|--------|
+| `GET /api/v1/analytics/*` | Executive summary, WC, delay, accuracy | **SHIPPED** |
+| `GET /api/v1/analytics/otd-baseline` | FR-R1-16 | **SHIPPED** |
+| `GET /api/v1/dashboard/unified` | Workspace | **SHIPPED** |
+| `GET /api/v1/outcomes/*` | R2 outcomes | **SHIPPED** |
+| S&OP / cost-accounting | Forecast, COGM/COPQ | **SHIPPED** full stack |
 
-### 11.3 fea-svc / connector APIs
+### 11.3 Feasibility / Sync Observability
 
-| Endpoint | Purpose |
-|----------|---------|
-| GET `/feasibility/queue` | MO risk queue |
-| GET `/feasibility/kpis` | at_risk, avg score |
-| GET `/feasibility/mdr` | MDR composite |
-| GET `/sync/status` | Last sync audit |
-| GET `/sync/data-quality` | Flag count |
+| API | Purpose | Status |
+|-----|---------|--------|
+| `GET /feasibility/queue` | Risk queue | **SHIPPED** |
+| `GET /feasibility/compliance-kpis` | Compliance KPIs | **SHIPPED** |
+| `GET /sync/status` | Last sync | **SHIPPED** |
+| `GET /sync/data-quality` | DQ flags | **SHIPPED** |
 
 ---
 
 ## 12. Integration Requirements
 
-### 12.1 Odoo (Primary — Live)
+### 12.1 Odoo (Primary)
 
-| Attribute | Specification |
-|-----------|---------------|
-| Protocol | XML-RPC primary; REST via `ipe_connector` addon optional |
-| Versions validated | Odoo 17 (spec 013), Odoo 19 (local dev) — **OQ-1** |
-| Auth | Per-tenant `config` JSONB; KMS-encrypted password (`odoo_password_enc`) |
-| Sync | POST `/api/v1/sync/run` body: `entity`, optional inline creds (required when connector KMS ≠ dpe KMS) |
-| Write-back | POST `/api/v1/sync/odoo/activate` |
-| Scheduler | 900s APScheduler in connector |
+| Item | Detail | Status |
+|------|--------|--------|
+| Protocol | XML-RPC (+ optional `ipe_connector` Odoo module) | **SHIPPED** |
+| Entities | product, MO, BOM/lines, WC, routing, inventory proxy | **PARTIAL** (stock.quant — OQ-11) |
+| Auth to IPE actions | HMAC `X-IPE-Signature` | **SHIPPED** |
+| Sync cadence | 15 min + manual | **SHIPPED** |
+| Write-back | `/sync/odoo/activate` | **SHIPPED** |
+| Local double | `mock-odoo-api` in R2 compose | **SHIPPED** |
+| Staging | Customer Odoo | **BLOCKED** PH1-02 |
+| Docs | `docs/integration/ODOO-*.md`, Star Trans worksheets | **SHIPPED** |
 
-### 12.2 SAP / D365 (Scaffold)
+### 12.2 SAP / D365 / SAP B1
 
-| Attribute | Specification |
-|-----------|---------------|
-| Status | Registry factory; no-op sync; Gate 10 unit tests |
-| Activation trigger | Customer #2 per spec 015 |
-| Constraint | ERP logic MUST NOT leak into CDM core |
+| ERP | Status |
+|-----|--------|
+| SAP / D365 | Registry factory + no-op sync — **SHIPPED** scaffold; not production |
+| SAP B1 | **CUT** (S12) |
 
-### 12.3 Enterprise Services
+### 12.3 Kong Routes (Release 2 — `kong.release2.yml`)
 
-| Service | Port | Requirement |
-|---------|------|-------------|
-| Keycloak | 8180 | OIDC; Gate 5 |
-| Vault | 8200 | Secrets; `VAULT_ENABLED` |
-| Kong | 8000/8443 | TLS, rate limit 300/min |
-| Kafka | 9092 | Full stack only; `IPE_KAFKA_BOOTSTRAP_SERVERS=""` for R1 |
+| Service | Upstream | Paths |
+|---------|----------|-------|
+| dpe-svc | `:8001` | `/api/v1/auth`, `/dashboard`, `/analytics`, `/demand/classify|queue`, `/planner-assist`, `/admin`, `/compliance`, `/outcomes` |
+| fea-svc | `:8004` | `/api/v1/feasibility` |
+| res-svc | `:8005` | `/api/v1/resolution` |
+| cap-svc | `:8003` | `/api/v1/capacity` |
+| connector | `:8009` | `/api/v1/sync`, `/sync/odoo`, `/erp/odoo` |
+| nlp-svc | `:8007` | `/api/v1/copilot`, `/nlp` |
+| demand-svc | `:8040` | `/api/v1/demand/forecast|sense|accuracy|signal` |
+| scenario-svc | `:8050` | `/api/v1/scenario` |
 
-### 12.4 EIB — Ecosystem Integration Bus (Sprint 7)
+Plugins: CORS, HSTS, rate-limit (Redis), tenant strip.
 
-```
-Tool → ipe.{tool}.{event} (Kafka) OR POST /activity/events
-     → EIB normalizer (eib.py)
-     → cdm_activity_event
-     → republish ipe.activity.unified (future)
-     → Unified dashboard / activity feed
-```
+### 12.4 Event Mesh (Full Profile)
 
-**Ingress topics (as-is):** `ipe.demand.created`, `ipe.sync.completed`, `ipe.feasibility.scored`, `ipe.schedule.created`, `ipe.resolution.proposed`, `ipe.alert.raised` (see `EIB_INGRESS_TOPICS`).
+| Topic (examples) | Producers → Consumers | Status |
+|------------------|----------------------|--------|
+| `ipe.demand.created/classified` | connector/dpe → mat | **SHIPPED** full |
+| `ipe.mo.material_scored` | mat → fea | **SHIPPED** full |
+| `ipe.mo.feasibility_scored` | fea → UI WS | **SHIPPED** full |
+| `ipe.resolution.*` | res | **SHIPPED** full |
+| DLQ + Redis idempotency | shared consumer | **SHIPPED** full |
+| R1/R2 Kafka | Disabled (`IPE_KAFKA_ENABLED=false` / empty bootstrap) | By design |
 
-### 12.5 API Response Envelope
+### 12.5 Auth Integration
 
-All public APIs use `APIResponse`: `{ success, data, error, meta }` — `ipe_shared/schemas/common.py`.
+| Mode | When | Status |
+|------|------|--------|
+| `AUTH_MODE=local` | R1/R2 PoC, smoke/demo | **SHIPPED** (required for R2 smoke 2026-07-10) |
+| Keycloak OIDC RS256 | Enterprise / Option B | **PARTIAL** (container health flaky) |
+| JWKS opt-in | `JWT_USE_JWKS=true` | **SHIPPED** code |
+
+### 12.6 Performance Requirements
+
+| Profile | Target | Evidence | Status |
+|---------|--------|----------|--------|
+| k6 SLO | P95 <500ms, err <5% | 293ms / 0% @ v9.3.0-p2 | **SHIPPED** |
+| k6 stress | Rate limiter 429 | Separate script | **SHIPPED** |
+| R1 compose start | ≤10 min on 8GB VM | Playbook | **PARTIAL** (customer VM unproven — T037) |
+| Copilot LLM | Graceful degrade without keys | nlp-svc | **SHIPPED** |
+
+### 12.7 API Envelope
+
+Standard service responses prefer structured JSON; OpenAPI per service under `docs/api/`. Contract fuzz: Schemathesis config in `tests/contract/`.
 
 ---
 
 ## 13. Technical Architecture
 
-### 13.1 Release 1 Topology (As-Is)
+### 13.1 Release 1 Topology
 
 ```
-Browser (:8082) → Kong (:8000)
-  → dpe-svc | fea-svc | cap-svc | res-svc | connector
-  → PostgreSQL (:5433) + Redis (:6380)
-  → Odoo (:8069) via host.docker.internal
-Optional overlay: Keycloak, Vault, MinIO, Prometheus/Grafana
+[Odoo / mock] --XML-RPC--> [connector]
+                              |
+[web-ui] --> [Kong] --> [dpe-svc | fea-svc | res-svc | cap-svc | connector]
+                              |
+                         [PostgreSQL]  [Redis]
+                    (Keycloak/Vault/MinIO optional)
 ```
 
-**Note (OQ-8):** Constitution Principle V lists `mat-svc` in R1; verify `docker-compose.release1.yml` for your deployment.
+**No Kafka** in R1 (Constitution IV).
 
-### 13.2 Full Stack (22 services)
+### 13.2 Release 2 Topology
 
-See `infrastructure/docker/docker-compose.yml` and PRD §14.1 in comprehensive doc. Ports: dpe 8001, fea 8004, cap 8003, connector 8009, etc.
+R1 + `nlp-svc` + `demand-svc` + `scenario-svc` + `mock-odoo-api`.
 
-### 13.3 Technology Stack
+**Gap:** `mat-svc` referenced by URL but **missing** from compose — **OQ-8** / C-14.
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 18, Vite 5, TypeScript, Tailwind |
-| API | FastAPI, Python 3.14+, Pydantic v2 |
-| Solver | Google OR-Tools CP-SAT (cap-svc) |
-| DB | PostgreSQL 16, RLS, Alembic (migrations through **038**) |
-| Gateway | Kong 3.x |
-| K8s | Helm chart `helm/ipe/`; kind cluster `ipe-dev` |
-| LLM | Ollama, OpenRouter, Anthropic (full) |
+### 13.3 Full Stack Services (monorepo `ipe/services/`)
 
-### 13.4 Core CDM Entities
+| Service | Role | Typical port | In R1 compose | In R2 compose |
+|---------|------|--------------|---------------|---------------|
+| dpe-svc | Demand/priority, analytics, auth, admin, outcomes | 8001 | ✅ | ✅ |
+| mat-svc | Material, pATP, CTP | 8002 | ❌ (OQ-8) | ❌ |
+| cap-svc | OR-Tools scheduling | 8003 | ✅ | ✅ |
+| fea-svc | Feasibility + WS | 8004 | ✅ | ✅ |
+| res-svc | Resolution scenarios | 8005 | ✅ | ✅ |
+| del-svc | Delay NLP | 8006 | Full | — |
+| nlp-svc | Copilot | 8007 | — | ✅ |
+| rec-svc | Recommendations | 8008 | Full | — |
+| connector | ERP sync | 8009 | ✅ | ✅ |
+| alert-svc | Alerts | 8010 | Full | — |
+| sustain / quality / scn / network | Specialty | 8012–8015 | Full | — |
+| ml-svc | ML | 8016 | Full | — |
+| demand-svc | SES demand | 8040 | — | ✅ |
+| scenario-svc | Scenarios | 8050 | — | ✅ |
+| mock-odoo-api | Test ERP | — | — | ✅ |
+| order/supply/equipment/procurement/… | v8 streams | varies | Full | — |
 
-| Table | Entity |
-|-------|--------|
-| `cdm_tenant` | Tenant + Odoo config JSONB |
-| `cdm_user` | User + role |
-| `cdm_manufacturing_order` | MO + feasibility_score |
-| `cdm_bill_of_material` / `cdm_bom_line` | BOM |
-| `cdm_routing_operation` | Routing |
-| `cdm_resolution_scenario` | Resolution |
-| `cdm_sync_run` | Sync audit |
-| `cdm_activity_event` | Cross-tool activity (038) |
-| `cdm_audit_log` | Append-only audit |
+Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alternate; prefer canonical names above. **Do not use** orphan `services/` at AISOP repo root.
 
-### 13.5 MDR Composite Formula
+### 13.4 Technology Stack
 
-```
-composite = 0.40 × BOM_coverage + 0.35 × routing_coverage + 0.25 × inventory_coverage
-Gate threshold = 70% (MDR_QUALITY_GATE_THRESHOLD)
-```
+| Layer | Tech |
+|-------|------|
+| Backend | Python 3.12, FastAPI, SQLAlchemy, Pydantic, uv workspaces |
+| Shared | `ipe_shared` (auth, RLS session, events, audit, observability) |
+| Frontend | React + TypeScript + Vite; Vitest; Playwright |
+| DB | PostgreSQL 16 (+ Timescale patterns for inventory) |
+| Cache | Redis 7 (host **6380** in common env) |
+| Messaging | Kafka 7.x + Schema Registry (full) |
+| Gateway | Kong |
+| IdP | Keycloak (enterprise) |
+| Secrets | Vault scaffold |
+| Orchestration | Docker Compose; Helm/kind (enterprise) |
+| Observability | Prometheus, Grafana, OTel, Jaeger |
+| Solvers | OR-Tools CP-SAT |
+| LLM | Ollama / OpenRouter / Anthropic (tiered) |
 
-### 13.6 Scalability & Performance
+### 13.5 Security Architecture
 
-| Operation | Target | As-is |
-|-----------|--------|-------|
-| Full Odoo sync | <60s | ~40–60s local |
-| k6 SLO P95 | <500ms | 293ms |
-| OR-Tools 3-MO | <90s compose | ✅; **timeout on kind** Gate 11 |
-| Ingress proxy timeout | 300s | `values-dev.yaml` |
+| Control | Status |
+|---------|--------|
+| RLS on tenant tables | **SHIPPED** (legacy INSERT policies 033/035) |
+| JWT + RBAC | **SHIPPED** |
+| Audit immutability | **SHIPPED** |
+| PII stripping (Copilot SaaS tier) | **SHIPPED** |
+| Istio mTLS manifests | **SHIPPED** scaffold |
+| SOC 2 control catalog | **SHIPPED** code; audit engagement **PLANNED** Phase 5 |
+| Production secrets in vault | **PARTIAL** / POST-B |
+
+### 13.6 Scalability
+
+| Mode | Pattern | Status |
+|------|---------|--------|
+| R1 single VM | Compose 8GB | **SHIPPED** docs |
+| Enterprise | Helm + HPA smoke | **SHIPPED** gates 6–10 |
+| Multi-tenant SaaS | Quotas/metering/Stripe | **PARTIAL** / Phase 4 |
 
 ---
 
 ## 14. Competitive Context
 
-### 14.1 Positioning
+> **Evidence note:** The repository contains **positioning guidance** (Constitution MENA constraints, Spec 013) but **no formal third-party competitive research dossier**. The matrix below is **PROVISIONAL** and requires **PM validation** before customer-facing use.
 
-| Competitor | IPE aligns | IPE differentiates | IPE gaps |
-|------------|------------|-------------------|----------|
-| **Excel + Odoo MRP** | MO list, basic scheduling | Feasibility queue, resolution, OR-Tools | Change management |
-| **Kinaxis RapidResponse** | Control tower concept | Faster deploy; mid-market price | Multi-site proven benchmarks |
-| **SAP IBP** | S&OP, scenarios (v8 streams) | Odoo-native; MENA story | Live SAP connector |
-| **o9 Solutions** | AI planning narrative | Integrated resolution workflow | Enterprise ML ops maturity |
+### 14.1 Positioning (from constitution / specs)
 
-### 14.2 Feature Comparison Matrix (Abbreviated)
+| Axis | IPE stance |
+|------|------------|
+| R1 competitor | Excel + Odoo MRP |
+| Not primary pitch | Kinaxis / SAP IBP feature parity |
+| Moat claim | MENA implementation + feasibility-before-shift workflow |
+| Buyer | CEO / Ops Director |
 
-| Capability | IPE | Kinaxis | SAP IBP | Excel+Odoo |
-|------------|-----|---------|---------|------------|
-| Feasibility pre-schedule scoring | ✅ | ✅ | ✅ | ❌ |
-| Finite capacity OR-Tools | ✅ | ✅ | ✅ | Manual |
-| Odoo bidirectional sync | ✅ | ❌ | Via integrator | Native ERP only |
-| Resolution scenarios | ✅ | Partial | Partial | ❌ |
-| Mid-market compose deploy | ✅ | ❌ | ❌ | ✅ |
-| Live SAP connector | Scaffold | ✅ | ✅ | N/A |
-| Unified cross-tool workspace | ✅ Sprint 7 | ✅ | ✅ | ❌ |
+### 14.2 Provisional Feature Matrix (needs PM validation)
+
+| Capability | IPE (as-is) | Excel+Odoo MRP | Kinaxis* | SAP IBP* | o9* |
+|------------|-------------|----------------|----------|----------|-----|
+| Live Odoo MO risk queue | ✅ R1 | Manual | * | * | * |
+| Feasibility gates + unscorable | ✅ | ❌ | * | * | * |
+| OR-Tools finite schedule | ✅ | Limited MRP | * | * | * |
+| Resolution scenarios | ✅ | ❌ | * | * | * |
+| Arabic MVP | 🟡 | Varies | * | * | * |
+| 8GB VM deploy | ✅ | N/A | ❌ typical | ❌ | ❌ |
+| Multi-echelon network | Demo/full | ❌ | * | * | * |
+| Enterprise SSO/K8s | 🟡 | N/A | * | * | * |
+| Live SAP connector | ❌ scaffold | N/A | * | Native | * |
+
+\*Cells marked `*` = **UNKNOWN** — not evidenced in repo; do not cite as fact.
+
+### 14.3 Pricing Fit (commercial — OQ-7)
+
+| Component | Range (constitution) | Status |
+|-----------|----------------------|--------|
+| License | $18K–30K / yr | **OQ-7** pending sign-off |
+| Implementation | $12K–25K one-time | **OQ-7** |
 
 ---
 
 ## 15. Data & Privacy
 
-### 15.1 Data Collection & Storage
+### 15.1 Data Collected / Stored
 
-| Data class | Storage | Retention |
-|------------|---------|-----------|
-| Manufacturing master data | PostgreSQL CDM | Tenant lifetime |
-| Odoo credentials | `tenant.config` encrypted | Until rotated |
-| Audit events | `cdm_audit_log` | Append-only; export API |
-| Activity events | `cdm_activity_event` | No auto-purge policy — **OQ-6** |
-| Copilot sessions | nlp-svc / DB | Retention policy TBD — **OQ-6** |
+| Category | Examples | Store |
+|----------|----------|-------|
+| Master data | Products, BOM, WC, operators | CDM Postgres |
+| Transactional | MOs, demand lines, supply orders | CDM |
+| Planning | Feasibility scores, schedules, scenarios | CDM |
+| Sync audit | `cdm_sync_run`, DQ flags | CDM |
+| Activity | `cdm_activity_event` | CDM (038) |
+| Auth | `cdm_user` password hashes | CDM |
+| Copilot | Session/query logs | nlp-svc — **OQ-6** |
+| Telemetry | Metrics, traces | Prometheus/Jaeger |
 
-### 15.2 GDPR / Compliance (As-Is)
+### 15.2 Privacy & Compliance
 
-| Requirement | Status |
-|-------------|--------|
-| DSAR export API | ✅ scaffold (`/dsar`) |
-| Right to erasure | ⬜ Phase 5 (spec 015) |
-| Tenant RLS | ✅ Must |
-| PII in LLM prompts | PII stripper middleware (Tier 1) — POST-B production hardening |
+| Control | Status |
+|---------|--------|
+| Tenant RLS | **SHIPPED** |
+| GDPR DSAR APIs | **SHIPPED** (dpe) |
+| Consent manager | **SHIPPED** code |
+| Retention policies + Airflow DAG | **SHIPPED** code |
+| PII strip before SaaS LLM | **SHIPPED** |
+| SOC 2 Type II | **PLANNED** Phase 5 |
+| WCAG 2.1 AA cert | **PLANNED** Phase 5 |
 
-### 15.3 Security Architecture
+### 15.3 Conflict & Ownership Policy
 
-| Control | Implementation |
-|---------|----------------|
-| Auth | JWT HS256 (dev) / RS256 Keycloak (enterprise) |
-| Transport | TLS via Kong :8443 (enterprise demo) |
-| Secrets | Vault scaffold; env vars dev only |
-| Rate limiting | Kong 300/min, 10000/hr |
+| Data class | Winner |
+|------------|--------|
+| Master data (BOM, product, WC) | **Odoo** |
+| Approved schedule dates | **IPE** until next sync conflict |
+| Inventory on-hand | Odoo (`stock.quant` target) — **PARTIAL** |
 
 ---
 
@@ -729,55 +1003,80 @@ Gate threshold = 70% (MDR_QUALITY_GATE_THRESHOLD)
 
 ### 16.1 Completed Phases
 
-| Phase | Version / spec | Status |
-|-------|----------------|--------|
-| V5 convergence | v1.0.0 / 003 | ✅ |
-| V6 AI-first | v6.0.0 / 004 | ✅ |
-| Hub consolidation | v7.0.0 / 006 | ✅ |
-| v8 U1–U8 | v8.2.0 / 007–010 | ✅ 32/32 |
-| Release 1 | 013 | ✅ 14/14 compose |
-| Release 2 | 014 | ✅ 5/5 |
-| Enterprise P0–P2 | 015 | ✅ `v9.3.0-p2` |
+| Phase | Scope | Tag / evidence | Status |
+|-------|-------|----------------|--------|
+| Foundation → AI-first | Specs 000–004 | v6.x | **SHIPPED** |
+| Hub + v8 streams | 006–010 | v8.2.0 | **SHIPPED** |
+| R1 Odoo MENA eng | 013 | R1 compose/demo | **SHIPPED** eng |
+| Enterprise P0–P2 | 015 | v9.3.0-p2 | **SHIPPED** |
+| Enterprise P3 | 015/017 | v9.4.0-p3 | **SHIPPED** |
+| Sprint 7 cohesion | 016 | mig 038 | **SHIPPED** Tier 1 |
+| R2 sprints S1–S4, S6–S11 | 018 | smoke/demo | **SHIPPED** eng |
 
-### 16.2 In Progress
+### 16.2 In Progress / Hold
 
-| Phase | Target | Blocker |
-|-------|--------|---------|
-| Enterprise P3 | `v9.4.0-p3` | Gate 11 **12/14** — OR-Tools on kind |
-| Sprint 7 Tier 1 | `v9.5.0-s7` | Tier 2/3 stretch |
-| Star Trans UAT | Customer sign-off | SOW + Odoo staging |
+| Item | Owner | Blocker | Status |
+|------|-------|---------|--------|
+| G-R2-04 Arabic native sign-off | Native reviewer | Human | **BLOCKED** |
+| G-R2-TAG / `v9.1.1-r2` | Release manager | G-R2-04 policy | **BLOCKED** |
+| Phase 1 UAT Star Trans | Exec + Eng | PH1-01 SOW, PH1-02 staging | **BLOCKED** |
+| C-15 stock.quant | Backend / ARB | OQ-11 | **PARTIAL** |
+| #40 scenario promotion | Frontend | OQ-10 | **PLANNED** |
+| #37/#38 provision/quotas | Backend | Scope | **PARTIAL** |
+| mat-svc in R2 compose | Backend | OQ-8 | **PLANNED** |
+| Keycloak health in R2 | Ops | Container | **PARTIAL** |
 
-### 16.3 Upcoming
+### 16.3 Upcoming (Waves / Phases)
 
-| Phase | Scope | Start condition |
-|-------|-------|-----------------|
-| Enterprise P4 GTM | Stripe live, tenant API, Terraform | After `v9.4.0-p3` |
-| Enterprise P5 | SOC2, WCAG, live SAP/D365 | Post-GTM |
-| Sprint 7 Tier 2 | Pattern discovery, anomaly alerts | After Tier 1 stable |
-| Sprint 8 | Email-PM sync, integration marketplace design | Roadmap doc |
+| Horizon | Content | Gate |
+|---------|---------|------|
+| Wave 2 remainder | Predictive delay (#42); provision/quotas | Spec 017 |
+| Wave 3 | NL schedule + supplier comms (#43–46) | Spec 017 |
+| Phase 4 GTM | Stripe, tenant self-service, developer portal | After P3 tag ✅ |
+| Phase 5 | SOC 2 II, WCAG, live SAP/D365 | Post-GTM |
 
-### 16.4 Milestone Dependencies
+### 16.4 Resource Notes
 
-```
-v9.4.0-p3 ──requires──► Gate 11 14/14
-v10.0.0-e4 ──requires──► v9.4.0-p3 + Phase 4 tasks T170–T179
-Star Trans UAT ──requires──► Customer IT + SOW (business)
-```
+| Resource | Note |
+|----------|------|
+| Engineering | R2 eng ~92% per STATUS-REPORT |
+| Commercial | PH1-01/02 required for revenue UAT |
+| Native Arabic QA | Cannot be automated |
+| Infra | Kind 8/8; compose R2 up with AUTH_MODE=local |
+
+### 16.5 Current Gate Matrix (authoritative snapshot)
+
+| Gate | Status | Evidence |
+|------|--------|----------|
+| G-R2-01 | **PASS** 15/15 | `docs/qa/release2-smoke-2026-07-10.txt` |
+| G-R2-02 | **PASS** | Copilot tools tests / smoke |
+| G-R2-03 | **PASS (eng)** | Live Odoo = PH1-02 |
+| G-R2-04 | **PARTIAL** | `docs/qa/arabic-qa-r2.md` |
+| G-R2-05 | **PASS** 7/7 | `docs/demo-data/release2-demo-g-r2-05.txt` |
+| G-R2-TAG | **HOLD** | Prefer `v9.1.1-r2` after Arabic |
+| Enterprise 1–10 | **PASS** | Spec 015 / GATE-RESULTS |
+| Gate 11 | **12/14 + waiver** | OQ-9 accepted |
+
+Open inventory: `specs/018-phase2-release2/OPEN-ITEMS-PROJECT.md`.
 
 ---
 
 ## 17. Risks & Mitigation
 
-| ID | Risk | Likelihood | Impact | Mitigation |
-|----|------|------------|--------|------------|
-| R-01 | Gate 11 fails on K8s CPU | High | Blocks `v9.4.0-p3` | More cap-svc CPU; direct port-forward; or waiver OQ-9 |
-| R-02 | Customer UAT delay | High | Revenue slip | Parallel demo env; SOW escalation |
-| R-03 | Odoo version drift 17 vs 19 | Medium | Sync mapper breaks | Version-specific mapper tests; OQ-1 decision |
-| R-04 | UI RBAC gap | Medium | Unauthorized actions | OQ-3; route guards Phase 5 |
-| R-05 | Per-pod KMS breaks sync creds | Medium | Sync fails on K8s | Inline creds in sync body (implemented demo); shared KMS store |
-| R-06 | Kafka-off R1 limits real-time | Low | Stale activity feed | POST `/activity/events` direct ingest |
-| R-07 | Doc drift (service count) | Medium | Wrong deploy | OQ-8; reconcile compose + constitution |
-| R-08 | Scope creep Sprint 7 | Medium | Tier 1 delay | Committed vs stretch tiers in spec 016 |
+| ID | Risk | Impact | Likelihood | Mitigation | Status |
+|----|------|--------|------------|------------|--------|
+| R-01 | No signed SOW / staging Odoo | Cannot prove ROI | High | PH1-01/02 executive track | **BLOCKED** |
+| R-02 | Arabic QA unsigned | Tag hold; MENA trust | Medium | Native reviewer checklist | **BLOCKED** |
+| R-03 | stock.quant gap | Misleading material scores | Medium | Implement or ARB CUT (OQ-11) | Open |
+| R-04 | mat-svc absent from R2 compose | Broken material paths | Medium | Add service (C-14) | Open |
+| R-05 | Keycloak unhealthy | SSO demos fail | Medium | AUTH_MODE=local for R2; fix container | Mitigated short-term |
+| R-06 | AUTH_MODE mismatch → 401 | Smoke/demo red | Medium | Document local mode; dual JWT | Mitigated 2026-07-10 |
+| R-07 | Feature sprawl vs R1 focus | Diluted go-live | Medium | Constitution VII | Ongoing |
+| R-08 | LLM key absence | Copilot degrade | Low | Graceful fallback + tools | Mitigated |
+| R-09 | Kind OR-Tools timeout | Gate 11 incomplete | Low | OQ-9 waiver | Accepted |
+| R-10 | Competitive overclaim | Sales risk | Medium | Label provisional matrix | Process |
+| R-11 | UI RBAC gap | Unauthorized screen access | Medium | OQ-3 decision | Open |
+| R-12 | Unpushed / dirty git | Traceability | Low | Release hygiene | Process |
 
 ---
 
@@ -785,280 +1084,191 @@ Star Trans UAT ──requires──► Customer IT + SOW (business)
 
 ### 18.1 Assumptions
 
-| ID | Assumption |
-|----|------------|
-| A-01 | Star Trans runs Odoo on reachable host from Docker/kind |
-| A-02 | Demo user `Ahmed@nour` / `admin` acceptable in non-prod only |
-| A-03 | 8 GB VM sufficient for R1 compose |
-| A-04 | Planners accept shadow-mode AI initially |
-| A-05 | English primary; Arabic partial acceptable for R1 |
+| ID | Assumption | Validated? |
+|----|------------|------------|
+| A-01 | Customer #1 is Odoo-based discrete manufacturer | Yes (Star Trans) |
+| A-02 | Shadow autonomy acceptable at go-live | Yes (constitution) |
+| A-03 | Batch sync sufficient vs webhooks for R1 | Yes (MENA connectivity) |
+| A-04 | 8GB VM is acceptable production for R1 | Docs yes; customer VM **UNKNOWN** |
+| A-05 | Pricing band $18–30K fits buyer | **OQ-7** |
+| A-06 | mock-odoo ≈ staging for eng gates | Accepted for G-R2; not for UAT |
 
 ### 18.2 Technical Constraints
 
-| ID | Constraint |
-|----|------------|
-| C-01 | RLS mandatory on all tenant tables (Constitution I) |
-| C-02 | No Kafka in R1 Helm/compose profiles |
-| C-03 | k6 SLO and stress profiles MUST NOT be combined (Constitution VI) |
-| C-04 | Tag `v9.4.0-p3` requires Gates 6–11 PASS (Constitution VIII) |
-| C-05 | Windows dev host; PowerShell scripts primary operator path |
-| C-06 | Canonical codebase: `ipe/` not root `services/` |
+| Constraint | Detail |
+|------------|--------|
+| RLS mandatory | Constitution I |
+| Tests for behavioral changes | Constitution III |
+| No Kafka in R1 | Constitution IV |
+| Port reconciliation | Dockerfile / compose / Kong / Helm |
+| Redis host port | **6380** (common env) |
+| Python 3.12 + ruff/mypy/prettier | Tooling |
+| Cross-platform scripts | PowerShell customer-facing |
 
 ### 18.3 Business Constraints
 
-| ID | Constraint |
-|----|------------|
-| B-01 | First customer deploy = Compose not 22-service K8s |
-| B-02 | SAP/D365 live connectors deferred until second customer |
-| B-03 | NEXUS product line not funded in IPE program |
+| Constraint | Detail |
+|------------|--------|
+| One ERP first | Odoo |
+| Three screens minimum R1 | CT, Resolution, Executive OTD |
+| Arabic before go-live | CT, Resolution, nav, alerts |
+| Fixed-scope SOW | Not demo-script-only |
+| Phase 4 GTM after `v9.4.0-p3` | Constitution VIII |
+
+### 18.4 Doc Drift / Conflicts (do not invent resolution)
+
+| Conflict | Sources | Action |
+|----------|---------|--------|
+| FR-R1-05 done vs C-15 open | Spec 013 vs OPEN-ITEMS | **OQ-11** |
+| READINESS score 100 vs R2 finalize ~92% eng | READINESS vs 018 STATUS | Treat as different scopes (v8 demo vs R2 program) |
+| Root AGENTS.md still cites v6 REL-* | Root AGENTS vs tags v9.x | Update pointer — **UNKNOWN** owner |
+| Spec 018 header still “smoke pending” | spec.md vs GATES.md | Prefer **GATES.md** + STATUS-REPORT as live |
 
 ---
 
-## 19. Task Tool & Cursor Integration
+## 19. Appendices
 
-This section specifies how **Spec Kit task management** integrates with **Cursor IDE** for IPE development workflow.
+### Appendix A — Core Data Model (CDM)
 
-### 19.1 System Components
+| Table | Purpose |
+|-------|---------|
+| `cdm_tenant` | Tenant config |
+| `cdm_product` | Product master |
+| `cdm_bill_of_material` / `cdm_bom_line` | BOM |
+| `cdm_demand_line` | Demand + priority |
+| `cdm_supply_order` | Supply / POs |
+| `cdm_manufacturing_order` | MOs + feasibility / material scores |
+| `cdm_work_order` / `cdm_work_center` / `cdm_operator` | Capacity / labor |
+| `cdm_inventory_position` | Inventory time-series |
+| `cdm_delay_event` | Delay causes |
+| `cdm_resolution_scenario` | Scenarios |
+| `cdm_sync_run` / DQ flags | R1 sync audit (036) |
+| `cdm_activity_event` | Sprint 7 activity (038) |
+| `cdm_otd_snapshot` | OTD (039) |
+| `cdm_tenant_health` | Ops (040) |
+| `cdm_supplier_score` | SC intel (041) |
+| `cdm_sop_report` | S&OP (042) |
+| Odoo config versioning | 043 |
+| `cdm_audit_log` | Append-only audit |
 
-| Component | Path | Purpose |
-|-----------|------|---------|
-| **Spec Kit root** | `E:\AISOP\.specify\` | Workflow registry, templates, feature pointer |
-| **Active feature** | `.specify/feature.json` | Points to `ipe/specs/016-sprint7-ecosystem-cohesion` |
-| **Constitution** | `ipe/.specify/memory/constitution.md` | Binding gates and principles |
-| **Per-feature tasks** | `ipe/specs/{NNN}/tasks.md` | Checklist with IDs (T701, T150, etc.) |
-| **Cursor workspace** | `E:\AISOP` (monorepo); canonical code `ipe/` | Agent execution environment |
-| **AGENTS.md** | `ipe/AGENTS.md` | Workspace rules for agents |
+ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kong.
 
-### 19.2 Task Creation & Assignment Workflow
+### Appendix B — Configuration Options (selected)
 
-```
-1. /speckit.specify  → creates/updates spec.md
-2. /speckit.plan     → plan.md with phases
-3. /speckit.tasks    → tasks.md with IDs, priority, status
-4. /speckit.implement → agent executes tasks; updates status ✅/🔄/⬜
-5. /speckit.converge → analyze gaps; update GATE-RESULTS, converge.md
-```
+| Variable | Purpose |
+|----------|---------|
+| `IPE_DATABASE_URL` | Postgres |
+| `IPE_REDIS_URL` | Redis (host 6380) |
+| `IPE_KAFKA_BOOTSTRAP_SERVERS` | Empty for R1 |
+| `IPE_JWT_SECRET_KEY` | Local JWT |
+| `AUTH_MODE` | `local` \| `keycloak` |
+| `JWT_USE_JWKS` | JWKS validation |
+| `VITE_RELEASE_PROFILE` | `full` \| `release1` \| `release2` |
+| `VITE_API_BASE_URL` | Kong/API |
+| `ANTHROPIC_API_KEY` / OpenRouter / Ollama | LLM |
+| `ODOO_*` / sync body creds | Connector |
+| `ERP_SYNC_MODE` | e.g. `direct` |
+| `OTEL_*` | Tracing |
 
-| Step | Owner | Output artifact |
-|------|-------|-----------------|
-| Specify | PM + agent | `spec.md` with FR-* IDs |
-| Tasks | PM + agent | `tasks.md` with traceable IDs |
-| Implement | Dev + Cursor agent | Code + evidence files |
-| Verify | QA / agent | `evidence/*.txt`, gate scripts |
-| Close | PM | Git tag when constitution gates pass |
+### Appendix C — Edge Cases
 
-### 19.3 How Cursor Surfaces Incomplete Work
+| Case | Expected behavior |
+|------|-------------------|
+| MO missing BOM/routing | Unscorable + DQ flag; no silent high score |
+| Sync while Odoo down | Failed sync_run; alert webhook if configured; UI last-synced stale |
+| MDR <70% | Schedule returns 503 |
+| Cross-tenant JWT | RLS + 403/empty |
+| Expired JWT | 401; UI redirect login |
+| LLM unavailable | Copilot fallback text; tools may still run |
+| Solver timeout | Partial/timeout status; no corrupt assignments |
+| SYNC_CONFLICT | Badge on CT; planner resolves |
 
-| Mechanism | Behavior |
-|-----------|----------|
-| **Active feature pointer** | `feature.json` → agent reads correct `specs/NNN/` |
-| **tasks.md status columns** | Agent searches `⬜` and `🔄` rows for backlog |
-| **Constitution Principle VIII** | Agent MUST NOT tag release if gates incomplete |
-| **GATE-RESULTS-PHASE3.md** | Single source for gate PASS/FAIL |
-| **READINESS.md** | Production blocker IDs (C-007, SEC-P0, etc.) |
-| **ISSUES.md / GitHub** | `#12–#18` enterprise gate issues |
-| **Todo tool (Cursor)** | Session-level task tracking during agent runs |
-| **Evidence folder** | `specs/NNN/evidence/` — missing file = incomplete gate |
+### Appendix D — Technical Decisions (ADR / constitution)
 
-### 19.4 Integration Points with IPE Modules
+| Decision | Rationale | Ref |
+|----------|-----------|-----|
+| Odoo first | Customer #1 revenue | Principle VII |
+| No Kafka in R1 | Reliability over purity | Principle IV |
+| Shadow autonomy default | Trust | Product |
+| Gate scripts = SoT | Anti-checklist-theater | Principle VIII |
+| OQ-9 Gate 11 waiver | Infra OR-Tools on kind | `gate11-oq9-waiver.md` |
+| Keycloak deferral options | ADR-001 | `docs/decisions/` |
+| Legacy RLS waiver | ADR-002 | `docs/decisions/` |
+| SAP B1 CUT | Strategy / Spec 017 | S12-CUT.md |
 
-| Module | Task traceability |
-|--------|-------------------|
-| Gate scripts | `tasks.md` T150–T166 map to `verify-gate*.ps1` |
-| Demo scripts | T200–T201 regression |
-| Migrations | T701 → `038_sprint7_activity_events.py` |
-| Helm/K8s | T151–T157 → `helm/ipe/`, `scripts/k8s/` |
-| Frontend hubs | T714 → `apps/web/src/features/hubs/` |
+### Appendix E — Testing Evidence Paths
 
-### 19.5 Acceptance Criteria — Task Tool + Cursor Integration
+| Layer | Path / command | Latest signal |
+|-------|----------------|---------------|
+| Unit | `uv run pytest` per service | 860/860 (018) |
+| Vitest | `apps/web` | 41/41 |
+| Playwright | `e2e/arabic-r2.spec.ts`, critical-path | Run for G-R2-04 |
+| R2 smoke | `scripts/release2-smoke.ps1` | 15/15 |
+| R2 demo | `scripts/run-release2-demo.ps1` | 7/7 |
+| R1 demo | `scripts/run-release1-integration-demo.ps1` | 14/14 compose |
+| k6 SLO | `docs/qa/PERFORMANCE-BASELINE-v9.1.0.md` | PASS 293ms |
+| Chaos | `docs/chaos/` C1–C6 | Documented |
+| Integration | `tests/integration/` | Multiple suites |
 
-| ID | Criterion | Verification |
-|----|-----------|--------------|
-| TC-TASK-01 | Every implemented feature has task ID in `tasks.md` marked ✅ | Manual audit |
-| TC-TASK-02 | `feature.json` active_feature matches current sprint spec | Read file |
-| TC-TASK-03 | Gate evidence paths in tasks match files on disk | `audit-event-streams.ps1` pattern |
-| TC-TASK-04 | Agent does not tag release when Constitution VIII blocks | Gate 11 partial → no `v9.4.0-p3` |
-| TC-TASK-05 | Converge doc updated after phase close | `converge-phase3-close.md` exists |
-
-### 19.6 Gap Resolution Protocol
-
-```
-1. Agent or QA identifies gap → document in analyze.md or ISSUES.md
-2. Create task row in tasks.md with P0/P1 + owner
-3. If gate-related → add to GATE-RESULTS with evidence path
-4. Implement fix → run verify script → update evidence
-5. Mark task ✅ only with command output or evidence file
-6. For stakeholder decisions → add OQ-* to spec §1.6; do NOT assume
-```
-
----
-
-## 20. Full Integration Testing Requirements
-
-### 20.1 Test Pyramid (As-Is)
-
-| Layer | Scope | Command / artifact |
-|-------|-------|-------------------|
-| Unit | Per-service pytest | `uv run pytest services/*/tests` |
-| Integration | v8 E2E | `tests/integration/test_v8_e2e.py` (5/5) |
-| Connector | Odoo mapper | 16/16 tests |
-| Demo regression | Full product | `run-full-demo.ps1` (32/32) |
-| Release regression | R1 + R2 | `run-release1-integration-demo.ps1`, `run-release2-demo.ps1` |
-| Enterprise gates | Security + obs | `verify-gate1.sh` … `verify-gate5.ps1` |
-| K8s gates | Scale + R1 on K8s | `verify-gate6.ps1` … `verify-gate11.ps1` |
-| Load | k6 SLO + stress | `k6-slo.js`, `k6-stress.js` **separate runs** |
-| Chaos | Resilience | 6/6 documented `docs/chaos/` |
-| E2E UI | Playwright foundation | `apps/web/e2e/` |
-| Sprint 7 audit | EIB scaffolding | `scripts/sprint7/audit-event-streams.ps1` |
-
-### 20.2 End-to-End Integration Scenarios (Must Pass for Release)
-
-| ID | Scenario | Steps | Pass criteria |
-|----|----------|-------|---------------|
-| E2E-01 | Login → Control Tower | Auth → queue | 200; ≥1 MO |
-| E2E-02 | Full Odoo sync | sync/run all | status=success |
-| E2E-03 | Resolution → Schedule | scenarios → OR-Tools | ops scheduled |
-| E2E-04 | Approve → Odoo | activate | Odoo dates updated |
-| E2E-05 | MDR gate block | score <70 | cap-svc 503 |
-| E2E-06 | R2 Outcomes | OTD + ROI APIs | 200 |
-| E2E-07 | Unified workspace | /dashboard/unified | KPIs + activity |
-| E2E-08 | Tenant isolation | cross-tenant read | 403 / empty |
-| E2E-09 | K8s ingress R1 | 14 demo steps via `localhost` | **12/14** as-is; target 14/14 |
-| E2E-10 | Compose–K8s parity | health + feasibility + resolution | Gate 8 3/3 |
-
-### 20.3 Gate Testing Schedule (Enterprise)
-
-| Gate | When | Owner | Evidence path |
-|------|------|-------|---------------|
-| 1–5 | Pre `v9.3.0-p2` | Platform | scripts/security, monitoring |
-| 6–7 | Phase 3 start | Platform | `verify-gate6.ps1`, kind deploy |
-| 8 | After DB seed | Platform | `gate8-parity.txt` |
-| 9 | HPA overlay | Platform | `gate9-hpa.txt` |
-| 10 | CI / local | Backend | `test_erp_scaffolds.py` |
-| 11 | Pre `v9.4.0-p3` | Platform | `gate11-r1-k8s.txt` |
-
-### 20.4 Task Tool & Cursor Test Cases
-
-| ID | Test | Steps | Expected |
-|----|------|-------|----------|
-| TC-CUR-01 | Active feature resolution | Read `feature.json` | Points to 016 |
-| TC-CUR-02 | Task completion traceability | T714 ✅ → file exists | `UnifiedWorkspacePage.tsx` |
-| TC-CUR-03 | Gate blocked tag | Gate 11 partial | No `v9.4.0-p3` tag |
-| TC-CUR-04 | Evidence regeneration | Run `verify-gate11.ps1` | Updates `gate11-r1-k8s.txt` |
-| TC-CUR-05 | Sprint 7 audit | Run `audit-event-streams.ps1` | ≥6 checks pass |
-
-### 20.5 Known Testing Gaps (Require Resolution)
-
-| ID | Gap | Dependency | Target phase |
-|----|-----|------------|--------------|
-| TG-01 | Gate 11 schedule timeout on kind | cap-svc CPU / timeout | P3 close |
-| TG-02 | Schemathesis in CI | Pipeline wiring | P5 |
-| TG-03 | Chaos Mesh on K8s | Helm addon | P5 |
-| TG-04 | Playwright full R1 path | CI stable stack | P4 |
-| TG-05 | Formal MAPE baseline | Production data | Post-UAT |
-| TG-06 | SCIM live Keycloak test | IdP staging | POST-B |
-| TG-07 | Route-level RBAC UI tests | OQ-3 decision | P5 |
-
-### 20.6 Regression Policy
-
-| Trigger | Required runs |
-|---------|---------------|
-| Any PR touching `connector/` | Odoo tests + Gate 4 subset |
-| Any PR touching `cap-svc/` | Schedule tests + demo step 10 |
-| Any PR touching RLS migrations | Gate 3 + adversarial RLS tests |
-| Pre-release tag | Full gate suite per Constitution VIII |
-| Post-Sprint 7 change | `test_activity_eib.py` + unified API smoke |
-
----
-
-## 21. Appendices
-
-### Appendix A — Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| v1.0.0 | 2026 | V5 convergence — MDR, closed-loop schedule |
-| v6.0.0 | 2026 | Tariff, CPM, War Room |
-| v7.0.0 | 2026 | 6 hub consolidation |
-| v8.2.0 | 2026 | U1–U8 streams; 32/32 demo |
-| v9.3.0-p2 | 2026-07-04 | Enterprise gates 1–5; k6 |
-| v9.4.0-p3 | Target | Phase 3 gates 6–11 — **blocked** |
-| v9.5.0-s7 | In progress | Unified workspace, EIB, activity feed |
-| PRD authoritative | 2026-07-07 | This document; supersedes comprehensive PRD snapshot |
-
-### Appendix B — Glossary
+### Appendix F — Glossary
 
 | Term | Definition |
 |------|------------|
-| **APS** | Advanced Planning & Scheduling |
-| **CDM** | Canonical Data Model (`cdm_*` tables) |
-| **Control Tower** | Feasibility queue UI |
-| **EIB** | Ecosystem Integration Bus — event normalization layer |
-| **MDR** | Master Data Readiness — composite score gating schedule |
+| **IPE** | Intelligent Planning Engine |
+| **CDM** | Canonical Data Model |
 | **MO** | Manufacturing Order |
 | **OTD** | On-Time Delivery |
-| **R1 / R2** | Release 1 (Odoo customer) / Release 2 (growth) |
-| **RLS** | Row-Level Security (PostgreSQL) |
-| **Spec Kit** | Speckit workflow tooling under `.specify/` |
-| **Star Trans** | Reference customer — electrical transformers |
+| **MDR** | Master Data Readiness (composite gate) |
+| **pATP** | Probabilistic Available-to-Promise |
+| **CTP** | Capable-to-Promise |
+| **EIB** | Ecosystem Integration Bus (activity normalization) |
+| **R1 / R2** | Release 1 / Release 2 compose profiles |
+| **Shadow mode** | AI observes/suggests; no auto-apply |
+| **Unscorable** | MO lacking data for honest feasibility |
+| **Star Trans** | Reference MENA customer |
+| **Kong** | API gateway |
+| **RLS** | Row-Level Security |
+| **OQ** | Open Question (stakeholder) |
 
-### Appendix C — Key File References
+### Appendix G — Stakeholder Decision Log (Open)
 
-| Artifact | Path |
-|----------|------|
-| This PRD | `ipe/docs/PRD-IPE-AUTHORITATIVE.md` |
-| Readiness | `ipe/READINESS.md` |
-| Constitution | `ipe/.specify/memory/constitution.md` |
-| Gate results P3 | `ipe/docs/qa/GATE-RESULTS-PHASE3.md` |
-| Spec 015 | `ipe/specs/015-enterprise-production-readiness/` |
-| Spec 016 | `ipe/specs/016-sprint7-ecosystem-cohesion/` |
-| R1 compose | `ipe/infrastructure/docker/docker-compose.release1.yml` |
-| Web routes | `ipe/apps/web/src/app/router.tsx` |
-| RBAC | `ipe/services/shared/ipe_shared/auth/rbac.py` |
+| ID | Decision needed | Owner | Blocks |
+|----|-----------------|-------|--------|
+| OQ-1 | Odoo 17 vs 19 canonical | Product + Customer IT | Mapping docs |
+| OQ-3 | UI route RBAC | Product + Security | Hardening |
+| OQ-5 | Formal KPI baseline study | Product | G-01/G-02 claims |
+| OQ-6 | Copilot retention/erasure | Legal + Eng | GDPR |
+| OQ-7 | Pricing confirmation | Executive | SOW |
+| OQ-8 | mat-svc in compose | Eng lead | C-14 |
+| OQ-9 §6 names | Waiver signatories | Program | Governance record |
+| OQ-10 | Scenario promotion CUT vs build | PM | #40 |
+| OQ-11 | stock.quant true sync vs CUT | ARB | C-15 / material honesty |
+| OQ-12 | Tag `v9.1.0-r2` vs `v9.1.1-r2` | Release manager | G-R2-TAG |
+| PH1-01 | Sign SOW | Executive | UAT |
+| PH1-02 | Provision Odoo staging | Ops + Customer | UAT |
+| PH1-05 / G-R2-04 | Arabic native sign-off | Native reviewer | Tag |
 
-### Appendix D — Entity Relationship (Core Planning)
+### Appendix H — Version History (this PRD)
 
-```
-cdm_tenant ─┬─ cdm_user
-            ├─ cdm_product ── cdm_bill_of_material ── cdm_routing_operation
-            ├─ cdm_manufacturing_order ── cdm_work_order
-            ├─ cdm_resolution_scenario
-            ├─ cdm_sync_run / cdm_data_quality_flag
-            └─ cdm_activity_event (Sprint 7)
-```
+| Date | Change |
+|------|--------|
+| 2026-07-07 | Initial authoritative draft (21 sections; pre-R2 finalize) |
+| 2026-07-10 | Full rewrite to 19 required sections; aligned to constitution v1.2.4, specs 017/018, GATES, OPEN-ITEMS, live tags `v9.4.0-p3` / `v9.1.0-r2` HOLD |
 
-### Appendix E — Edge Cases & Error Handling
+### Appendix I — Key File References
 
-| Condition | System behavior |
-|-----------|-----------------|
-| Odoo unreachable | `ODOO_CONNECT_FAILED`; sync status failed |
-| MDR < 70% | cap-svc 503 `MDR_QUALITY_GATE_FAILED` |
-| Missing BOM for MO | MO skipped in sync; unscorable in queue |
-| VERSION_CONFLICT on approve | 409; refresh schedule |
-| Kafka disabled | Health `not_configured`; direct activity POST |
-| Cross-tenant JWT | RLS returns empty / 403 |
-
-### Appendix F — Configuration Options
-
-| Variable | Values | Profile |
-|----------|--------|---------|
-| `VITE_RELEASE_PROFILE` | `full`, `release1` | Frontend |
-| `AUTH_PROVIDER` | `local`, `keycloak` | Auth |
-| `IPE_KAFKA_BOOTSTRAP_SERVERS` | `""` = disabled | R1/K8s dev |
-| `VAULT_ENABLED` | `true`/`false` | Enterprise |
-| `MDR_QUALITY_GATE_THRESHOLD` | default `70` | Scheduling |
-
-### Appendix G — Stakeholder Decision Log
-
-| ID | Decision needed | Status |
-|----|-----------------|--------|
-| OQ-1 | Odoo 17 vs 19 canonical | Open |
-| OQ-3 | UI route RBAC | Open |
-| OQ-8 | mat-svc in R1 compose | Open |
-| OQ-9 | Gate 11 12/14 vs 14/14 for tag | Open |
+| Path | Role |
+|------|------|
+| `ipe/.specify/memory/constitution.md` | Binding principles |
+| `ipe/specs/013-release1-odoo-mena/` | R1 FRs |
+| `ipe/specs/017-first-release-plan/` | Waves / PH1 |
+| `ipe/specs/018-phase2-release2/` | R2 gates, open items |
+| `ipe/READINESS.md` | Deployment readiness pointer |
+| `ipe/apps/web/src/app/router.tsx` | UI routes |
+| `ipe/infrastructure/docker/docker-compose.release{1,2}.yml` | Profiles |
+| `ipe/infrastructure/docker/kong.release2.yml` | R2 gateway |
+| `ipe/docs/qa/*` / `ipe/docs/demo-data/*` | Gate evidence |
 
 ---
 
-*End of PRD — IPE Authoritative Specification v2026-07-07*
-
-*Maintainers: Update this document when gates close, specs converge, or scope decisions (OQ-*) are resolved. Historical detail through 2026-07-04 remains in `docs/PRD-IPE-COMPREHENSIVE-AS-IS.md`.*
+*End of PRD-IPE-AUTHORITATIVE — 2026-07-10*

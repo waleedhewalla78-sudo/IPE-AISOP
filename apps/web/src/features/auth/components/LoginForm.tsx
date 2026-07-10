@@ -22,7 +22,7 @@ export function LoginForm() {
       await login({ email, password });
       navigate('/planning/dashboard');
     } catch {
-      setError(t('login.error'));
+      setError(t('auth.error'));
     }
   };
 
@@ -33,36 +33,36 @@ export function LoginForm() {
   return (
     <div className="flex h-screen items-center justify-center bg-ipe-surface">
       <Card className="w-full max-w-sm">
-        <h1 className="mb-6 text-2xl font-bold text-ipe-primary">{t('login.title')}</h1>
+        <h1 className="mb-6 text-2xl font-bold text-ipe-primary">{t('auth.title')}</h1>
         {keycloakMode ? (
           <div className="space-y-4">
-            <p className="text-sm text-ipe-muted">{t('login.ssoHint')}</p>
+            <p className="text-sm text-ipe-muted">{t('auth.ssoHint')}</p>
             {error && <p className="text-sm text-ipe-danger">{error}</p>}
             <Button type="button" className="w-full" onClick={handleSso}>
-              {t('login.sso')}
+              {t('auth.sso')}
             </Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label={t('login.email')}
+              label={t('auth.email')}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('login.emailPlaceholder')}
+              placeholder={t('auth.emailPlaceholder')}
               required
             />
             <Input
-              label={t('login.password')}
+              label={t('auth.password')}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('login.passwordPlaceholder')}
+              placeholder={t('auth.passwordPlaceholder')}
               required
             />
             {error && <p className="text-sm text-ipe-danger">{error}</p>}
             <Button type="submit" className="w-full">
-              {t('login.submit')}
+              {t('auth.submit')}
             </Button>
           </form>
         )}

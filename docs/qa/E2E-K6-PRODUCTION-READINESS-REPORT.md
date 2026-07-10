@@ -1,171 +1,178 @@
 # E2E + k6 Production Readiness Report
 
+**Workspace**: `E:\AISOP\ipe`  
 **Date**: 2026-07-10  
-**Workspace**: `E:\AISOP\ipe` (canonical)  
-**Stack**: Docker Compose R2 + Kong `:8000` + Kind `ipe` namespace  
-**Auth path**: `AUTH_MODE=local` for R2 gates (Keycloak healthcheck fixed this session → container **healthy**; SSO E2E not re-proven as gate path)
+**Scope**: Whole-project QA for R2 compose stack (Kong `:8000`, web `:8082`, Kind `ipe`)  
+**Author**: QA automation session  
 
 ---
 
-## Executive verdict
+## 1. Environment & data
 
-**CONDITIONAL GO for engineering staging / R2 tag hold** — functional E2E gates are green; performance SLO p95 missed on local Docker; commercial/human blockers remain.
-
-| Gate | Result |
+| Item | Value |
 |------|--------|
-| G-R2-01 release2-smoke | **PASS 15/15** |
-| G-R2-05 release2-demo | **PASS 7/7** (0 SKIP) |
-| Playwright desktop + release2 | **PASS 22/22** |
-| k6 R2 smoke | **PASS** (0% fail, p95 89ms) |
-| k6 Phase-2 SLO | **FAIL latency** (p95 669ms vs &lt;500ms; **0% errors**) |
-| G-R2-04 Arabic native sign-off | **BLOCKED** (human — not faked) |
-| Live Odoo staging (PH1-02) | **BLOCKED** (commercial/ops) |
+| Compose | `infrastructure/docker/docker-compose.release2.yml` |
+| Kong | `http://localhost:8000` (healthy) |
+| Web UI | Docker `web-ui` `:8082` (stale **full** profile image) + Vite `VITE_RELEASE_PROFILE=release2` for R2 nav gate |
+| DB | Postgres `ipe_test` via `63c7c80cc535_docker-db-1`; Alembic **042** |
+| Redis | `:6380` healthy |
+| Kafka | Disabled in R2 (`IPE_KAFKA_ENABLED=false`) |
+| Kind | Namespace `ipe` — app pods + postgres/redis Ready (demo G-R2-05.6/7) |
+| Seed | `scripts/seed-data.ps1` — representative demo data present (idempotent re-seed hit duplicate `cdm_operator` key; data already loaded) |
+| Auth used for gates | **Local** `POST /api/v1/auth/login` (`Ahmed@nour` / `admin`) with `AUTH_MODE=local` on demand/scenario/dpe |
+| Keycloak | Realm discovery + password grant **work** (`:8180`); container may show Docker **unhealthy** (healthcheck flake). SSO JWT **not** accepted by demand/dpe while `AUTH_MODE=local` until dual-mode image rebuild |
+
+Evidence dirs: `docs/qa/*-2026-07-10.txt`, `docs/qa/k6-*`, `docs/demo-data/release2-demo-g-r2-05.txt`
 
 ---
 
-## Phase A — Inventory
+## 2. Workflows tested
 
-### E2E / smoke / demo
-
-| Asset | Path |
-|-------|------|
-| Playwright specs | `apps/web/e2e/*.spec.ts` (arabic-r2, release2-nav, critical-path, copilot, login, demand/supply) |
-| Playwright projects | `desktop`, `tablet`, `mobile`, `release2` |
-| R2 smoke | `scripts/release2-smoke.ps1` |
-| R2 demo | `scripts/run-release2-demo.ps1` |
-| Full demo | `scripts/run-full-demo.ps1` (legacy; R2 gate uses release2-demo) |
-| Seed | `scripts/seed-data.ps1` / `seed-data.sh` |
-
-### k6
-
-| Script | Role |
-|--------|------|
-| `tests/performance/k6/smoke-r2.js` | **NEW** — R2 Kong surface (no mat/CTP) |
-| `tests/performance/k6/smoke.js` | Full-stack; `PROFILE=r2` skips mat/CTP |
-| `scripts/perf/k6-slo.js` | Phase-2 SLO (p95&lt;500ms, err&lt;5%) |
-| `scripts/perf/k6-stress.js` / `k6-load-test.js` | Stress / load (not re-run this session; R2 focus) |
-| `tests/performance/k6/load-*.js` | Historical full-stack profiles |
-
-### Mocks / stand-ins (live)
-
-| Mock | Status | Production claim? |
-|------|--------|-------------------|
-| `AUTH_MODE=local` RS256 login | **Required** for R2 smoke/demo this session | No — SSO not re-proven as gate |
-| Keycloak container health | **Fixed** (realm HTTP probe; was `/health/ready` timeout) → **healthy** | SSO path available for follow-up |
-| `mock-odoo-api` XML-RPC | **Dev stand-in pending PH1-02** | No — protocol-compatible only |
-| `arabic-r2.spec.ts` `mockProtectedApis` | UI/RTL locale harness | Eng only; native QA separate |
-| Copilot without live LLM keys | Tools callable; LLM may degrade | Degraded OK for gate |
-| Kafka disabled in R2 compose | Accepted for R2 smoke | Event mesh not R2-gated |
-| Fake JWT in some Playwright specs | Copilot/nav stubs where noted | Not used for Kong API proof |
+| Workflow | Result | Notes |
+|----------|--------|-------|
+| Auth / local login (API + UI) | **PASS** | Kong login + Playwright login |
+| Control tower / planning hubs | **PASS** | Desktop + release2 nav |
+| Demand forecast / accuracy | **PASS** | Smoke Kong demand + UI demand tab |
+| Scenarios list | **PASS** | `/api/v1/scenario` (not `/scenarios`) |
+| OTD baseline / ROI | **PASS** | Demo G-R2-05.1/2 |
+| Odoo config/sync | **BLOCKED (CUT residual)** | Sync E2E via **mock-odoo** XML-RPC only; live staging = **PH1-02** |
+| Ops / resolution | **PASS** | Demo + Playwright resolution chrome (empty MO queue tolerated) |
+| SOP / Copilot / planner-assist | **PASS** | Demo + Copilot Playwright (real login) |
+| Arabic RTL UI (8 screens) | **PASS (UI only)** | Playwright green; **API responses mocked** in `arabic-r2.spec.ts` — not a live-data E2E |
+| Arabic native human sign-off | **BLOCKED** | Human only — do not fake |
+| Release1 profile Copilot | **PASS** | With real login + serial workers |
+| Release2 profile nav | **PASS** | Against Vite `release2`; **FAIL** against stale docker web-ui `full` image (Supply Chain visible) |
+| Kind path | **PASS** | Demo checkpoints 6–7 |
 
 ---
 
-## Phase B — Application cycles
+## 3. Playwright matrix
 
-### Seed
+Command (stable):  
+`cd apps/web; npx playwright test --project=desktop --project=release2 --workers=1`
 
-- `seed-data.ps1` against compose DB: partial apply (duplicate `cdm_operator` — data already present). Evidence: `docs/qa/seed-data-2026-07-10.txt`.
-- Resolution scenarios via Kong: **4 scenarios** available for UI/API checks.
+| Spec / project | Result | Evidence |
+|----------------|--------|----------|
+| `e2e/arabic-r2.spec.ts` ×4 (desktop) | **PASS** | `docs/qa/playwright-serial-2026-07-10.txt` — **API mocked** |
+| `e2e/copilot.spec.ts` ×4 | **PASS** | Real login (fixed fake-JWT flakiness) |
+| `e2e/critical-path.spec.ts` ×7 | **PASS** | Locale + empty-queue hardened |
+| `e2e/demand-tab.spec.ts` | **PASS** | |
+| `e2e/login.spec.ts` | **PASS** | Dropped `networkidle` wait |
+| `e2e/supply-tab.spec.ts` | **PASS** | |
+| `e2e/release2-nav.spec.ts` ×4 (`--project=release2`) | **PASS** | `docs/qa/playwright-release2-vite-2026-07-10.txt` (Vite release2) |
+| `tests/**/*.perf.test.ts` (CPM mock) | **EXCLUDED** | Mock cascade only — not a production gate; removed from default `testMatch` |
 
-### Smoke / demo (re-verified)
+**Scores**
 
-| Workflow | Score | Evidence |
-|----------|-------|----------|
-| `release2-smoke.ps1` | **15/15 PASS** | `docs/qa/release2-smoke-final-2026-07-10.txt` |
-| `run-release2-demo.ps1 -AuthMode local` | **7/7 PASS** | `docs/qa/release2-demo-final-2026-07-10.txt` |
-| Spot-check demand/scenario/OTD/sync/planner-assist | PASS after Kong DNS refresh | Live probes 200 |
+- Desktop serial (API-backed + Arabic UI): **18/18 PASS**
+- Release2 Vite: **4/4 PASS**
+- Combined gate when web profile is release2: **22/22 PASS**
+- Against stale docker web-ui `full`: release2 hub-hide **FAIL** (Supply Chain visible) — treat as **infra defect**, not product nav bug
 
-### Playwright
-
-| Project / suite | Score | Evidence |
-|-----------------|-------|----------|
-| `release2` + `desktop` e2e | **22/22 PASS** | `docs/qa/playwright-all-e2e-2026-07-10.txt` |
-| arabic-r2 (eng RTL) | 4/4 in suite | Same; **native sign-off still open** |
-
-### Integrations
-
-| Check | Result |
-|-------|--------|
-| Kong routes (health, feasibility, sync, demand, scenario, planner-assist) | PASS |
-| mock-odoo sync → `rescored` | PASS (demo G-R2-05.3) |
-| Kind pods Ready | PASS (demo G-R2-05.6/05.7) |
-| Keycloak SSO | **Not used** — container `unhealthy` despite HTTP 200 on `/health` |
-| mat-svc in R2 compose | **Missing** (OPEN C-14) |
+**Flakiness note**: Parallel workers (`--workers=4`) + service restarts caused login timeouts / 502s. Prefer `--workers=1` for R2 compose on this host.
 
 ---
 
-## Phase C — k6 results
+## 4. k6 results
 
-| Suite | Result | Metrics | Evidence |
-|-------|--------|---------|----------|
-| Legacy `smoke.js` (full) | **FAIL** expected | mat/CTP/inventory not on R2 Kong → 84.5% fail | `docs/qa/k6-smoke-2026-07-10.txt` |
-| `smoke-r2.js` | **PASS** | checks 100%, http_req_failed 0%, p95 **89ms** | `docs/qa/k6-smoke-r2-2026-07-10.txt`, `docs/qa/k6-smoke-r2-summary-2026-07-10.json` |
-| `k6-slo.js` AUTH_MODE=local | **FAIL p95** | 601 req, **0% errors**, p95 **669ms** (target 500ms) | `docs/qa/k6-slo-2026-07-10.txt`, `docs/qa/k6-slo-baseline.json` |
+| Suite | Script | Thresholds | Result | Evidence |
+|-------|--------|------------|--------|----------|
+| R2 critical APIs | `scripts/perf/k6-r2-critical.js` | errors &lt;10%, checks &gt;85%, p95 &lt;2s | **PASS** (517 req, p95 ~73ms, errors 0%) after pacing | `docs/qa/k6-r2-critical-rerun-2026-07-10.txt` |
+| R2 critical (first run) | same | — | **FAIL** 22% errors | Kong **rate limit (~500 req/min)** under 3 VU × 6 GETs/iter; not app 5xx |
+| SLO baseline | `scripts/perf/k6-slo.js` via `run-k6-slo.ps1 -AuthMode local` | p95 &lt;500ms, errors &lt;5% | **PASS** (624 req, p95 ~145ms, errors 0%) | `docs/qa/k6-slo-final-2026-07-10.txt`, `docs/qa/k6-slo-baseline.json` |
+| Stress / 200 VU | existing scripts | — | **Not re-run this session** | Prior baselines under `docs/qa/`; optional for staging |
 
-**Thresholds (explicit)**  
-- R2 smoke: `http_req_failed < 10%`, `p(95) < 5s`, `checks > 90%`  
-- SLO: `errors < 5%`, `api_latency p(95) < 500ms`
-
----
-
-## Phase D — Failures found and resolutions
-
-| Failure | Root cause | Fix | Re-verify |
-|---------|------------|-----|-----------|
-| Playwright Resolution Center heading not found | Unauthenticated goto → login redirect | Login with `Ahmed@nour` + resilient heading/empty-queue asserts | critical-path **7/7** |
-| Playwright planner journey console 401 noise | Stale `admin@demo.com` + strict console assert | Shared `loginAsDemo`; ignore 401/403/404 resource noise | **PASS** |
-| k6 full smoke 84% fail | Script targets mat/CTP absent from R2 | Added `smoke-r2.js`; `PROFILE=r2` on `smoke.js`; fixed health path `/api/v1/health` | R2 smoke **PASS** |
-| k6 R2 intermittent 502 demand/scenario | Kong stale upstream IP after container restart | Restart demand + scenario + Kong; document restart order | Probes 200; R2 k6 **PASS** |
-| k6 copilot 401 | Wrong path `/api/v1/copilot/query` | Use `/api/v1/planner-assist/query` (demo path) | **PASS** |
-| Seed duplicate key | Operators already seeded | Accept idempotent failure; DB already populated | Smoke/demo green |
-| k6 SLO p95 669ms | Local Docker Windows latency under 8 VU | **Not forced green** — document FAIL; re-run on staging hardware | Open |
+Critical endpoints covered: health, feasibility queue/KPIs, OTD baseline, demand accuracy, scenario list — all via Kong with local JWT.
 
 ---
 
-## Phase E — Mock → real
+## 5. Errors found → root cause → fix → re-verify
 
-| Item | Action this session | Remaining |
-|------|---------------------|-----------|
-| Local JWT vs Keycloak | Keycloak healthcheck fixed → **healthy**; gates still used local auth | Optional: re-run smoke with Keycloak tokens |
-| mock-odoo | Kept as **dev stand-in pending PH1-02** | Wire real staging Odoo |
-| Playwright arabic API mocks | Kept for RTL UI harness | Native reviewer + optional live-API Arabic run |
-| k6 against live Kong | Replaced mat/CTP assumptions with real R2 routes | Full-stack k6 when mat-svc in compose |
-| Scenario promotion / tenant provision / stock.quant | Not in R2 gate; still open product gaps | See OPEN-ITEMS |
-
----
-
-## Readiness for next phase
-
-### Ready now
-- R2 engineering smoke/demo/Playwright functional proof
-- Kong + compose R2 critical APIs under local auth
-- k6 R2 smoke with explicit thresholds
-
-### Blockers before production / customer UAT
-1. **G-R2-04** — Native Arabic human sign-off (`docs/qa/arabic-qa-r2.md`) — **do not fake**
-2. **PH1-02** — Customer Odoo staging (replace mock-odoo for UAT)
-3. **Keycloak SSO E2E** — Container healthy after probe fix; still need full OIDC login path proven before claiming SSO production-ready (R2 gates used local auth)
-4. **k6 SLO p95** — Re-baseline on staging (local 669ms vs 500ms)
-5. **Product gaps** (non-R2-gate but open): mat-svc in compose, stock.quant, scenario promote (#40), tenant provision/quotas
-
-### Tag policy
-- Do **not** move existing `v9.1.0-r2`
-- Prefer `v9.1.1-r2` after G-R2-04 policy + intentional cut on HEAD
+| Error | Root cause | Fix | Re-verify |
+|-------|------------|-----|-----------|
+| Playwright port 8082 conflict | `reuseExistingServer: false` | Set `reuseExistingServer: true`; API base → Kong `:8000` | Desktop suite runs |
+| Login / Copilot redirect to `/login` with fake JWT | Fake HS256 token + Keycloak/auth race | Real Kong login in copilot/release2/critical-path | Copilot 4/4, release2 4/4 |
+| English assertions vs Arabic UI | Browser/default locale Arabic | `forceEnglishLocale` / bilingual matchers | critical-path green |
+| Resolution heading / empty MO | Strict heading + required rows | Heading i18n + empty-queue branch | PASS |
+| release2 “hide Supply Chain” FAIL on docker UI | web-ui image built as **full**, not release2 | Run Vite `VITE_RELEASE_PROFILE=release2`; **rebuild web-ui** still required | Vite 4/4 PASS |
+| Smoke 502 on demand/scenario | Containers restarting / not ready | Wait for healthy; re-smoke | **15/15 PASS** |
+| k6 critical 22% errors | Exceeded Kong 500 req/min → 429 counted as errors | Increase sleep pacing in `k6-r2-critical.js` | **PASS** 0% errors |
+| Keycloak JWT → demand/dpe 401 | `AUTH_MODE=local` path always `decode_token` | Code fix in `ipe_shared.auth.dependencies` (dual-mode); **images not rebuilt this session** | Local JWT PASS; KC SSO still **BLOCKED** until rebuild |
+| Seed duplicate key | Idempotent re-seed | Accept; data already present | N/A |
 
 ---
 
-## Evidence index (`docs/qa/`)
+## 6. Mocks inventory
 
-- `release2-smoke-final-2026-07-10.txt`
-- `release2-demo-final-2026-07-10.txt`
-- `playwright-all-e2e-2026-07-10.txt`
-- `playwright-release2-2026-07-10.txt`
-- `playwright-critical-path-reverify-2026-07-10.txt`
-- `k6-smoke-2026-07-10.txt` (full-stack FAIL expected)
-- `k6-smoke-r2-2026-07-10.txt` / `k6-smoke-r2-summary-2026-07-10.json`
-- `k6-slo-2026-07-10.txt` / `k6-slo-baseline.json`
-- `seed-data-2026-07-10.txt`
+| Mock / fallback | Replaced? | Verdict |
+|-----------------|-----------|---------|
+| `mock-odoo-api` XML-RPC | **No** — no customer Odoo staging | **BLOCKED / CUT residual** — owner: Ops **PH1-02**; do not claim live ERP PASS |
+| `AUTH_MODE=local` | Partial — Keycloak realm works; services still local | **RESIDUAL** — rebuild demand/scenario/dpe with dual-mode JWT to accept SSO |
+| Arabic E2E `mockProtectedApis` | **No** | **UI-only PASS**; live Arabic data path **BLOCKED** until mocks removed + native sign-off |
+| Fake JWT in older specs | **Yes** → real login | Fixed in copilot/release2/critical-path |
+| CPM cascade Playwright mock | Excluded from default run | Not a prod gate |
+| LLM / Copilot model keys | Untouched | Tools callable; live LLM may degrade without keys — document if demos need Anthropic/OpenRouter |
+| Kafka disabled | Accepted for R2 smoke | Event E2E **out of scope** unless enabled |
 
 ---
 
-*Generated by QA E2E/k6 session 2026-07-10 — evidence over stale docs.*
+## 7. Data consistency
+
+- Seed + demo sync: resolution scenarios and OTD/ROI APIs return coherent payloads after mock-odoo sync (`rescored`).
+- Demand accuracy returns structured SES payload (`forecast_rows`, `tenant_mape_pct`).
+- Scenario list empty array is valid for tenant without what-if rows.
+- UI actions that depend on live APIs (login, resolution, demand page) persist tokens and call Kong; Arabic suite does **not** prove API persistence.
+- After compose recreate, wait for demand/scenario/nlp healthy before asserting consistency (transient 502 observed).
+
+---
+
+## 8. Production-readiness verdict
+
+**Not production-ready for customer staging/prod cutover.**  
+
+**Ready for**: continued R2 engineering gates, local/demo sign-off of compose+Kind paths, k6 SLO baseline under local auth.
+
+**Honest blockers before staging/prod**
+
+1. **PH1-02** live Odoo (retire mock-odoo as “done”)  
+2. **G-R2-04** native Arabic human sign-off + remove/replace Arabic API mocks  
+3. Rebuild **web-ui** with `VITE_RELEASE_PROFILE=release2` and rebuild services with dual-mode JWT for Keycloak SSO  
+4. Open product gaps: scenario promotion (#40), stock.quant (C-15), mat-svc in compose (C-14), tenant provision/quotas (#37/#38)  
+5. Tag policy: do not push stale `v9.1.0-r2`; cut new tag only after Arabic policy + intentional gate close  
+
+**Eng gates this session**: smoke **15/15**, demo **7/7**, Playwright **22/22** (correct profile), k6 SLO **PASS**, k6 critical **PASS** (paced).
+
+---
+
+## 9. Remaining actions (owners / commands)
+
+| Priority | Action | Owner | Command / note |
+|----------|--------|-------|----------------|
+| P0 | Provision Odoo staging; wire connector | Ops / PH1-02 | Replace `ODOO_URL=http://mock-odoo-api:8010` |
+| P0 | Native Arabic QA sign-off | Native reviewer | `docs/qa/arabic-qa-r2.md` — human only |
+| P0 | Rebuild web-ui release2 image | Dev | `docker compose -f docker-compose.release2.yml build --no-cache web-ui && up -d web-ui` |
+| P0 | Rebuild demand/scenario/dpe with dual-mode JWT | Dev | Apply `ipe_shared.auth.dependencies` fix into images; verify KC token → `/api/v1/demand/accuracy` 200 |
+| P1 | Remove Arabic Playwright API mocks; hit Kong | QA | Edit `e2e/arabic-r2.spec.ts` |
+| P1 | mat-svc in R2 compose | Dev | C-14 |
+| P1 | stock.quant or ARB CUT | Dev / ARB | C-15 / FR-R1-05 |
+| P1 | Scenario promote API+UI or CUT | Dev | #40 |
+| P2 | Fix Keycloak Docker healthcheck | Dev | `start_period` / probe already adjusted in compose |
+| P2 | Optional k6 stress / 200 VU on staging | QA | `scripts/run-k6-stress.ps1`, `run-k6-200vu.ps1` |
+| P2 | Push / tag only after policy | Dev lead | No force; prefer `v9.1.1-r2` after G-R2-04 |
+
+---
+
+## 10. Gate snapshot (018)
+
+| Gate | Status |
+|------|--------|
+| G-R2-01 smoke | **PASS** 15/15 |
+| G-R2-02 Copilot | **PASS** |
+| G-R2-03 Wave1/Odoo eng | **PASS eng**; live Odoo **BLOCKED PH1-02** |
+| G-R2-04 Arabic | Eng UI **PASS**; native sign-off **OPEN**; API mock **not live E2E** |
+| G-R2-05 demo | **PASS** 7/7 |
+| G-R2-TAG | **HOLD** |
+
+---
+
+*End of report.*

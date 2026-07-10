@@ -33,6 +33,7 @@ class OdooConfigUpdate(BaseModel):
     odoo_username: str | None = None
     odoo_password: str | None = None
     enabled: bool | None = None
+    sync_interval_minutes: int | None = None
 
 
 @router.put("/config")
@@ -130,6 +131,7 @@ def _mask_odoo_config(cfg: dict) -> dict:
         "odoo_username": cfg.get("odoo_username") or "",
         "enabled": bool(cfg.get("odoo_enabled", True)),
         "password_set": odoo_password_is_set(cfg),
+        "sync_interval_minutes": int(cfg.get("odoo_sync_interval_minutes", 900)),
     }
     return out
 
@@ -204,6 +206,8 @@ async def update_odoo_config(
         cfg = store_odoo_password(cfg, req.odoo_password)
     if req.enabled is not None:
         cfg["odoo_enabled"] = req.enabled
+    if req.sync_interval_minutes is not None:
+        cfg["odoo_sync_interval_minutes"] = max(5, min(req.sync_interval_minutes, 10080))
 
     tenant.erp_type = "odoo"
     tenant.config = cfg

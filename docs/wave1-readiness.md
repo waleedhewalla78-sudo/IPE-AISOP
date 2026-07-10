@@ -1,8 +1,8 @@
 # Wave 1 Readiness — Phase 0 → Phase 1 Handoff
 
-**Date**: 2026-07-09  
-**From**: Phase 0 (Spec 017 Week 1)  
-**To**: Wave 1 Foundation (Weeks 2–5)
+**Date**: 2026-07-10  
+**From**: Phase 0 (Spec 017 Week 1) — **COMPLETE**  
+**To**: Wave 1 Foundation (Weeks 2–5) — **IN PROGRESS (25%)**
 
 ---
 
@@ -53,25 +53,31 @@ HPA resources removed; all R1 deployments scaled to **1** replica.
 
 | ID | Issue | Mitigation / owner |
 |----|-------|-------------------|
-| **OQ-9** | Gate 11 kind steps 10–11 OR-Tools timeout (12/14) | Waiver doc; compose 14/14 proves logic; [#27](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/27) kind CPU / port-forward follow-up |
-| **Stakeholder sign-off** | OQ-9 Section 6 blank until PO/Platform/QA sign | [#28](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/28) |
+| **OQ-9** | Gate 11 kind steps 10–11 OR-Tools timeout (12/14) | ✅ Waiver accepted — `gate11-oq9-waiver.md` §6; [#28](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/28) closed |
+| **Kind cluster** | App pods may CrashLoop after rollout | Restabilize: delete HPA, scale R1 deploys to 1 |
 | **Ingress root** | `GET /` → 404 (expected); health at `/api/v1/health` | Document in K8S-DEPLOYMENT-GUIDE if needed |
 
 ---
 
-## First Wave 1 task
+## Wave 1 progress
 
-**W1-01 Copilot R1 nav unhide** — ✅ **Already implemented** (`apps/web/src/components/layout/Sidebar.tsx`, `releaseProfile.ts`).
+| Task | Status | Evidence |
+|------|--------|----------|
+| W1-01 Copilot R1 nav | ✅ | `Sidebar.tsx`, `releaseProfile.ts` |
+| W1-02 Copilot smoke | ✅ | `docs/qa/copilot-r1-smoke.txt` — **12/12** |
+| W1-03 Odoo Config v2 schema | ⬜ | [#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31) — **START HERE** |
+| W1-04–W1-08 | ⬜ | [#32](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/32)–[#36](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/36) |
 
-**Start here (Prompt 3 / next session):**
+---
 
-| Priority | Task | GitHub | Cursor prompt |
-|----------|------|--------|---------------|
-| **1** | Copilot smoke test (R1 profile) | [#30](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/30) | Prompt 3 suite — Copilot validation |
-| **2** | Admin Odoo Config v2 schema | [#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31) | Prompt 4 |
+## First Wave 1 task (next session)
 
-Spec: `ipe/specs/017-first-release-plan/tasks.md`  
-Plan: `ipe/specs/017-first-release-plan/plan.md` (Wave 1, Weeks 2–5)
+**W1-03 Admin Odoo Config v2 schema** — migration + API per `specs/017-first-release-plan/plan.md` §3.1.
+
+| Priority | Task | GitHub |
+|----------|------|--------|
+| **1** | Odoo Config v2 schema | [#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31) |
+| **2** | Odoo connection test | [#32](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/32) |
 
 ---
 

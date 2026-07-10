@@ -102,7 +102,7 @@ export function UnifiedWorkspacePage() {
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ipe-text">Cross-tool activity</h2>
           <Link to={ROUTES.PLANNING_CONTROL_TOWER}>
-            <Button size="sm" variant="outline">Planning hub</Button>
+            <Button size="sm" variant="ghost">Planning hub</Button>
           </Link>
         </div>
         {data.recent_activity.length === 0 ? (

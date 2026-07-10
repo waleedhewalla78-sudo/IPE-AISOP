@@ -1,5 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import api from '@/lib/api';
+
+vi.mock('recharts', () => {
+  const Passthrough = ({ children }: { children?: ReactNode }) => children ?? null;
+  return {
+    ResponsiveContainer: Passthrough,
+    ComposedChart: Passthrough,
+    CartesianGrid: Passthrough,
+    XAxis: Passthrough,
+    YAxis: Passthrough,
+    Tooltip: Passthrough,
+    Legend: Passthrough,
+    Area: Passthrough,
+    Line: Passthrough,
+  };
+});
+
+vi.mock('@/lib/api', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+  },
+}));
 
 vi.stubGlobal('fetch', vi.fn());
 
@@ -14,7 +38,16 @@ describe('DemandForecastPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.setItem('access_token', 'header.payload.sig');
-    mockFetch({ forecasts: [] });
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/demand/forecast')) {
+        return Promise.resolve({ data: { data: { forecasts: [] } } });
+      }
+      if (url.includes('/demand/accuracy')) {
+        return Promise.resolve({ data: { data: { mape_pct: null } } });
+      }
+      return Promise.resolve({ data: { data: {} } });
+    });
+    vi.mocked(api.post).mockResolvedValue({ data: { success: true } });
   });
 
   it('renders demand forecast heading', async () => {
@@ -28,7 +61,8 @@ describe('ScenarioWorkbenchPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.setItem('access_token', 'header.payload.sig');
-    mockFetch({ scenarios: [] });
+    vi.mocked(api.get).mockResolvedValue({ data: { data: { scenarios: [] } } });
+    vi.mocked(api.post).mockResolvedValue({ data: { success: true } });
   });
 
   it('renders scenario workbench heading', async () => {

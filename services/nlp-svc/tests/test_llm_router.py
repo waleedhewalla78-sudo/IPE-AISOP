@@ -52,12 +52,17 @@ class TestTierRouting:
         router = LLMTierRouter(tenant_tier=99)
         assert router.provider == LLMProvider.ANTHROPIC
 
-    def test_tier1_fallback_is_anthropic_only(self, router_tier1):
-        assert router_tier1.fallback_chain == [LLMProvider.ANTHROPIC, LLMProvider.OLLAMA]
+    def test_tier1_fallback_is_anthropic_openrouter_ollama(self, router_tier1):
+        assert router_tier1.fallback_chain == [
+            LLMProvider.ANTHROPIC,
+            LLMProvider.OPENROUTER,
+            LLMProvider.OLLAMA,
+        ]
 
     def test_tier2_fallback_includes_anthropic(self, router_tier2):
         assert router_tier2.fallback_chain == [
             LLMProvider.SAGEMAKER,
+            LLMProvider.OPENROUTER,
             LLMProvider.OLLAMA,
             LLMProvider.ANTHROPIC,
         ]

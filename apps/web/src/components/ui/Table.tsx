@@ -18,7 +18,7 @@ export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowEle
 }
 
 export function TableHeader({ className, ...props }: HTMLAttributes<HTMLTableCellElement>) {
-  return <th className={cn('px-4 py-3 text-left font-medium text-ipe-text-muted', className)} {...props} />;
+  return <th className={cn('px-4 py-3 text-start font-medium text-ipe-text-muted', className)} {...props} />;
 }
 
 interface TableCellProps extends HTMLAttributes<HTMLTableCellElement> {

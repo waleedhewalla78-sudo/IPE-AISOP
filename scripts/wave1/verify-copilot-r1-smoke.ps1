@@ -51,11 +51,6 @@ Step "Playwright - copilot e2e (release1 profile)" {
     Push-Location apps/web
     $env:VITE_RELEASE_PROFILE = "release1"
     $env:VITE_API_BASE_URL = "http://127.0.0.1:9"
-    $conn = Get-NetTCPConnection -LocalPort 8082 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($conn) {
-        Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 2
-    }
     npx playwright install chromium 2>$null
     npx playwright test e2e/copilot.spec.ts --project=desktop
     Pop-Location

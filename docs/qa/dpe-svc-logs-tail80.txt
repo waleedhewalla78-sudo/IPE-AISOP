@@ -1,0 +1,80 @@
+﻿DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=9.6
+INFO:     10.244.0.1:56696 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=13.5
+INFO:     10.244.0.1:56700 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=18.3
+INFO:     10.244.0.1:52154 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=22.4
+INFO:     10.244.0.1:52170 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=26.0
+INFO:     10.244.0.1:52180 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=28.7
+INFO:     10.244.0.1:60764 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=77.6
+INFO:     10.244.0.1:60778 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=9.4
+INFO:     10.244.0.1:60780 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=18.8
+INFO:     10.244.0.1:54738 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=48.1
+INFO:     10.244.0.1:54750 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=73.0
+INFO:     10.244.0.1:54762 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=32.5
+INFO:     10.244.0.1:34544 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=43.4
+INFO:     10.244.0.1:34556 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:     10.244.0.1:34566 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=30.9
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:     10.244.0.1:38874 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=21.0
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=34.3
+INFO:     10.244.0.1:38888 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=66.4
+INFO:     10.244.0.1:38904 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=11.8
+INFO:     10.244.0.1:43370 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=9.6
+INFO:     10.244.0.1:43386 - "GET /api/v1/health HTTP/1.1" 200 OK
+DEBUG:ipe_shared.database.connection:Tenant context reset on checkout not supported: 'AsyncAdapt_asyncpg_connection' object has no attribute 'execute'
+INFO:ipe_shared.cache.redis_client:Redis connected: redis://redis:6379/0
+INFO:ipe.request:request_id= method=GET path=/api/v1/health status=200 elapsed_ms=10.4
+INFO:     10.244.0.1:43394 - "GET /api/v1/health HTTP/1.1" 200 OK

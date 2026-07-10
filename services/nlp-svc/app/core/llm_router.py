@@ -37,10 +37,16 @@ TIER_PROVIDER_MAP: dict[int, LLMProvider] = {
 }
 
 TIER_FALLBACK: dict[int, list[LLMProvider]] = {
-    1: [LLMProvider.ANTHROPIC, LLMProvider.OLLAMA],
-    2: [LLMProvider.SAGEMAKER, LLMProvider.OLLAMA, LLMProvider.ANTHROPIC],
+    1: [LLMProvider.ANTHROPIC, LLMProvider.OPENROUTER, LLMProvider.OLLAMA],
+    2: [LLMProvider.SAGEMAKER, LLMProvider.OPENROUTER, LLMProvider.OLLAMA, LLMProvider.ANTHROPIC],
     3: [LLMProvider.VLLM, LLMProvider.OLLAMA, LLMProvider.SAGEMAKER, LLMProvider.ANTHROPIC],
 }
+
+R2_CLOUD_FALLBACK: list[LLMProvider] = [
+    LLMProvider.ANTHROPIC,
+    LLMProvider.OPENROUTER,
+    LLMProvider.OLLAMA,
+]
 
 
 def _fallback_chain_for_tier(tier: int) -> list[LLMProvider]:
@@ -63,12 +69,15 @@ def _fallback_chain_for_tier(tier: int) -> list[LLMProvider]:
     elif pref == "anthropic" and anthropic_ok:
         chain = _prepend(LLMProvider.ANTHROPIC, chain)
     elif pref == "auto":
+        auto_chain: list[LLMProvider] = []
+        if anthropic_ok:
+            auto_chain.append(LLMProvider.ANTHROPIC)
+        if openrouter_ok:
+            auto_chain.append(LLMProvider.OPENROUTER)
         if ollama_ok:
-            chain = _prepend(LLMProvider.OLLAMA, chain)
-        elif openrouter_ok:
-            chain = _prepend(LLMProvider.OPENROUTER, chain)
-        elif anthropic_ok:
-            chain = _prepend(LLMProvider.ANTHROPIC, chain)
+            auto_chain.append(LLMProvider.OLLAMA)
+        if auto_chain:
+            chain = auto_chain
     else:
         if openrouter_ok:
             chain = _prepend(LLMProvider.OPENROUTER, chain)

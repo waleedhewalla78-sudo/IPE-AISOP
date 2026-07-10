@@ -104,6 +104,9 @@ services:
       - name: r1-erp-odoo
         paths: [/api/v1/erp/odoo]
         strip_path: false
+      - name: r1-admin-odoo-config
+        paths: [/api/v1/admin/odoo-config]
+        strip_path: false
 
 consumers:
   - username: tenant-aaa-111

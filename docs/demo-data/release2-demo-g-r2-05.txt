@@ -1,5 +1,5 @@
 ﻿=== Release 2 Demo — Gate G-R2-05 ===
-2026-07-10 12:12:33
+2026-07-10 12:57:03
 BaseUrl=http://localhost:8000 Namespace=ipe
 
 [PASS] G-R2-05.1 Outcomes - OTD baseline API

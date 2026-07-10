@@ -1,8 +1,8 @@
 # Speckit Converge — Spec 017 First Release Plan
 
-**Date**: 2026-07-09  
-**Constitution**: v1.2.3  
-**Tag target**: `v9.4.0-p3` — **NOT APPLIED**
+**Date**: 2026-07-10  
+**Constitution**: v1.2.4  
+**Tag**: `v9.4.0-p3` @ `4629119` · HEAD `ad494e0`
 
 ---
 
@@ -10,62 +10,70 @@
 
 | Stream | Spec | Code | Tests | Issues |
 |--------|------|------|-------|--------|
-| Phase 0 cluster | ✅ | ✅ | — | — |
-| Phase 0 Gate 11 | 🟡 12/14 | — | script | #27 |
-| Sprint 7 emitters | ✅ | ✅ | 20/20 | — |
-| T730 migration | ⬜ | ✅ file | — | #29 |
-| Wave 1 Copilot nav | ✅ | ✅ | ⬜ | #30 |
-| Wave 1 Odoo/OTD | ⬜ | — | — | #31–#36 |
-| Wave 2–3 | ⬜ | — | — | #37–#46 |
+| Phase 0 | ✅ | ✅ | 20/20 + gates | Closed |
+| Phase 1 UAT | ✅ spec | ⬜ | — | Commercial block |
+| Wave 1 Copilot | ✅ | ✅ | 12/12 | #30 closed |
+| Wave 1 Odoo/OTD | ✅ | ⬜ | — | #31–#36 open |
+| Wave 2–3 | ✅ | ⬜ | — | #37–#46 open |
+| Carry-over | ✅ | partial | — | T731/T732 |
 
-**Phase 0: ~88%** · **Wave 1: ~12%** · **Program issues: #27–#46 created**
+**Phase 0: 100%** · **Wave 1: 25%** · **Phase 1: 0%** · **Program: ~35%**
 
----
-
-## 2. Implemented this run
-
-| Change | Path |
-|--------|------|
-| Copilot R1 sidebar | `apps/web/src/components/layout/Sidebar.tsx` |
-| i18n en/ar | `locales/en.json`, `ar.json` |
-| releaseProfile | `lib/releaseProfile.ts` |
-| Spec 017 artifacts | `specs/017-first-release-plan/*` |
-| GitHub issues | `taskstoissues.md` (#27–#46) |
-| Constitution sync | Gate 11 2026-07-09, Spec 017 workflow |
+**Phase 0 UAT verdict**: **PASS**  
+**Program verdict**: **PROCEED Wave 1** — escalate Phase 1 commercial in parallel
 
 ---
 
-## 3. Appended tasks (converge)
-
-| ID | Task | Priority | Issue |
-|----|------|----------|-------|
-| C-01 | Close #30 — Copilot smoke test | P1 | #30 |
-| C-02 | Run T730 migration (compose + K8s) | P0 | #29 |
-| C-03 | OQ-9 decision document | P0 | #28 |
-| C-04 | Gate 11 steps 10–11 remediation | P0 | #27 |
-| C-05 | Tag v9.4.0-p3 after C-03/C-04 | P0 | #18 |
-| C-06 | T732 mat-svc release1 compose | P1 | (new — add to #29 body) |
-| C-07 | Update GATE-RESULTS 2026-07-09 run | P1 | — |
-
----
-
-## 4. Constitution checklist
+## 2. Constitution checklist
 
 | Principle | Status |
 |-----------|--------|
-| I RLS | ✅ migration 038 ready; apply pending |
-| II Auth | ✅ Copilot route behind ProtectedRoute |
-| III Tests | ✅ emitters 20/20 |
-| VIII Gates | 🟡 12/14 |
+| I RLS | ✅ 038 applied |
+| II Auth | ✅ Copilot protected + 401 |
+| III Tests | ✅ emitters + smoke |
+| IV Events | ✅ R1 Kafka optional |
+| V API | ✅ R1 deploy set |
+| VI Observability | ✅ Gates 1, 6–7 |
+| VII Customer-first | 🟡 Phase 1 Arabic pending |
+| VIII Gates | ✅ OQ-9 satisfied |
+
+---
+
+## 3. Closed this converge
+
+| ID | Was | Now |
+|----|-----|-----|
+| C-01 #30 Copilot smoke | Open | ✅ 12/12 |
+| C-02 T730 | Open | ✅ Applied |
+| C-03 OQ-9 | Open | ✅ §6 template |
+| C-04 #27 | Open | ✅ WON'T FIX infra |
+| C-05 Tag | Open | ✅ v9.4.0-p3 |
+| C-07 GATE-RESULTS | Open | ✅ Updated |
+
+---
+
+## 4. Appended tasks (converge — new)
+
+| ID | Task | Priority | Issue |
+|----|------|----------|-------|
+| C-08 | Push 6 commits to origin | P0 | — |
+| C-09 | Restabilize kind cluster | P0 | ops |
+| C-10 | Update `wave1-readiness.md` | P2 | ✅ Done 2026-07-10 |
+| C-11 | Regenerate UAT docx from corrections | P2 | — |
+| C-12 | OQ-9 stakeholder names | P2 | #28 |
+| C-13 | T731 activity API integration tests | P1 | — |
+| C-14 | T732 mat-svc release1 compose | P1 | OQ-8 |
+| C-15 | FR-R1-05 stock.quant (Phase 1) | P0 | new |
+| C-16 | FR-R1-16 OTD baseline API (Phase 1) | P0 | overlaps #35 |
 
 ---
 
 ## 5. Next action
 
-1. Approve **#29** migration run on K8s  
-2. Stakeholder **#28** OQ-9 decision  
-3. Execute **#31** Odoo Config v2 (Wave 1) after tag or in parallel per stakeholder  
+1. `git push origin master`
+2. **W1-03** Odoo Config v2 ([#31](https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/31))
+3. Escalate Phase 1 SOW + Odoo staging
 
 ---
 
-*Converge v1.0 — 2026-07-09*
+*Converge v2.0 — `/speckit.converge` 2026-07-10*

@@ -11,6 +11,40 @@ from ipe_shared.database.session import get_session
 DEFAULT_JWT_SECRET = "dev-jwt-secret-change-in-production-min-32-chars"
 
 
+
+
+def patch_unit_test_health_probes(monkeypatch) -> None:
+    """Avoid marking health degraded when Redis/Kafka are not running locally."""
+
+    async def _redis_up():
+        return {"status": "up", "latency_ms": 0.0}
+
+    monkeypatch.setattr("ipe_shared.health.probes.probe_redis", _redis_up)
+
+
+def apply_unit_test_env_defaults() -> None:
+    """Minimal env for validate_config_fatal without a live stack."""
+    import os
+
+    repo_root = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")
+    )
+    pub = os.path.join(repo_root, "config", "keys", "jwt-public.pem")
+    priv = os.path.join(repo_root, "config", "keys", "jwt-private.pem")
+    os.environ.setdefault(
+        "IPE_DATABASE_URL",
+        "postgresql+asyncpg://ipe:ipe_test_pass@localhost:5433/ipe_test",
+    )
+    os.environ.setdefault("IPE_REDIS_URL", "redis://localhost:6380/0")
+    os.environ.setdefault("IPE_KAFKA_ENABLED", "false")
+    if os.path.isfile(pub) and os.path.isfile(priv):
+        os.environ.setdefault("IPE_JWT_PUBLIC_KEY_PATH", pub)
+        os.environ.setdefault("IPE_JWT_PRIVATE_KEY_PATH", priv)
+        os.environ.setdefault("IPE_JWT_SIGNING_MODE", "rs256")
+        os.environ.setdefault("IPE_JWT_KEY_ID", "ipe-rs256-v1")
+    else:
+        os.environ.setdefault("IPE_JWT_SIGNING_MODE", "hs256")
+
 def make_token_payload(
     *,
     role: str = "admin",

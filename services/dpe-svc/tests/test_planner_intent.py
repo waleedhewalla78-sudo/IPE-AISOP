@@ -1,10 +1,10 @@
-"""Planner intent router unit tests — 014 Stream C."""
+﻿"""Planner intent router unit tests â€” 014 Stream C."""
 
 from app.core.planner_intent import PlannerIntent, detect_intent, extract_mo_ref
 
 
 def test_intent_at_risk_mos():
-    assert detect_intent("Which manufacturing orders are at risk?") == PlannerIntent.AT_RISK_MOS
+    assert detect_intent("Which orders are at risk?") == PlannerIntent.AT_RISK_MOS
 
 
 def test_intent_mo_detail():
