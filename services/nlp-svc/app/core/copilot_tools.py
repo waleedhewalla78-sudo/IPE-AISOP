@@ -8,6 +8,244 @@ import httpx
 from app.config import settings
 
 
+def _tenant_headers(tenant_id: str) -> dict[str, str]:
+    return {"X-Tenant-ID": tenant_id}
+
+
+def _unwrap_api_payload(body: dict) -> dict | list:
+    data = body.get("data")
+    if data is not None:
+        return data
+    return body
+
+
+async def _planning_get(
+    url: str,
+    tenant_id: str,
+    *,
+    params: dict | None = None,
+    timeout: float = 10.0,
+) -> dict:
+    """GET a planning service endpoint with tenant header."""
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            resp = await client.get(url, params=params or {}, headers=_tenant_headers(tenant_id))
+            if resp.status_code == 200:
+                payload = _unwrap_api_payload(resp.json())
+                if isinstance(payload, dict):
+                    return {"status": "ok", **payload}
+                return {"status": "ok", "items": payload}
+            return {"status": "error", "message": f"HTTP {resp.status_code} from {url}"}
+    except Exception as exc:
+        return {"status": "error", "message": str(exc), "url": url}
+
+
+async def get_mo_status(mo_id: str | None, tenant_id: str) -> dict:
+    """Fetch manufacturing order status from the control tower dashboard."""
+    params: dict[str, str] = {}
+    if mo_id:
+        params["mo_id"] = mo_id
+    return await _planning_get(
+        f"{settings.DPE_SVC_URL}/api/v1/dashboard/mos",
+        tenant_id,
+        params=params or None,
+    )
+
+
+async def get_feasibility_queue(tenant_id: str) -> dict:
+    """Fetch MOs in the feasibility risk queue (lowest scores first)."""
+    return await _planning_get(
+        f"{settings.FEA_SVC_URL}/api/v1/feasibility/queue",
+        tenant_id,
+    )
+
+
+async def get_schedule(tenant_id: str) -> dict:
+    """Fetch the active production schedule."""
+    return await _planning_get(
+        f"{settings.CAP_SVC_URL}/api/v1/capacity/schedule/active",
+        tenant_id,
+        timeout=20.0,
+    )
+
+
+async def get_otd_metrics(tenant_id: str) -> dict:
+    """Fetch on-time delivery analytics for the tenant."""
+    primary = await _planning_get(
+        f"{settings.DPE_SVC_URL}/api/v1/dashboard/analytics",
+        tenant_id,
+    )
+    if primary.get("status") == "ok":
+        return primary
+    fallback = await _planning_get(
+        f"{settings.DPE_SVC_URL}/api/v1/analytics/otd-baseline",
+        tenant_id,
+    )
+    if fallback.get("status") == "ok":
+        return fallback
+    return primary
+
+
+async def get_material_availability(
+    product_id: str,
+    quantity: float,
+    required_date: str,
+    tenant_id: str,
+) -> dict:
+    """Check rule-based material availability (ATP) for a product."""
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(
+                f"{settings.MAT_SVC_URL}/api/v1/material/check-availability",
+                json={
+                    "product_id": product_id,
+                    "quantity": quantity,
+                    "required_date": required_date,
+                },
+                headers=_tenant_headers(tenant_id),
+            )
+            if resp.status_code == 200:
+                payload = _unwrap_api_payload(resp.json())
+                if isinstance(payload, dict):
+                    return {"status": "ok", **payload}
+                return {"status": "ok", "result": payload}
+            return {
+                "status": "error",
+                "message": f"mat-svc returned {resp.status_code}",
+            }
+    except Exception as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+async def get_sync_status(tenant_id: str) -> dict:
+    """Fetch ERP sync status from the connector service."""
+    return await _planning_get(
+        f"{settings.CONNECTOR_SVC_URL}/api/v1/sync/status",
+        tenant_id,
+    )
+
+
+async def get_resolution_scenarios(mo_id: str, tenant_id: str) -> dict:
+    """Fetch proposed resolution scenarios for a manufacturing order."""
+    primary = await _planning_get(
+        f"{settings.DPE_SVC_URL}/api/v1/resolution/scenarios/{mo_id}",
+        tenant_id,
+    )
+    if primary.get("status") == "ok":
+        return primary
+    return await _planning_get(
+        f"{settings.RES_SVC_URL}/api/v1/resolution/scenarios",
+        tenant_id,
+        params={"mo_id": mo_id},
+    )
+
+
+async def analyze_quality_patterns(
+    tenant_id: str,
+    lookback_days: int = 30,
+) -> dict:
+    """Aggregate quality defect patterns from quality-svc / del-svc."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{settings.CAP_SVC_URL}/api/v1/analytics/bottlenecks",
+                headers={"X-Tenant-ID": tenant_id},
+            )
+            bottleneck_data = resp.json().get("data", {}) if resp.status_code == 200 else {}
+
+            util_resp = await client.get(
+                f"{settings.CAP_SVC_URL}/api/v1/analytics/utilisation",
+                headers={"X-Tenant-ID": tenant_id},
+            )
+            util_data = util_resp.json().get("data", {}) if util_resp.status_code == 200 else {}
+
+        patterns = []
+        for wc in bottleneck_data.get("top_bottlenecks", [])[:3]:
+            patterns.append(
+                {
+                    "pattern": "capacity_stress",
+                    "work_center": wc.get("work_center_name"),
+                    "utilization_pct": wc.get("utilization_pct"),
+                    "severity": wc.get("severity"),
+                }
+            )
+
+        return {
+            "lookback_days": lookback_days,
+            "pattern_count": len(patterns),
+            "patterns": patterns,
+            "average_utilization_pct": util_data.get("average_utilization_pct"),
+            "recommendation": (
+                "Review quality holds on overloaded work centers"
+                if patterns
+                else "No significant quality-capacity correlation detected"
+            ),
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+async def get_supplier_risk(tenant_id: str) -> dict:
+    """Fetch supplier risk scores from mat-svc."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{settings.MAT_SVC_URL}/api/v1/supply-chain/supplier-risk",
+                headers={"X-Tenant-ID": tenant_id},
+            )
+            if resp.status_code == 200:
+                return resp.json().get("data", {})
+            return {"status": "error", "message": f"mat-svc returned {resp.status_code}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+async def get_inventory_abc(tenant_id: str) -> dict:
+    """Fetch ABC inventory classification from mat-svc."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{settings.MAT_SVC_URL}/api/v1/supply-chain/inventory-abc",
+                headers={"X-Tenant-ID": tenant_id},
+            )
+            if resp.status_code == 200:
+                return resp.json().get("data", {})
+            return {"status": "error", "message": f"mat-svc returned {resp.status_code}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+async def get_slow_moving_inventory(tenant_id: str, stale_days: int = 90) -> dict:
+    """Fetch slow-moving inventory from mat-svc."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{settings.MAT_SVC_URL}/api/v1/supply-chain/slow-moving",
+                params={"stale_days": stale_days},
+                headers={"X-Tenant-ID": tenant_id},
+            )
+            if resp.status_code == 200:
+                return resp.json().get("data", {})
+            return {"status": "error", "message": f"mat-svc returned {resp.status_code}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+async def get_reorder_suggestions(tenant_id: str) -> dict:
+    """Fetch reorder suggestions from mat-svc."""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{settings.MAT_SVC_URL}/api/v1/supply-chain/reorder-suggestions",
+                headers={"X-Tenant-ID": tenant_id},
+            )
+            if resp.status_code == 200:
+                return resp.json().get("data", {})
+            return {"status": "error", "message": f"mat-svc returned {resp.status_code}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 async def get_war_room_recovery(
     disruption_id: str | None,
     tenant_id: str,
@@ -223,6 +461,46 @@ TOOL_DEFINITIONS = [
         },
     },
     {
+        "name": "analyze_quality_patterns",
+        "description": "Analyze quality defect patterns correlated with capacity bottlenecks and utilization stress.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "lookback_days": {
+                    "type": "integer",
+                    "description": "Days of history to analyze (default 30)",
+                },
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "get_supplier_risk",
+        "description": "Get supplier reliability scores and risk tiers for the tenant supply base.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_inventory_abc",
+        "description": "Get ABC inventory classification by on-hand quantity share.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_slow_moving_inventory",
+        "description": "List slow-moving inventory SKUs with no recent receipts.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "stale_days": {"type": "integer", "description": "Days without movement (default 90)"},
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "get_reorder_suggestions",
+        "description": "Get purchase reorder suggestions for purchased materials below reorder point.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
         "name": "get_war_room_recovery",
         "description": "Get top 3 War Room recovery scenarios for a disruption, including scenario_id citations for planner approval.",
         "input_schema": {
@@ -236,6 +514,64 @@ TOOL_DEFINITIONS = [
             "required": [],
         },
     },
+    {
+        "name": "get_mo_status",
+        "description": "Get manufacturing order status, feasibility score, and primary constraint from live planning data.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "mo_id": {
+                    "type": "string",
+                    "description": "Manufacturing order ID or ERP reference (e.g. MO-ST-001); omit for all active MOs",
+                },
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "get_feasibility_queue",
+        "description": "List manufacturing orders in the feasibility risk queue sorted by lowest score.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_schedule",
+        "description": "Get the active finite-capacity production schedule.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_otd_metrics",
+        "description": "Get on-time delivery (OTD) metrics and analytics for the tenant.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_material_availability",
+        "description": "Check material availability (ATP) for a product on a required date.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "product_id": {"type": "string", "description": "Product UUID"},
+                "quantity": {"type": "number", "description": "Required quantity"},
+                "required_date": {"type": "string", "description": "ISO date (YYYY-MM-DD)"},
+            },
+            "required": ["product_id", "quantity", "required_date"],
+        },
+    },
+    {
+        "name": "get_sync_status",
+        "description": "Get ERP/Odoo sync status including last run and data-quality monitor state.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_resolution_scenarios",
+        "description": "Get proposed resolution scenarios for a manufacturing order (read-only; planner must approve).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "mo_id": {"type": "string", "description": "Manufacturing order UUID"},
+            },
+            "required": ["mo_id"],
+        },
+    },
 ]
 
 TOOL_HANDLERS = {
@@ -243,4 +579,16 @@ TOOL_HANDLERS = {
     "get_resource_utilization": get_resource_utilization,
     "simulate_disruption": simulate_disruption,
     "get_war_room_recovery": get_war_room_recovery,
+    "analyze_quality_patterns": analyze_quality_patterns,
+    "get_supplier_risk": get_supplier_risk,
+    "get_inventory_abc": get_inventory_abc,
+    "get_slow_moving_inventory": get_slow_moving_inventory,
+    "get_reorder_suggestions": get_reorder_suggestions,
+    "get_mo_status": get_mo_status,
+    "get_feasibility_queue": get_feasibility_queue,
+    "get_schedule": get_schedule,
+    "get_otd_metrics": get_otd_metrics,
+    "get_material_availability": get_material_availability,
+    "get_sync_status": get_sync_status,
+    "get_resolution_scenarios": get_resolution_scenarios,
 }

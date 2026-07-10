@@ -28,6 +28,8 @@ export const ROUTES = {
   COMMAND_OUTCOMES: '/command-center/outcomes',
   COMMAND_COST_OF_CHAOS: '/command-center/cost-of-chaos',
   COMMAND_EQUIPMENT: '/command-center/equipment',
+  COMMAND_SOP_REPORT: '/command-center/sop-report',
+  COMMAND_OTD_ANALYTICS: '/command-center/otd-analytics',
 
   // Supply Chain tabs
   SUPPLY_TARIFF: '/supply-chain/tariff',
@@ -48,8 +50,10 @@ export const ROUTES = {
 
   // Platform tabs
   PLATFORM_ADMIN: '/platform/admin',
+  PLATFORM_ODOO_CONFIG: '/platform/odoo-config',
   PLATFORM_ONBOARDING: '/platform/onboarding',
   PLATFORM_MLOPS: '/platform/ml-ops',
+  PLATFORM_OPS: '/platform/ops',
 
   // Legacy aliases (redirects in router)
   CONTROL_TOWER: '/control-tower',

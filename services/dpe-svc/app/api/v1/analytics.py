@@ -22,7 +22,10 @@ from ipe_shared.models.product import Product
 from ipe_shared.models.tenant import Tenant
 from ipe_shared.schemas.common import APIResponse
 
+from app.api.v1.otd_analytics import router as otd_router
+
 router = APIRouter(prefix="/analytics", tags=["analytics"])
+router.include_router(otd_router)
 
 
 class OtdBaselineCaptureRequest(BaseModel):

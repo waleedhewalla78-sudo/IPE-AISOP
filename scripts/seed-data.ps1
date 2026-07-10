@@ -4,14 +4,18 @@
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 $SeedSh = Join-Path $Root "scripts\seed-data.sh"
-$Container = "docker-db-1"
+$Container = $env:IPE_DB_CONTAINER
+if (-not $Container) {
+    $Container = docker ps --format "{{.Names}}" | Where-Object { $_ -match "docker-db" } | Select-Object -First 1
+}
+if (-not $Container) { $Container = "docker-db-1" }
 
-Write-Host "=== Loading seed data (via Docker) ===" -ForegroundColor Cyan
+Write-Host "=== Loading seed data (via Docker: $Container) ===" -ForegroundColor Cyan
 
 $running = docker ps --filter "name=$Container" --filter "status=running" -q 2>$null
 if (-not $running) {
     Write-Host "Postgres container '$Container' is not running. Start stack first:" -ForegroundColor Red
-    Write-Host "  cd infrastructure\docker; docker compose up -d db" -ForegroundColor Yellow
+    Write-Host "  cd infrastructure\docker; docker compose -f docker-compose.release2.yml up -d db" -ForegroundColor Yellow
     exit 1
 }
 

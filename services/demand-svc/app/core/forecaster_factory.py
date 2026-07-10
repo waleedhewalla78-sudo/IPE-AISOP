@@ -106,17 +106,22 @@ class LstmForecaster(BaseForecaster):
         return points
 
 
-def select_forecaster(history: list[float]) -> tuple[BaseForecaster, str]:
-    n = len(history)
-    if n > 365:
+def select_forecaster(history: list[float], *, model: str = "ses") -> tuple[BaseForecaster, str]:
+    """SES-first per Spec 017; Prophet/LSTM only when explicitly requested."""
+    if model == "lstm" and len(history) > 365:
         return LstmForecaster(), "lstm-v1"
-    if n >= 30:
+    if model == "prophet" and len(history) >= 30:
         return ProphetForecaster(), "prophet-v1"
     return SesForecaster(), "ses-v1"
 
 
-def forecast_with_factory(history: list[float], periods: int) -> tuple[list[dict[str, float]], str]:
-    forecaster, version = select_forecaster(history)
+def forecast_with_factory(
+    history: list[float],
+    periods: int,
+    *,
+    model: str = "ses",
+) -> tuple[list[dict[str, float]], str]:
+    forecaster, version = select_forecaster(history, model=model)
     try:
         return forecaster.predict(history, periods), version
     except Exception:

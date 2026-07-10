@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import type { ConfigData, DataQualityMetrics, OdooConfig } from './types';
+import type { ConfigData, DataQualityFlag, DataQualityMetrics, OdooConfig, SyncRun } from './types';
 
 export async function fetchConfig(): Promise<ConfigData> {
   try {
@@ -72,6 +72,7 @@ export async function fetchOdooConfig(): Promise<OdooConfig> {
       odoo_username: data?.odoo_username ?? '',
       enabled: data?.enabled ?? true,
       password_set: data?.password_set ?? false,
+      sync_interval_minutes: data?.sync_interval_minutes ?? 900,
     };
   } catch (err) {
     console.error('Failed to fetch Odoo config:', err);
@@ -86,6 +87,7 @@ export async function updateOdooConfig(config: Partial<OdooConfig> & { odoo_pass
     odoo_username: config.odoo_username,
     odoo_password: config.odoo_password,
     enabled: config.enabled,
+    sync_interval_minutes: config.sync_interval_minutes,
   });
   const data = res.data?.data;
   return {
@@ -95,6 +97,7 @@ export async function updateOdooConfig(config: Partial<OdooConfig> & { odoo_pass
     odoo_username: data?.odoo_username ?? '',
     enabled: data?.enabled ?? true,
     password_set: data?.password_set ?? false,
+    sync_interval_minutes: data?.sync_interval_minutes ?? config.sync_interval_minutes ?? 900,
   };
 }
 
@@ -113,5 +116,38 @@ export async function testOdooConnection(config: Partial<OdooConfig> & { odoo_pa
   } catch (err) {
     console.error('Odoo test failed:', err);
     return { connected: false, message: 'Connection failed' };
+  }
+}
+
+export async function fetchSyncDqFlags(): Promise<DataQualityFlag[]> {
+  try {
+    const res = await api.get('/api/v1/sync/data-quality');
+    return (res.data?.data?.flags ?? []) as DataQualityFlag[];
+  } catch (err) {
+    console.error('Failed to fetch sync DQ flags:', err);
+    return [];
+  }
+}
+
+export async function fetchSyncHistory(limit = 10): Promise<SyncRun[]> {
+  try {
+    const res = await api.get('/api/v1/sync/history', { params: { limit } });
+    return (res.data?.data?.runs ?? []) as SyncRun[];
+  } catch (err) {
+    console.error('Failed to fetch sync history:', err);
+    return [];
+  }
+}
+
+export async function runSyncNow(): Promise<{ ok: boolean; message?: string }> {
+  try {
+    const res = await api.post('/api/v1/sync/run', { entity: 'all' });
+    if (res.data?.success) {
+      return { ok: true };
+    }
+    return { ok: false, message: res.data?.error?.message ?? 'Sync failed' };
+  } catch (err) {
+    console.error('Sync run failed:', err);
+    return { ok: false, message: 'Sync failed' };
   }
 }

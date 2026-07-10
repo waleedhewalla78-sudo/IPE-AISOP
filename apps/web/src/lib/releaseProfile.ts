@@ -1,5 +1,10 @@
-/** Release 1 profile — hides POST-R1 hubs (Copilot, supply network, etc.) */
+/** Release profiles — controls hub visibility per deployment target */
 export const RELEASE_PROFILE = import.meta.env.VITE_RELEASE_PROFILE ?? 'full';
 export const IS_RELEASE1 = RELEASE_PROFILE === 'release1';
+export const IS_RELEASE2 = RELEASE_PROFILE === 'release2';
 
 export const RELEASE1_HUBS = ['planning', 'command-center', 'platform', 'copilot'] as const;
+export const RELEASE2_HUBS = [...RELEASE1_HUBS, 'demand', 'scenarios'] as const;
+
+/** Demand + Scenarios tabs visible in release2 and full profiles */
+export const SHOW_R2_PLANNING_TABS = !IS_RELEASE1 || IS_RELEASE2;

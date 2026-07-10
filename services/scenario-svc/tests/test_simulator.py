@@ -1,9 +1,9 @@
-from app.core.simulator import compare_scenarios, simulate_kpis
+from app.core.simulator import DEFAULT_BASELINE, compare_scenarios, simulate_kpis
 
 
 def test_simulate_demand_increase_raises_risk():
     kpis = simulate_kpis({"demand_change_pct": "20%"})
-    assert kpis["orders_at_risk"] >= 1.0
+    assert kpis["orders_at_risk"] >= DEFAULT_BASELINE["orders_at_risk"]
 
 
 def test_compare_scenarios_scores():

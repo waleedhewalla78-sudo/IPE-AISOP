@@ -6,6 +6,7 @@ import { ROUTES } from '@/lib/constants';
 import { fetchExecutiveSummary } from '@/features/executive/api';
 import { fetchCostOfChaos } from '@/features/cost-of-chaos/api';
 import api from '@/lib/api';
+import { t } from '@/lib/i18n';
 
 interface CommandStats {
   activeAlerts: number;
@@ -55,25 +56,23 @@ export function CommandCenterDashboardPage() {
   }
 
   const cards = [
-    { label: 'Active alerts', value: stats.activeAlerts, link: ROUTES.COMMAND_WAR_ROOM, action: 'War Room' },
-    { label: 'AI OTD', value: stats.aiOtd != null ? `${stats.aiOtd.toFixed(1)}%` : 'N/A', link: ROUTES.COMMAND_EXECUTIVE, action: 'Executive' },
-    { label: 'Cost of chaos (7d)', value: `$${stats.chaosUsd.toLocaleString()}`, link: ROUTES.COMMAND_COST_OF_CHAOS, action: 'Pareto' },
-    { label: 'Recovery options', value: stats.recoveryOptions, link: ROUTES.COMMAND_WAR_ROOM, action: 'Mitigate' },
-    { label: 'Delay categories', value: stats.delayCategories, link: ROUTES.COMMAND_EXECUTIVE, action: 'Analytics' },
+    { labelKey: 'command.activeAlerts', value: stats.activeAlerts, link: ROUTES.COMMAND_WAR_ROOM, actionKey: 'command.warRoom' },
+    { labelKey: 'command.aiOtd', value: stats.aiOtd != null ? `${stats.aiOtd.toFixed(1)}%` : t('command.na'), link: ROUTES.COMMAND_EXECUTIVE, actionKey: 'command.executive' },
+    { labelKey: 'command.chaosUsd', value: `$${stats.chaosUsd.toLocaleString()}`, link: ROUTES.COMMAND_COST_OF_CHAOS, actionKey: 'command.pareto' },
+    { labelKey: 'command.recoveryOptions', value: stats.recoveryOptions, link: ROUTES.COMMAND_WAR_ROOM, actionKey: 'command.mitigate' },
+    { labelKey: 'command.delayCategories', value: stats.delayCategories, link: ROUTES.COMMAND_EXECUTIVE, actionKey: 'command.analytics' },
   ];
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-ipe-text-muted">
-        Executive command view — disruptions, financial impact, and recovery in one place.
-      </p>
+      <p className="text-sm text-ipe-text-muted">{t('command.subtitle')}</p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {cards.map((c) => (
-          <Card key={c.label} className="p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-ipe-text-muted">{c.label}</p>
-            <p className="mt-2 text-3xl font-bold text-ipe-text">{c.value}</p>
+          <Card key={c.labelKey} className="p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-ipe-text-muted">{t(c.labelKey)}</p>
+            <p className="mt-2 text-3xl font-bold tabular-nums text-ipe-text">{c.value}</p>
             <Link to={c.link} className="mt-3 inline-block">
-              <Button size="sm" variant="ghost">{c.action} →</Button>
+              <Button size="sm" variant="ghost">{t(c.actionKey)} →</Button>
             </Link>
           </Card>
         ))}

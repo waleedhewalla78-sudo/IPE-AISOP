@@ -30,6 +30,7 @@ from app.api.v1 import (
     sla_monitoring,
     feature_store,
     sop,
+    ops,
     mdr,
     outcomes,
     planner_assist,
@@ -53,6 +54,7 @@ api_router.include_router(demand_sense.router)
 api_router.include_router(financial.router)
 api_router.include_router(ctp.router)
 api_router.include_router(sop.router)
+api_router.include_router(ops.router)
 api_router.include_router(cost_accounting.router)
 api_router.include_router(dsar.router)
 api_router.include_router(compliance.router)

@@ -1,0 +1,168 @@
+_format_version: "3.0"
+_comment: "IPE Release 2 — R1 routes + nlp-svc, demand-svc, scenario-svc"
+
+plugins:
+  - name: cors
+    config:
+      origins: ["http://localhost:8082", "http://localhost:3000", "http://localhost:5173", "https://localhost:8443"]
+      methods: [GET, POST, PUT, DELETE, PATCH, OPTIONS]
+      headers: [Authorization, Content-Type, X-Tenant-ID, X-Request-ID]
+      credentials: true
+      max_age: 3600
+  - name: response-transformer
+    config:
+      add:
+        headers:
+          - "Strict-Transport-Security:max-age=31536000; includeSubDomains"
+  - name: rate-limiting
+    config:
+      minute: 500
+      limit_by: ip
+      policy: redis
+      redis_host: redis
+      redis_port: 6379
+      redis_database: 2
+      fault_tolerant: true
+
+services:
+  - name: dpe-auth-public
+    url: http://dpe-svc:8001
+    routes:
+      - name: r2-auth-login
+        paths: [/api/v1/auth/login, /api/v1/auth/refresh]
+        strip_path: false
+      - name: r2-health
+        paths: [/api/v1/health]
+        strip_path: false
+
+  - name: dpe-svc
+    url: http://dpe-svc:8001
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-auth
+        paths: [/api/v1/auth]
+        strip_path: false
+      - name: r2-dashboard
+        paths: [/api/v1/dashboard, /api/v1/analytics]
+        strip_path: false
+      - name: r2-demand-classify
+        paths: [/api/v1/demand/classify, /api/v1/demand/queue]
+        strip_path: false
+      - name: r2-planner-assist
+        paths: [/api/v1/planner-assist]
+        strip_path: false
+      - name: r2-admin
+        paths: [/api/v1/admin]
+        strip_path: false
+      - name: r2-compliance
+        paths: [/api/v1/compliance]
+        strip_path: false
+      - name: r2-outcomes
+        paths: [/api/v1/outcomes]
+        strip_path: false
+
+  - name: fea-svc
+    url: http://fea-svc:8004
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-feasibility
+        paths: [/api/v1/feasibility]
+        strip_path: false
+
+  - name: res-svc
+    url: http://res-svc:8005
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-resolution
+        paths: [/api/v1/resolution]
+        strip_path: false
+
+  - name: cap-svc
+    url: http://cap-svc:8003
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-capacity
+        paths: [/api/v1/capacity]
+        strip_path: false
+
+  - name: connector
+    url: http://connector:8009
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-sync
+        paths: [/api/v1/sync]
+        strip_path: false
+      - name: r2-odoo-activate
+        paths: [/api/v1/sync/odoo]
+        strip_path: false
+      - name: r2-erp-odoo
+        paths: [/api/v1/erp/odoo]
+        strip_path: false
+
+  - name: nlp-svc
+    url: http://nlp-svc:8007
+    connect_timeout: 60000
+    read_timeout: 300000
+    write_timeout: 300000
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-copilot
+        paths: [/api/v1/copilot]
+        strip_path: false
+      - name: r2-nlp
+        paths: [/api/v1/nlp]
+        strip_path: false
+
+  - name: demand-svc
+    url: http://demand-svc:8040
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-demand-forecast
+        paths: [/api/v1/demand/forecast, /api/v1/demand/sense, /api/v1/demand/accuracy, /api/v1/demand/signal]
+        strip_path: false
+      - name: r2-demand
+        paths: [/api/v1/demand]
+        strip_path: false
+
+  - name: scenario-svc
+    url: http://scenario-svc:8050
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-scenario
+        paths: [/api/v1/scenario]
+        strip_path: false
+
+consumers:
+  - username: tenant-aaa-111
+    custom_id: aaaaaaaa-1111-4111-8111-111111111111
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          limit_by: consumer
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_database: 2
+          fault_tolerant: true
+
+  - username: tenant-bbb-222
+    custom_id: bbbbbbbb-2222-4222-8222-222222222222
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          limit_by: consumer
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_database: 2
+          fault_tolerant: true

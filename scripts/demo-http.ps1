@@ -115,12 +115,15 @@ function Get-IpeDemoJwt {
     $authMode = if ($AuthMode) { $AuthMode } else { Get-IpeAuthMode -BaseUrl $BaseUrl -TimeoutSec $TimeoutSec }
 
     if ($authMode -eq "keycloak") {
-        $realm = Invoke-RestMethod -Uri "$KeycloakUrl/realms/ipe/.well-known/openid-configuration" -TimeoutSec $TimeoutSec
-        $tokenBody = 'grant_type=password&client_id=ipe-web&username=admin@ipe.example.com&password=' + $Password
-        $tokenResp = Invoke-RestMethod -Method POST -Uri $realm.token_endpoint `
-            -ContentType "application/x-www-form-urlencoded" -Body $tokenBody -TimeoutSec $TimeoutSec
-        if (-not $tokenResp.access_token) { throw "Keycloak password grant returned no access_token" }
-        return $tokenResp.access_token
+        try {
+            $realm = Invoke-RestMethod -Uri "$KeycloakUrl/realms/ipe/.well-known/openid-configuration" -TimeoutSec $TimeoutSec
+            $tokenBody = 'grant_type=password&client_id=ipe-web&username=admin@ipe.example.com&password=' + $Password
+            $tokenResp = Invoke-RestMethod -Method POST -Uri $realm.token_endpoint `
+                -ContentType "application/x-www-form-urlencoded" -Body $tokenBody -TimeoutSec $TimeoutSec
+            if ($tokenResp.access_token) { return $tokenResp.access_token }
+        } catch {
+            # Keycloak unhealthy or misconfigured — fall through to local RS256 login.
+        }
     }
 
     $loginBody = (@{ email = $Email; password = $Password } | ConvertTo-Json -Compress)

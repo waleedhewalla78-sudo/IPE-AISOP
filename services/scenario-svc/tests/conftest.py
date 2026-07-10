@@ -13,6 +13,15 @@ from httpx import ASGITransport, AsyncClient
 from ipe_shared.testing.conftest_helpers import apply_v8_api_overrides, clear_overrides, make_auth_headers, V8_TENANT_ID
 
 
+@pytest.fixture(autouse=True)
+def _reset_v8_session():
+    from ipe_shared.testing.conftest_helpers import reset_v8_test_session
+
+    reset_v8_test_session()
+    yield
+    reset_v8_test_session()
+
+
 @pytest.fixture(scope="session")
 def event_loop():
     import asyncio

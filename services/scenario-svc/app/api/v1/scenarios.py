@@ -36,9 +36,27 @@ class ParameterBatchRequest(BaseModel):
 
 DEFAULT_PARAMS = [
     ParameterUpdate(parameter_key="demand_change_pct", parameter_value="0%", description="Demand delta"),
-    ParameterUpdate(parameter_key="capacity_change_pct", parameter_value="0%", description="Capacity delta"),
-    ParameterUpdate(parameter_key="lead_time_change_pct", parameter_value="0%", description="Lead time delta"),
+    ParameterUpdate(
+        parameter_key="supplier_delay_days",
+        parameter_value="0",
+        data_type="integer",
+        description="Supplier lead-time delay (days)",
+    ),
+    ParameterUpdate(
+        parameter_key="capacity_reduction_pct",
+        parameter_value="0%",
+        description="Capacity reduction",
+    ),
 ]
+
+
+class SimulateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=3, max_length=128)
+    description: str | None = None
+    demand_change_pct: str = "0%"
+    supplier_delay_days: str = "0"
+    capacity_reduction_pct: str = "0%"
+    persist: bool = True
 
 
 async def _params_map(session: AsyncSession, scenario_id: UUID) -> dict[str, str]:
@@ -46,6 +64,96 @@ async def _params_map(session: AsyncSession, scenario_id: UUID) -> dict[str, str
         select(ScenarioParameter).where(ScenarioParameter.scenario_id == scenario_id)
     )
     return {row.parameter_key: row.parameter_value for row in result.scalars().all()}
+
+
+def _params_from_simulate(req: SimulateRequest) -> dict[str, str]:
+    return {
+        "demand_change_pct": req.demand_change_pct,
+        "supplier_delay_days": req.supplier_delay_days,
+        "capacity_reduction_pct": req.capacity_reduction_pct,
+    }
+
+
+@router.post("/simulate")
+async def simulate_ad_hoc(
+    req: SimulateRequest,
+    session: AsyncSession = Depends(get_db_session),
+    user: TokenPayload = Depends(require_roles(["planner", "admin", "manager"])),
+):
+    """Run what-if simulation; optionally persist as a scenario (max 3 active per tenant)."""
+    tenant_id = tenant_ctx.get()
+    params = _params_from_simulate(req)
+    kpis = simulate_kpis(params)
+    baseline = dict(DEFAULT_BASELINE)
+    deltas = {k: round(kpis.get(k, 0) - baseline.get(k, 0), 2) for k in baseline}
+
+    if not req.persist:
+        return APIResponse(
+            success=True,
+            data={"baseline": baseline, "kpis": kpis, "deltas": deltas, "parameters": params},
+            error=None,
+        )
+
+    active_count = (
+        await session.execute(
+            select(PlanningScenario).where(
+                PlanningScenario.tenant_id == tenant_id,
+                PlanningScenario.status == "active",
+            )
+        )
+    ).scalars().all()
+    if len(active_count) >= 3:
+        return APIResponse(
+            success=False,
+            data=None,
+            error={"code": "LIMIT", "message": "Maximum 3 active scenarios; archive one before saving"},
+        )
+
+    scenario_name = req.name or f"What-if {datetime.now(UTC).strftime('%Y-%m-%d %H:%M')}"
+    scenario = PlanningScenario(
+        tenant_id=tenant_id,
+        name=scenario_name,
+        description=req.description,
+        status="active",
+        created_by=str(user.sub),
+    )
+    session.add(scenario)
+    await session.flush()
+
+    for key, value in params.items():
+        session.add(
+            ScenarioParameter(
+                tenant_id=tenant_id,
+                scenario_id=scenario.id,
+                parameter_key=key,
+                parameter_value=value,
+                data_type="integer" if key.endswith("_days") else "string",
+            )
+        )
+    for key, value in kpis.items():
+        session.add(
+            ScenarioResult(
+                tenant_id=tenant_id,
+                scenario_id=scenario.id,
+                kpi_key=key,
+                kpi_value=value,
+                unit="pct" if key.endswith("_pct") else "usd" if key.endswith("_usd") else "count",
+            )
+        )
+    scenario.completed_at = datetime.now(UTC)
+    await session.commit()
+    return APIResponse(
+        success=True,
+        data={
+            "scenario_id": str(scenario.id),
+            "name": scenario.name,
+            "baseline": baseline,
+            "kpis": kpis,
+            "deltas": deltas,
+            "parameters": params,
+        },
+        error=None,
+    )
 
 
 @router.post("")

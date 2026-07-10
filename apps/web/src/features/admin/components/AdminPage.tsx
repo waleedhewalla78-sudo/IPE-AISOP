@@ -4,8 +4,9 @@ import { IS_RELEASE1 } from '@/lib/releaseProfile';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { fetchConfig, fetchDataQuality, fetchLlmStatus, fetchOdooConfig, testOdooConnection, updateConfig, updateOdooConfig, type LlmTierStatus } from '../api';
-import type { ConfigData, DataQualityMetrics, OdooConfig } from '../types';
+import { fetchConfig, fetchDataQuality, fetchLlmStatus, updateConfig, type LlmTierStatus } from '../api';
+import type { ConfigData, DataQualityMetrics } from '../types';
+import { OdooConfigPanel } from './OdooConfigPanel';
 
 type Tab = 'config' | 'data-quality' | 'llm' | 'odoo';
 
@@ -14,10 +15,6 @@ export function AdminPage() {
   const [config, setConfig] = useState<ConfigData | null>(null);
   const [metrics, setMetrics] = useState<DataQualityMetrics | null>(null);
   const [llmStatus, setLlmStatus] = useState<LlmTierStatus | null>(null);
-  const [odooConfig, setOdooConfig] = useState<OdooConfig | null>(null);
-  const [odooPassword, setOdooPassword] = useState('');
-  const [odooTestMsg, setOdooTestMsg] = useState('');
-  const [testingOdoo, setTestingOdoo] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -31,10 +28,6 @@ export function AdminPage() {
       setConfig(cfg);
       setMetrics(m);
       setLlmStatus(llm);
-      if (IS_RELEASE1) {
-        const odoo = await fetchOdooConfig();
-        setOdooConfig(odoo);
-      }
       setLoading(false);
     }
     load();
@@ -232,97 +225,7 @@ export function AdminPage() {
         </div>
       )}
 
-      {activeTab === 'odoo' && odooConfig && (
-        <Card>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-ipe-text-muted">{t('admin.odoo.url')}</label>
-              <input
-                className="w-full rounded border border-ipe-border px-3 py-1.5 text-sm"
-                value={odooConfig.odoo_url}
-                onChange={(e) => setOdooConfig({ ...odooConfig, odoo_url: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-ipe-text-muted">{t('admin.odoo.db')}</label>
-              <input
-                className="w-full rounded border border-ipe-border px-3 py-1.5 text-sm"
-                value={odooConfig.odoo_db}
-                onChange={(e) => setOdooConfig({ ...odooConfig, odoo_db: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-ipe-text-muted">{t('admin.odoo.username')}</label>
-              <input
-                className="w-full rounded border border-ipe-border px-3 py-1.5 text-sm"
-                value={odooConfig.odoo_username}
-                onChange={(e) => setOdooConfig({ ...odooConfig, odoo_username: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-ipe-text-muted">{t('admin.odoo.password')}</label>
-              <input
-                type="password"
-                className="w-full rounded border border-ipe-border px-3 py-1.5 text-sm"
-                placeholder={odooConfig.password_set ? '••••••••' : ''}
-                value={odooPassword}
-                onChange={(e) => setOdooPassword(e.target.value)}
-              />
-              <p className="mt-1 text-xs text-ipe-text-muted">{t('admin.odoo.passwordHint')}</p>
-            </div>
-          </div>
-          <label className="mt-4 flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={odooConfig.enabled}
-              onChange={(e) => setOdooConfig({ ...odooConfig, enabled: e.target.checked })}
-            />
-            {t('admin.odoo.enabled')}
-          </label>
-          {odooTestMsg ? (
-            <p className={`mt-3 text-sm ${odooTestMsg.includes('Connected') || odooTestMsg.includes('متصل') ? 'text-green-600' : 'text-red-600'}`}>
-              {odooTestMsg}
-            </p>
-          ) : null}
-          <div className="mt-4 flex justify-end gap-2">
-            <Button
-              variant="ghost"
-              disabled={testingOdoo}
-              onClick={async () => {
-                setTestingOdoo(true);
-                setOdooTestMsg(t('admin.odoo.testing'));
-                const result = await testOdooConnection({
-                  ...odooConfig,
-                  odoo_password: odooPassword || undefined,
-                });
-                setOdooTestMsg(
-                  result.connected
-                    ? `${t('admin.odoo.connected')}${result.message ? ` (${result.message})` : ''}`
-                    : `${t('admin.odoo.failed')}: ${result.message ?? ''}`,
-                );
-                setTestingOdoo(false);
-              }}
-            >
-              {t('admin.odoo.test')}
-            </Button>
-            <Button
-              disabled={saving}
-              onClick={async () => {
-                setSaving(true);
-                const updated = await updateOdooConfig({
-                  ...odooConfig,
-                  odoo_password: odooPassword || undefined,
-                });
-                setOdooConfig(updated);
-                setOdooPassword('');
-                setSaving(false);
-              }}
-            >
-              {t('admin.odoo.save')}
-            </Button>
-          </div>
-        </Card>
-      )}
+      {activeTab === 'odoo' && IS_RELEASE1 ? <OdooConfigPanel /> : null}
     </div>
   );
 }

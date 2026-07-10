@@ -19,6 +19,7 @@ import {
   ExecutiveDashboardPage,
   OutcomesPage,
   CostOfChaosPage,
+  OTDDashboardPage,
   TariffPage,
   SCNDashboard,
   InventoryPage,
@@ -34,8 +35,11 @@ import {
   QualityPage,
   SustainabilityPage,
   AdminPage,
+  OdooConfigPage,
   OnboardingWizard,
   MLOpsDashboard,
+  OpsDashboard,
+  SOPReport,
   ShopFloorPage,
   UnifiedWorkspacePage,
 } from '@/app/lazyRoutes';
@@ -77,6 +81,8 @@ export function AppRouter() {
             <Route path="outcomes" element={<OutcomesPage />} />
             <Route path="equipment" element={<EquipmentHealthPage />} />
             <Route path="cost-of-chaos" element={<CostOfChaosPage />} />
+            <Route path="otd-analytics" element={<OTDDashboardPage />} />
+            <Route path="sop-report" element={<SOPReport />} />
           </Route>
 
           {/* Supply Chain Hub */}
@@ -106,8 +112,10 @@ export function AppRouter() {
           <Route path={ROUTES.PLATFORM} element={<PlatformHub />}>
             <Route index element={<Navigate to="admin" replace />} />
             <Route path="admin" element={<AdminPage />} />
+            <Route path="odoo-config" element={<OdooConfigPage />} />
             <Route path="onboarding" element={<OnboardingWizard />} />
             <Route path="ml-ops" element={<MLOpsDashboard tenantId={tenantId} />} />
+            <Route path="ops" element={<OpsDashboard />} />
           </Route>
 
           <Route path={ROUTES.SHOP_FLOOR} element={<ShopFloorPage tenantId={tenantId} />} />

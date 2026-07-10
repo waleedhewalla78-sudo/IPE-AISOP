@@ -141,6 +141,54 @@ async def sync_status(session: AsyncSession = Depends(get_db_session)):
     )
 
 
+@router.get("/history")
+async def sync_history(
+    limit: int = 10,
+    session: AsyncSession = Depends(get_db_session),
+):
+    """Return the last N sync runs for the current tenant (default 10, max 50)."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(success=False, data=None, error={"code": "NO_TENANT", "message": "No tenant context"})
+
+    tid = UUID(tenant_id) if isinstance(tenant_id, str) else tenant_id
+    capped = max(1, min(limit, 50))
+    rows = await session.execute(
+        text("""
+            SELECT id, source, trigger, started_at, finished_at, status, entity_counts, error_summary
+            FROM cdm_sync_run
+            WHERE tenant_id = :tid
+            ORDER BY started_at DESC
+            LIMIT :lim
+        """),
+        {"tid": tid, "lim": capped},
+    )
+
+    runs = []
+    for row in rows.fetchall():
+        started = row[3]
+        finished = row[4]
+        duration_seconds = None
+        if started and finished:
+            duration_seconds = round((finished - started).total_seconds(), 1)
+
+        runs.append(
+            {
+                "id": str(row[0]),
+                "source": row[1],
+                "trigger": row[2],
+                "started_at": started.isoformat() if started else None,
+                "finished_at": finished.isoformat() if finished else None,
+                "duration_seconds": duration_seconds,
+                "status": row[5],
+                "entity_counts": row[6] or {},
+                "error_summary": row[7],
+            }
+        )
+
+    return APIResponse(success=True, data={"runs": runs, "count": len(runs)}, error=None)
+
+
 @router.get("/data-quality")
 async def sync_data_quality(session: AsyncSession = Depends(get_db_session)):
     tenant_id = tenant_ctx.get()

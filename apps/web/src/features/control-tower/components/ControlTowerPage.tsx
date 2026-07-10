@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { TariffShockPanel } from '@/features/tariff/components/TariffShockPanel';
 import { SyncStatusBar } from './SyncStatusBar';
 import { PlannerAssistPanel } from './PlannerAssistPanel';
+import { ForecastOverlayWidget } from './ForecastOverlayWidget';
 import { ROUTES } from '@/lib/constants';
 import { IS_RELEASE1 } from '@/lib/releaseProfile';
 import { t } from '@/lib/i18n';
@@ -32,10 +33,10 @@ function scoreBadge(score: number | null): 'success' | 'warning' | 'danger' | 'd
 }
 
 function scoreLabel(score: number | null): string {
-  if (score === null) return 'Pending';
-  if (score >= 90) return 'On Track';
-  if (score >= 70) return 'At Risk';
-  return 'Critical';
+  if (score === null) return t('controlTower.pending');
+  if (score >= 90) return t('controlTower.onTrack');
+  if (score >= 70) return t('controlTower.atRisk');
+  return t('controlTower.critical');
 }
 
 function rowBg(score: number | null): string {
@@ -124,43 +125,43 @@ export function ControlTowerPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-ipe-text">Control Tower</h1>
-        <p className="text-sm text-ipe-text-muted">Production overview, risk queue, and bottleneck map</p>
+        <h1 className="text-2xl font-bold text-ipe-text">{t('controlTower.title')}</h1>
+        <p className="text-sm text-ipe-text-muted">{t('controlTower.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KPICard
-          title="Avg Feasibility Score"
+          title={t('controlTower.avgFeasibility')}
           value={avgScore !== null ? `${avgScore}%` : '-'}
           trend={kpiScoreColor(avgScore)}
-          subtitle="Overall avg"
+          subtitle={t('controlTower.overallAvg')}
           className={kpiBgColor(avgScore)}
         />
         <KPICard
-          title="Active Bottlenecks"
+          title={t('controlTower.bottlenecks')}
           value={activeBottlenecks !== null ? activeBottlenecks : '-'}
           trend={activeBottlenecks !== null && activeBottlenecks > 0 ? 'down' : 'neutral'}
-          subtitle="WC >85% util"
+          subtitle={t('controlTower.wcUtil')}
         />
         <KPICard
-          title="Orders at Risk"
+          title={t('controlTower.ordersAtRisk')}
           value={ordersAtRisk !== null ? ordersAtRisk : '-'}
           trend={ordersAtRisk !== null && ordersAtRisk > 0 ? 'down' : 'neutral'}
-          subtitle="Score &lt;70"
+          subtitle={t('controlTower.scoreBelow70')}
         />
         {otdPct !== null ? (
           <KPICard
-            title="On-Time Delivery"
+            title={t('controlTower.otd')}
             value={`${otdPct}%`}
             trend={otdPct >= 80 ? 'up' : 'down'}
-            subtitle="Last 30 days"
+            subtitle={t('controlTower.otdSubtitle')}
           />
         ) : (
           <div className="rounded-lg border border-ipe-border bg-gray-50 p-5 shadow-sm opacity-60">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-ipe-text-muted">On-Time Delivery</p>
-                <p className="mt-1 text-xl font-semibold text-ipe-text-muted">Not available in Shadow Mode</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-ipe-text-muted">{t('controlTower.otd')}</p>
+                <p className="mt-1 text-xl font-semibold text-ipe-text-muted">{t('controlTower.shadowMode')}</p>
               </div>
             </div>
           </div>
@@ -171,27 +172,29 @@ export function ControlTowerPage() {
 
       <PlannerAssistPanel />
 
+      <ForecastOverlayWidget />
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card>
-            <h3 className="mb-3 font-medium">MO Risk Queue ({queue.length})</h3>
+            <h3 className="mb-3 font-medium">{t('controlTower.moQueue')} ({queue.length})</h3>
             <div className="overflow-x-auto">
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableHeader>MO ID</TableHeader>
-                  <TableHeader>Product</TableHeader>
-                  <TableHeader>Customer</TableHeader>
-                  <TableHeader>Required</TableHeader>
-                  <TableHeader>Feasibility <span className="text-xs font-normal text-ipe-text-muted" title="Capacity & Labor scoring pending (Sprint 3)">*</span></TableHeader>
-                  <TableHeader>Constraint</TableHeader>
+                  <TableHeader>{t('resolution.moId')}</TableHeader>
+                  <TableHeader>{t('controlTower.product')}</TableHeader>
+                  <TableHeader>{t('controlTower.customer')}</TableHeader>
+                  <TableHeader>{t('controlTower.required')}</TableHeader>
+                  <TableHeader>{t('controlTower.feasibility')} <span className="text-xs font-normal text-ipe-text-muted" title={t('controlTower.scorePendingNote')}>*</span></TableHeader>
+                  <TableHeader>{t('controlTower.constraint')}</TableHeader>
                   <TableHeader />
                 </TableRow>
               </TableHead>
               <tfoot>
                 <TableRow>
                   <TableCell colSpan={7} className="text-xs text-ipe-text-muted italic pt-2">
-                    * Capacity &amp; Labor scoring pending (Sprint 3) &mdash; scores are material-driven only.
+                    * {t('controlTower.scorePendingNote')}
                   </TableCell>
                 </TableRow>
               </tfoot>
@@ -202,7 +205,7 @@ export function ControlTowerPage() {
                       <span>{item.erp_mo_id ?? item.mo_id.slice(0, 8)}</span>
                       {(item.sync_conflict ||
                         item.data_quality_flags?.some((f) => f.flag_code === 'SYNC_CONFLICT')) && (
-                        <Badge variant="warning" className="ml-2" title={JSON.stringify(item.sync_conflict ?? {})}>
+                        <Badge variant="warning" className="ms-2" title={JSON.stringify(item.sync_conflict ?? {})}>
                           {t('controlTower.syncConflict')}
                         </Badge>
                       )}
@@ -218,7 +221,7 @@ export function ControlTowerPage() {
                           <span className={`font-semibold ${scoreColor(item.feasibility_score)}`}>
                             {item.feasibility_score !== null ? item.feasibility_score : '-'}
                           </span>
-                          <Badge variant={scoreBadge(item.feasibility_score)} className="ml-2">
+                          <Badge variant={scoreBadge(item.feasibility_score)} className="ms-2">
                             {scoreLabel(item.feasibility_score)}
                           </Badge>
                         </>
@@ -231,7 +234,7 @@ export function ControlTowerPage() {
                           {item.primary_constraint}
                         </span>
                       ) : (
-                        <span className="text-xs text-ipe-text-muted">None</span>
+                        <span className="text-xs text-ipe-text-muted">{t('controlTower.none')}</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -244,7 +247,7 @@ export function ControlTowerPage() {
                 {queue.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={7} className="py-8 text-center text-sm text-ipe-text-muted">
-                      No MOs in the queue.
+                      {t('controlTower.noQueue')}
                     </TableCell>
                   </TableRow>
                 )}
@@ -256,8 +259,8 @@ export function ControlTowerPage() {
 
         <div className="space-y-6">
           <Card>
-            <h3 className="mb-3 font-medium">Bottleneck Map</h3>
-            <p className="mb-4 text-xs text-ipe-text-muted">Work centers exceeding 85% utilization</p>
+            <h3 className="mb-3 font-medium">{t('controlTower.bottleneckMap')}</h3>
+            <p className="mb-4 text-xs text-ipe-text-muted">{t('controlTower.bottleneckHint')}</p>
             <div className="space-y-4">
               {bottlenecks.map((b) => {
                 const barPct = Math.min(b.utilization_pct, 100);
@@ -274,22 +277,22 @@ export function ControlTowerPage() {
                       />
                     </div>
                     <div className="mt-0.5 text-xs text-ipe-text-muted">
-                      {b.utilization_pct > 95 ? 'Critical overload' : b.utilization_pct > 85 ? 'Bottleneck risk' : 'Moderate load'}
+                      {b.utilization_pct > 95 ? t('controlTower.criticalOverload') : b.utilization_pct > 85 ? t('controlTower.bottleneckRisk') : t('controlTower.moderateLoad')}
                     </div>
                   </div>
                 );
               })}
               {bottlenecks.length === 0 && (
-                <p className="text-sm text-ipe-text-muted">No bottlenecks detected.</p>
+                <p className="text-sm text-ipe-text-muted">{t('controlTower.noBottlenecks')}</p>
               )}
             </div>
           </Card>
 
           <Card>
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-medium">Tariff Shock</h3>
+              <h3 className="font-medium">{t('controlTower.tariffShock')}</h3>
               <Button size="sm" variant="ghost" onClick={() => navigate(ROUTES.SUPPLY_TARIFF)}>
-                Full view →
+                {t('controlTower.fullView')} →
               </Button>
             </div>
             <TariffShockPanel />

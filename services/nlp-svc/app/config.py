@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     CAP_SVC_URL: str = "http://cap-svc:8003"
     FEA_SVC_URL: str = "http://fea-svc:8004"
     RES_SVC_URL: str = "http://res-svc:8005"
+    CONNECTOR_SVC_URL: str = "http://connector:8009"
     ALERT_SVC_URL: str = "http://alert-svc:8010"
+    COPILOT_SHADOW_MODE: bool = True
+    COPILOT_TIMEOUT_SECONDS: int = 300
     model_config = {"env_prefix": "IPE_", "case_sensitive": False}
 settings = Settings()

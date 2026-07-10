@@ -1,9 +1,11 @@
-"""Simple exponential smoothing and moving-average demand forecasts."""
+"""Simple exponential smoothing demand forecasts (Spec 017 SES-first)."""
 
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from statistics import mean, pstdev
+
+STANDARD_HORIZONS: tuple[int, ...] = (7, 14, 30)
 
 
 def simple_exponential_smoothing(history: list[float], alpha: float = 0.3) -> float:

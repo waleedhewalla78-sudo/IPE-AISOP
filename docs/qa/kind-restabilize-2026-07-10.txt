@@ -1,0 +1,28 @@
+﻿IPE Kind cluster restabilization — 2026-07-10
+Operator: ops+docs (Phase 2)
+Cluster: kind / namespace ipe / node ipe-dev-control-plane
+
+=== Actions ===
+1. kubectl delete hpa -n ipe --all  -> No resources found (HPA already absent)
+2. Scaled deployments to replicas=1: cap-svc, connector, dpe-svc, fea-svc, mat-svc, postgresql, redis, res-svc
+3. Observed CrashLoopBackOff on 6/8 app pods (postgresql/redis healthy)
+4. kubectl logs deploy/dpe-svc --tail=80 -> docs/qa/dpe-svc-logs-tail80.txt
+
+=== Root cause (CrashLoop) ===
+- kubelet events: liveness/readiness GET /api/v1/health failed (context deadline exceeded, connection refused)
+- Last terminated exit code 143 (SIGTERM) — pod killed after failed liveness probes
+- Health handler cold-path latency observed up to ~1290ms while probe timeoutSeconds=1 (helm default)
+- Stale pods + in-progress rollouts after control-plane recycle (~24m uptime) amplified restart churn
+- Intermittent FailedMount on service-account token (API server timeout on kind under load)
+
+=== Remediation applied ===
+- kubectl rollout restart on app deployments
+- Force delete all pods in namespace ipe (grace-period=0) to clear dual-ReplicaSet churn
+- Post-recycle: 8/8 pods Ready (all deployments 1/1)
+
+=== Verification (2026-07-10 09:15:52) ===
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE cap-svc      1/1     1            1           4d19h connector    1/1     1            1           4d19h dpe-svc      1/1     1            1           4d19h fea-svc      1/1     1            1           4d19h mat-svc      1/1     1            1           4d19h postgresql   1/1     1            1           4d19h redis        1/1     1            1           4d19h res-svc      1/1     1            1           4d19h
+NAME                          READY   STATUS    RESTARTS   AGE cap-svc-75956cfbf4-fzzg7      1/1     Running   0          3m21s connector-798ff7ff96-wcmg5    1/1     Running   0          3m21s dpe-svc-8457bb5954-rtttn      1/1     Running   0          3m21s fea-svc-846b979547-lhhng      1/1     Running   0          3m21s mat-svc-595d9b9f8-hpnbk       1/1     Running   0          3m21s postgresql-74fbb4cbf7-mspq5   1/1     Running   0          3m20s redis-85849f9876-whtw9        1/1     Running   0          3m20s res-svc-54d45b45dc-xh45q      1/1     Running   0          3m19s
+
+=== Follow-up (code/helm) ===
+- Recommend raising liveness/readiness timeoutSeconds to 10 and initialDelaySeconds to 60–90 in helm/ipe/values*.yaml for kind dev

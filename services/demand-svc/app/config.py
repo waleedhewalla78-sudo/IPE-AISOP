@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://ipe:ipe_dev_pass@localhost:5432/ipe_dev"
     LOG_LEVEL: str = "DEBUG"
     CORS_ORIGINS: list[str] = ["http://localhost:8082"]
+    DEMAND_FORECAST_HORIZON_DAYS: int = 14
+    DEMAND_FORECAST_MODEL: str = "ses"
 
     model_config = {"env_prefix": "IPE_", "case_sensitive": False}
 

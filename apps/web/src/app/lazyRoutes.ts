@@ -63,6 +63,10 @@ export const OutcomesPage = lazyNamed(
   'OutcomesPage',
 );
 export const CostOfChaosPage = lazyNamed(() => import('@/features/cost-of-chaos/CostOfChaosPage'), 'CostOfChaosPage');
+export const OTDDashboardPage = lazyNamed(
+  () => import('@/features/otd-analytics/OTDDashboardPage'),
+  'OTDDashboardPage',
+);
 
 // Supply Chain tabs
 export const TariffPage = lazyNamed(() => import('@/features/tariff/TariffPage'), 'TariffPage');
@@ -111,6 +115,10 @@ export const SustainabilityPage = lazyNamed(
 
 // Platform tabs
 export const AdminPage = lazyNamed(() => import('@/features/admin/components/AdminPage'), 'AdminPage');
+export const OdooConfigPage = lazyNamed(
+  () => import('@/features/odoo-config/components/OdooConfigPage'),
+  'OdooConfigPage',
+);
 export const OnboardingWizard = lazyNamed(
   () => import('@/features/onboarding/components/OnboardingWizard'),
   'OnboardingWizard',
@@ -118,6 +126,14 @@ export const OnboardingWizard = lazyNamed(
 export const MLOpsDashboard = lazyNamed(
   () => import('@/features/ml-ops/components/MLOpsDashboard'),
   'MLOpsDashboard',
+);
+export const OpsDashboard = lazyNamed(
+  () => import('@/features/platform/components/OpsDashboard'),
+  'OpsDashboard',
+);
+export const SOPReport = lazyNamed(
+  () => import('@/features/command-center/components/SOPReport'),
+  'SOPReport',
 );
 
 // Standalone

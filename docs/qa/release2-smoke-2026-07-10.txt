@@ -1,0 +1,23 @@
+﻿=== Release 2 smoke test ===
+Date: 2026-07-10
+Fix: AUTH_MODE=local on demand-svc/scenario-svc (local RS256 login vs Keycloak JWKS mismatch)
+Also: dual-mode JWT resolve in ipe_shared.auth.dependencies (kid ipe-rs256-v1 -> local decode)
+
+[PASS] nlp-svc container
+[PASS] demand-svc container
+[PASS] scenario-svc container
+[PASS] dpe-svc container
+[PASS] fea-svc container
+[PASS] res-svc container
+[PASS] cap-svc container
+[PASS] connector container
+[PASS] Login via Kong
+[PASS] Kong health
+[PASS] Sync status (R1)
+[PASS] Feasibility queue (R1)
+[PASS] nlp-svc authenticated health
+[PASS] Kong scenario route
+[PASS] Kong demand route
+
+Result: 15 passed, 0 failed
+G-R2-01: PASS

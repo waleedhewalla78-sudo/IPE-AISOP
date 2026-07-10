@@ -17,6 +17,7 @@ export function LanguageSwitcher() {
       onClick={toggle}
       className="rounded border border-ipe-border px-2 py-1 text-xs text-ipe-text-muted hover:bg-ipe-surface-alt"
       title={t('nav.language')}
+      data-testid="language-toggle"
     >
       {locale === 'ar' ? 'EN' : 'عربي'}
     </button>

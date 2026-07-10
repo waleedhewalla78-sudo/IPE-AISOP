@@ -14,6 +14,27 @@ export interface OdooConfig {
   odoo_password?: string;
   enabled: boolean;
   password_set?: boolean;
+  sync_interval_minutes?: number;
+}
+
+export interface DataQualityFlag {
+  mo_id: string;
+  erp_mo_id?: string | null;
+  flag_code: string;
+  message: string;
+  created_at?: string | null;
+}
+
+export interface SyncRun {
+  id: string;
+  source?: string;
+  trigger?: string;
+  started_at?: string | null;
+  finished_at?: string | null;
+  duration_seconds?: number | null;
+  status: string;
+  entity_counts?: Record<string, unknown>;
+  error_summary?: string | null;
 }
 
 export interface ConfigData {

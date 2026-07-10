@@ -21,8 +21,18 @@ export function setLocale(locale: Locale): void {
   document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
 }
 
-export function t(key: string, fallback?: string): string {
-  return bundles[currentLocale][key] ?? bundles.en[key] ?? fallback ?? key;
+export function isRtl(): boolean {
+  return currentLocale === 'ar';
+}
+
+export function t(key: string, fallback?: string, vars?: Record<string, string | number>): string {
+  let text = bundles[currentLocale][key] ?? bundles.en[key] ?? fallback ?? key;
+  if (vars) {
+    for (const [name, value] of Object.entries(vars)) {
+      text = text.split(`{${name}}`).join(String(value));
+    }
+  }
+  return text;
 }
 
 // init on load

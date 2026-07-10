@@ -3,6 +3,7 @@
 import json
 from collections.abc import AsyncGenerator
 
+from app.config import settings
 from app.core.copilot_tools import TOOL_DEFINITIONS, TOOL_HANDLERS
 from app.core.llm_client import get_tool_agent_backend
 from app.core.ollama_tool_client import OllamaToolClient, anthropic_tool_defs_to_ollama
@@ -16,17 +17,42 @@ You have access to tools that can query production data and run what-if simulati
 IMPORTANT: You can ONLY read data or trigger isolated scenario simulations.
 You CANNOT modify, update, or delete any live production records.
 
-When a user asks about a specific order, use get_order_status to check its status.
+When a user asks about a specific order, use get_mo_status or get_order_status to check its status.
+When a user asks what is blocking an MO, use get_feasibility_queue and get_mo_status.
 When a user asks about machine utilization, use get_resource_utilization.
 When a user asks "what if" or wants to simulate a breakdown, use simulate_disruption.
+Use get_schedule, get_otd_metrics, get_material_availability, get_sync_status, and
+get_resolution_scenarios for live planning context.
 
 Always explain your findings clearly and suggest actionable next steps when appropriate.
 Be concise but thorough.
 """
 
+_SHADOW_MODE_PROMPT = """
+
+SHADOW MODE (default): You may only READ data and SUGGEST actions.
+Never claim you executed a schedule approval, ERP write-back, or live record change.
+All mutations require explicit planner approval in the IPE UI.
+"""
+
+DEFAULT_SHADOW_MODE = True
+
 _NOT_CONFIGURED_MSG = (
     "LLM service not configured. Set IPE_OLLAMA_ENDPOINT_URL (recommended) or IPE_ANTHROPIC_API_KEY."
 )
+
+
+def _resolve_shadow_mode(shadow_mode: bool | None) -> bool:
+    if shadow_mode is not None:
+        return shadow_mode
+    return settings.COPILOT_SHADOW_MODE if hasattr(settings, "COPILOT_SHADOW_MODE") else DEFAULT_SHADOW_MODE
+
+
+def _build_system_prompt(shadow_mode: bool) -> str:
+    prompt = SYSTEM_PROMPT
+    if shadow_mode:
+        prompt += _SHADOW_MODE_PROMPT
+    return prompt
 
 
 async def _run_anthropic_tool_loop(
@@ -34,6 +60,7 @@ async def _run_anthropic_tool_loop(
     clean_query: str,
     tenant_id: str,
     max_iterations: int,
+    system_prompt: str,
 ) -> AsyncGenerator[dict, None]:
     client = backend.client
     model = backend.model_config.get("model", "claude-sonnet-4-20250514")
@@ -45,7 +72,7 @@ async def _run_anthropic_tool_loop(
             response = await client.messages.create(
                 model=model,
                 max_tokens=max_tokens,
-                system=SYSTEM_PROMPT,
+                system=system_prompt,
                 tools=TOOL_DEFINITIONS,
                 messages=messages,
             )
@@ -97,6 +124,7 @@ async def _run_ollama_tool_loop(
     clean_query: str,
     tenant_id: str,
     max_iterations: int,
+    system_prompt: str,
 ) -> AsyncGenerator[dict, None]:
     client: OllamaToolClient = backend.client
     max_tokens = backend.model_config.get("max_tokens", 1024)
@@ -108,7 +136,7 @@ async def _run_ollama_tool_loop(
             turn = await client.create_turn(
                 messages=messages,
                 tools=ollama_tools,
-                system_prompt=SYSTEM_PROMPT,
+                system_prompt=system_prompt,
                 max_tokens=max_tokens,
             )
 
@@ -153,12 +181,16 @@ async def run_agent_with_tools(
     query: str,
     tenant_id: str,
     max_iterations: int = 5,
+    shadow_mode: bool | None = None,
 ) -> AsyncGenerator[dict, None]:
     """Run the LLM agent with tool calling in a loop."""
     backend = get_tool_agent_backend()
     if backend is None:
         yield {"type": "response", "content": _NOT_CONFIGURED_MSG}
         return
+
+    resolved_shadow = _resolve_shadow_mode(shadow_mode)
+    system_prompt = _build_system_prompt(resolved_shadow)
 
     clean_query, redacted = strip_pii_from_prompt(query)
     if redacted:
@@ -167,10 +199,14 @@ async def run_agent_with_tools(
         logging.getLogger(__name__).info("PII stripped from copilot query: types=%s", redacted)
 
     if backend.provider == "ollama":
-        async for event in _run_ollama_tool_loop(backend, clean_query, tenant_id, max_iterations):
+        async for event in _run_ollama_tool_loop(
+            backend, clean_query, tenant_id, max_iterations, system_prompt
+        ):
             yield event
     else:
-        async for event in _run_anthropic_tool_loop(backend, clean_query, tenant_id, max_iterations):
+        async for event in _run_anthropic_tool_loop(
+            backend, clean_query, tenant_id, max_iterations, system_prompt
+        ):
             yield event
 
 
