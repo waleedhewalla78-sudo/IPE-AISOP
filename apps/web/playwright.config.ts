@@ -32,8 +32,9 @@ export default defineConfig({
       webServer: {
         command: 'npm run dev',
         port: 8082,
-        // Prefer docker web-ui (or an already-running Vite) when port 8082 is taken.
-        reuseExistingServer: true,
+        // Stale docker web-ui may bake a broken nav filter; prefer a fresh Vite with release2 env.
+        // Set PLAYWRIGHT_REUSE_SERVER=1 to reuse docker/Vite already on 8082.
+        reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === '1',
         timeout: 120_000,
         env: {
           ...process.env,

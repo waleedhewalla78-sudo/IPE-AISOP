@@ -1,0 +1,35 @@
+﻿IPE Playwright R2 E2E Evidence
+Date: 2026-07-10 19:07:01
+Workspace: E:\AISOP\ipe\apps\web
+Host: Windows PowerShell
+
+## Config
+- playwright.config.ts: release2 project uses fresh Vite when PLAYWRIGHT_REUSE_SERVER!=1
+  (avoids stale docker web-ui nav filter fold to filter(e=>!0))
+- VITE_RELEASE_PROFILE=release2
+- VITE_API_BASE_URL=http://127.0.0.1:8000
+- Port 8082: docker-web-ui stopped for release2 run; restarted after
+
+## arabic-r2.spec.ts --project=desktop
+Command: npx playwright test e2e/arabic-r2.spec.ts --project=desktop
+Result: 4 passed (~23s)
+  ok sets RTL direction and persists locale
+  ok sidebar toggle switches locale and reloads
+  ok Arabic labels on 8+ screens
+  ok login page renders Arabic auth labels
+
+## release2-nav.spec.ts --project=release2
+Command: npx playwright test e2e/release2-nav.spec.ts --project=release2
+Result: 4 passed (~58s)
+  ok sidebar shows Copilot in release2
+  ok planning hub shows Demand and Scenarios tabs
+  ok navigates to demand and scenarios pages
+  ok hides POST-R2 hubs (supply chain, shop floor)
+
+## Fix applied (engineering)
+- Sidebar nav filter hardened via IS_CONSTRAINED_RELEASE / RELEASE_PROFILE string checks
+  so Vite cannot constant-fold to always-true (stale docker image had jn=Nn.filter(e=>!0)).
+- docker-web-ui-1 still needs rebuild to pick up filter; Vite path verified green.
+
+## G-R2-04 note
+Engineering E2E PASS. Native Arabic human sign-off remains OPEN (do not fake).

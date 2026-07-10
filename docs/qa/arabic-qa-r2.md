@@ -84,10 +84,25 @@
 ```powershell
 cd ipe/apps/web
 npx playwright test e2e/arabic-r2.spec.ts --project=desktop
+npx playwright test e2e/release2-nav.spec.ts --project=release2
 ```
 
-- [ ] E2E smoke PASS
-- [ ] No console errors on Arabic routes
+- [x] E2E smoke PASS — `arabic-r2.spec.ts` **4/4** (2026-07-10, Vite + Kong)
+- [x] release2-nav PASS — **4/4** (Copilot, Demand/Scenarios, POST-R2 hubs hidden)
+- [x] Evidence: `docs/qa/playwright-r2-e2e-2026-07-10.txt`
+- [ ] No console errors on Arabic routes (manual / native reviewer)
+
+### Engineering evidence (2026-07-10) — NOT human sign-off
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| RTL `dir` + locale persistence | PASS | Playwright desktop |
+| Language toggle reload | PASS | Playwright desktop |
+| Arabic labels on 8+ screens | PASS | Playwright desktop |
+| Login Arabic auth labels | PASS | Playwright desktop |
+| release2 nav profile | PASS | Fresh Vite `VITE_RELEASE_PROFILE=release2` |
+
+**G-R2-04 engineering**: PASS. **Native Arabic human sign-off**: still OPEN (PH1-05) — do not treat this section as reviewer acceptance.
 
 ---
 
@@ -95,8 +110,10 @@ npx playwright test e2e/arabic-r2.spec.ts --project=desktop
 
 | Role | Name | Date | Result |
 |------|------|------|--------|
-| Native Arabic reviewer | | | ☐ PASS / ☐ FAIL |
+| Native Arabic reviewer | _pending assignment_ | | ☐ PASS / ☐ FAIL |
 | QA lead | | | ☐ PASS / ☐ FAIL |
 | Product owner | | | ☐ PASS / ☐ FAIL |
 
-**Notes:**
+**Next action (human-blocked)**: Assign native Arabic reviewer; complete terminology + RTL layout rows above; sign Sign-off table. Engineering cannot close G-R2-04 formal PASS without this.
+
+**Notes:** Engineering E2E green 2026-07-10. Sidebar filter hardened for release2 constrained hubs.
