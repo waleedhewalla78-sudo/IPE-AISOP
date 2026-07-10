@@ -1,5 +1,5 @@
 _format_version: "3.0"
-_comment: "IPE Release 2 — R1 routes + nlp-svc, demand-svc, scenario-svc"
+_comment: "IPE Release 2 — R1 routes + nlp-svc, demand-svc, scenario-svc, mat-svc"
 
 plugins:
   - name: cors
@@ -138,6 +138,15 @@ services:
     routes:
       - name: r2-scenario
         paths: [/api/v1/scenario]
+        strip_path: false
+
+  - name: mat-svc
+    url: http://mat-svc:8002
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-material
+        paths: [/api/v1/material]
         strip_path: false
 
 consumers:
