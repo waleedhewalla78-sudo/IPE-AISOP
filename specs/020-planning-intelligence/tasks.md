@@ -17,6 +17,6 @@
 - [x] Copilot planning tools
 - [x] Docker + Kong wiring
 - [x] Frontend/i18n keys (minimal)
-- [x] Tests green (31/31) + finalize report
+- [x] Tests green (46/46) + finalize report
 - [ ] Apply migrations on live stack + release2 smoke (ops)
 - [ ] Tag v9.2.0 after smoke green
