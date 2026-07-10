@@ -7,7 +7,7 @@
 
 ## Executive summary
 
-All in-scope R2 planning intelligence modules from the Cursor prompt library (Prompts 1–9) and technical spec Modules A–F + Odoo extensions + Copilot + Docker/Kong are implemented as IPE-native engineering. Unit tests for core algorithms: **31/31 passed**.
+All in-scope R2 planning intelligence modules from the Cursor prompt library (Prompts 1–9) and technical spec Modules A–F + Odoo extensions + Copilot + Docker/Kong are implemented as IPE-native engineering. Unit tests for core algorithms: **46/46 passed**.
 
 ## Requirements matrix
 
@@ -56,7 +56,7 @@ Spec docs used 043–048; repo already had `043_odoo_config_versioning`. Applied
 
 ## Commits / push
 
-See git log after finalize push on `master`. Report path: this file.
+Pushed commit: `143d350010da585b28682374c417da9e011698ae` on `master`. Report path: this file.
 
 ## Remaining human-only items
 
