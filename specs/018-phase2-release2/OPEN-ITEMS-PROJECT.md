@@ -108,9 +108,11 @@
 | Item | Status | Needed action |
 |------|--------|---------------|
 | Alembic head on compose DB | **042** | Confirm whether 043 must apply; upgrade if yes |
-| Unpushed commits | **6** ahead of origin/master | `git push origin master` |
-| Uncommitted R2 tree | Large modified + untracked (018, compose, services, web, docs) | Stage safe paths; commit; exclude `.env`, `.venv`, secrets, kms test keys |
-| Tag `v9.1.0-r2` | Exists locally (prior annotated tag) | Verify `git ls-remote --tags origin v9.1.0-r2`; do not move tag; new finalize may need `v9.1.1-r2` if content diverged |
+| Unpushed commits | **PUSHED** 2026-07-10 (`4629119..04df574`) | None for this finalize commit |
+| Uncommitted R2 tree | Residual non-R2 dirty files remain | Optional cleanup; kms keys must stay uncommitted |
+| Tag `v9.1.0-r2` | Local only (commit `992b908` ≠ HEAD `04df574`); **not on origin** | Do **not** move/push old tag; after Arabic sign-off cut `v9.1.1-r2` on HEAD |
+| GH #27–#36, #39, #41 | **Closed** 2026-07-10 | — |
+| GH #37,#38,#40,#42–#46 | **Open** with defer comments | Implement or ARB CUT |
 | Tag `v9.4.0-p3` | Interim platform tag | Keep; not a substitute for R2 gate close |
 
 ### A8. Frontend / backend TODOs mapped to deliverables
