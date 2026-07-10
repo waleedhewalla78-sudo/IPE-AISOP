@@ -140,6 +140,87 @@ async def get_resolution_scenarios(mo_id: str, tenant_id: str) -> dict:
     )
 
 
+async def get_forecast_accuracy(tenant_id: str, lag: int = 3) -> dict:
+    """Current forecast accuracy (MAPE) across products."""
+    return await _planning_get(
+        f"{settings.DEMAND_SVC_URL}/api/v1/demand/error/mape",
+        tenant_id,
+        params={"lag": lag},
+    )
+
+
+async def get_forecast_bias(tenant_id: str, lag: int = 3) -> dict:
+    """Forecast bias — systematic over/under forecasting."""
+    return await _planning_get(
+        f"{settings.DEMAND_SVC_URL}/api/v1/demand/error/bias",
+        tenant_id,
+        params={"lag": lag},
+    )
+
+
+async def get_product_segments(tenant_id: str) -> dict:
+    """ABC/XYZ product segmentation matrix."""
+    return await _planning_get(
+        f"{settings.MAT_SVC_URL}/api/v1/material/segmentation/summary",
+        tenant_id,
+    )
+
+
+async def get_safety_stock_gaps(tenant_id: str) -> dict:
+    """Safety stock gaps — over/under stocked products."""
+    return await _planning_get(
+        f"{settings.MAT_SVC_URL}/api/v1/material/safety-stock/summary",
+        tenant_id,
+    )
+
+
+async def get_capacity_alerts(tenant_id: str) -> dict:
+    """Overloaded work centers above utilisation threshold."""
+    return await _planning_get(
+        f"{settings.CAP_SVC_URL}/api/v1/capacity/utilisation/alerts",
+        tenant_id,
+    )
+
+
+async def get_capacity_ranking(tenant_id: str, top_n: int = 5) -> dict:
+    """Most utilised work centers."""
+    return await _planning_get(
+        f"{settings.CAP_SVC_URL}/api/v1/capacity/utilisation/ranking",
+        tenant_id,
+        params={"top_n": top_n},
+    )
+
+
+async def get_sop_cycle_status(tenant_id: str) -> dict:
+    """Current S&OP cycle stage and deadlines."""
+    return await _planning_get(
+        f"{settings.SOP_SVC_URL}/api/v1/sop/cycle",
+        tenant_id,
+    )
+
+
+async def get_consensus_vs_plan(tenant_id: str) -> dict:
+    """Consensus demand vs plan / reconciliation dashboard."""
+    return await _planning_get(
+        f"{settings.SOP_SVC_URL}/api/v1/sop/reconciliation/dashboard",
+        tenant_id,
+    )
+
+
+async def compare_sop_versions(tenant_id: str, a: str | None = None, b: str | None = None) -> dict:
+    """Side-by-side S&OP version comparison."""
+    params: dict[str, str] = {}
+    if a:
+        params["a"] = a
+    if b:
+        params["b"] = b
+    return await _planning_get(
+        f"{settings.SOP_SVC_URL}/api/v1/sop/version/compare",
+        tenant_id,
+        params=params or None,
+    )
+
+
 async def analyze_quality_patterns(
     tenant_id: str,
     lookback_days: int = 30,
@@ -572,6 +653,76 @@ TOOL_DEFINITIONS = [
             "required": ["mo_id"],
         },
     },
+    {
+        "name": "get_forecast_accuracy",
+        "description": "Get forecast accuracy (MAPE/bias) across products for planning quality review.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "lag": {"type": "integer", "description": "Lag periods for error calculation (default 3)"},
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "get_forecast_bias",
+        "description": "Get forecast bias — whether forecasts are systematically high or low.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "lag": {"type": "integer", "description": "Lag periods (default 3)"},
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "get_product_segments",
+        "description": "Get ABC/XYZ product segmentation matrix with counts and revenue share.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_safety_stock_gaps",
+        "description": "Get safety stock gaps: total value, over-stocked and under-stocked products.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_capacity_alerts",
+        "description": "Get overloaded work centers at or above capacity utilisation threshold.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_capacity_ranking",
+        "description": "Get top most utilised work centers.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "top_n": {"type": "integer", "description": "Number of work centers (default 5)"},
+            },
+            "required": [],
+        },
+    },
+    {
+        "name": "get_sop_cycle_status",
+        "description": "Get current S&OP cycle stage, status, and deadlines.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_consensus_vs_plan",
+        "description": "Get consensus demand vs plan reconciliation dashboard (revenue gap, lost sales).",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "compare_sop_versions",
+        "description": "Compare two S&OP versions side by side (baseline vs upside/downside).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "a": {"type": "string", "description": "First version id"},
+                "b": {"type": "string", "description": "Second version id"},
+            },
+            "required": [],
+        },
+    },
 ]
 
 TOOL_HANDLERS = {
@@ -591,4 +742,13 @@ TOOL_HANDLERS = {
     "get_material_availability": get_material_availability,
     "get_sync_status": get_sync_status,
     "get_resolution_scenarios": get_resolution_scenarios,
+    "get_forecast_accuracy": get_forecast_accuracy,
+    "get_forecast_bias": get_forecast_bias,
+    "get_product_segments": get_product_segments,
+    "get_safety_stock_gaps": get_safety_stock_gaps,
+    "get_capacity_alerts": get_capacity_alerts,
+    "get_capacity_ranking": get_capacity_ranking,
+    "get_sop_cycle_status": get_sop_cycle_status,
+    "get_consensus_vs_plan": get_consensus_vs_plan,
+    "compare_sop_versions": compare_sop_versions,
 }

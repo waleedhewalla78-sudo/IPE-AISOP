@@ -91,18 +91,23 @@ async def _compute_live_forecast(
     tenant_id: str,
     product_id: UUID,
     days: int,
-) -> list[dict]:
+    *,
+    model: str,
+    segment: str | None = None,
+) -> tuple[list[dict], dict[str, object]]:
     history = await _history_for_product(session, tenant_id, product_id)
     if not history:
         history = [10.0, 12.0, 11.0, 13.0, 12.0]
-    points, model_version = forecast_with_factory(
+    points, model_version, metadata = forecast_with_factory(
         history,
         days,
-        model=settings.DEMAND_FORECAST_MODEL,
+        model=model,
+        segment=segment,
+        include_metadata=True,
     )
     start = datetime.now(UTC)
     dates = forecast_dates(start, days, horizon="short")
-    return [
+    forecasts = [
         _serialize_forecast_point(
             product_id=product_id,
             fdate=fdate,
@@ -112,6 +117,7 @@ async def _compute_live_forecast(
         )
         for point, fdate in zip(points, dates, strict=True)
     ]
+    return forecasts, metadata
 
 
 @router.get("/forecast")
@@ -119,6 +125,8 @@ async def get_forecast(
     product_id: UUID | None = Query(default=None),
     horizon: str = Query(default="short", pattern="^(short|medium)$"),
     days: int | None = Query(default=None, description="7, 14, or 30 day horizon"),
+    model: str = Query(default="ses", pattern="^(ses|arima|sarima|prophet|lstm|best_fit)$"),
+    segment: str | None = Query(default=None, min_length=2, max_length=2),
     session: AsyncSession = Depends(get_db_session),
     _user=Depends(require_roles(["planner", "admin", "manager", "executive"])),
 ):
@@ -126,10 +134,23 @@ async def get_forecast(
     horizon_days = _normalize_days(days)
 
     if product_id:
-        live = await _compute_live_forecast(session, tenant_id, product_id, horizon_days)
+        live, metadata = await _compute_live_forecast(
+            session,
+            tenant_id,
+            product_id,
+            horizon_days,
+            model=model,
+            segment=segment,
+        )
         return APIResponse(
             success=True,
-            data={"forecasts": live, "source": "cdm_demand_line", "horizon_days": horizon_days},
+            data={
+                "forecasts": live,
+                "source": "cdm_demand_line",
+                "horizon_days": horizon_days,
+                "model": model,
+                **metadata,
+            },
             error=None,
         )
 
@@ -150,14 +171,26 @@ async def get_forecast(
         )
         product_ids = [row[0] for row in pid_result.all()]
         live_all: list[dict] = []
+        selections: dict[str, dict[str, object]] = {}
         for pid in product_ids:
-            live_all.extend(await _compute_live_forecast(session, tenant_id, pid, horizon_days))
+            live, metadata = await _compute_live_forecast(
+                session,
+                tenant_id,
+                pid,
+                horizon_days,
+                model=model,
+                segment=segment,
+            )
+            live_all.extend(live)
+            selections[str(pid)] = metadata
         return APIResponse(
             success=True,
             data={
                 "forecasts": live_all,
                 "source": "cdm_demand_line",
                 "horizon_days": horizon_days,
+                "model": model,
+                "selections": selections,
             },
             error=None,
         )

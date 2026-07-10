@@ -1,39 +1,30 @@
 ﻿{
-  "feature_directory": "specs/019-program-converge",
-  "active_implementation": "specs/019-program-converge",
-  "active_plan": "specs/019-program-converge/tasks.md",
-  "readiness_score": 82,
-  "readiness_note": "019 program converge: mat-svc R2 + scenario promote + stock.quant mock; PH1 commercial + Arabic human still OPEN",
-  "release_target": "v9.1.1-r2-hold",
-  "phase": "019-program-converge",
+  "feature_directory": "specs/020-planning-intelligence",
+  "active_implementation": "specs/020-planning-intelligence",
+  "active_plan": "specs/020-planning-intelligence/tasks.md",
+  "readiness_score": 88,
+  "readiness_note": "020 planning intelligence: Modules A-F + Copilot + Kong eng done; mig 044-049; apply migrate + smoke; Odoo live = PH1-02",
+  "release_target": "v9.2.0",
+  "phase": "020-planning-intelligence",
   "prior_specs": [
     "005-ipe-program-status",
     "017-first-release-plan",
-    "018-phase2-release2"
+    "018-phase2-release2",
+    "019-program-converge"
   ],
   "constitution_version": "1.2.5",
-  "last_speckit_run": "2026-07-10-019-full-pipeline",
+  "last_speckit_run": "2026-07-11-020-planning-intelligence",
   "speckit_phases_complete": [
-    "constitution",
     "specify",
-    "clarify",
-    "analyze",
     "plan",
     "tasks",
-    "taskstoissues",
-    "implement",
-    "converge"
+    "implement"
   ],
   "commercial_blockers_open": [
     "PH1-01-SOW",
     "PH1-02-odoo-staging",
     "G-R2-04-arabic-native-signoff"
   ],
-  "github_issues": {
-    "closed_do_not_duplicate": "27-36,39,41",
-    "open_wave2_wave3": "37,38,40,42-46",
-    "mapping": "specs/019-program-converge/taskstoissues.md"
-  },
   "out_of_scope_products": [
     "nexus-social/docs/PRD-NEXUS-AUTHORITATIVE.md"
   ]

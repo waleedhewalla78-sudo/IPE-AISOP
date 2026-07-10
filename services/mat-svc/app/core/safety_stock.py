@@ -57,6 +57,89 @@ def _z_score(service_level: float) -> float:
     return SERVICE_LEVEL_Z.get(levels[-1], 1.65)
 
 
+def _z_score_ibp(service_level_pct: float) -> float:
+    """Convert a service level percentage to a z-score for IBP calculations."""
+    service_level = service_level_pct / 100 if service_level_pct > 1 else service_level_pct
+    service_level = min(max(service_level, 0.0), 0.999)
+    try:
+        from scipy.stats import norm
+
+        return float(norm.ppf(service_level))
+    except Exception:
+        return _z_score(service_level)
+
+
+def _sample_std(values: list[float], mean: float) -> float:
+    if len(values) <= 1:
+        return 0.0
+    variance = sum((value - mean) ** 2 for value in values) / (len(values) - 1)
+    return math.sqrt(max(0.0, variance))
+
+
+def calculate_safety_stock_ibp(
+    demand_series: list[float],
+    lead_time_days_series: list[float],
+    service_level_pct: float,
+    period_days: int = 7,
+) -> dict[str, Any]:
+    """Calculate safety stock using the SAP IBP-style independent component formula.
+
+    Formula:
+        SS = z * σ_d * sqrt(LT) + z * d_bar * σ_LT
+
+    Demand is assumed to be expressed per planning period. Lead times are supplied
+    in days and converted to planning periods using ``period_days``.
+    """
+    demand_values = [float(value or 0) for value in demand_series]
+    lead_time_days = [float(value or 0) for value in lead_time_days_series if value is not None]
+    if period_days <= 0:
+        raise ValueError("period_days must be greater than zero")
+    if not demand_values:
+        demand_values = [0.0]
+    if not lead_time_days:
+        lead_time_days = [14.0]
+
+    avg_demand = sum(demand_values) / len(demand_values)
+    demand_stddev = _sample_std(demand_values, avg_demand)
+    avg_lead_time_days = sum(lead_time_days) / len(lead_time_days)
+    lead_time_stddev_days = _sample_std(lead_time_days, avg_lead_time_days)
+    avg_lead_time_periods = avg_lead_time_days / period_days
+    lead_time_stddev_periods = lead_time_stddev_days / period_days
+    z = _z_score_ibp(service_level_pct)
+
+    demand_component = z * demand_stddev * math.sqrt(max(avg_lead_time_periods, 0.0))
+    lead_time_component = z * avg_demand * lead_time_stddev_periods
+    safety_stock = demand_component + lead_time_component
+    reorder_point = (avg_demand * avg_lead_time_periods) + safety_stock
+
+    demand_cv = demand_stddev / avg_demand if avg_demand else 0.0
+    lead_time_cv = lead_time_stddev_days / avg_lead_time_days if avg_lead_time_days else 0.0
+    service_level = service_level_pct / 100 if service_level_pct > 1 else service_level_pct
+
+    return {
+        "safety_stock_qty": round(safety_stock, 2),
+        "reorder_point": round(reorder_point, 2),
+        "z_score": round(z, 4),
+        "service_level": round(service_level, 4),
+        "service_level_pct": round(service_level * 100, 2),
+        "components": {
+            "demand_component": round(demand_component, 4),
+            "lead_time_component": round(lead_time_component, 4),
+        },
+        "inputs": {
+            "avg_demand_per_period": round(avg_demand, 4),
+            "demand_stddev": round(demand_stddev, 4),
+            "demand_cv": round(demand_cv, 4),
+            "avg_lead_time_days": round(avg_lead_time_days, 4),
+            "avg_lead_time_periods": round(avg_lead_time_periods, 4),
+            "lead_time_stddev_days": round(lead_time_stddev_days, 4),
+            "lead_time_stddev_periods": round(lead_time_stddev_periods, 4),
+            "lead_time_cv": round(lead_time_cv, 4),
+            "period_days": period_days,
+        },
+    }
+
+
 def calculate_safety_stock(
     avg_daily_demand: float,
     demand_std_dev: float,

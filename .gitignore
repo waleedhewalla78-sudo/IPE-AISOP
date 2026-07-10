@@ -39,9 +39,10 @@ docker-compose.override.yml
 *.tfstate.backup
 *.tfvars
 
-# ML artifacts
+# ML artifacts (top-level / path-scoped — do NOT ignore ipe_shared CDM models)
 mlruns/
-models/
+/models/
+**/mlruns/
 *.pkl
 *.joblib
 

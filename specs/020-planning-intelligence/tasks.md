@@ -1,0 +1,22 @@
+# Tasks — 020 Planning Intelligence
+
+- [x] Archive source docs to `docs/planning/`
+- [x] Migration 044 product segmentation
+- [x] Module B ABC/XYZ engine + API + tests
+- [x] Migration 045 forecast quality
+- [x] Module A forecast quality engine + API + tests
+- [x] Module D ARIMA/SARIMA + best-fit
+- [x] Migration 046 connector extensions
+- [x] Lead time mapper + product cost fields
+- [x] Migration 047 safety stock
+- [x] Module C safety stock service + API + tests
+- [x] Migration 048 capacity alerts
+- [x] Module E utilisation calculator + API + tests
+- [x] Migration 049 sop engine
+- [x] Module F sop-svc full service
+- [x] Copilot planning tools
+- [x] Docker + Kong wiring
+- [x] Frontend/i18n keys (minimal)
+- [x] Tests green (31/31) + finalize report
+- [ ] Apply migrations on live stack + release2 smoke (ops)
+- [ ] Tag v9.2.0 after smoke green

@@ -148,6 +148,42 @@ services:
       - name: r2-material
         paths: [/api/v1/material]
         strip_path: false
+      - name: r2-segmentation
+        paths: [/api/v1/material/segmentation]
+        strip_path: false
+      - name: r2-safety-stock
+        paths: [/api/v1/material/safety-stock]
+        strip_path: false
+
+  - name: cap-svc-planning
+    url: http://cap-svc:8003
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-utilisation
+        paths: [/api/v1/capacity/utilisation]
+        strip_path: false
+
+  - name: demand-svc-planning
+    url: http://demand-svc:8040
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-forecast-quality
+        paths: [/api/v1/demand/forecast-quality]
+        strip_path: false
+
+  - name: sop-svc
+    url: http://sop-svc:8110
+    connect_timeout: 30000
+    read_timeout: 60000
+    write_timeout: 60000
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-sop
+        paths: [/api/v1/sop]
+        strip_path: false
 
 consumers:
   - username: tenant-aaa-111

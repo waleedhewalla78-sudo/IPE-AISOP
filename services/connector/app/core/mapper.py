@@ -37,6 +37,8 @@ ODOO_TO_CDM_PRODUCT = {
     }.get(v, "manufactured")),
     "uom_id": ("uom", lambda v: v[1] if isinstance(v, (list, tuple)) else str(v)),
     "standard_price": ("standard_cost", lambda v: float(v) if v else 0),
+    "list_price": ("list_price", lambda v: float(v) if v else None),
+    "weight": ("weight", lambda v: float(v) if v else None),
     "qty_available": ("qty_available", lambda v: float(v) if v else 0),
 }
 
@@ -44,6 +46,7 @@ ODOO_TO_CDM_DEMAND = {
     "id": ("erp_source_id", lambda v: str(v)),
     "product_id": ("product_erp_id", lambda v: str(v[0]) if isinstance(v, (list, tuple)) else str(v)),
     "product_uom_qty": ("quantity", lambda v: float(v)),
+    "price_subtotal": ("revenue", lambda v: float(v) if v not in (None, False) else None),
     "scheduled_date": ("required_date", parse_odoo_datetime),
     "order_partner_id": ("customer_erp_id", lambda v: str(v[0]) if isinstance(v, (list, tuple)) else str(v) if v else None),
     "state": ("status", lambda v: v),

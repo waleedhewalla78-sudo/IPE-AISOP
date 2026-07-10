@@ -324,5 +324,12 @@
   "otd.chaosSummary": "Cost of chaos",
   "otd.exportPdf": "Export PDF",
   "otd.retry": "Retry",
+  "planning.intelligence.title": "Planning Intelligence",
+  "planning.segmentation": "ABC/XYZ Segmentation",
+  "planning.forecastQuality": "Forecast Quality",
+  "planning.safetyStock": "Safety Stock",
+  "planning.capacityAlerts": "Capacity Alerts",
+  "planning.sopCycle": "S&OP Cycle",
+  "planning.consensus": "Consensus Demand",
   "alert.dataQuality": "Data quality issue"
 }

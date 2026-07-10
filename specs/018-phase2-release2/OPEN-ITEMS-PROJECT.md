@@ -23,6 +23,7 @@
 | Spec 017 First release plan | Wave 1 eng ✅; C-08–C-16 + PH1-* still open | See A2; push commits; commercial PH1; stock.quant / mat-svc compose |
 | Spec 018 Phase 2 Release 2 | Engineering ~90%; gates mostly PASS | See **Section B**; human Arabic + tag HOLD |
 | Spec 019 `program-converge` | mat-svc + promote + stock.quant mock done | #47–#49 closed; #51 closed; #50 human-open |
+| Spec 020 `planning-intelligence` | **ENG DONE 2026-07-11** — Modules A–F + Copilot + Kong | Apply mig 044–049; smoke sop-svc; Odoo E2E = PH1-02; see `docs/qa/PLANNING-INTELLIGENCE-FINALIZE-REPORT.md` |
 
 ### A2. Spec 017 converge carry-over (still open)
 

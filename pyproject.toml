@@ -22,6 +22,7 @@ members = [
     "services/network-svc",
     "services/demand-svc",
     "services/scenario-svc",
+    "services/sop-svc",
     "services/supply-svc",
     "services/order-svc",
     "services/equipment-svc",

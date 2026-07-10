@@ -6,6 +6,7 @@ dependencies = [
     "fastavro>=1.12.2",
     "ipe-shared>=0.1.0",
     "mlflow>=2.14.0",
+    "scipy>=1.11",
 ]
 
 [tool.pytest.ini_options]

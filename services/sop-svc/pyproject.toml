@@ -1,0 +1,21 @@
+[project]
+name = "ipe-sop-svc"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "ipe-shared>=0.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.uv.sources]
+ipe-shared = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.0",
+    "pytest-asyncio>=1.4.0",
+]

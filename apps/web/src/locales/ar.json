@@ -324,5 +324,12 @@
   "otd.chaosSummary": "تكلفة الفوضى",
   "otd.exportPdf": "تصدير PDF",
   "otd.retry": "إعادة المحاولة",
+  "planning.intelligence.title": "ذكاء التخطيط",
+  "planning.segmentation": "تصنيف ABC/XYZ",
+  "planning.forecastQuality": "جودة التوقع",
+  "planning.safetyStock": "مخزون الأمان",
+  "planning.capacityAlerts": "تنبيهات الطاقة الإنتاجية",
+  "planning.sopCycle": "دورة S&OP",
+  "planning.consensus": "طلب الإجماع",
   "alert.dataQuality": "مشكلة جودة البيانات"
 }

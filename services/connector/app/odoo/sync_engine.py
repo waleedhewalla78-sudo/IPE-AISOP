@@ -108,6 +108,7 @@ class OdooSyncEngine:
             counts["manufacturing_orders"] = await self.sync_manufacturing_orders()
             counts["demands"] = await self.sync_demands()
             counts["supply"] = await self.sync_supply()
+            counts["lead_times"] = await self.sync_lead_times()
 
             has_errors = any(
                 isinstance(v, dict) and v.get("errors", 0) > 0 for v in counts.values()
@@ -204,6 +205,12 @@ class OdooSyncEngine:
                 existing.name = mapped.get("name") or existing.name
                 existing.internal_ref = mapped.get("internal_ref") or existing.internal_ref
                 existing.standard_cost = mapped.get("standard_cost")
+                if mapped.get("list_price") is not None and hasattr(existing, "list_price"):
+                    existing.list_price = mapped.get("list_price")
+                if mapped.get("standard_cost") is not None and hasattr(existing, "unit_cost"):
+                    existing.unit_cost = mapped.get("standard_cost")
+                if mapped.get("weight") is not None and hasattr(existing, "weight"):
+                    existing.weight = mapped.get("weight")
                 if mapped.get("qty_available") is not None:
                     existing.safety_stock = mapped.get("qty_available")
                 existing.updated_at = datetime.now(UTC)
@@ -220,6 +227,9 @@ class OdooSyncEngine:
                     source_type=mapped.get("source_type") or "manufactured",
                     uom=mapped.get("uom") or "unit",
                     standard_cost=mapped.get("standard_cost"),
+                    unit_cost=mapped.get("standard_cost"),
+                    list_price=mapped.get("list_price"),
+                    weight=mapped.get("weight"),
                     safety_stock=mapped.get("qty_available") or 0,
                 ))
                 product_count += 1
@@ -227,6 +237,20 @@ class OdooSyncEngine:
         await self.session.flush()
         self._product_cache.clear()
         return self._finish_odoo_to_ipe("products", {"synced": synced, "updated": updated, "total": len(records), "errors": 0})
+
+    async def sync_lead_times(self) -> dict[str, Any]:
+        """Daily-oriented sync of PO receipt lead times into cdm_lead_time_history."""
+        from app.odoo.mappers.lead_time_mapper import LeadTimeMapper
+
+        try:
+            mapper = LeadTimeMapper(self.client, self.tenant_id, self.session)
+            result = await mapper.sync()
+            return self._finish_odoo_to_ipe("lead_times", result)
+        except Exception as e:
+            logger.error("Lead time sync failed: %s", e)
+            return self._finish_odoo_to_ipe(
+                "lead_times", {"synced": 0, "skipped": 0, "errors": 1, "error": str(e)}
+            )
 
     async def sync_inventory(self) -> dict[str, Any]:
         """Sync stock.quant levels into product.safety_stock (available qty proxy for R1)."""

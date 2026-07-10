@@ -1,11 +1,14 @@
-"""Forecasting strategy factory — SES, Prophet, LSTM with graceful fallbacks."""
+"""Forecasting strategy factory — SES, ARIMA, Prophet, LSTM with graceful fallbacks."""
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import overload
 from statistics import pstdev
 
 from app.core.forecaster import forecast_series as ses_forecast_series, simple_exponential_smoothing
+from app.core.forecasters.arima_forecaster import ARIMAForecaster, SARIMAForecaster
+from app.core.forecasters.model_selector import BestFitSelector
 
 
 class BaseForecaster(ABC):
@@ -108,11 +111,38 @@ class LstmForecaster(BaseForecaster):
 
 def select_forecaster(history: list[float], *, model: str = "ses") -> tuple[BaseForecaster, str]:
     """SES-first per Spec 017; Prophet/LSTM only when explicitly requested."""
-    if model == "lstm" and len(history) > 365:
+    normalized = model.lower()
+    if normalized == "arima" and len(history) >= 10:
+        return ARIMAForecaster(), "arima-v1"  # type: ignore[return-value]
+    if normalized == "sarima" and len(history) >= 10:
+        return SARIMAForecaster(), "sarima-v1"  # type: ignore[return-value]
+    if normalized == "lstm" and len(history) > 365:
         return LstmForecaster(), "lstm-v1"
-    if model == "prophet" and len(history) >= 30:
+    if normalized == "prophet" and len(history) >= 30:
         return ProphetForecaster(), "prophet-v1"
     return SesForecaster(), "ses-v1"
+
+
+@overload
+def forecast_with_factory(
+    history: list[float],
+    periods: int,
+    *,
+    model: str = "ses",
+    segment: str | None = None,
+    include_metadata: bool = False,
+) -> tuple[list[dict[str, float]], str]: ...
+
+
+@overload
+def forecast_with_factory(
+    history: list[float],
+    periods: int,
+    *,
+    model: str = "ses",
+    segment: str | None = None,
+    include_metadata: bool = True,
+) -> tuple[list[dict[str, float]], str, dict[str, object]]: ...
 
 
 def forecast_with_factory(
@@ -120,9 +150,39 @@ def forecast_with_factory(
     periods: int,
     *,
     model: str = "ses",
-) -> tuple[list[dict[str, float]], str]:
-    forecaster, version = select_forecaster(history, model=model)
+    segment: str | None = None,
+    include_metadata: bool = False,
+):
+    normalized = model.lower()
+    if normalized == "best_fit":
+        try:
+            result = BestFitSelector().select_and_forecast(history, periods, segment=segment)
+            metadata: dict[str, object] = {
+                "selected_model": result.selected_model,
+                "validation_mape": result.validation_mape,
+                "intermittent": result.intermittent,
+                "candidates": result.candidates,
+            }
+            if include_metadata:
+                return result.points, result.version, metadata
+            return result.points, result.version
+        except Exception:
+            points = SesForecaster().predict(history, periods)
+            metadata = {"selected_model": "ses", "validation_mape": None, "intermittent": False, "candidates": ["ses"]}
+            if include_metadata:
+                return points, "best-fit:ses-v1", metadata
+            return points, "best-fit:ses-v1"
+
+    forecaster, version = select_forecaster(history, model=normalized)
     try:
-        return forecaster.predict(history, periods), version
+        points = forecaster.predict(history, periods)
+        metadata = {"selected_model": version.removesuffix("-v1"), "validation_mape": None}
+        if include_metadata:
+            return points, version, metadata
+        return points, version
     except Exception:
-        return SesForecaster().predict(history, periods), "ses-v1"
+        points = SesForecaster().predict(history, periods)
+        metadata = {"selected_model": "ses", "validation_mape": None}
+        if include_metadata:
+            return points, "ses-v1", metadata
+        return points, "ses-v1"

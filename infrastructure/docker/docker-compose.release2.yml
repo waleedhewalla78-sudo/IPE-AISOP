@@ -249,6 +249,8 @@ services:
       CAP_SVC_URL: http://cap-svc:8003
       FEA_SVC_URL: http://fea-svc:8004
       CONNECTOR_SVC_URL: http://connector:8009
+      SOP_SVC_URL: http://sop-svc:8110
+      DEMAND_SVC_URL: http://demand-svc:8040
     volumes: *jwt-public-volume
     depends_on:
       db:
@@ -327,6 +329,38 @@ services:
       retries: 5
       start_period: 15s
 
+  sop-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/sop-svc/Dockerfile
+    ports:
+      - "8110:8110"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      REDIS_URL: redis://redis:6379/0
+      IPE_RELEASE_PROFILE: release2
+      IPE_KAFKA_BOOTSTRAP_SERVERS: ""
+      IPE_OTEL_TRACING_ENABLED: "false"
+      AUTH_MODE: local
+      AUTH_PROVIDER: local
+      DEMAND_SVC_URL: http://demand-svc:8040
+      MAT_SVC_URL: http://mat-svc:8002
+      CAP_SVC_URL: http://cap-svc:8003
+    volumes: *jwt-public-volume
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8110/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   kong:
     image: kong:3.7
     environment:
@@ -365,6 +399,8 @@ services:
       demand-svc:
         condition: service_healthy
       scenario-svc:
+        condition: service_healthy
+      sop-svc:
         condition: service_healthy
 
   web-ui:
