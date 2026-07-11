@@ -2,7 +2,7 @@
 
 **Workspace**: `E:\AISOP\ipe`  
 **Generated**: 2026-07-10 (live-verified: `gh`, `git`, `docker`, `kubectl`, specs)  
-**Updated**: 2026-07-11 — Sprint 1 Engineering Closure (v9.2.0-planning tag closure)  
+**Updated**: 2026-07-11 — Spec 022 Sprint 3 go-live (Sprint 2 GTM complete; Spec 021 closed)  
 **Purpose**: Durable inventory of everything still not closed, with needed action per point.
 
 ---
@@ -25,7 +25,8 @@
 | Spec 018 Phase 2 Release 2 | Engineering ~90%; gates mostly PASS | See **Section B**; human Arabic + tag HOLD |
 | Spec 019 `program-converge` | **DONE** — mat-svc + promote + stock.quant mock done | #47–#49 closed; #51 closed; #50 human-open |
 | Spec 020 `planning-intelligence` | **RESOLVED (v9.2.0-planning)** — Modules A–F + Copilot + Kong; mig 044–049 applied; 70+ tests green; UAT-10/11 code-fixed | Odoo live E2E = PH1-02 (commercial); unit tests 22/22 PASS |
-| Spec 021 `release-closure` | **RESOLVED (v9.2.0-planning)** — UAT-10/11 fixed + verified; all timeout fixes confirmed; CHANGELOG/PRODUCT-STATUS/deploy package delivered | Star Trans deployment package in `deploy/star-trans/` |
+| Spec 021 `release-closure` | **DONE** — UAT-10/11 fixed; tag `v9.2.0-planning` @ `b04434d`; GH #52–#55 closed | Deploy package in `deploy/star-trans/` |
+| Spec 022 `sprint3-golive` | **ACTIVE** — deploy dry-run, validate script hardened (14 PASS / 3 FAIL empty-queue+writeback / 1 SKIP live Odoo), status honesty | COM: OQ-7, OQ-1, PH1-02, G-R2-04 remain OPEN (#50) |
 
 ### A2. Spec 017 converge carry-over (still open)
 

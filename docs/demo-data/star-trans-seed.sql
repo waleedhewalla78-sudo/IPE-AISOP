@@ -1,6 +1,9 @@
 -- ============================================
 -- IPE Star Trans Demo Data Seed
 -- Egyptian electrical transformer manufacturer
+-- POLICY (OQ-2): NON-PRODUCTION ONLY.
+--   Production MUST set DEMO_SEED_ENABLED=false and use live Odoo sync.
+--   Do NOT apply this overlay to customer production databases.
 -- Run after migrations:
 --   docker compose exec -T db psql -U ipe -d ipe < star-trans-seed.sql
 -- Or (PowerShell from repo root):

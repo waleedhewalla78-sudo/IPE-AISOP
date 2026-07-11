@@ -1,5 +1,7 @@
 # IPE Project Progress
 
+> **Current (2026-07-11):** Constitution **1.2.7** · Active Speckit **`specs/022-sprint3-golive`** · Tag **`v9.2.0-planning`** applied · Sprint 2 GTM complete · Commercial blockers OQ-7 / OQ-1 / PH1-02 / G-R2-04 remain OPEN. See `PRODUCT-STATUS.md`.
+
 ## Phase 0: Foundation (COMPLETE)
 
 ### Done

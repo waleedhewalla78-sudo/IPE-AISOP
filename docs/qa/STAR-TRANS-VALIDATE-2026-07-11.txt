@@ -1,0 +1,15 @@
+﻿IPE Star Trans Deployment Validation — Spec 022 T004
+Date: 2026-07-11
+Command: scripts/star-trans-validate.ps1 -DpePort 8020 -ConnectorPort 8016
+Stack: infrastructure/docker/docker-compose.release2.yml
+
+SUMMARY
+  Total checks:  18
+  PASS:  14   FAIL:  3   SKIP:  1
+  OVERALL: FAILED (3 residual items — not commercial closures)
+
+PASS highlights: dpe/mat/cap/fea/connector/kong health; PostgreSQL; alembic head=049; RLS 83 CDM tables; Web UI 200; Arabic 333 keys; JWT login
+FAIL: Feasibility queue empty; Last sync status unknown; Write-back activate 404
+SKIP: Odoo test-connection (PH1-02 live staging OPEN — not faked)
+
+Script fixes this run: PS 5.1 encoding, host port params, repo-root Arabic paths, auto-detect POSTGRES_DB (ipe_test).

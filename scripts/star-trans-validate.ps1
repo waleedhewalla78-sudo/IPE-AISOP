@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
   IPE Star Trans Deployment Validation Script
@@ -46,8 +46,33 @@ param(
     [string]$TenantId    = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
     [string]$Email       = "Ahmed@nour",
     [string]$Password    = "admin",
-    [string]$WebRoot     = "apps/web/src"
+    [string]$WebRoot     = "",
+    # Host ports (star-trans defaults). R2 compose often maps dpe->8020, connector->8016.
+    [int]$DpePort        = 8001,
+    [int]$MatPort        = 8002,
+    [int]$CapPort        = 8003,
+    [int]$FeaPort        = 8004,
+    [int]$ConnectorPort  = 8009,
+    [int]$KongPort       = 8000,
+    [string]$DbUser      = "ipe",
+    [string]$DbName      = ""
 )
+
+# Resolve repo root (ipe/) so relative paths work when invoked from any cwd
+$script:RepoRoot = Split-Path $PSScriptRoot -Parent
+if (-not (Test-Path (Join-Path $script:RepoRoot "apps\web"))) {
+    Write-Warning "Could not locate apps/web under $script:RepoRoot - Arabic path checks may FAIL"
+}
+if ([string]::IsNullOrWhiteSpace($WebRoot)) {
+    $WebRoot = Join-Path $script:RepoRoot "apps\web\src"
+} elseif (-not [System.IO.Path]::IsPathRooted($WebRoot)) {
+    $WebRoot = Join-Path $script:RepoRoot $WebRoot
+}
+# Auto-detect DB name from running compose when not provided (release2 often uses ipe_test)
+if ([string]::IsNullOrWhiteSpace($DbName)) {
+    $dbEnv = (& docker compose exec -T db printenv POSTGRES_DB 2>$null | Out-String).Trim()
+    if ($dbEnv) { $DbName = $dbEnv } else { $DbName = "ipe" }
+}
 
 $ErrorActionPreference = "Continue"
 $script:pass = 0
@@ -64,19 +89,19 @@ function Write-Header([string]$Title) {
 }
 
 function Write-Pass([string]$Name, [string]$Detail = "") {
-    $msg = if ($Detail) { "  [PASS] $Name — $Detail" } else { "  [PASS] $Name" }
+    $msg = if ($Detail) { "  [PASS] $Name  -  $Detail" } else { "  [PASS] $Name" }
     Write-Host $msg -ForegroundColor Green
     $script:pass++
 }
 
 function Write-Fail([string]$Name, [string]$Detail = "") {
-    $msg = if ($Detail) { "  [FAIL] $Name — $Detail" } else { "  [FAIL] $Name" }
+    $msg = if ($Detail) { "  [FAIL] $Name  -  $Detail" } else { "  [FAIL] $Name" }
     Write-Host $msg -ForegroundColor Red
     $script:fail++
 }
 
 function Write-Skip([string]$Name, [string]$Reason = "") {
-    $msg = if ($Reason) { "  [SKIP] $Name — $Reason" } else { "  [SKIP] $Name" }
+    $msg = if ($Reason) { "  [SKIP] $Name  -  $Reason" } else { "  [SKIP] $Name" }
     Write-Host $msg -ForegroundColor DarkYellow
     $script:skip++
 }
@@ -126,27 +151,37 @@ Write-Host "  Started:      $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Write-Header "1. Service Health Checks"
 
 $services = @(
-    @{ Name = "dpe-svc (Data Processing)"; Port = 8001 },
-    @{ Name = "mat-svc (Material)";         Port = 8002 },
-    @{ Name = "cap-svc (Capacity)";         Port = 8003 },
-    @{ Name = "fea-svc (Feasibility)";      Port = 8004 },
-    @{ Name = "connector (Odoo)";           Port = 8009 },
-    @{ Name = "kong (API Gateway)";         Port = 8000 }
+    @{ Name = "dpe-svc (Data Processing)"; Port = $DpePort },
+    @{ Name = "mat-svc (Material)";         Port = $MatPort },
+    @{ Name = "cap-svc (Capacity)";         Port = $CapPort },
+    @{ Name = "fea-svc (Feasibility)";      Port = $FeaPort },
+    @{ Name = "connector (Odoo)";           Port = $ConnectorPort },
+    @{ Name = "kong (API Gateway)";         Port = $KongPort }
 )
 
 foreach ($svc in $services) {
-    $url = "http://localhost:$($svc.Port)/healthz"
-    $resp = Invoke-SafeRest -Uri $url -TimeoutSec 5
-    if ($null -ne $resp) {
-        Write-Pass $svc.Name "port $($svc.Port) responding"
-    } else {
-        # Try /health as fallback
-        $resp2 = Invoke-SafeRest -Uri "http://localhost:$($svc.Port)/health" -TimeoutSec 5
-        if ($null -ne $resp2) {
-            Write-Pass $svc.Name "port $($svc.Port) responding (/health endpoint)"
-        } else {
-            Write-Fail $svc.Name "port $($svc.Port) not reachable — check: docker compose ps"
+    $paths = @("/health", "/healthz", "/api/v1/health", "/ready")
+    $ok = $false
+    $used = ""
+    foreach ($path in $paths) {
+        $resp = Invoke-SafeRest -Uri "http://localhost:$($svc.Port)$path" -TimeoutSec 3
+        if ($null -ne $resp) {
+            $ok = $true
+            $used = $path
+            break
         }
+        # Kong may return JSON via Invoke-WebRequest even when RestMethod quirks
+        $web = Invoke-SafeWeb -Uri "http://localhost:$($svc.Port)$path" -TimeoutSec 3
+        if ($null -ne $web -and [int]$web.StatusCode -ge 200 -and [int]$web.StatusCode -lt 500) {
+            $ok = $true
+            $used = "$path HTTP $($web.StatusCode)"
+            break
+        }
+    }
+    if ($ok) {
+        Write-Pass $svc.Name "port $($svc.Port) responding ($used)"
+    } else {
+        Write-Fail $svc.Name "port $($svc.Port) not reachable - check: docker compose ps (R2 may remap ports; pass -DpePort/-ConnectorPort)"
     }
 }
 
@@ -154,28 +189,33 @@ foreach ($svc in $services) {
 
 Write-Header "2. Database Health"
 
-$pgReady = & docker compose exec -T db pg_isready -U ipe 2>&1
+$pgReady = & docker compose exec -T db pg_isready -U $DbUser 2>&1
 if ($LASTEXITCODE -eq 0) {
-    Write-Pass "PostgreSQL responding" "pg_isready exit 0"
+    Write-Pass "PostgreSQL responding" "pg_isready exit 0 (db=$DbName)"
 } else {
-    Write-Fail "PostgreSQL responding" "pg_isready failed — check: docker compose logs db"
+    Write-Fail "PostgreSQL responding" "pg_isready failed - check: docker compose logs db"
 }
-
-# ─── Check 3: Migrations at Head ─────────────────────────────────────────
 
 Write-Header "3. Database Migrations"
 
-$alembicVer = & docker compose exec -T db psql -U ipe -t -c "SELECT version_num FROM alembic_version ORDER BY version_num DESC LIMIT 1;" 2>&1
-if ($LASTEXITCODE -eq 0 -and $alembicVer -and $alembicVer.Trim().Length -gt 0) {
-    $ver = $alembicVer.Trim()
-    Write-Pass "Alembic migration version found" "head = $ver"
-} else {
-    Write-Fail "Alembic migration version" "Could not read alembic_version — run: docker compose exec dpe-svc uv run alembic upgrade head"
+function Get-PsqlScalar([string]$Sql) {
+    $raw = & docker compose exec -T db psql -U $DbUser -d $DbName -t -A -c $Sql 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { return $null }
+    $line = ($raw -split "`r?`n" | Where-Object { $_.Trim() -ne "" -and $_ -notmatch "(?i)WARNING|FATAL|error:" } | Select-Object -First 1)
+    if ($null -eq $line) { return $null }
+    return $line.Trim()
 }
 
-# Verify migration count (R1 should have 49+ migrations)
-$migCountRaw = & docker compose exec -T db psql -U ipe -t -c "SELECT COUNT(*) FROM alembic_version;" 2>&1
-$migCount = if ($migCountRaw -match '\d+') { [int]$Matches[0] } else { 0 }
+$alembicVer = Get-PsqlScalar "SELECT version_num FROM alembic_version ORDER BY version_num DESC LIMIT 1;"
+if ($alembicVer) {
+    Write-Pass "Alembic migration version found" "head = $alembicVer"
+} else {
+    Write-Fail "Alembic migration version" "Could not read alembic_version - run: docker compose exec dpe-svc uv run alembic upgrade head"
+}
+
+$migCountRaw = Get-PsqlScalar "SELECT COUNT(*) FROM alembic_version;"
+$migCount = 0
+if ($migCountRaw -match '^(\d+)$') { $migCount = [int]$Matches[1] }
 if ($migCount -ge 1) {
     Write-Pass "Migration table exists" "$migCount version(s) tracked"
 } else {
@@ -186,14 +226,14 @@ if ($migCount -ge 1) {
 
 Write-Header "4. Row-Level Security (RLS)"
 
-$rlsQuery = "SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE 'cdm_%' AND rowsecurity = true;"
-$rlsCountRaw = & docker compose exec -T db psql -U ipe -t -c $rlsQuery 2>&1
-$rlsCount = if ($rlsCountRaw -match '\d+') { [int]$Matches[0] } else { 0 }
+$rlsCountRaw = Get-PsqlScalar "SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE 'cdm_%' AND rowsecurity = true;"
+$rlsCount = 0
+if ($rlsCountRaw -match '^(\d+)$') { $rlsCount = [int]$Matches[1] }
 
 if ($rlsCount -gt 0) {
     Write-Pass "RLS enabled on CDM tables" "$rlsCount cdm_* tables have rowsecurity=true"
 } else {
-    Write-Fail "RLS enabled on CDM tables" "No CDM tables found with RLS enabled — run migration 015"
+    Write-Fail "RLS enabled on CDM tables" "No CDM tables found with RLS enabled  -  run migration 015"
 }
 
 # ─── Check 5: Web UI Accessibility ───────────────────────────────────────
@@ -213,10 +253,11 @@ if ($null -ne $webResp -and $webResp.StatusCode -eq 200) {
 Write-Header "6. Arabic i18n"
 
 $arJsonPaths = @(
-    "$WebRoot/i18n/ar.json",
-    "$WebRoot/locales/ar.json",
-    "apps/web/public/locales/ar/translation.json",
-    "apps/web/src/i18n/ar.json"
+    (Join-Path $WebRoot "i18n\ar.json"),
+    (Join-Path $WebRoot "locales\ar.json"),
+    (Join-Path $script:RepoRoot "apps\web\src\locales\ar.json"),
+    (Join-Path $script:RepoRoot "apps\web\public\locales\ar\translation.json"),
+    (Join-Path $script:RepoRoot "apps\web\src\i18n\ar.json")
 )
 
 $arJsonFound = $false
@@ -235,15 +276,15 @@ if ($arJsonFound) {
         $content = Get-Content $arJsonPath -Raw
         $keyCount = ([regex]::Matches($content, '":(?:\s*)"')).Count
         if ($keyCount -lt 10) {
-            # Try counting differently — "key": pattern
+            # Try counting differently  -  "key": pattern
             $keyCount = ([regex]::Matches($content, '"[^"]+"\s*:')).Count
         }
         if ($keyCount -ge 250) {
-            Write-Pass "Arabic key count sufficient" "$keyCount keys (≥250 required)"
+            Write-Pass "Arabic key count sufficient" "$keyCount keys (>=250 required)"
         } elseif ($keyCount -ge 50) {
-            Write-Fail "Arabic key count sufficient" "$keyCount keys (≥250 required — partial translation, may cause UI gaps)"
+            Write-Fail "Arabic key count sufficient" "$keyCount keys (>=250 required  -  partial translation, may cause UI gaps)"
         } else {
-            Write-Fail "Arabic key count sufficient" "$keyCount keys (≥250 required — ar.json may be empty or malformed)"
+            Write-Fail "Arabic key count sufficient" "$keyCount keys (>=250 required  -  ar.json may be empty or malformed)"
         }
     } catch {
         Write-Fail "Arabic key count sufficient" "Could not parse ar.json: $($_.Exception.Message)"
@@ -267,12 +308,12 @@ if ($null -ne $loginResp -and $loginResp.data.access_token) {
     $script:token = $loginResp.data.access_token
     Write-Pass "Login successful" "JWT token obtained"
 } else {
-    Write-Fail "Login successful" "POST /api/v1/auth/login failed — check credentials"
+    Write-Fail "Login successful" "POST /api/v1/auth/login failed  -  check credentials"
 }
 
 # ─── Check 8: Feasibility Queue (API data flow) ───────────────────────────
 
-Write-Header "8. Data Flow — Feasibility Queue"
+Write-Header "8. Data Flow  -  Feasibility Queue"
 
 if ($script:token) {
     $authHeaders = @{
@@ -286,7 +327,7 @@ if ($script:token) {
         if ($moCount -gt 0) {
             Write-Pass "Feasibility queue returning MOs" "$moCount MOs in queue"
         } else {
-            Write-Fail "Feasibility queue returning MOs" "Queue empty — trigger a sync first: POST /api/v1/sync/run"
+            Write-Fail "Feasibility queue returning MOs" "Queue empty  -  trigger a sync first: POST /api/v1/sync/run"
         }
     } else {
         Write-Fail "Feasibility queue API" "Endpoint returned null or success=false"
@@ -300,14 +341,14 @@ if ($script:token) {
         if ($lastStatus -eq "success" -or $lastStatus -eq "partial") {
             Write-Pass "Last sync status" "$lastStatus (last run: $lastRun)"
         } else {
-            Write-Fail "Last sync status" "$lastStatus — check connector logs"
+            Write-Fail "Last sync status" "$lastStatus  -  check connector logs"
         }
     } else {
         Write-Fail "Sync status API" "Endpoint not responding or returned error"
     }
 } else {
-    Write-Skip "Feasibility queue API" "Skipping — authentication failed"
-    Write-Skip "Sync status API" "Skipping — authentication failed"
+    Write-Skip "Feasibility queue API" "Skipping  -  authentication failed"
+    Write-Skip "Sync status API" "Skipping  -  authentication failed"
 }
 
 # ─── Check 9: Odoo Connector Test-Connection ─────────────────────────────
@@ -334,7 +375,7 @@ if ($null -ne $odooTestResp) {
     if ($null -ne $odooTestResp2) {
         Write-Pass "Odoo test-connection" "Connector can reach Odoo (alternate path)"
     } else {
-        Write-Skip "Odoo test-connection" "Endpoint not available — verify Odoo URL is configured in .env"
+        Write-Skip "Odoo test-connection" "Endpoint not available  -  verify Odoo URL is configured in .env"
     }
 }
 
@@ -348,7 +389,7 @@ if ($script:token) {
         "X-Tenant-ID"   = $TenantId
     }
 
-    # Check the activate endpoint exists (dry-run — just check it responds, don't execute)
+    # Check the activate endpoint exists (dry-run  -  just check it responds, don't execute)
     try {
         $wbResp = Invoke-WebRequest `
             -Uri "$BaseUrl/api/v1/activate" `
@@ -375,7 +416,7 @@ if ($script:token) {
         }
     }
 } else {
-    Write-Skip "Write-back activate endpoint reachable" "Skipping — authentication failed"
+    Write-Skip "Write-back activate endpoint reachable" "Skipping  -  authentication failed"
 }
 
 # ─── Summary ─────────────────────────────────────────────────────────────
@@ -393,9 +434,9 @@ Write-Host "║  PASS:  $($script:pass)   FAIL:  $($script:fail)   SKIP:  $($scr
 Write-Host "╠══════════════════════════════════════════════════════════════╣" -ForegroundColor Cyan
 
 if ($script:fail -eq 0) {
-    Write-Host "║  OVERALL RESULT: PASSED — System ready for UAT              ║" -ForegroundColor Green
+    Write-Host "║  OVERALL RESULT: PASSED  -  System ready for UAT              ║" -ForegroundColor Green
 } else {
-    Write-Host "║  OVERALL RESULT: FAILED — Fix $($script:fail) item(s) before UAT          ║" -ForegroundColor Red
+    Write-Host "║  OVERALL RESULT: FAILED  -  Fix $($script:fail) item(s) before UAT          ║" -ForegroundColor Red
 }
 
 Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
@@ -403,7 +444,7 @@ Write-Host ""
 
 if ($script:fail -gt 0) {
     Write-Host "Next steps for FAILED items:" -ForegroundColor Yellow
-    Write-Host "  1. Review output above — each FAIL includes a remediation hint"
+    Write-Host "  1. Review output above  -  each FAIL includes a remediation hint"
     Write-Host "  2. Run: docker compose ps  (verify all services Up)"
     Write-Host "  3. Run: docker compose logs [service-name]  (check error details)"
     Write-Host "  4. Re-run this script after fixes: .\scripts\star-trans-validate.ps1"
