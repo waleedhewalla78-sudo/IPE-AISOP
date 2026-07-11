@@ -16,7 +16,7 @@ const ALL_TABS = [
 
   { to: ROUTES.COMMAND_OUTCOMES, labelKey: 'outcomes.title', label: 'Outcomes' },
 
-  { to: ROUTES.COMMAND_OTD_ANALYTICS, labelKey: 'otd.title', label: 'OTD Analytics', release1: true },
+  { to: ROUTES.COMMAND_OTD_ANALYTICS, labelKey: 'analytics.otd.title', label: 'OTD Analytics', release1: true },
 
   { to: ROUTES.COMMAND_EXECUTIVE, label: 'Executive', release1: false },
 
