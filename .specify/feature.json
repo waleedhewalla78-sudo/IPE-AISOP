@@ -1,40 +1,10 @@
 ﻿{
-  "feature_directory": "specs/022-sprint3-golive",
-  "active_implementation": "specs/022-sprint3-golive",
-  "active_plan": "specs/022-sprint3-golive/tasks.md",
-  "readiness_score": 92,
-  "readiness_note": "022 sprint3-golive: eng core done; smoke 15/15; validate 14/18; converge T022-T024 residual; COM blockers OPEN",
-  "release_target": "star-trans-r1-golive-ready",
-  "phase": "022-sprint3-golive",
-  "prior_specs": [
-    "005-ipe-program-status",
-    "017-first-release-plan",
-    "018-phase2-release2",
-    "019-program-converge",
-    "020-planning-intelligence",
-    "021-release-closure"
-  ],
-  "constitution_version": "1.2.7",
-  "last_speckit_run": "2026-07-11-022-sprint3-golive",
-  "speckit_phases_complete": [
-    "constitution",
-    "specify",
-    "clarify",
-    "analyze",
-    "plan",
-    "tasks",
-    "taskstoissues",
-    "implement",
-    "converge"
-  ],
-  "commercial_blockers_open": [
-    "OQ-7-pricing",
-    "OQ-1-odoo-version",
-    "PH1-01-SOW-send",
-    "PH1-02-odoo-staging",
-    "G-R2-04-arabic-native-signoff"
-  ],
-  "out_of_scope_products": [
-    "nexus-social/docs/PRD-NEXUS-AUTHORITATIVE.md"
-  ]
+  "active_feature": "specs/023-sprint4-wave1",
+  "active_implementation": "specs/023-sprint4-wave1",
+  "active_plan": "specs/023-sprint4-wave1/tasks.md",
+  "readiness_score": 70,
+  "readiness_note": "023 sprint4-wave1 active; constitution 1.2.8; COM OPEN",
+  "phase": "023-sprint4-wave1",
+  "constitution_version": "1.2.8",
+  "last_speckit_run": "2026-07-11-023-sprint4-wave1"
 }
