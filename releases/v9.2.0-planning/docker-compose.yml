@@ -1,0 +1,232 @@
+# IPE Star Trans Deployment — Release 1 Profile
+# Based on: infrastructure/docker/docker-compose.release1.yml
+# Generated: 2026-07-11 | v9.2.0-planning
+#
+# Usage:
+#   cp .env.template .env
+#   # Edit .env with actual Star Trans values
+#   docker compose up -d
+#   docker compose exec dpe-svc uv run alembic upgrade head
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ipe}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-ipe}
+    volumes:
+      - st_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ipe} -d ${POSTGRES_DB:-ipe}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  dpe-svc:
+    image: ipe-dpe-svc:release1
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      IPE_RELEASE_PROFILE: release1
+      IPE_KMS_KEY_DIR: /data/kms
+      AUTH_MODE: ${AUTH_MODE:-local}
+    volumes:
+      - st_kms_data:/data/kms
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+  fea-svc:
+    image: ipe-fea-svc:release1
+    restart: unless-stopped
+    ports:
+      - "8004:8004"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      IPE_RELEASE_PROFILE: release1
+      AUTH_MODE: ${AUTH_MODE:-local}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  res-svc:
+    image: ipe-res-svc:release1
+    restart: unless-stopped
+    ports:
+      - "8005:8005"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      IPE_RELEASE_PROFILE: release1
+      AUTH_MODE: ${AUTH_MODE:-local}
+      IPE_OTEL_TRACING_ENABLED: "false"
+      IPE_OTEL_LOGGING_ENABLED: "false"
+      CONNECTOR_SVC_URL: http://connector:8009
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  cap-svc:
+    image: ipe-cap-svc:release1
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      IPE_RELEASE_PROFILE: release1
+      AUTH_MODE: ${AUTH_MODE:-local}
+      ERP_SYNC_MODE: direct
+      CONNECTOR_SVC_URL: http://connector:8009
+    depends_on:
+      db:
+        condition: service_healthy
+      connector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  mat-svc:
+    image: ipe-mat-svc:release1
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      IPE_RELEASE_PROFILE: release1
+      AUTH_MODE: ${AUTH_MODE:-local}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  connector:
+    image: ipe-connector:release1
+    restart: unless-stopped
+    ports:
+      - "8009:8009"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      IPE_RELEASE_PROFILE: release1
+      IPE_KAFKA_ENABLED: "false"
+      IPE_KAFKA_BOOTSTRAP_SERVERS: ""
+      ODOO_URL: ${ODOO_URL}
+      ODOO_DB: ${ODOO_DB}
+      ODOO_USER: ${ODOO_USER}
+      ODOO_PASSWORD: ${ODOO_PASSWORD}
+      ODOO_SYNC_INTERVAL_SEC: ${ODOO_SYNC_INTERVAL_SEC:-900}
+      AUTO_PROPOSE_THRESHOLD: ${AUTO_PROPOSE_THRESHOLD:-75}
+      FEA_SVC_URL: http://fea-svc:8004
+      RES_SVC_URL: http://res-svc:8005
+      AUTH_MODE: ${AUTH_MODE:-local}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8009/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+  kong:
+    image: kong:3.7
+    restart: unless-stopped
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /opt/kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_PLUGINS: "bundled,ipe-tenant-strip"
+    ports:
+      - "8000:8000"
+      - "8444:8001"
+    volumes:
+      - ./kong.star-trans.yml:/opt/kong/kong.yml:ro
+    depends_on:
+      dpe-svc:
+        condition: service_healthy
+      connector:
+        condition: service_healthy
+
+  web-ui:
+    image: ipe-web-ui:release1
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    depends_on:
+      - kong
+
+networks:
+  default:
+    name: ipe-star-trans
+
+volumes:
+  st_db_data:
+  st_kms_data:
