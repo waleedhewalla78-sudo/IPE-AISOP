@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select as sa_select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +23,7 @@ from ipe_shared.models.planning_intelligence import (
     SopConsensusWeight,
     SopCycle,
     SopStageGate,
+    SopVersion,
 )
 from ipe_shared.schemas.common import APIResponse
 
@@ -78,7 +79,27 @@ def _stage_to_dict(stage: SopStageGate) -> dict:
     }
 
 
-def _weights_to_dict(weights: SopConsensusWeight | None) -> dict:
+def _version_to_dict(version: SopVersion) -> dict:
+    return {
+        "id": str(version.id),
+        "cycle_id": str(version.cycle_id),
+        "version_type": version.version_type,
+        "version_name": version.version_name,
+        "is_active": bool(version.is_active),
+        "created_at": version.created_at.isoformat() if version.created_at else None,
+    }
+
+
+async def _versions_for_cycle(session: AsyncSession, tenant_id: UUID, cycle_id: UUID) -> list[dict]:
+    versions = (
+        await session.execute(
+            sa_select(SopVersion).where(
+                SopVersion.tenant_id == tenant_id,
+                SopVersion.cycle_id == cycle_id,
+            )
+        )
+    ).scalars().all()
+    return [_version_to_dict(v) for v in versions]
     return {
         "weight_sales": float(weights.weight_sales) if weights else 0.30,
         "weight_statistical": float(weights.weight_statistical) if weights else 0.40,
@@ -121,8 +142,20 @@ async def create_cycle(
     )
     session.add(cycle)
     await session.flush()
+    baseline = SopVersion(
+        tenant_id=tenant_id,
+        cycle_id=cycle.id,
+        version_type="baseline",
+        version_name="Baseline",
+        is_active=True,
+        created_by=_user_uuid(current_user),
+    )
+    session.add(baseline)
+    await session.flush()
     await session.commit()
-    return APIResponse(success=True, data=_cycle_to_dict(cycle), error=None)
+    data = _cycle_to_dict(cycle)
+    data["versions"] = [_version_to_dict(baseline)]
+    return APIResponse(success=True, data=data, error=None)
 
 
 @router.get("/cycle")
@@ -159,7 +192,9 @@ async def get_cycle(
     ).scalar_one_or_none()
     if not cycle:
         return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "S&OP cycle not found"})
-    return APIResponse(success=True, data=_cycle_to_dict(cycle), error=None)
+    data = _cycle_to_dict(cycle)
+    data["versions"] = await _versions_for_cycle(session, tenant_id, cycle_id)
+    return APIResponse(success=True, data=data, error=None)
 
 
 @router.post("/cycle/{cycle_id}/advance")
@@ -213,6 +248,13 @@ async def approve_stage(
     ).scalar_one_or_none()
     if not cycle:
         return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "S&OP cycle not found"})
+
+    # Only the current cycle stage may be approved (UAT-8 invalid future stage)
+    if stage != cycle.status:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot approve stage '{stage}' while cycle is in '{cycle.status}'",
+        )
 
     stage_gate = (
         await session.execute(
