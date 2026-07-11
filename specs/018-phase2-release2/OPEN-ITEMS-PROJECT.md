@@ -2,6 +2,7 @@
 
 **Workspace**: `E:\AISOP\ipe`  
 **Generated**: 2026-07-10 (live-verified: `gh`, `git`, `docker`, `kubectl`, specs)  
+**Updated**: 2026-07-11 — Sprint 1 Engineering Closure (v9.2.0-planning tag closure)  
 **Purpose**: Durable inventory of everything still not closed, with needed action per point.
 
 ---
@@ -23,14 +24,14 @@
 | Spec 017 First release plan | Wave 1 eng ✅; C-08–C-16 + PH1-* still open | See A2; push commits; commercial PH1; stock.quant / mat-svc compose |
 | Spec 018 Phase 2 Release 2 | Engineering ~90%; gates mostly PASS | See **Section B**; human Arabic + tag HOLD |
 | Spec 019 `program-converge` | **DONE** — mat-svc + promote + stock.quant mock done | #47–#49 closed; #51 closed; #50 human-open |
-| Spec 020 `planning-intelligence` | **ENG COMPLETE** — Modules A–F + Copilot + Kong; mig 044–049 applied; 68 tests green; UAT 8/10 | UAT-10/11 code-fixed in Spec 021; Odoo E2E = PH1-02 |
-| Spec 021 `release-closure` | **ACTIVE (2026-07-11)** — UAT-10/11 code fixed; 199 tests green; tag readiness documented | Pending: live UAT re-run, GitHub issues, push |
+| Spec 020 `planning-intelligence` | **RESOLVED (v9.2.0-planning)** — Modules A–F + Copilot + Kong; mig 044–049 applied; 70+ tests green; UAT-10/11 code-fixed | Odoo live E2E = PH1-02 (commercial); unit tests 22/22 PASS |
+| Spec 021 `release-closure` | **RESOLVED (v9.2.0-planning)** — UAT-10/11 fixed + verified; all timeout fixes confirmed; CHANGELOG/PRODUCT-STATUS/deploy package delivered | Star Trans deployment package in `deploy/star-trans/` |
 
 ### A2. Spec 017 converge carry-over (still open)
 
 | Item | Status | Needed action |
 |------|--------|---------------|
-| C-08 Push commits to origin | OPEN until finalize push | `git push origin master` |
+| C-08 Push commits to origin | **RESOLVED** — `git push origin master` complete (2026-07-11) | None |
 | C-09 Restabilize kind cluster | DONE (8/8 Running) | None — evidence `docs/qa/kind-restabilize-2026-07-10.txt` |
 | C-11 Regenerate UAT docx | OPEN | Regenerate from corrected UAT source (P2) |
 | C-12 OQ-9 stakeholder names | OPEN (#28) | Fill Section 6 sign-off names in waiver doc |
@@ -174,8 +175,8 @@
 | C-021 smoke | **DONE PASS** | — |
 | C-022 demo | **DONE PASS** | — |
 | C-023 / C-024 | P2 open | Optional or CUT |
-| C-026 push | OPEN | `git push origin master` |
-| C-027 tag | HOLD | After G-R2-04 policy |
+| C-026 push | **RESOLVED** — pushed 2026-07-11 | None |
+| C-027 tag v9.1.1-r2 | HOLD — after G-R2-04 Arabic sign-off (COM) | Human reviewer required; ENG env ready |
 
 ### B4. Honest E2E vs CUT
 

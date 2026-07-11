@@ -4,7 +4,50 @@ All notable changes to the IPE platform are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-**Authoritative product spec:** [docs/PRD-IPE-COMPREHENSIVE-AS-IS.md](docs/PRD-IPE-COMPREHENSIVE-AS-IS.md)
+**Authoritative product spec:** [docs/PRD-IPE-AUTHORITATIVE.md](docs/PRD-IPE-AUTHORITATIVE.md)
+
+---
+
+## [v9.2.0-planning] — 2026-07-11
+
+### Added
+- ABC/XYZ product segmentation engine (mat-svc, mig 044)
+- Forecast quality tracking: MAPE, bias, MASE, stability, value-add (demand-svc, mig 045)
+- ARIMA/SARIMA forecasters with best-fit auto-selection (demand-svc)
+- Statistical safety stock calculator with segment-driven service levels (mat-svc, mig 047)
+- Capacity utilisation alerts with configurable thresholds (cap-svc, mig 048)
+- S&OP process engine with stage workflow and consensus calculation (sop-svc :8110, mig 049)
+- Odoo lead time history sync + product cost/price fields (connector, mig 046)
+- 9+ Copilot planning intelligence tools (nlp-svc)
+- `scripts/planning-uat.ps1` — 12-step automated UAT
+
+### Fixed
+- Copilot tool-call chain timeout: concurrent tool execution, per-tool HTTP timeouts, LLM warm-up, 20s chat ceiling with tool-backed fallback
+- ARIMA auto-order cold path: reduced grid (18 combos), 8s selection budget, SES-first guaranteed fallback, statsmodels warm-up
+
+### Database
+- Migrations 044–049: planning intelligence tables with RLS (043 reserved for Odoo config versioning)
+
+### Tests
+- 70+ planning-module unit tests across mat/demand/cap/connector/sop/nlp
+
+---
+
+## [v9.1.1-r2] — 2026-07-XX (PENDING: Arabic native QA sign-off)
+
+### Added
+- Release 2 profile: Copilot, Demand Sensing, Scenario Workbench in navigation (`VITE_RELEASE_PROFILE=release2`)
+- 299+ Arabic i18n keys across 8+ screens with RTL layout
+- Full R2 Kong routes: nlp-svc (read_timeout 300s), demand-svc, scenario-svc, mat-svc
+
+### Validated
+- Playwright desktop + R2: 22/22 PASS
+- R2 smoke: 15/15 PASS
+- R2 demo: 7/7 PASS
+- k6 SLO: p95 293ms
+
+### Pending
+- G-R2-04 Arabic native speaker QA sign-off (`docs/qa/arabic-qa-r2.md`) — COM task, ENG env ready
 
 ---
 

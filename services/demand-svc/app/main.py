@@ -15,8 +15,20 @@ from ipe_shared.observability import setup_observability
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import logging
+
+    logger = logging.getLogger(settings.SERVICE_NAME)
     await init_database(settings.DATABASE_URL)
     await start_consumers()
+    # Fix 2D: pre-import statsmodels/scipy to avoid cold-start on first best_fit
+    try:
+        import statsmodels.tsa.arima.model  # noqa: F401
+        import statsmodels.tsa.holtwinters  # noqa: F401
+        from scipy import stats  # noqa: F401
+
+        logger.info("statsmodels warm-up complete")
+    except ImportError:
+        logger.warning("statsmodels not available — ARIMA/SARIMA disabled")
     yield
     await stop_consumers()
     await close_database()

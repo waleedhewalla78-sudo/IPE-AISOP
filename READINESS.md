@@ -3,7 +3,7 @@
 **Version**: v8.2.0  
 **Published**: 2026-06-27  
 **Supersedes**: v7.0.0, v6.1.0, v6.0.0, v1.0.0  
-**Product spec**: [docs/PRD-IPE-AUTHORITATIVE.md](docs/PRD-IPE-AUTHORITATIVE.md) (authoritative, 2026-07-10) · [docs/PRD-IPE-COMPREHENSIVE-AS-IS.md](docs/PRD-IPE-COMPREHENSIVE-AS-IS.md) (historical snapshot)
+**Product spec**: [docs/PRD-IPE-AUTHORITATIVE.md](docs/PRD-IPE-AUTHORITATIVE.md) (authoritative, 2026-07-11) · [docs/PRD-IPE-COMPREHENSIVE-AS-IS.md](docs/PRD-IPE-COMPREHENSIVE-AS-IS.md) (historical snapshot)
 
 ---
 

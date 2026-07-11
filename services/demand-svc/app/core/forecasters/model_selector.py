@@ -65,8 +65,9 @@ class BestFitSelector:
             return ["ses"]
 
         normalized = (segment or "").upper()
+        # SES always first as guaranteed fast baseline (UAT-11 Fix 2C)
         if normalized in {"AX", "BX"}:
-            return ["arima", "sarima", "ses"]
+            return ["ses", "arima", "sarima"]
         if normalized in {"AY", "BY"}:
             return ["ses", "arima"]
         if normalized in {"AZ", "BZ", "CX", "CY", "CZ"}:

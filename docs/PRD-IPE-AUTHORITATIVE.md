@@ -7,10 +7,10 @@
 | **Document ID** | PRD-IPE-AUTHORITATIVE-2026 |
 | **Product** | **IPE** (Intelligent Planning Engine / AISOP IPE) — **not NEXUS Social** |
 | **Document status** | **As-is development reference** — living platform, not idealized future state |
-| **Last updated** | **2026-07-10** |
+| **Last updated** | **2026-07-11** |
 | **Workspace** | `E:\AISOP\ipe` |
-| **Constitution** | `ipe/.specify/memory/constitution.md` **v1.2.4** |
-| **Supersedes** | Prior draft of this file (2026-07-07); `docs/PRD-IPE-COMPREHENSIVE-AS-IS.md` (historical snapshot) |
+| **Constitution** | `ipe/.specify/memory/constitution.md` **v1.2.5** |
+| **Supersedes** | Prior draft (2026-07-10); `docs/PRD-IPE-COMPREHENSIVE-AS-IS.md` (historical snapshot) |
 | **Primary vertical** | Discrete manufacturing — electrical transformers (Star Trans, Egypt / MENA) |
 | **Scope boundary** | **IPE only** — NEXUS Social is out of scope (one-line note in §1.4) |
 
@@ -23,7 +23,7 @@
 | **SHIPPED** | In codebase and verified by tests, smoke, and/or demo evidence |
 | **PARTIAL** | Implemented with named gaps |
 | **PLANNED** | In spec/tasks; not built (or not verified) |
-| **CUT** | Explicitly removed from scope (e.g. SAP B1 S12) |
+| **CUT** | Explicitly removed from scope |
 | **BLOCKED** | Commercial / human / external dependency |
 | **UNKNOWN** | Insufficient repo evidence — needs stakeholder input |
 
@@ -57,7 +57,7 @@
 
 ### 1.1 Vision Statement
 
-> Enable discrete manufacturers to **see which manufacturing orders (MOs) are at risk before the shift starts**, **choose among structured resolution options**, and **publish feasible schedules** — grounded in live ERP master data (Odoo first), not manually maintained spreadsheets — with AI in **shadow mode** until trust is established.
+> Enable discrete manufacturers to **see which manufacturing orders (MOs) are at risk before the shift starts**, **choose among structured resolution options**, and **publish feasible schedules** — grounded in live ERP master data (Odoo first), not manually maintained spreadsheets — with AI in **shadow mode** until trust is established. Layer in **planning intelligence** (ABC/XYZ segmentation, statistical forecasting, safety stock, S&OP process) drawn from the 20% of SAP IBP capabilities that provide 80% of MENA mid-market value.
 
 ### 1.2 Product Definition (As-Is)
 
@@ -69,9 +69,9 @@
 | **Primary ERP** | Odoo 17–19 via XML-RPC (`connector`); mock-odoo for local E2E |
 | **Reference customer** | Star Trans — Electrical Transformer Technology (Egypt / MENA) |
 | **Buyer persona (R1)** | CEO / Operations Director — not IT steering committee |
-| **Spec Kit program** | Features `000`–`018` under `ipe/specs/`; active rollup `005`; active R2 `018`; first-release plan `017` |
+| **Spec Kit program** | Features `000`–`020` under `ipe/specs/`; active: `019-program-converge`, `020-planning-intelligence` |
 
-### 1.3 In Scope (As-Is — 2026-07-10)
+### 1.3 In Scope (As-Is — 2026-07-11)
 
 #### Full profile (`VITE_RELEASE_PROFILE=full`)
 
@@ -102,9 +102,10 @@
 
 | Area | Capabilities | Status |
 |------|--------------|--------|
-| **Compose adds** | `nlp-svc`, `demand-svc`, `scenario-svc`, `mock-odoo-api` | **SHIPPED** |
-| **Planning adds** | Demand sensing (SES), Scenario workbench | **SHIPPED** |
-| **Copilot** | Live planning tools + shadow mode | **SHIPPED** |
+| **Compose adds** | `nlp-svc`, `demand-svc`, `scenario-svc`, `mock-odoo-api`, `mat-svc`, `sop-svc` | **SHIPPED** |
+| **Planning adds** | Demand sensing (SES + ARIMA/SARIMA best-fit), Scenario workbench + promote | **SHIPPED** |
+| **Planning Intelligence** | ABC/XYZ segmentation, forecast quality (MAPE/Bias/MASE/Stability), statistical safety stock, capacity utilisation alerts, S&OP process engine (sop-svc :8110) | **SHIPPED** (Spec 020, mig 044–049) |
+| **Copilot** | Live planning tools + shadow mode (25 tools; 9+ planning-specific) | **SHIPPED** |
 | **Arabic** | 8+ screens engineering | **PARTIAL** — native sign-off **BLOCKED** |
 | **Ops** | Multi-tenant ops dashboard | **PARTIAL** (provision/quotas incomplete) |
 | **SAP B1** | Sprint 12 | **CUT** |
@@ -121,6 +122,9 @@
 | Design AI as R1/R2 paid scope | Strategy cut unless contracted |
 | Enterprise K8s as Star Trans R1 go-live requirement | Compose 8GB VM is R1 path |
 | Gate 11 14/14 on kind without infra investment | **WON'T FIX** (#27); OQ-9 waiver accepted for `v9.4.0-p3` |
+| Full SAP IBP key-figure taxonomy (200+ KFs) | ~45 KF overlay registry documented; no `cdm_key_figure_*` tables (R3) |
+| Multi-stage inventory optimisation | R4 |
+| Planning operators framework | **CUT** (R3) |
 
 ### 1.5 Version Evolution (with reasoning)
 
@@ -128,14 +132,18 @@
 |-----------------|------|-----------|--------|
 | `v1.0.0` → `v6.x` | 000–004 | Foundation → AI-first closed loop | **SHIPPED** (historical) |
 | `v7.0.0` | 006 | Hub consolidation (6 hubs) | **SHIPPED** |
-| `v8.2.0` | 007–010 | U1–U8 streams + sustain/quality demo (32/32) | **SHIPPED** (code); tag exists |
+| `v8.2.0` | 007–010 | U1–U8 streams + sustain/quality demo (32/32) | **SHIPPED** (code + tag) |
 | `v9.0.0-r1` / R1 | 013 | Customer #1 Odoo MENA slice | **SHIPPED** eng; UAT **BLOCKED** |
 | `v9.1.0-r2` | 014 / 018 | R2 growth (Copilot, demand, scenarios, Arabic) | Eng ~92%; **G-R2-TAG HOLD** |
+| `v9.1.1-r2` | 018 | Preferred R2 tag after Arabic native sign-off | **BLOCKED** G-R2-04 |
 | `v9.2.0-p1` / `v9.3.0-p2` | 015 | Enterprise Gates 1–5 + Option B | **SHIPPED** |
 | `v9.4.0-p3` | 015 / 017 | Phase 3 K8s gates 6–10 PASS; Gate 11 12/14 + OQ-9 waiver | **SHIPPED** @ `4629119` |
 | Sprint 7 / 016 | 016 | Ecosystem cohesion (activity / workspace) | **SHIPPED** Tier 1 |
-| Spec 017 Waves 1–3 | 017 | First release plan post-P3 | Wave 1 eng largely done; PH1 **BLOCKED** |
-| Spec 018 | 018 | Phase 2 R2 program gates | In progress finalize |
+| Spec 017 Waves 1–3 | 017 | First release plan post-P3 | Wave 1 eng done; PH1 **BLOCKED** |
+| Spec 018 R2 finalize | 018 | Phase 2 R2 program gates | Eng PASS; Arabic HOLD |
+| Spec 019 Program converge | 019 | mat-svc compose, scenario promote, stock.quant mock | **SHIPPED** (commit `fcd2545`) |
+| Spec 020 Planning intelligence | 020 | Modules A–F + Copilot tools + Kong | **SHIPPED** (2026-07-11; mig 044–049) |
+| `v9.2.0-planning` | 020 | Tag after mig 044–049 applied + smoke | **NOT TAGGED** — apply mig + smoke first |
 
 ### 1.6 Open Scope Decisions (Stakeholder Input)
 
@@ -147,11 +155,14 @@
 | **OQ-5** | Formal MAPE / triage-time baseline study? | G-01/G-02 unmeasured in production |
 | **OQ-6** | Copilot session retention / GDPR erasure policy? | nlp-svc storage |
 | **OQ-7** | Confirm R1 pricing **$18K–30K/yr** + **$12K–25K** implementation? | Commercial model |
-| **OQ-8** | Include **mat-svc** in R1/R2 compose? | Constitution lists it; compose omits (URL-only in R2) |
+| **OQ-8** | **CLOSED** — mat-svc now in R2 compose (Spec 019 T010) | — |
 | **OQ-9** | Gate 11 waiver — **accepted** (2026-07-10); confirm stakeholder names in waiver §6 | Release governance |
-| **OQ-10** | Cut or implement **scenario promotion UI** (#40)? | R2 completeness |
+| **OQ-10** | **CLOSED** — scenario promotion shipped (Spec 019 T020–T024, #40 closed) | — |
 | **OQ-11** | Cut or implement true **`stock.quant`** sync (C-15) vs safety_stock proxy? | Material gate honesty |
-| **OQ-12** | Tag policy: push `v9.1.0-r2` vs cut `v9.1.1-r2` after Arabic sign-off? | Release management |
+| **OQ-12** | Tag policy: push `v9.1.1-r2` after Arabic sign-off OR cut altogether? | Release management |
+| **OQ-13** | Apply mig 044–049 + run smoke → tag `v9.2.0-planning`? | Planning intelligence release gate |
+| **OQ-14** | Defer or implement tenant provision API (#37) / quotas (#38)? | Phase 4 vs near-term |
+| **OQ-15** | Defer or CUT predictive delay XGBoost+SHAP (#42)? | Wave 2 stretch |
 
 ---
 
@@ -164,18 +175,21 @@
 | **Invisible infeasibility** | Material/capacity conflicts found on shop floor | Feasibility G1–G5 scoring + Control Tower queue | **SHIPPED** |
 | **Spreadsheet parallel to ERP** | Dual maintenance; stale MO dates | Odoo sync → CDM; write-back on approve | **SHIPPED** (local); **BLOCKED** staging |
 | **Unstructured firefighting** | No comparable options | Resolution Center scenarios | **SHIPPED** |
-| **Capacity blindness** | Overloaded WCs discovered late | Bottleneck map; OR-Tools CP-SAT | **SHIPPED** |
+| **Capacity blindness** | Overloaded WCs discovered late | Bottleneck map; OR-Tools CP-SAT; utilisation alerts | **SHIPPED** |
 | **Leadership lag** | OTD after month-end | Outcomes, OTD dashboard, Cost of Chaos | **SHIPPED** / **PARTIAL** |
 | **Tool fragmentation** | Context switching | Hub IA + Unified Workspace | **SHIPPED** |
 | **AI distrust** | Black-box recommendations | Shadow autonomy; XAI; AI Trust | **PARTIAL** |
 | **Data quality lies** | Misleading scores on incomplete BOM/routing | Unscorable flags; DQ badges | **SHIPPED** |
+| **No statistical forecasting** | Manual demand guesses | ARIMA/SARIMA best-fit + MAPE/Bias/MASE quality | **SHIPPED** (Spec 020) |
+| **No product segmentation** | One-size-fits-all planning | ABC/XYZ segmentation + safety stock by class | **SHIPPED** (Spec 020) |
+| **S&OP ad hoc** | No structured monthly cycle | S&OP process engine (sop-svc, FSM 6-stage) | **SHIPPED** (Spec 020) |
 
 ### 2.2 Target Market
 
 | Segment | Characteristics | IPE fit |
 |---------|-----------------|--------|
 | **Primary (R1)** | Mid-market discrete on **Odoo** (MENA) | 8-service compose; feasibility-first |
-| **Secondary (R2)** | Same + Copilot / demand / scenarios | `release2` profile |
+| **Secondary (R2)** | Same + Copilot / demand / scenarios / planning intelligence | `release2` profile (11 services + sop-svc) |
 | **Enterprise demo** | Prospects evaluating vs Kinaxis/SAP IBP | Full 22-service + 32/32 demo |
 | **Not primary** | Fortune 500 multi-site SAP IBP replacement | No live SAP/D365 connector |
 
@@ -192,7 +206,7 @@
 
 ### 2.4 Competitive Positioning (Summary)
 
-Sell R1 against **Excel + Odoo MRP**. Full-profile demos may reference Kinaxis / SAP IBP / o9 feature breadth — see §14 (**provisional**; no formal competitor research dossier in repo).
+Sell R1 against **Excel + Odoo MRP**. Full-profile demos may reference Kinaxis / SAP IBP / o9 feature breadth — see §14 (**provisional**; no formal competitor research dossier in repo). Spec 020 closes the critical SAP IBP gap for MENA mid-market (20% of IBP capabilities, 80% of value).
 
 ---
 
@@ -200,21 +214,24 @@ Sell R1 against **Excel + Odoo MRP**. Full-profile demos may reference Kinaxis /
 
 ### 3.1 Platform KPIs (Executive)
 
-| Metric | Target | As-is (2026-07-10) | Evidence | Status |
+| Metric | Target | As-is (2026-07-11) | Evidence | Status |
 |--------|--------|---------------------|----------|--------|
 | Full demo checkpoints | 32/32 | Documented PASS | `scripts/run-full-demo.ps1`, READINESS | **SHIPPED** |
 | R1 compose demo | 14/14 | PASS | `docs/demo-data/release1-integration-demo.txt` | **SHIPPED** |
 | R1 K8s Gate 11 | ≥12/14 + waiver | 12/14 + OQ-9 | `gate11-k8s-demo.txt`, waiver | **SHIPPED** (waived) |
 | R2 smoke | 15/15 | PASS | `docs/qa/release2-smoke-2026-07-10.txt` | **SHIPPED** |
 | R2 demo | 7/7 | PASS | `docs/demo-data/release2-demo-g-r2-05.txt` | **SHIPPED** |
-| Backend pytest | Green | **860/860** (018 TEST-RESULTS) | Spec 018 | **SHIPPED** |
+| Planning intelligence unit tests | 46/46 | 46/46 (Spec 020) | `PLANNING-INTELLIGENCE-FINALIZE-REPORT.md` | **SHIPPED** |
+| Planning UAT (UAT-4–12) | 10/10 | PASS=8 PARTIAL=2 FAIL=0 | `PLANNING-UAT-RESULTS-2026-07-11.md` | **PARTIAL** (UAT-10/11 Copilot chat timeout) |
+| Backend pytest | Green | **860+/860** | Spec 018 | **SHIPPED** |
 | Frontend Vitest | Green | **41/41** | Spec 018 | **SHIPPED** |
 | Enterprise Gates 1–5 | PASS | `v9.3.0-p2` | Spec 015 | **SHIPPED** |
 | Enterprise Gates 6–10 | PASS | GATE-RESULTS-PHASE3 | Spec 015 | **SHIPPED** |
 | k6 SLO P95 | <500ms | **293ms**, 0% err | `PERFORMANCE-BASELINE-v9.1.0.md` | **SHIPPED** |
 | Star Trans UAT | Signed | Open | PH1-01/02 | **BLOCKED** |
 | Arabic native QA | Signed | Eng done | `docs/qa/arabic-qa-r2.md` | **BLOCKED** |
-| G-R2-TAG | `v9.1.0-r2` / `v9.1.1-r2` | HOLD | GATES.md | **BLOCKED** |
+| G-R2-TAG | `v9.1.1-r2` | HOLD | GATES.md | **BLOCKED** |
+| `v9.2.0-planning` tag | After mig+smoke | Not yet | OQ-13 | **BLOCKED** (ops) |
 
 ### 3.2 Product Outcome Goals
 
@@ -226,18 +243,11 @@ Sell R1 against **Excel + Odoo MRP**. Full-profile demos may reference Kinaxis /
 | G-04 | Data quality honesty | Unscorable MOs never silent-scored | **SHIPPED** |
 | G-05 | 90-day ROI | Adoption + 2+ MOs saved + OTD trend | **PARTIAL** (instrumented) |
 | G-06 | Arabic planner path | CT + Resolution + nav + alerts | **PARTIAL** (sign-off open) |
+| G-07 | Statistical demand accuracy | Forecast MAPE visible + bias detected | **SHIPPED** (Spec 020 demand-svc) |
+| G-08 | Product-class-aware planning | ABC/XYZ segmentation informs safety stock | **SHIPPED** (Spec 020 mat-svc) |
+| G-09 | Monthly S&OP cycle managed | sop-svc FSM: draft→closed 6-stage cycle | **SHIPPED** (Spec 020 sop-svc) |
 
 ### 3.3 Spec-Aligned Goal Sets
-
-#### V5 Convergence (spec 003)
-
-| ID | Goal | Status |
-|----|------|--------|
-| V5-G1 | Closed-loop planning (approve persists <60s) | **SHIPPED** |
-| V5-G2 | Planner trust (XAI) | **PARTIAL** (UI; no formal study — OQ-5) |
-| V5-G3 | MDR gate (composite <70% blocks) | **SHIPPED** |
-| V5-G4 | War Room ≥3 mitigations | **SHIPPED** |
-| V5-G5 | Financial clarity on scenarios | **SHIPPED** |
 
 #### Release 1 (spec 013)
 
@@ -260,6 +270,18 @@ Sell R1 against **Excel + Odoo MRP**. Full-profile demos may reference Kinaxis /
 | **G-R2-05** | `run-release2-demo.ps1` 7/7 | **PASS** |
 | **G-R2-TAG** | Tag on green matrix | **HOLD** |
 
+#### Spec 020 Planning Intelligence acceptance
+
+| Criterion | Status |
+|-----------|--------|
+| Migrations 044–049 authored (chain 042→044→…→049) | **SHIPPED** (eng) |
+| Unit tests green (46/46) | **SHIPPED** |
+| Kong routes expose planning APIs | **SHIPPED** |
+| Copilot ≥9 planning tools (MET: 9 specific + 16 general = 25) | **SHIPPED** |
+| Finalize report at `docs/qa/PLANNING-INTELLIGENCE-FINALIZE-REPORT.md` | **SHIPPED** |
+| Apply migrations on live stack + release2 smoke | **BLOCKED** (ops — OQ-13) |
+| Tag `v9.2.0-planning` | **BLOCKED** (depends above) |
+
 ---
 
 ## 4. User Personas & Workflows
@@ -268,13 +290,14 @@ Sell R1 against **Excel + Odoo MRP**. Full-profile demos may reference Kinaxis /
 
 | Persona | RBAC role | Primary goals | Typical hubs | Status |
 |---------|-----------|---------------|--------------|--------|
-| **Production Planner** | `planner` | Triage, resolve, schedule | Workspace, Planning, Copilot | Primary |
-| **Plant Manager** | `manager` | Approve schedules, trade-offs | Planning, Command | Primary |
+| **Production Planner** | `planner` | Triage, resolve, schedule, forecast review, segment review | Workspace, Planning, Copilot | Primary |
+| **Plant Manager** | `manager` | Approve schedules, S&OP cycle management | Planning, Command | Primary |
 | **Shop Supervisor** | `supervisor` | Monitor disruptions | Command, Shop Floor | Full profile |
 | **Shop Operator** | `operator` | Execute work orders | Shop Floor | Full profile |
-| **Executive / VP Ops** | `executive` | OTD, margin, chaos cost | Command, Workspace | Primary |
-| **Procurement Analyst** | `procurement` | Supplier risk, spend | Supply Chain | Full / R2 stretch |
-| **System Administrator** | `admin` | Tenant, Odoo, autonomy, ops | Platform | Primary |
+| **Executive / VP Ops** | `executive` | OTD, margin, chaos cost, S&OP alignment | Command, Workspace | Primary |
+| **Procurement Analyst** | `procurement` | Supplier risk, spend, safety stock alerts | Supply Chain | Full / R2 stretch |
+| **Demand Planner** | `planner` | Forecast quality, bias, segment-based policies | Planning/Demand | R2/Full |
+| **System Administrator** | `admin` | Tenant, Odoo, autonomy, ops, S&OP cycle admin | Platform | Primary |
 | **Auditor** | `auditor` | Read-only compliance | Compliance | Enterprise |
 | **Demo Engineer** | `admin` | 32/32, R1/R2 demos | All + scripts | Internal |
 
@@ -292,6 +315,7 @@ Login (local JWT or Keycloak)
        └─ score ≥ 70 → Schedule directly → Approve
   → [R2] /planning/demand | /planning/scenarios | /ai-governance/copilot
   → [R2] /command-center/otd-analytics | /command-center/outcomes
+  → [R2/020] Copilot: "show forecast accuracy" | "ABC/XYZ segments" | "safety stock gaps" | "SOP cycle status"
 ```
 
 ### 4.3 Decision Tree — MO Triage
@@ -328,6 +352,17 @@ MO in feasibility queue?
   → /command-center/otd-analytics (5 KPIs)
   → /command-center/outcomes (ROI / baseline)
   → Drill to Control Tower if OTD down
+  → [R2] /command-center/sop-report → review consensus vs plan
+```
+
+### 4.6 Demand Planner Journey — Monthly Forecast Review (R2/020)
+
+```
+Copilot: "get forecast accuracy" → MAPE by product
+  → identify high-bias SKUs → check ABC/XYZ segment
+  → update safety stock policy for class C/Z items
+  → review SOP cycle: POST /api/v1/sop/cycle (advance stage)
+  → consensus vs plan reconciliation before management review
 ```
 
 ---
@@ -344,7 +379,7 @@ MO in feasibility queue?
 | UC-04 | Excel project plan import | Planner | R1/Full | **SHIPPED** |
 | UC-05 | Demand sensing (SES) | Planner | R2/Full | **SHIPPED** |
 | UC-06 | Scenario simulate/compare | Planner | R2/Full | **SHIPPED** |
-| UC-07 | Scenario promotion to live plan | Planner | R2 | **PLANNED** (#40) |
+| UC-07 | Scenario promotion to live plan | Planner | R2 | **SHIPPED** (Spec 019, #40 closed) |
 | UC-08 | Supply network visibility | Planner, Exec | Full | **SHIPPED** |
 | UC-09 | Copilot NL planning query | Planner | R2/Full | **SHIPPED** |
 | UC-10 | Executive disruption review | Executive | Full/R1 partial | **SHIPPED** |
@@ -358,6 +393,12 @@ MO in feasibility queue?
 | UC-18 | Predictive delay (XGBoost+SHAP) | Planner | Wave 2 | **PLANNED** / **UNKNOWN** (#42) |
 | UC-19 | NL schedule change | Planner | Wave 3 | **PLANNED** (#43–#44) |
 | UC-20 | Automated supplier comms | System | Wave 3 | **PLANNED** (#45–#46) |
+| UC-21 | ABC/XYZ product segmentation | Demand Planner | R2/020 | **SHIPPED** (Spec 020) |
+| UC-22 | Forecast quality review (MAPE/Bias) | Demand Planner | R2/020 | **SHIPPED** (Spec 020) |
+| UC-23 | Statistical safety stock calculation | Planner | R2/020 | **SHIPPED** (Spec 020) |
+| UC-24 | Capacity utilisation alerts | Manager | R2/020 | **SHIPPED** (Spec 020) |
+| UC-25 | S&OP cycle management | Manager | R2/020 | **SHIPPED** (Spec 020) |
+| UC-26 | S&OP consensus vs plan | Exec, Manager | R2/020 | **SHIPPED** (Spec 020) |
 
 ### 5.2 UC-01 — Daily Production Health Triage
 
@@ -366,7 +407,7 @@ MO in feasibility queue?
 | **Actor** | Planner |
 | **Preconditions** | Authenticated JWT; tenant set; MOs in CDM; fea-svc healthy |
 | **Main flow** | Login → Control Tower → `GET /feasibility/kpis` + `GET /feasibility/queue` → sort by score ASC → open Resolve |
-| **Alternatives** | WebSocket refresh; manual sync if stale; Copilot “show at-risk MOs” (R2) |
+| **Alternatives** | WebSocket refresh; manual sync if stale; Copilot "show at-risk MOs" (R2) |
 | **Edge** | Empty queue; `unscorable=true`; Kong 401 if AUTH_MODE mismatch |
 | **Success** | Top 3 at-risk MOs identified in **≤5 minutes** |
 
@@ -413,8 +454,19 @@ MO in feasibility queue?
 | Attribute | Detail |
 |-----------|--------|
 | **Preconditions** | nlp-svc up; AUTH; optional LLM keys (degrades gracefully) |
-| **Main flow** | `/ai-governance/copilot` → query → tools hit live feasibility/schedule APIs → response + sources |
-| **Success** | Unauthenticated → 401; authenticated tool path returns structured answer (smoke 12/12 W1-02) |
+| **Main flow** | `/ai-governance/copilot` → query → tools hit live feasibility/schedule/planning APIs → response + sources |
+| **Planning tools** | `get_forecast_accuracy`, `get_forecast_bias`, `get_product_segments`, `get_safety_stock_gaps`, `get_capacity_alerts`, `get_sop_cycle_status`, `get_consensus_vs_plan`, `compare_sop_versions` (+ 16 general) |
+| **Success** | Unauthenticated → 401; authenticated tool path returns structured answer; UAT-10 timeout = LLM infra gap |
+
+### 5.8 UC-25 — S&OP Cycle Management (Spec 020)
+
+| Attribute | Detail |
+|-----------|--------|
+| **Actor** | Manager / Admin |
+| **Preconditions** | sop-svc healthy; tenant set |
+| **Main flow** | `POST /api/v1/sop/cycle` (create) → advance FSM: `draft→demand_review→supply_review→reconciliation→management_review→closed` |
+| **Validation** | Invalid transitions rejected with 422; stage deadlines nullable |
+| **Success** | FSM transitions pass; consensus calculate returns `version` UUID; tests 6/6 (sop-svc) |
 
 ---
 
@@ -445,7 +497,7 @@ MO in feasibility queue?
 | FR-PLN-08 | Excel upload | .xlsx validation | Should | **SHIPPED** |
 | FR-PLN-09 | Demand SES forecast (R2) | Forecast + intervals API | Should | **SHIPPED** |
 | FR-PLN-10 | Scenario simulate/compare (R2) | scenario-svc | Should | **SHIPPED** |
-| FR-PLN-11 | Scenario promotion UI | Promote to live plan | Should | **PLANNED** (#40) |
+| FR-PLN-11 | Scenario promotion | POST `/{id}/promote` → status=promoted | Should | **SHIPPED** (Spec 019) |
 
 **Business rules:** BR-PLN-01 shadow autonomy — no silent auto-apply. BR-PLN-02 unscorable MOs excluded from auto-confirm. BR-PLN-03 Odoo wins master data on conflict.
 
@@ -456,8 +508,8 @@ MO in feasibility queue?
 | FR-R1-01 | MO upsert from `mrp.production` | **SHIPPED** | |
 | FR-R1-02 | BOM + BOM lines + routing | **SHIPPED** | |
 | FR-R1-03 | Work center sync | **SHIPPED** | |
-| FR-R1-04 | Product update path | **SHIPPED** | |
-| FR-R1-05 | Stock / material availability | **PARTIAL** | Spec 013 claims safety_stock proxy; **C-15** still open for true `stock.quant` — **OQ-11** |
+| FR-R1-04 | Product update path (+ lead time, cost price via 046) | **SHIPPED** | |
+| FR-R1-05 | Stock / material availability | **PARTIAL** | mock-quants in Spec 019; live `stock.quant` = PH1-02 — **OQ-11** |
 | FR-R1-06 | Scheduled sync 15 min | **SHIPPED** | |
 | FR-R1-07 | Sync run log | **SHIPPED** | `cdm_sync_run` |
 | FR-R1-08 | Data quality flags | **SHIPPED** | |
@@ -486,7 +538,7 @@ MO in feasibility queue?
 | FR-017-W1-07/08 | OTD API + dashboard | **SHIPPED** |
 | FR-017-W2-01 | Tenant provision API | **PARTIAL** (#37) |
 | FR-017-W2-02 | Quotas/metering | **PARTIAL** (#38) |
-| FR-017-W2-03/04 | Scenario + demand | **SHIPPED** (promotion UI open) |
+| FR-017-W2-03/04 | Scenario + demand | **SHIPPED** (promotion shipped Spec 019) |
 | FR-017-W2-06 | Predictive delay ML | **PLANNED** (#42) |
 | FR-017-W3-* | NL schedule + supplier comms | **PLANNED** (#43–#46) |
 
@@ -501,7 +553,43 @@ MO in feasibility queue?
 | FR-S7-05 | Pattern discovery | **PLANNED** |
 | FR-S7-06 | Email↔PM Graph sync | Deferred |
 
-### 6.6 Feasibility Scoring Rules
+### 6.6 Planning Intelligence (Spec 020 — FR-020-*)
+
+| ID | Requirement | Acceptance | Priority | Status |
+|----|-------------|------------|----------|--------|
+| FR-020-B-01 | ABC/XYZ product segmentation | `GET /api/v1/material/segmentation/{product_id}` returns segment; mig 044 applies | Must | **SHIPPED** |
+| FR-020-B-02 | Segmentation by revenue (ABC) + demand variation (XYZ) | Formula-correct known-value tests 4/4 | Must | **SHIPPED** |
+| FR-020-A-01 | Forecast quality MAPE/Bias/MASE/Stability | `GET /api/v1/demand/forecast-quality` | Must | **SHIPPED** |
+| FR-020-A-02 | Bias detection (systematic over/under forecasting) | Bias flag in response | Must | **SHIPPED** |
+| FR-020-D-01 | ARIMA/SARIMA model fitting | Best-fit model selector factory | Must | **SHIPPED** |
+| FR-020-D-02 | SES fallback if statsmodels/scipy missing | Graceful degrade | Must | **SHIPPED** |
+| FR-020-Odoo-01 | Lead time sync from Odoo | `lead_time_mapper.py`; mig 046 adds fields | Must | **SHIPPED** (protocol stand-in; live = PH1-02) |
+| FR-020-Odoo-02 | Product cost + price + revenue fields | `cdm_product` extended | Must | **SHIPPED** |
+| FR-020-C-01 | Statistical safety stock (IBP formula) | `GET /api/v1/material/safety-stock/{product_id}` | Must | **SHIPPED** |
+| FR-020-C-02 | Safety stock linked to ABC/XYZ segment service level | SL=97.0 for A/X items (UAT-12 PASS) | Must | **SHIPPED** |
+| FR-020-E-01 | Capacity utilisation alerts | `GET /api/v1/capacity/utilisation` | Must | **SHIPPED** |
+| FR-020-E-02 | Overloaded WC alert with threshold config | mig 048 + `cdm_capacity_alert` | Must | **SHIPPED** |
+| FR-020-F-01 | S&OP process engine (sop-svc :8110) | `POST /api/v1/sop/cycle`; FSM 6-stage | Must | **SHIPPED** |
+| FR-020-F-02 | Consensus calculate + version | `POST /api/v1/sop/consensus/calculate` returns `version` UUID | Must | **SHIPPED** |
+| FR-020-F-03 | SOP versions list + compare | `GET /api/v1/sop/versions` | Must | **SHIPPED** |
+| FR-020-COP-01 | ≥9 planning-specific Copilot tools | 25 total (9 planning + 16 general) | Must | **SHIPPED** |
+| FR-020-INFRA-01 | Docker compose includes sop-svc :8110 | In `docker-compose.release2.yml` | Must | **SHIPPED** |
+| FR-020-INFRA-02 | Kong routes for all new APIs | 5 new routes in `kong.release2.yml` | Must | **SHIPPED** |
+| FR-020-I18N-01 | AR/EN planning i18n keys | `locales/en.json` + `locales/ar.json` | Must | **SHIPPED** |
+
+### 6.7 Program Converge (Spec 019 — FR-019-*)
+
+| ID | Requirement | Status |
+|----|-------------|--------|
+| FR-019-01 | release2 compose defines `mat-svc` (AUTH_MODE=local, no Kafka, port 8002) | **SHIPPED** |
+| FR-019-02 | scenario-svc `POST /api/v1/scenario/{id}/promote` | **SHIPPED** |
+| FR-019-03 | Scenario Workbench Promote action (EN+AR strings) | **SHIPPED** |
+| FR-019-04 | mock-odoo returns sample `stock.quant` records | **SHIPPED** |
+| FR-019-05 | Commercial blockers documented as OPEN (not faked) | **SHIPPED** |
+| FR-019-06 | No duplicate GitHub issues for closed #27–#36/#39/#41 | **SHIPPED** |
+| FR-019-07 | Open #37/#38/#42–#46 linked with defer/ARB notes | **SHIPPED** |
+
+### 6.8 Feasibility Scoring Rules
 
 | Gate | Weight | Input | Rule |
 |------|--------|-------|------|
@@ -532,14 +620,20 @@ MO in feasibility queue?
 | **Unified Workspace** | Cross-tool briefing | Less context switch | `/workspace` + unified API | dpe | P1 | spec 016 | **SHIPPED** |
 | **Hub consolidation** | IA | 6 hubs + redirects | Sidebar matches profile | web | P0 | v7 | **SHIPPED** |
 | **Outcomes / OTD** | ROI story | Baseline + trend | 5 KPIs; filters | dpe | P0 R2 | 014/017 | **SHIPPED** |
-| **Copilot live tools** | NL assist | Faster triage | Tools + 401 smoke | nlp-svc | P1 R2 | 017/018 | **SHIPPED** |
+| **Copilot live tools** | NL assist | Faster triage | 25 tools + 401 smoke; UAT-10 timeout | nlp-svc | P1 R2 | 017/018/020 | **SHIPPED** (UAT-10/11 partial) |
 | **Demand SES** | Sensing | Forecast intervals | MAPE endpoint | demand-svc | P1 R2 | 018 S3 | **SHIPPED** |
+| **ARIMA/SARIMA best-fit** | Statistical forecast | Better accuracy | Best-fit factory; tests 5/5 | demand-svc | P1 R2 | Spec 020 | **SHIPPED** |
+| **Forecast quality** | MAPE/Bias/MASE/Stability | Detect drift | Tests 4/4; `/demand/forecast-quality` | demand-svc | P1 R2 | Spec 020 | **SHIPPED** |
+| **ABC/XYZ Segmentation** | Product class | Policy differentiation | Tests 4/4; segment API | mat-svc | P1 R2 | Spec 020 | **SHIPPED** |
+| **Statistical safety stock** | IBP formula | Right inventory | IBP calc; linked to SL by segment | mat-svc | P1 R2 | Spec 020 | **SHIPPED** |
+| **Capacity utilisation alerts** | WC overload early warning | Prevent bottlenecks | Tests 4/4; alert API | cap-svc | P1 R2 | Spec 020 | **SHIPPED** |
+| **S&OP process engine** | Monthly cycle | Structured planning | FSM 6-stage; consensus calc; tests 6/6 | sop-svc :8110 | P1 R2 | Spec 020 | **SHIPPED** |
 | **Scenario workbench** | What-if | Compare plans | Simulate + compare | scenario-svc | P1 R2 | 018 S4 | **SHIPPED** |
-| **Scenario promotion** | Commit what-if | Promote to live | UI + API | scenario-svc | P2 | #40 | **PLANNED** |
+| **Scenario promotion** | Commit what-if | Promote to live | POST promote → status=promoted | scenario-svc | P1 R2 | Spec 019 | **SHIPPED** |
 | **Arabic 8+ screens** | MENA UX | Planner in AR | Native sign-off | i18n | P0 | 018 S5 | **PARTIAL** |
 | **Ops dashboard** | Multi-tenant health | Ops visibility | Admin-only APIs | dpe | P2 | 018 S8 | **PARTIAL** |
 | **Tenant provision** | Self-service | Scale customers | One-call provision | dpe | P2 | #37/#25 | **PARTIAL** |
-| **Keycloak SSO** | Enterprise IdP | SSO | Gate 5 / Option B | keycloak | P1 Ent | 011/015 | **PARTIAL** (R2 container often unhealthy; local JWT path) |
+| **Keycloak SSO** | Enterprise IdP | SSO | Gate 5 / Option B | keycloak | P1 Ent | 011/015 | **PARTIAL** (health flaky in R2) |
 | **Helm / K8s R1** | Scale path | Gates 6–10 | kind deploy | helm | P1 Ent | 015 | **SHIPPED** |
 | **SAP/D365 scaffold** | Future ERP | Registry no-op | Gate 10 imports | connector | P3 | 015 | **SHIPPED** scaffold |
 | **SAP B1** | ERP #2 | — | — | — | — | S12 | **CUT** |
@@ -606,6 +700,30 @@ MO in feasibility queue?
 
 **Status:** Eng **PARTIAL**; human **BLOCKED**.
 
+### BS-06 — Planning Intelligence Monthly Cycle (Spec 020)
+
+| Step | Action | Metric |
+|------|--------|--------|
+| 1 | Admin creates S&OP cycle | `POST /api/v1/sop/cycle` → `status=draft` |
+| 2 | Planner reviews ABC/XYZ segments | `/api/v1/material/segmentation` → UAT-6 PASS (7 products classified) |
+| 3 | Demand planner checks MAPE/Bias | `/api/v1/demand/forecast-quality` |
+| 4 | Update safety stock by class | `/api/v1/material/safety-stock` (SL=97.0 for A/X — UAT-12 PASS) |
+| 5 | Advance cycle to demand_review | FSM transition |
+| 6 | Copilot: "get consensus vs plan" | tool response + version UUID |
+
+**Status:** Eng **SHIPPED**; migrations apply on live stack required (OQ-13).
+
+### BS-07 — Scenario Promote to Live Plan (Spec 019)
+
+| Step | Action | Metric |
+|------|--------|--------|
+| 1 | Planner opens scenario workbench | Active scenarios listed |
+| 2 | Select preferred what-if scenario | Scenario with compare complete |
+| 3 | Click Promote | POST `/{id}/promote` → `status=promoted` |
+| 4 | Confirm in list | Promoted scenario filtered/returned |
+
+**Status:** **SHIPPED** (#40 closed). Product verify pending (T061).
+
 ---
 
 ## 9. User Interface & Navigation
@@ -660,10 +778,11 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 | Resolution | `/planning/resolution` | Constraint list, scenario cards (cost/OTD/risk) | **SHIPPED** |
 | Schedule | `/planning/schedule` | Gantt, solver status, Approve, Excel upload | **SHIPPED** |
 | Demand | `/planning/demand` | Forecast chart, intervals, accuracy | **SHIPPED** R2 |
-| Scenarios | `/planning/scenarios` | Simulate, compare; **no promote** | **PARTIAL** |
+| Scenarios | `/planning/scenarios` | Simulate, compare, **Promote button** | **SHIPPED** |
 | OTD | `/command-center/otd-analytics` | 5 KPIs, filters, charts | **SHIPPED** |
 | Outcomes | `/command-center/outcomes` | Baseline / ROI widgets | **SHIPPED** |
-| Copilot | `/ai-governance/copilot` | Chat, sources, tools | **SHIPPED** |
+| S&OP Report | `/command-center/sop-report` | S&OP cycle, COGM/COPQ | **SHIPPED** (mig 042) |
+| Copilot | `/ai-governance/copilot` | Chat, sources, 25 tools | **SHIPPED** |
 | Odoo Config | `/platform/odoo-config` | URL/DB/user/pass, test, history | **SHIPPED** |
 | Ops | `/platform/ops` | Tenant health | **PARTIAL** |
 | Executive | `/command-center/executive` | P&L, S&OP gap, what-if | **SHIPPED** / mock gaps **UNKNOWN** |
@@ -676,8 +795,9 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 | Auth gate | `ProtectedRoute` / JWT expiry |
 | Default landing | `/` → `/workspace` |
 | Unknown routes | Redirect to planning dashboard |
-| i18n | `locales/en.json`, `locales/ar.json` |
+| i18n | `locales/en.json`, `locales/ar.json` (+ planning keys from Spec 020) |
 | Profile | `VITE_RELEASE_PROFILE` |
+| RTL | Enabled on AR locale switch |
 
 ---
 
@@ -700,7 +820,7 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 
 | Layer | Behavior | Status |
 |-------|----------|--------|
-| Kong JWT | Validates token; injects tenant; strips client tenant header | **SHIPPED** |
+| Kong JWT | Validates token; injects tenant; strips client `X-Tenant-ID` | **SHIPPED** |
 | FastAPI `require_roles` | State-changing endpoints | **SHIPPED** |
 | FastAPI `require_any_permission` | Fine-grained | **SHIPPED** |
 | PostgreSQL RLS | `app.current_tenant` / `set_config` | **SHIPPED** |
@@ -715,13 +835,15 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 | `POST /resolution/approve` | planner, admin, manager | approve |
 | `POST /feasibility/auto-confirm` | planner, admin | write |
 | `POST /copilot/query` | planner, admin (+ view_copilot) | read/write |
+| `POST /api/v1/sop/cycle` | admin, manager | write |
+| `POST /api/v1/scenario/{id}/promote` | planner, admin, manager | approve |
 | Admin / ops APIs | admin | admin |
 
 ### 10.4 Data Visibility
 
 | Principle | Rule |
 |-----------|------|
-| Tenant isolation | All CDM queries under tenant RLS |
+| Tenant isolation | All CDM queries under tenant RLS; tables 044–049 all have RLS |
 | Cross-tenant | Forbidden except platform ops with explicit break-glass (**UNKNOWN** if implemented) |
 | Audit | Append-only `cdm_audit_log` (migration 021 immutability) |
 
@@ -748,7 +870,19 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 | MLOps | `/platform/ml-ops` | Admin | **PARTIAL** |
 | Grafana / Prometheus | infra | SRE | **SHIPPED** enterprise |
 
-### 11.2 Key Analytics APIs (dpe-svc)
+### 11.2 Planning Intelligence Reports (Spec 020)
+
+| Report | API | Audience | Status |
+|--------|-----|----------|--------|
+| ABC/XYZ Segment Matrix | `GET /api/v1/material/segmentation/{product_id}` | Demand Planner | **SHIPPED** |
+| Forecast Quality (MAPE/Bias/MASE/Stability) | `GET /api/v1/demand/forecast-quality` | Demand Planner | **SHIPPED** |
+| Safety Stock Gaps | `GET /api/v1/material/safety-stock/{product_id}` (+ Copilot tool) | Planner | **SHIPPED** |
+| Capacity Utilisation Alerts | `GET /api/v1/capacity/utilisation` | Manager | **SHIPPED** |
+| S&OP Cycle Status | `GET /api/v1/sop/cycle/{id}` | Manager | **SHIPPED** |
+| Consensus vs Plan | `GET /api/v1/sop/consensus/…` | Exec, Manager | **SHIPPED** |
+| SOP Versions Compare | `GET /api/v1/sop/versions` | Manager | **SHIPPED** |
+
+### 11.3 Key Analytics APIs (dpe-svc)
 
 | API | Purpose | Status |
 |-----|---------|--------|
@@ -758,7 +892,7 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 | `GET /api/v1/outcomes/*` | R2 outcomes | **SHIPPED** |
 | S&OP / cost-accounting | Forecast, COGM/COPQ | **SHIPPED** full stack |
 
-### 11.3 Feasibility / Sync Observability
+### 11.4 Feasibility / Sync Observability
 
 | API | Purpose | Status |
 |-----|---------|--------|
@@ -776,11 +910,12 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 | Item | Detail | Status |
 |------|--------|--------|
 | Protocol | XML-RPC (+ optional `ipe_connector` Odoo module) | **SHIPPED** |
-| Entities | product, MO, BOM/lines, WC, routing, inventory proxy | **PARTIAL** (stock.quant — OQ-11) |
+| Entities | product (+ cost/price/revenue mig 046), MO, BOM/lines, WC, routing, inventory proxy | **PARTIAL** (stock.quant — OQ-11) |
+| Lead time | `lead_time_mapper.py` + `cdm_product.lead_time_days` (mig 046) | **SHIPPED** (stand-in) |
 | Auth to IPE actions | HMAC `X-IPE-Signature` | **SHIPPED** |
 | Sync cadence | 15 min + manual | **SHIPPED** |
 | Write-back | `/sync/odoo/activate` | **SHIPPED** |
-| Local double | `mock-odoo-api` in R2 compose | **SHIPPED** |
+| Local double | `mock-odoo-api` in R2 compose (+ stock.quant sample from Spec 019) | **SHIPPED** |
 | Staging | Customer Odoo | **BLOCKED** PH1-02 |
 | Docs | `docs/integration/ODOO-*.md`, Star Trans worksheets | **SHIPPED** |
 
@@ -798,11 +933,12 @@ Source: `apps/web/src/app/router.tsx`, `apps/web/src/lib/constants.ts`, `release
 | dpe-svc | `:8001` | `/api/v1/auth`, `/dashboard`, `/analytics`, `/demand/classify|queue`, `/planner-assist`, `/admin`, `/compliance`, `/outcomes` |
 | fea-svc | `:8004` | `/api/v1/feasibility` |
 | res-svc | `:8005` | `/api/v1/resolution` |
-| cap-svc | `:8003` | `/api/v1/capacity` |
+| cap-svc | `:8003` | `/api/v1/capacity`, **`/api/v1/capacity/utilisation`** |
 | connector | `:8009` | `/api/v1/sync`, `/sync/odoo`, `/erp/odoo` |
 | nlp-svc | `:8007` | `/api/v1/copilot`, `/nlp` |
-| demand-svc | `:8040` | `/api/v1/demand/forecast|sense|accuracy|signal` |
-| scenario-svc | `:8050` | `/api/v1/scenario` |
+| demand-svc | `:8040` | `/api/v1/demand/forecast|sense|accuracy|signal`, **`/api/v1/demand/forecast-quality`** |
+| scenario-svc | `:8050` | `/api/v1/scenario`, **`/api/v1/material/segmentation`**, **`/api/v1/material/safety-stock`** |
+| **sop-svc** | **`:8110`** | **`/api/v1/sop`** |
 
 Plugins: CORS, HSTS, rate-limit (Redis), tenant strip.
 
@@ -833,6 +969,7 @@ Plugins: CORS, HSTS, rate-limit (Redis), tenant strip.
 | k6 stress | Rate limiter 429 | Separate script | **SHIPPED** |
 | R1 compose start | ≤10 min on 8GB VM | Playbook | **PARTIAL** (customer VM unproven — T037) |
 | Copilot LLM | Graceful degrade without keys | nlp-svc | **SHIPPED** |
+| sop-svc API | Standard FastAPI SLO | Inherits platform baseline | **UNKNOWN** (not k6-profiled separately) |
 
 ### 12.7 API Envelope
 
@@ -857,32 +994,33 @@ Standard service responses prefer structured JSON; OpenAPI per service under `do
 
 ### 13.2 Release 2 Topology
 
-R1 + `nlp-svc` + `demand-svc` + `scenario-svc` + `mock-odoo-api`.
+R1 + `nlp-svc` + `demand-svc` + `scenario-svc` + `mock-odoo-api` + `mat-svc` (Spec 019) + `sop-svc :8110` (Spec 020).
 
-**Gap:** `mat-svc` referenced by URL but **missing** from compose — **OQ-8** / C-14.
+**Gap resolved:** `mat-svc` is now in compose (OQ-8 **CLOSED** by Spec 019 T010). `sop-svc` added at `:8110` by Spec 020.
 
 ### 13.3 Full Stack Services (monorepo `ipe/services/`)
 
 | Service | Role | Typical port | In R1 compose | In R2 compose |
 |---------|------|--------------|---------------|---------------|
 | dpe-svc | Demand/priority, analytics, auth, admin, outcomes | 8001 | ✅ | ✅ |
-| mat-svc | Material, pATP, CTP | 8002 | ❌ (OQ-8) | ❌ |
-| cap-svc | OR-Tools scheduling | 8003 | ✅ | ✅ |
+| mat-svc | Material, pATP, CTP, ABC/XYZ segmentation, safety stock | 8002 | ❌ | ✅ |
+| cap-svc | OR-Tools scheduling, utilisation alerts | 8003 | ✅ | ✅ |
 | fea-svc | Feasibility + WS | 8004 | ✅ | ✅ |
 | res-svc | Resolution scenarios | 8005 | ✅ | ✅ |
 | del-svc | Delay NLP | 8006 | Full | — |
-| nlp-svc | Copilot | 8007 | — | ✅ |
+| nlp-svc | Copilot (25 tools) | 8007 | — | ✅ |
 | rec-svc | Recommendations | 8008 | Full | — |
-| connector | ERP sync | 8009 | ✅ | ✅ |
+| connector | ERP sync + lead time mapper | 8009 | ✅ | ✅ |
+| mock-odoo-api | Test ERP (+ stock.quant) | 8010 | — | ✅ |
 | alert-svc | Alerts | 8010 | Full | — |
 | sustain / quality / scn / network | Specialty | 8012–8015 | Full | — |
 | ml-svc | ML | 8016 | Full | — |
-| demand-svc | SES demand | 8040 | — | ✅ |
-| scenario-svc | Scenarios | 8050 | — | ✅ |
-| mock-odoo-api | Test ERP | — | — | ✅ |
+| demand-svc | SES + ARIMA/best-fit + forecast quality | 8040 | — | ✅ |
+| scenario-svc | Scenarios (+ promote endpoint) | 8050 | — | ✅ |
+| **sop-svc** | **S&OP process engine** | **8110** | — | ✅ |
 | order/supply/equipment/procurement/… | v8 streams | varies | Full | — |
 
-Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alternate; prefer canonical names above. **Do not use** orphan `services/` at AISOP repo root.
+Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alternate. **Do not use** orphan `services/` at AISOP repo root.
 
 ### 13.4 Technology Stack
 
@@ -900,13 +1038,14 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 | Orchestration | Docker Compose; Helm/kind (enterprise) |
 | Observability | Prometheus, Grafana, OTel, Jaeger |
 | Solvers | OR-Tools CP-SAT |
+| Statistical | statsmodels (ARIMA/SARIMA), scipy (safety stock) |
 | LLM | Ollama / OpenRouter / Anthropic (tiered) |
 
 ### 13.5 Security Architecture
 
 | Control | Status |
 |---------|--------|
-| RLS on tenant tables | **SHIPPED** (legacy INSERT policies 033/035) |
+| RLS on tenant tables | **SHIPPED** (legacy INSERT policies 033/035; new tables 044–049 all RLS-enabled) |
 | JWT + RBAC | **SHIPPED** |
 | Audit immutability | **SHIPPED** |
 | PII stripping (Copilot SaaS tier) | **SHIPPED** |
@@ -922,6 +1061,19 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 | Enterprise | Helm + HPA smoke | **SHIPPED** gates 6–10 |
 | Multi-tenant SaaS | Quotas/metering/Stripe | **PARTIAL** / Phase 4 |
 
+### 13.7 Spec 020 Module Architecture
+
+```
+Odoo 19 ──connector (lead_time_mapper)──→ CDM
+                         ├── demand-svc (forecast quality: MAPE/Bias/MASE/Stability; ARIMA/SARIMA best-fit)
+                         ├── mat-svc (ABC/XYZ segmentation; statistical safety stock IBP)
+                         ├── cap-svc (utilisation alerts, capacity thresholds)
+                         └── sop-svc :8110 (S&OP cycles, consensus, version compare)
+                                   └── nlp-svc Copilot (25 tools; 9 planning-specific)
+```
+
+**Migration chain:** `042` → `044` (segmentation) → `045` (forecast quality) → `046` (connector extensions) → `047` (safety stock) → `048` (capacity alerts) → `049` (sop engine)
+
 ---
 
 ## 14. Competitive Context
@@ -934,7 +1086,8 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 |------|------------|
 | R1 competitor | Excel + Odoo MRP |
 | Not primary pitch | Kinaxis / SAP IBP feature parity |
-| Moat claim | MENA implementation + feasibility-before-shift workflow |
+| Spec 020 claim | 20% of SAP IBP capabilities = 80% of MENA mid-market value (IPE-native modules, not SAP connector) |
+| Moat claim | MENA implementation + feasibility-before-shift workflow + Arabic MVP + 8GB VM deploy |
 | Buyer | CEO / Ops Director |
 
 ### 14.2 Provisional Feature Matrix (needs PM validation)
@@ -945,6 +1098,12 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 | Feasibility gates + unscorable | ✅ | ❌ | * | * | * |
 | OR-Tools finite schedule | ✅ | Limited MRP | * | * | * |
 | Resolution scenarios | ✅ | ❌ | * | * | * |
+| ABC/XYZ segmentation | ✅ R2 (Spec 020) | Limited | * | ✅* | * |
+| Forecast quality (MAPE/Bias/MASE) | ✅ R2 (Spec 020) | Manual | * | ✅* | * |
+| Statistical safety stock (IBP) | ✅ R2 (Spec 020) | Manual | * | ✅* | * |
+| S&OP process engine | ✅ R2 (Spec 020) | ❌ | * | ✅* | * |
+| ARIMA/SARIMA forecasting | ✅ R2 (Spec 020) | ❌ | * | * | * |
+| Copilot planning tools | ✅ 25 tools | ❌ | * | * | * |
 | Arabic MVP | 🟡 | Varies | * | * | * |
 | 8GB VM deploy | ✅ | N/A | ❌ typical | ❌ | ❌ |
 | Multi-echelon network | Demo/full | ❌ | * | * | * |
@@ -968,9 +1127,14 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 
 | Category | Examples | Store |
 |----------|----------|-------|
-| Master data | Products, BOM, WC, operators | CDM Postgres |
+| Master data | Products (+ cost/price/revenue mig 046), BOM, WC, operators | CDM Postgres |
 | Transactional | MOs, demand lines, supply orders | CDM |
-| Planning | Feasibility scores, schedules, scenarios | CDM |
+| Planning | Feasibility scores, schedules, scenarios, promotions | CDM |
+| Segmentation | `cdm_product_segment` (ABC/XYZ; mig 044) | CDM |
+| Forecast quality | `cdm_forecast_quality_log` (MAPE/Bias; mig 045) | CDM |
+| Safety stock | `cdm_safety_stock_policy` (mig 047) | CDM |
+| Capacity alerts | `cdm_capacity_alert` (mig 048) | CDM |
+| S&OP | `cdm_sop_cycle`, `cdm_sop_consensus`, `cdm_sop_version` (mig 049) | CDM |
 | Sync audit | `cdm_sync_run`, DQ flags | CDM |
 | Activity | `cdm_activity_event` | CDM (038) |
 | Auth | `cdm_user` password hashes | CDM |
@@ -981,7 +1145,7 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 
 | Control | Status |
 |---------|--------|
-| Tenant RLS | **SHIPPED** |
+| Tenant RLS (incl. tables 044–049) | **SHIPPED** |
 | GDPR DSAR APIs | **SHIPPED** (dpe) |
 | Consent manager | **SHIPPED** code |
 | Retention policies + Airflow DAG | **SHIPPED** code |
@@ -995,7 +1159,9 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 |------------|--------|
 | Master data (BOM, product, WC) | **Odoo** |
 | Approved schedule dates | **IPE** until next sync conflict |
-| Inventory on-hand | Odoo (`stock.quant` target) — **PARTIAL** |
+| Inventory on-hand | Odoo (`stock.quant` target) — **PARTIAL** (mock done; live PH1-02) |
+| Safety stock policy (IBP formula) | **IPE** (calculated, stored in CDM) |
+| S&OP consensus | **IPE** (versioned, owned by sop-svc) |
 
 ---
 
@@ -1012,37 +1178,43 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 | Enterprise P3 | 015/017 | v9.4.0-p3 | **SHIPPED** |
 | Sprint 7 cohesion | 016 | mig 038 | **SHIPPED** Tier 1 |
 | R2 sprints S1–S4, S6–S11 | 018 | smoke/demo | **SHIPPED** eng |
+| Program converge | 019 | commit `fcd2545` | **SHIPPED** (eng); T060/T061 ops-pending |
+| Planning intelligence | 020 | mig 044–049; 46/46 tests | **SHIPPED** (eng); mig apply + smoke pending |
 
 ### 16.2 In Progress / Hold
 
 | Item | Owner | Blocker | Status |
 |------|-------|---------|--------|
+| Apply mig 044–049 on live stack | Ops | Requires `make migrate` when stack up | **BLOCKED** (ops) |
+| Run R2 smoke with sop-svc | QA | After mig apply | **BLOCKED** (ops) |
+| Tag `v9.2.0-planning` | Release manager | After smoke green | **BLOCKED** (OQ-13) |
 | G-R2-04 Arabic native sign-off | Native reviewer | Human | **BLOCKED** |
 | G-R2-TAG / `v9.1.1-r2` | Release manager | G-R2-04 policy | **BLOCKED** |
 | Phase 1 UAT Star Trans | Exec + Eng | PH1-01 SOW, PH1-02 staging | **BLOCKED** |
-| C-15 stock.quant | Backend / ARB | OQ-11 | **PARTIAL** |
-| #40 scenario promotion | Frontend | OQ-10 | **PLANNED** |
-| #37/#38 provision/quotas | Backend | Scope | **PARTIAL** |
-| mat-svc in R2 compose | Backend | OQ-8 | **PLANNED** |
+| C-15 stock.quant live sync | Backend / ARB | OQ-11 / PH1-02 | **PARTIAL** (mock done) |
+| T060 mat-svc R2 health verify | Ops | QA window | **PLANNED** |
+| T061 Scenario promote product verify | PM | QA window / #40 | **PLANNED** |
+| #37/#38 provision/quotas | Backend | Scope / OQ-14 | **PARTIAL** |
 | Keycloak health in R2 | Ops | Container | **PARTIAL** |
 
 ### 16.3 Upcoming (Waves / Phases)
 
 | Horizon | Content | Gate |
 |---------|---------|------|
-| Wave 2 remainder | Predictive delay (#42); provision/quotas | Spec 017 |
-| Wave 3 | NL schedule + supplier comms (#43–46) | Spec 017 |
+| Ops: mig 044–049 apply | `make migrate` on live DB | OQ-13 → smoke → `v9.2.0-planning` |
+| Wave 2 remainder | Predictive delay (#42); provision/quotas | Spec 017 / OQ-14–15 |
+| Wave 3 | NL schedule + supplier comms (#43–46) | Spec 017 / ARB |
 | Phase 4 GTM | Stripe, tenant self-service, developer portal | After P3 tag ✅ |
-| Phase 5 | SOC 2 II, WCAG, live SAP/D365 | Post-GTM |
+| Phase 5 | SOC 2 II, WCAG, live SAP/D365, KF overlay tables | Post-GTM |
 
 ### 16.4 Resource Notes
 
 | Resource | Note |
 |----------|------|
-| Engineering | R2 eng ~92% per STATUS-REPORT |
+| Engineering | R2 eng ~92% per STATUS-REPORT; Spec 020 modules 100% eng-done |
 | Commercial | PH1-01/02 required for revenue UAT |
 | Native Arabic QA | Cannot be automated |
-| Infra | Kind 8/8; compose R2 up with AUTH_MODE=local |
+| Infra | Kind 8/8; compose R2 up with AUTH_MODE=local; sop-svc requires mig 049 before start |
 
 ### 16.5 Current Gate Matrix (authoritative snapshot)
 
@@ -1056,8 +1228,12 @@ Also present: `material-svc`, `gateway`, `connectors/` — treat as legacy/alter
 | G-R2-TAG | **HOLD** | Prefer `v9.1.1-r2` after Arabic |
 | Enterprise 1–10 | **PASS** | Spec 015 / GATE-RESULTS |
 | Gate 11 | **12/14 + waiver** | OQ-9 accepted |
+| Spec 020 unit tests | **PASS** 46/46 | `PLANNING-INTELLIGENCE-FINALIZE-REPORT.md` |
+| Planning UAT (UAT-4–12) | **PARTIAL** 8 PASS / 2 PARTIAL | `PLANNING-UAT-RESULTS-2026-07-11.md` |
+| Mig 044–049 on live DB | **OPEN** | OQ-13 / ops |
+| `v9.2.0-planning` tag | **NOT TAGGED** | After mig + smoke |
 
-Open inventory: `specs/018-phase2-release2/OPEN-ITEMS-PROJECT.md`.
+Open inventory: `specs/018-phase2-release2/OPEN-ITEMS-PROJECT.md`, `specs/019-program-converge/`, `specs/020-planning-intelligence/`.
 
 ---
 
@@ -1067,16 +1243,18 @@ Open inventory: `specs/018-phase2-release2/OPEN-ITEMS-PROJECT.md`.
 |----|------|--------|------------|------------|--------|
 | R-01 | No signed SOW / staging Odoo | Cannot prove ROI | High | PH1-01/02 executive track | **BLOCKED** |
 | R-02 | Arabic QA unsigned | Tag hold; MENA trust | Medium | Native reviewer checklist | **BLOCKED** |
-| R-03 | stock.quant gap | Misleading material scores | Medium | Implement or ARB CUT (OQ-11) | Open |
-| R-04 | mat-svc absent from R2 compose | Broken material paths | Medium | Add service (C-14) | Open |
+| R-03 | stock.quant gap (live) | Misleading material scores | Medium | Mock done; ARB CUT live sync until staging (OQ-11) | Mitigated (mock) |
+| R-04 | mig 044–049 not applied | sop-svc won't start; planning intelligence unavailable | High | Ops: `make migrate` + smoke | **OPEN** (OQ-13) |
 | R-05 | Keycloak unhealthy | SSO demos fail | Medium | AUTH_MODE=local for R2; fix container | Mitigated short-term |
 | R-06 | AUTH_MODE mismatch → 401 | Smoke/demo red | Medium | Document local mode; dual JWT | Mitigated 2026-07-10 |
 | R-07 | Feature sprawl vs R1 focus | Diluted go-live | Medium | Constitution VII | Ongoing |
-| R-08 | LLM key absence | Copilot degrade | Low | Graceful fallback + tools | Mitigated |
+| R-08 | LLM key absence / timeout | Copilot degrade (UAT-10/11 PARTIAL) | Low | Graceful fallback + tools; UAT-10 noted | Mitigated |
 | R-09 | Kind OR-Tools timeout | Gate 11 incomplete | Low | OQ-9 waiver | Accepted |
-| R-10 | Competitive overclaim | Sales risk | Medium | Label provisional matrix | Process |
+| R-10 | Competitive overclaim | Sales risk | Medium | Label provisional matrix; Spec 020 = IPE-native | Process |
 | R-11 | UI RBAC gap | Unauthorized screen access | Medium | OQ-3 decision | Open |
-| R-12 | Unpushed / dirty git | Traceability | Low | Release hygiene | Process |
+| R-12 | sop-svc port conflict (:8110) | Stack start failure | Low | Port 8110 reserved; check before up | Document |
+| R-13 | statsmodels/scipy not installed | ARIMA degrade to SES | Low | Graceful degrade coded; add to requirements | Mitigated |
+| R-14 | KF overlay tables missing | Key figure registry incomplete | Low | Deferred to R3 (PARTIAL—documented) | Accepted |
 
 ---
 
@@ -1092,18 +1270,22 @@ Open inventory: `specs/018-phase2-release2/OPEN-ITEMS-PROJECT.md`.
 | A-04 | 8GB VM is acceptable production for R1 | Docs yes; customer VM **UNKNOWN** |
 | A-05 | Pricing band $18–30K fits buyer | **OQ-7** |
 | A-06 | mock-odoo ≈ staging for eng gates | Accepted for G-R2; not for UAT |
+| A-07 | 20% of SAP IBP = 80% of MENA value is correct segmentation | Engineering judgment; not validated by customer |
+| A-08 | statsmodels/scipy available in demand-svc container | Added to requirements; graceful SES fallback if missing |
+| A-09 | sop-svc port 8110 does not conflict with other services | Verified in compose; 8110 is new |
 
 ### 18.2 Technical Constraints
 
 | Constraint | Detail |
 |------------|--------|
-| RLS mandatory | Constitution I |
+| RLS mandatory | Constitution I — ALL new tables must have RLS (verified: 044–049 all RLS) |
 | Tests for behavioral changes | Constitution III |
-| No Kafka in R1 | Constitution IV |
+| No Kafka in R1/R2 | Constitution IV |
 | Port reconciliation | Dockerfile / compose / Kong / Helm |
 | Redis host port | **6380** (common env) |
 | Python 3.12 + ruff/mypy/prettier | Tooling |
 | Cross-platform scripts | PowerShell customer-facing |
+| Migration chain linearity | 042→044→045→046→047→048→049 (no gaps) |
 
 ### 18.3 Business Constraints
 
@@ -1114,15 +1296,17 @@ Open inventory: `specs/018-phase2-release2/OPEN-ITEMS-PROJECT.md`.
 | Arabic before go-live | CT, Resolution, nav, alerts |
 | Fixed-scope SOW | Not demo-script-only |
 | Phase 4 GTM after `v9.4.0-p3` | Constitution VIII |
+| Spec 020 = IPE-native | Not SAP connectors; SAP B1 CUT |
 
 ### 18.4 Doc Drift / Conflicts (do not invent resolution)
 
 | Conflict | Sources | Action |
 |----------|---------|--------|
-| FR-R1-05 done vs C-15 open | Spec 013 vs OPEN-ITEMS | **OQ-11** |
+| FR-R1-05 done vs C-15 open | Spec 013 vs OPEN-ITEMS | Mock done (Spec 019); live PH1-02 — **OQ-11** |
 | READINESS score 100 vs R2 finalize ~92% eng | READINESS vs 018 STATUS | Treat as different scopes (v8 demo vs R2 program) |
 | Root AGENTS.md still cites v6 REL-* | Root AGENTS vs tags v9.x | Update pointer — **UNKNOWN** owner |
-| Spec 018 header still “smoke pending” | spec.md vs GATES.md | Prefer **GATES.md** + STATUS-REPORT as live |
+| Spec 020 task list has `v9.2.0-planning NOT tagged` | tasks.md | Do NOT retag blindly; apply mig + smoke first |
+| Planning UAT-10/11 PARTIAL | UAT results vs 46/46 unit tests | Copilot chat = LLM timeout; unit tests cover tools; note honestly |
 
 ---
 
@@ -1130,26 +1314,33 @@ Open inventory: `specs/018-phase2-release2/OPEN-ITEMS-PROJECT.md`.
 
 ### Appendix A — Core Data Model (CDM)
 
-| Table | Purpose |
-|-------|---------|
-| `cdm_tenant` | Tenant config |
-| `cdm_product` | Product master |
-| `cdm_bill_of_material` / `cdm_bom_line` | BOM |
-| `cdm_demand_line` | Demand + priority |
-| `cdm_supply_order` | Supply / POs |
-| `cdm_manufacturing_order` | MOs + feasibility / material scores |
-| `cdm_work_order` / `cdm_work_center` / `cdm_operator` | Capacity / labor |
-| `cdm_inventory_position` | Inventory time-series |
-| `cdm_delay_event` | Delay causes |
-| `cdm_resolution_scenario` | Scenarios |
-| `cdm_sync_run` / DQ flags | R1 sync audit (036) |
-| `cdm_activity_event` | Sprint 7 activity (038) |
-| `cdm_otd_snapshot` | OTD (039) |
-| `cdm_tenant_health` | Ops (040) |
-| `cdm_supplier_score` | SC intel (041) |
-| `cdm_sop_report` | S&OP (042) |
-| Odoo config versioning | 043 |
-| `cdm_audit_log` | Append-only audit |
+| Table | Purpose | Migration |
+|-------|---------|-----------|
+| `cdm_tenant` | Tenant config | early |
+| `cdm_product` | Product master (+ `lead_time_days`, `cost_price`, `list_price`, `revenue_ytd`) | 001, 046 |
+| `cdm_bill_of_material` / `cdm_bom_line` | BOM | early |
+| `cdm_demand_line` | Demand + priority | early |
+| `cdm_supply_order` | Supply / POs | early |
+| `cdm_manufacturing_order` | MOs + feasibility / material scores | early |
+| `cdm_work_order` / `cdm_work_center` / `cdm_operator` | Capacity / labor | early |
+| `cdm_inventory_position` | Inventory time-series | early |
+| `cdm_delay_event` | Delay causes | early |
+| `cdm_resolution_scenario` | Scenarios (+ `status=promoted`) | early; promote added Spec 019 |
+| `cdm_sync_run` / DQ flags | R1 sync audit | 036 |
+| `cdm_activity_event` | Sprint 7 activity | 038 |
+| `cdm_otd_snapshot` | OTD | 039 |
+| `cdm_tenant_health` | Ops | 040 |
+| `cdm_supplier_score` | SC intel | 041 |
+| `cdm_sop_report` | S&OP legacy report | 042 |
+| `cdm_odoo_config_version` | Odoo config history | 043 |
+| `cdm_product_segment` | ABC/XYZ segmentation (RLS) | **044** |
+| `cdm_forecast_quality_log` | MAPE/Bias/MASE/Stability (RLS) | **045** |
+| `cdm_capacity_alert` | WC overload alerts (RLS) | **048** |
+| `cdm_safety_stock_policy` | Statistical safety stock (RLS) | **047** |
+| `cdm_sop_cycle` | S&OP cycle FSM (RLS) | **049** |
+| `cdm_sop_consensus` | Consensus plan records (RLS) | **049** |
+| `cdm_sop_version` | Plan versions (RLS) | **049** |
+| `cdm_audit_log` | Append-only audit | 021 |
 
 ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kong.
 
@@ -1159,7 +1350,7 @@ ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kon
 |----------|---------|
 | `IPE_DATABASE_URL` | Postgres |
 | `IPE_REDIS_URL` | Redis (host 6380) |
-| `IPE_KAFKA_BOOTSTRAP_SERVERS` | Empty for R1 |
+| `IPE_KAFKA_BOOTSTRAP_SERVERS` | Empty for R1/R2 |
 | `IPE_JWT_SECRET_KEY` | Local JWT |
 | `AUTH_MODE` | `local` \| `keycloak` |
 | `JWT_USE_JWKS` | JWKS validation |
@@ -1169,6 +1360,9 @@ ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kon
 | `ODOO_*` / sync body creds | Connector |
 | `ERP_SYNC_MODE` | e.g. `direct` |
 | `OTEL_*` | Tracing |
+| `SOP_SVC_URL` | nlp-svc → sop-svc (`:8110`) |
+| `MAT_SVC_URL` | nlp-svc → mat-svc (`:8002`) |
+| `DEMAND_SVC_URL` | nlp-svc → demand-svc (`:8040`) |
 
 ### Appendix C — Edge Cases
 
@@ -1179,36 +1373,49 @@ ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kon
 | MDR <70% | Schedule returns 503 |
 | Cross-tenant JWT | RLS + 403/empty |
 | Expired JWT | 401; UI redirect login |
-| LLM unavailable | Copilot fallback text; tools may still run |
+| LLM unavailable / timeout | Copilot fallback text; tools may still run (see UAT-10/11 PARTIAL) |
 | Solver timeout | Partial/timeout status; no corrupt assignments |
 | SYNC_CONFLICT | Badge on CT; planner resolves |
+| Promote already-promoted scenario | Idempotent success |
+| stock.quant unknown product_id | Skip update; count as unmatched (no crash) |
+| Mig 049 not applied | sop-svc starts but DB queries fail on `cdm_sop_cycle` |
+| ARIMA statsmodels missing | Graceful degrade to SES; error logged |
+| SOP FSM invalid transition | 422 Unprocessable — UAT-8 PASS |
+| S&OP consensus version UUID | Returned as UUID string; `compare_sop_versions` tool verifiable |
 
 ### Appendix D — Technical Decisions (ADR / constitution)
 
 | Decision | Rationale | Ref |
 |----------|-----------|-----|
 | Odoo first | Customer #1 revenue | Principle VII |
-| No Kafka in R1 | Reliability over purity | Principle IV |
+| No Kafka in R1/R2 | Reliability over purity | Principle IV |
 | Shadow autonomy default | Trust | Product |
 | Gate scripts = SoT | Anti-checklist-theater | Principle VIII |
 | OQ-9 Gate 11 waiver | Infra OR-Tools on kind | `gate11-oq9-waiver.md` |
 | Keycloak deferral options | ADR-001 | `docs/decisions/` |
 | Legacy RLS waiver | ADR-002 | `docs/decisions/` |
 | SAP B1 CUT | Strategy / Spec 017 | S12-CUT.md |
+| mat-svc in R2 compose (not R1) | R1 minimal; mat needed for segmentation/safety stock | Spec 019 T010 |
+| sop-svc as new service (not dpe-svc extension) | S&OP cycle is stateful FSM with consensus versions; warrants own service | Spec 020 plan |
+| ARIMA/SARIMA with SES fallback | Graceful degrade without statsmodels | Spec 020 plan |
+| Spec 020 = IPE-native (not SAP) | SAP B1 CUT; IPE implements 20%/80% of IBP value | Spec 020 spec |
+| stock.quant mock only (until PH1-02) | Staging Odoo not available; eng-local proof via mock is honest | Spec 019 T030–T032 |
 
 ### Appendix E — Testing Evidence Paths
 
 | Layer | Path / command | Latest signal |
 |-------|----------------|---------------|
-| Unit | `uv run pytest` per service | 860/860 (018) |
+| Unit | `uv run pytest` per service | 860+ (018) + 46 (020) |
 | Vitest | `apps/web` | 41/41 |
 | Playwright | `e2e/arabic-r2.spec.ts`, critical-path | Run for G-R2-04 |
-| R2 smoke | `scripts/release2-smoke.ps1` | 15/15 |
+| R2 smoke | `scripts/release2-smoke.ps1` | 15/15 (2026-07-10) |
 | R2 demo | `scripts/run-release2-demo.ps1` | 7/7 |
 | R1 demo | `scripts/run-release1-integration-demo.ps1` | 14/14 compose |
+| Planning UAT | `scripts/planning-uat.ps1` | 8 PASS / 2 PARTIAL (2026-07-11) |
 | k6 SLO | `docs/qa/PERFORMANCE-BASELINE-v9.1.0.md` | PASS 293ms |
 | Chaos | `docs/chaos/` C1–C6 | Documented |
 | Integration | `tests/integration/` | Multiple suites |
+| Planning Intelligence unit | svc-level pytest (mat-svc 5, demand-svc 9, cap-svc 4, sop-svc 6, nlp-svc 22) | **46/46** |
 
 ### Appendix F — Glossary
 
@@ -1229,6 +1436,17 @@ ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kon
 | **Kong** | API gateway |
 | **RLS** | Row-Level Security |
 | **OQ** | Open Question (stakeholder) |
+| **ABC/XYZ** | Product segmentation by revenue (A/B/C) × demand variability (X/Y/Z) |
+| **MAPE** | Mean Absolute Percentage Error (forecast accuracy) |
+| **MASE** | Mean Absolute Scaled Error |
+| **Bias** | Systematic over/under forecasting |
+| **IBP** | SAP Integrated Business Planning (used here as reference for safety stock formula) |
+| **SES** | Simple Exponential Smoothing |
+| **ARIMA/SARIMA** | Auto-Regressive Integrated Moving Average (Seasonal variant) |
+| **S&OP** | Sales & Operations Planning |
+| **FSM** | Finite State Machine (sop-svc cycle stages) |
+| **sop-svc** | S&OP Service (port 8110; new in Spec 020) |
+| **KF** | Key Figure (SAP IBP planning variable) |
 
 ### Appendix G — Stakeholder Decision Log (Open)
 
@@ -1239,13 +1457,14 @@ ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kon
 | OQ-5 | Formal KPI baseline study | Product | G-01/G-02 claims |
 | OQ-6 | Copilot retention/erasure | Legal + Eng | GDPR |
 | OQ-7 | Pricing confirmation | Executive | SOW |
-| OQ-8 | mat-svc in compose | Eng lead | C-14 |
 | OQ-9 §6 names | Waiver signatories | Program | Governance record |
-| OQ-10 | Scenario promotion CUT vs build | PM | #40 |
-| OQ-11 | stock.quant true sync vs CUT | ARB | C-15 / material honesty |
-| OQ-12 | Tag `v9.1.0-r2` vs `v9.1.1-r2` | Release manager | G-R2-TAG |
+| OQ-11 | stock.quant true sync vs CUT (live Odoo) | ARB | C-15 / material honesty |
+| OQ-12 | Tag `v9.1.1-r2` after Arabic or cut | Release manager | G-R2-TAG |
+| OQ-13 | Apply mig 044–049 + run R2 smoke + tag `v9.2.0-planning` | Ops + Release manager | Planning intelligence release |
+| OQ-14 | Defer or implement tenant provision API (#37) / quotas (#38) | PM | Phase 4 scope |
+| OQ-15 | Defer or CUT predictive delay XGBoost+SHAP (#42) | PM / ML | Wave 2 stretch |
 | PH1-01 | Sign SOW | Executive | UAT |
-| PH1-02 | Provision Odoo staging | Ops + Customer | UAT |
+| PH1-02 | Provision Odoo staging | Ops + Customer | UAT + live Odoo E2E |
 | PH1-05 / G-R2-04 | Arabic native sign-off | Native reviewer | Tag |
 
 ### Appendix H — Version History (this PRD)
@@ -1254,21 +1473,34 @@ ER narrative: ERP → Connector → CDM ←→ AI services; UI reads CDM via Kon
 |------|--------|
 | 2026-07-07 | Initial authoritative draft (21 sections; pre-R2 finalize) |
 | 2026-07-10 | Full rewrite to 19 required sections; aligned to constitution v1.2.4, specs 017/018, GATES, OPEN-ITEMS, live tags `v9.4.0-p3` / `v9.1.0-r2` HOLD |
+| 2026-07-11 | **Full update:** Added Spec 019 (program converge — mat-svc, scenario promote, stock.quant mock) and Spec 020 (planning intelligence — Modules A–F: ABC/XYZ, ARIMA/SARIMA, MAPE/Bias, statistical safety stock IBP, capacity utilisation alerts, S&OP engine sop-svc :8110, 25 Copilot tools, mig 044–049, Kong planning routes); updated all section tables, CDM, service topology, FR-020-* requirements, new use cases UC-21–26, new OQ-13–15; planning UAT PARTIAL note (UAT-10/11 timeout); `v9.2.0-planning` NOT tagged (mig apply pending, OQ-13) |
 
 ### Appendix I — Key File References
 
 | Path | Role |
 |------|------|
-| `ipe/.specify/memory/constitution.md` | Binding principles |
+| `ipe/.specify/memory/constitution.md` | Binding principles v1.2.5 |
 | `ipe/specs/013-release1-odoo-mena/` | R1 FRs |
 | `ipe/specs/017-first-release-plan/` | Waves / PH1 |
 | `ipe/specs/018-phase2-release2/` | R2 gates, open items |
+| `ipe/specs/019-program-converge/` | mat-svc, promote, stock.quant mock |
+| `ipe/specs/020-planning-intelligence/` | Modules A–F, sop-svc, Copilot tools |
 | `ipe/READINESS.md` | Deployment readiness pointer |
 | `ipe/apps/web/src/app/router.tsx` | UI routes |
 | `ipe/infrastructure/docker/docker-compose.release{1,2}.yml` | Profiles |
-| `ipe/infrastructure/docker/kong.release2.yml` | R2 gateway |
+| `ipe/infrastructure/docker/kong.release2.yml` | R2 gateway (incl. sop-svc routes) |
+| `ipe/migrations/versions/044_product_segmentation.py` – `049_sop_engine.py` | Planning intelligence schema |
+| `ipe/services/sop-svc/` | S&OP service (new in Spec 020) |
+| `ipe/services/mat-svc/app/core/segmentation.py` | ABC/XYZ engine |
+| `ipe/services/mat-svc/app/core/safety_stock_service.py` | IBP safety stock |
+| `ipe/services/demand-svc/app/core/forecast_quality.py` | MAPE/Bias/MASE/Stability |
+| `ipe/services/cap-svc/app/core/utilisation.py` | Capacity utilisation alerts |
+| `ipe/services/nlp-svc/app/core/copilot_tools.py` | 25 Copilot tools |
+| `ipe/services/connector/app/core/mapper.py` | Lead time + product cost mapper (mig 046) |
+| `ipe/docs/qa/PLANNING-INTELLIGENCE-FINALIZE-REPORT.md` | 46/46 unit test evidence |
+| `ipe/docs/qa/PLANNING-UAT-RESULTS-2026-07-11.md` | UAT 8 PASS / 2 PARTIAL |
 | `ipe/docs/qa/*` / `ipe/docs/demo-data/*` | Gate evidence |
 
 ---
 
-*End of PRD-IPE-AUTHORITATIVE — 2026-07-10*
+*End of PRD-IPE-AUTHORITATIVE — 2026-07-11*

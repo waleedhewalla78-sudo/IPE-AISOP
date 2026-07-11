@@ -16,8 +16,22 @@ from ipe_shared.observability import setup_observability
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import logging
+
+    logger = logging.getLogger("nlp-svc")
     await init_database(settings.DATABASE_URL)
     await start_consumers()
+    # Fix 1A: warm LLM connection so first user request is not cold-start
+    try:
+        from app.core.llm_client import get_tool_agent_backend
+
+        backend = get_tool_agent_backend()
+        if backend is not None:
+            logger.info("LLM warm-up: backend=%s ready", backend.provider)
+        else:
+            logger.warning("LLM warm-up skipped — no LLM backend configured")
+    except Exception as exc:
+        logger.warning("LLM warm-up failed (non-fatal): %s", exc)
     yield
     await stop_consumers()
     await close_database()

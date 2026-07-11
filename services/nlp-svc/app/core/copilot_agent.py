@@ -107,18 +107,30 @@ async def _run_anthropic_tool_loop(
                 tool_uses = [block for block in response.content if block.type == "tool_use"]
                 messages.append({"role": "assistant", "content": response.content})
 
-                tool_results = []
-                for tool_use in tool_uses:
+                async def _run_one(tool_use):
                     tool_name = tool_use.name
                     tool_input = tool_use.input
-                    yield {"type": "tool_call", "tool": tool_name, "input": tool_input}
-
                     handler = TOOL_HANDLERS.get(tool_name)
                     if handler:
-                        result = await handler(tenant_id=tenant_id, **tool_input)
+                        try:
+                            result = await handler(tenant_id=tenant_id, **tool_input)
+                        except Exception as exc:
+                            result = {"error": str(exc)}
                     else:
                         result = {"error": f"Unknown tool: {tool_name}"}
+                    return tool_use, tool_name, tool_input, result
 
+                gathered = await asyncio.gather(
+                    *[_run_one(tu) for tu in tool_uses],
+                    return_exceptions=True,
+                )
+                tool_results = []
+                for item in gathered:
+                    if isinstance(item, Exception):
+                        yield {"type": "tool_result", "tool": "unknown", "result": {"error": str(item)}}
+                        continue
+                    tool_use, tool_name, tool_input, result = item
+                    yield {"type": "tool_call", "tool": tool_name, "input": tool_input}
                     yield {"type": "tool_result", "tool": tool_name, "result": result}
                     tool_results.append(
                         {
@@ -169,15 +181,29 @@ async def _run_ollama_tool_loop(
                 OllamaToolClient.append_assistant_message(messages, turn.raw_message)
 
                 tool_results_payload: list[dict] = []
-                for tc in turn.tool_calls:
-                    yield {"type": "tool_call", "tool": tc.name, "input": tc.arguments}
 
+                async def _run_one_ollama(tc):
                     handler = TOOL_HANDLERS.get(tc.name)
                     if handler:
-                        result = await handler(tenant_id=tenant_id, **tc.arguments)
+                        try:
+                            result = await handler(tenant_id=tenant_id, **tc.arguments)
+                        except Exception as exc:
+                            result = {"error": str(exc)}
                     else:
                         result = {"error": f"Unknown tool: {tc.name}"}
+                    return tc, result
 
+                gathered = await asyncio.gather(
+                    *[_run_one_ollama(tc) for tc in turn.tool_calls],
+                    return_exceptions=True,
+                )
+                for item in gathered:
+                    if isinstance(item, Exception):
+                        yield {"type": "tool_result", "tool": "unknown", "result": {"error": str(item)}}
+                        tool_results_payload.append({"error": str(item)})
+                        continue
+                    tc, result = item
+                    yield {"type": "tool_call", "tool": tc.name, "input": tc.arguments}
                     yield {"type": "tool_result", "tool": tc.name, "result": result}
                     tool_results_payload.append(result)
 
@@ -201,45 +227,49 @@ async def _run_ollama_tool_loop(
 async def build_tool_fallback_response(tenant_id: str) -> str:
     """Collect live planning data without the LLM and return a structured snapshot.
 
-    Called when the LLM is unavailable or exceeds the timeout budget.  All tool
-    calls are fire-and-forget with their own 5 s HTTP timeout so this function
-    always returns within ~15 s.
+    Called when the LLM is unavailable or exceeds the timeout budget.  Tool
+    calls run concurrently (each with its own HTTP timeout) so this returns
+    quickly even when some upstreams are slow.
     """
     parts: list[str] = [
         "[Tool-backed snapshot — LLM not available or timed out]",
         "",
     ]
-    try:
-        alerts = await get_capacity_alerts(tenant_id)
-        if alerts.get("status") == "ok":
-            alert_items = alerts.get("alerts", [])
-            parts.append(f"Capacity alerts: {len(alert_items)} overloaded work center(s)")
-            for a in alert_items[:3]:
-                parts.append(f"  • {a.get('work_center', '?')} — {a.get('utilisation_pct', '?')}% utilised")
-        else:
-            parts.append(f"Capacity alerts: unavailable ({alerts.get('message', '')})")
-    except Exception as exc:
-        parts.append(f"Capacity alerts: fetch error ({exc})")
 
-    try:
-        sop = await get_sop_cycle_status(tenant_id)
-        if sop.get("status") == "ok":
-            parts.append(f"S&OP cycle: {sop.get('cycle_status', 'unknown')} — deadline {sop.get('deadline', 'n/a')}")
-        else:
-            parts.append(f"S&OP cycle: unavailable ({sop.get('message', '')})")
-    except Exception as exc:
-        parts.append(f"S&OP cycle: fetch error ({exc})")
+    alerts, sop, mo_data = await asyncio.gather(
+        get_capacity_alerts(tenant_id),
+        get_sop_cycle_status(tenant_id),
+        get_mo_status(None, tenant_id),
+        return_exceptions=True,
+    )
 
-    try:
-        mo_data = await get_mo_status(None, tenant_id)
-        if mo_data.get("status") == "ok":
-            mos = mo_data.get("items", mo_data.get("mos", []))
-            count = len(mos) if isinstance(mos, list) else "see dashboard"
-            parts.append(f"Active manufacturing orders: {count}")
+    if isinstance(alerts, Exception):
+        parts.append(f"Capacity alerts: fetch error ({alerts})")
+    elif alerts.get("status") == "ok":
+        alert_items = alerts.get("alerts", [])
+        parts.append(f"Capacity alerts: {len(alert_items)} overloaded work center(s)")
+        for a in alert_items[:3]:
+            parts.append(f"  • {a.get('work_center', '?')} — {a.get('utilisation_pct', '?')}% utilised")
+    else:
+        parts.append(f"Capacity alerts: unavailable ({alerts.get('message', '')})")
+
+    if isinstance(sop, Exception):
+        parts.append(f"S&OP cycle: fetch error ({sop})")
+    elif sop.get("status") == "ok":
+        parts.append(f"S&OP cycle: {sop.get('cycle_status', 'unknown')} — deadline {sop.get('deadline', 'n/a')}")
+    else:
+        parts.append(f"S&OP cycle: unavailable ({sop.get('message', '')})")
+
+    if isinstance(mo_data, Exception):
+        parts.append(f"MO status: fetch error ({mo_data})")
+    elif mo_data.get("status") == "ok":
+        mos = mo_data.get("items") or mo_data.get("mos") or []
+        if isinstance(mos, list):
+            parts.append(f"Manufacturing orders visible: {len(mos)}")
         else:
-            parts.append(f"MO status: unavailable ({mo_data.get('message', '')})")
-    except Exception as exc:
-        parts.append(f"MO status: fetch error ({exc})")
+            parts.append("Manufacturing orders: ok")
+    else:
+        parts.append(f"MO status: unavailable ({mo_data.get('message', '')})")
 
     parts += [
         "",

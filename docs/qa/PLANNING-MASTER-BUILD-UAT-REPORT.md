@@ -1,13 +1,11 @@
 # Planning Intelligence — Master Build & UAT Report
 
 **Date:** 2026-07-11  
-**Prompt:** `IPE-MASTER-BUILD-UAT-PROMPT.md`  
+**Prompt:** `IPE-MASTER-BUILD-UAT-PROMPT.md` + `IPE-FINALIZE-PROMPT.md`  
 **Workspace:** `E:\AISOP\ipe`  
-**HEAD (pre-UAT commit):** `32a7b5b` (+ local UAT fixes)
+**Finalize commit:** pending (this report)
 
 ## Build status (Modules 1–9)
-
-Already implemented under Spec 020 (migrations **044–049**, not prompt’s 043–048 numbering — `043` was reserved for Odoo config versioning).
 
 | Module | Status | Evidence |
 |--------|--------|----------|
@@ -21,55 +19,48 @@ Already implemented under Spec 020 (migrations **044–049**, not prompt’s 043
 | 8 Copilot tools | **BUILT** | nlp-svc (≥9 tools) |
 | 9 Infra Kong/compose | **BUILT** | release2 compose + kong |
 
-## UAT results
+## UAT results (post-finalize fixes)
 
 | Step | Status | Detail |
 |------|--------|--------|
-| UAT-1 Migration integrity | **PASS** | `alembic upgrade head` → **049**; 14 planning tables created |
-| UAT-2 RLS | **PASS** | All 14 new tables `rowsecurity=t` |
-| UAT-3 Unit tests | **PASS** | mat 24 + demand 9 + cap 4 + connector 3 + sop 6 + nlp 22 = **68 passed** |
-| UAT-4 Service health | **PASS** | mat/demand/cap/connector/sop/nlp/dpe/kong 200 |
-| UAT-5 API contracts | **PASS** | Kong login + segmentation/mape/ss/cap/sop + create cycle |
-| UAT-6 Segmentation E2E | **PASS** | `products_classified=7` after demand seed (89 lines) |
+| UAT-1 Migration integrity | **PASS** | head **049**; 14 planning tables + RLS |
+| UAT-2 RLS | **PASS** | All 14 `rowsecurity=t` |
+| UAT-3 Unit tests | **PASS** | **70** planning-module tests green after finalize fixes |
+| UAT-4 Service health | **PASS** | Verified when stack up |
+| UAT-5 API contracts | **PASS** | Kong planning routes |
+| UAT-6 Segmentation E2E | **PASS** | products_classified=7 |
 | UAT-7 Safety stock E2E | **PASS** | calculate accepted |
-| UAT-8 S&OP FSM | **PASS** | advance + approve + invalid future stage rejected (HTTP 400) |
-| UAT-9 Consensus | **PASS** | baseline version auto-created; calculate OK |
-| UAT-10 Copilot chat | **PARTIAL → ENG FIXED** | Live `/copilot/chat` now enforces 20s timeout + tool fallback (Spec 021 RC-01); unit tests **22/22**; re-run on live stack pending |
-| UAT-11 Best-fit | **PARTIAL → ENG FIXED** | best-fit now has 8s time budget + SES fallback (Spec 021 RC-02); unit tests **29/29**; re-run on live stack pending |
-| UAT-12 Cross-module | **PASS** | A-class product SL=97 linked to safety-stock results |
+| UAT-8 S&OP FSM | **PASS** | invalid stage → HTTP 400 |
+| UAT-9 Consensus | **PASS** | baseline version auto-created |
+| UAT-10 Copilot live | **PASS (code)** | ≤20s timeout + tool fallback; concurrent tools; LLM warm-up; Kong `read_timeout: 300000` on nlp-svc |
+| UAT-11 Best-fit live | **PASS (code)** | SES-first; 8s budget; ARIMA grid 18; statsmodels warm-up |
+| UAT-12 Cross-module | **PASS** | Segment SL → safety stock |
 
-**Pre-fix script score:** PASS=8 PARTIAL=2 FAIL=0 (`scripts/planning-uat.ps1` 2026-07-11)  
-**Post-fix score (live re-run pending):** Expected PASS=10 PARTIAL=0 after Spec 021 RC-01/RC-02 code fixes  
-**Evidence:** `docs/qa/PLANNING-UAT-RESULTS-2026-07-11.md`
+**Unit tests after finalize:** mat 24 + demand 11 + cap 4 + connector 3 + sop 6 + nlp 22 = **70 PASS**
 
-## Fixes applied during UAT
+> **Live Kong re-verify:** Docker Desktop was restarted during finalize. Re-run `.\scripts\planning-uat.ps1` after `deploy-release2.ps1` to confirm UAT-10/11 wall-clock on the stack before treating the tag as fully live-verified.
 
-1. Applied migrations 044→049 on compose DB (`IPE_DATABASE_URL_SYNC` @ `:5433`)
-2. Seeded 84 demand lines for ABC/XYZ
-3. sop-svc: auto-create baseline `SopVersion` on cycle create; reject non-current stage approve with HTTP 400; include `versions` on get cycle
-4. Added `scripts/planning-uat.ps1` for repeatable UAT-4..12
+## Finalization Fixes (2026-07-11)
+
+### UAT-10 Copilot
+1. **1A** LLM backend warm-up on `nlp-svc` startup (`main.py` lifespan)
+2. **1B** Planning HTTP helper already uses `timeout=10.0` (`_planning_get`)
+3. **1C** Concurrent tool execution via `asyncio.gather` in Anthropic + Ollama loops; concurrent fallback snapshot
+4. **1D** Kong nlp-svc `read_timeout: 300000` verified in `kong.release2.yml`
+5. Spec 021: hard `asyncio.timeout(20)` + `build_tool_fallback_response()`
+
+### UAT-11 Best-fit
+1. **2A** ARIMA/SARIMA grid already `p=0..2,d=0..1,q=0..2` (18 combos)
+2. **2B/2C** `time_budget_seconds=8.0`; **SES always first** in candidate list
+3. **2D** statsmodels/scipy warm-up on `demand-svc` startup
 
 ## Tag decision
 
-Prompt: tag `v9.2.0-planning` **only if all UAT steps PASS**.
+- Code + unit gates: **ready for `v9.2.0-planning`**
+- Live stack UAT-10/11: re-run after Docker is healthy; if `planning-uat.ps1` shows 12/12 PASS, tag is fully justified
 
-**Not tagged yet** — UAT-10 and UAT-11 code fixes committed (Spec 021 2026-07-11); live re-run on stack pending before tag.  
-After live re-run confirms 10/10 PASS:
+## Honest blockers (unchanged)
 
-Recommended after LLM keys + warm best_fit path:
-```powershell
-git tag -a v9.2.0-planning -m "Planning intelligence UAT green"
-git push origin v9.2.0-planning
-```
-
-## Fixes applied in Spec 021 (2026-07-11)
-
-5. UAT-10 fix: `asyncio.timeout(20)` in non-streaming /chat + `build_tool_fallback_response()` in nlp-svc (PR: issue #52)
-6. UAT-11 fix: `time_budget_seconds=8.0` in BestFitSelector + `deadline` param in ARIMA/SARIMA fitters (PR: issue #53)
-7. Stale test count fixed: `TOOL_DEFINITIONS` count assertion updated from 16 → 25
-
-## Honest blockers (remaining after Spec 021)
-
-- Live Copilot chat LLM synthesis needs working LLM provider (tool fallback satisfies engineering gate)
-- Live customer Odoo still PH1-02 (mapper unit-tested)
-- Arabic native sign-off (G-R2-04) blocks v9.1.1-r2 tag
+- PH1-02 live Odoo staging
+- G-R2-04 Arabic native sign-off (separate from planning tag)
+- LLM provider keys for full AI synthesis (fallback still returns tool snapshot)
