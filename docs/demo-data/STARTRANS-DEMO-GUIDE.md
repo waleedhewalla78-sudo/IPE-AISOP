@@ -119,14 +119,42 @@ Open **AI & Governance → Copilot**. Use exact queries from [STARTRANS-COPILOT-
 
 ---
 
+## Loading Sprint 3 SQL demo seed
+
+Use when Odoo sync is unavailable (UAT / clean deploy / laptop demo against empty DB).
+
+**Seed file:** `docs/demo-data/star-trans-seed.sql`
+
+**Contents:** Star Trans tenant, 12 products (FG/SA/RM), 5 work centres, 3 BOMs + lines, 15 routing ops, 10 MOs (MO-ST-001…010), 3 customers, 3 suppliers, 6 demand lines, 4 supply orders.
+
+```powershell
+# After migrations on Star Trans compose stack:
+cd E:\AISOP\ipe
+Get-Content docs\demo-data\star-trans-seed.sql -Raw |
+  docker compose -f deploy\star-trans\docker-compose.yml exec -T db psql -U ipe -d ipe
+```
+
+```bash
+# Linux / macOS
+docker compose -f deploy/star-trans/docker-compose.yml exec -T db \
+  psql -U ipe -d ipe < docs/demo-data/star-trans-seed.sql
+```
+
+**Control Tower highlights after seed:**
+- **MO-ST-004** — at-risk (Winding capacity overload)
+- **MO-ST-005** — LATE (planned end in the past)
+- **MO-ST-007** — at-risk (copper wire material shortage)
+
+---
+
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
-| Empty Control Tower | `.\scripts\seed-startrans-demo.ps1` |
+| Empty Control Tower | Load `star-trans-seed.sql` (above) or `.\scripts\seed-startrans-demo.ps1` |
 | Copilot timeout | Ensure Ollama on `:11434`; pre-run cheat sheet queries |
 | Login fails | `.\scripts\prepare-startrans-demo.ps1` |
-| Upload fails | MO_ID must be MO-ST-*; WC codes WC001–WC003 |
+| Upload fails | MO_ID must be MO-ST-*; WC codes WC-CCS / WC-WND / WC-ASM / WC-TQC / WC-PNT |
 
 ---
 

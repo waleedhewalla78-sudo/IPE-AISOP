@@ -55,7 +55,9 @@ nano .env   # or use your preferred editor
 
 **Required values to fill in:**
 ```
+POSTGRES_USER=ipe
 POSTGRES_PASSWORD=<strong-random-password>
+POSTGRES_DB=ipe
 DATABASE_URL=postgresql+asyncpg://ipe:<same-password>@db:5432/ipe
 IPE_JWT_SECRET_KEY=<generate-with: openssl rand -hex 32>
 ODOO_URL=http://<star-trans-odoo-server>:8069
@@ -63,6 +65,8 @@ ODOO_DB=<star-trans-db-name>
 ODOO_USER=<api-username>
 ODOO_PASSWORD=<api-password>
 ```
+
+> **Important:** `docker compose` requires a `.env` file in this directory. Always `cp .env.template .env` before `docker compose up` or `docker compose config`.
 
 **Generate a secure JWT key:**
 ```bash
@@ -127,17 +131,24 @@ docker compose exec dpe-svc uv run alembic current
 
 ## Step 6: Verify Service Health
 
-```bash
-# Kong gateway
-curl http://localhost:8000/api/v1/health
-# Expected: {"status": "ok"}
+Healthchecks in `docker-compose.yml` use `/api/v1/health` on each service.
 
-# Direct service checks
+```bash
+# Kong gateway (proxy on host port 8000; Kong admin is on host 8444)
+curl http://localhost:8000/
+
+# Direct service checks (match compose healthcheck paths)
 curl http://localhost:8001/api/v1/health  # dpe-svc
 curl http://localhost:8004/api/v1/health  # fea-svc
+curl http://localhost:8005/api/v1/health  # res-svc
 curl http://localhost:8009/api/v1/health  # connector
 curl http://localhost:8002/api/v1/health  # mat-svc
 curl http://localhost:8003/api/v1/health  # cap-svc
+```
+
+Or run the packaged validator from the IPE repo:
+```powershell
+.\scripts\star-trans-validate.ps1
 ```
 
 ---
@@ -197,12 +208,23 @@ Default credentials (change after first login):
 
 ## Step 10: Seed Demo Data (Optional)
 
-If Star Trans Odoo is not yet connected or for initial testing:
+If Star Trans Odoo is not yet connected or for initial testing / UAT demos:
 
 ```bash
-# Load anonymised demo data for initial testing
-docker compose exec dpe-svc python scripts/seed-data.py
+# From deploy/star-trans/ (copy seed SQL next to compose, or mount from repo):
+# Seed file location in repo: docs/demo-data/star-trans-seed.sql
+docker compose exec -T db psql -U ipe -d ipe < star-trans-seed.sql
+
+# From IPE repo root (Linux/macOS):
+# docker compose -f deploy/star-trans/docker-compose.yml exec -T db \
+#   psql -U ipe -d ipe < docs/demo-data/star-trans-seed.sql
+
+# From IPE repo root (Windows PowerShell):
+# Get-Content docs/demo-data/star-trans-seed.sql -Raw |
+#   docker compose -f deploy/star-trans/docker-compose.yml exec -T db psql -U ipe -d ipe
 ```
+
+See `docs/demo-data/STARTRANS-DEMO-GUIDE.md` for demo narrative after seeding.
 
 ---
 
@@ -258,7 +280,12 @@ docker compose logs -f dpe-svc --tail 50  # Core service
 
 ### Backup database
 ```bash
-docker compose exec db pg_dump -U ipe ipe > ipe-backup-$(date +%Y%m%d).sql
+# Ad-hoc dump
+docker compose exec -T db pg_dump -U ipe -Fc ipe > ipe-backup-$(date +%Y%m%d).dump
+
+# Or use packaged automation (7-day retention):
+# Linux:   scripts/backup/ipe-backup.sh /var/backups/ipe
+# Windows: scripts/backup/ipe-backup.ps1 -BackupDir C:\ipe\backups
 ```
 
 ### Stop stack
