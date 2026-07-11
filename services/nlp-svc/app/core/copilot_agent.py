@@ -1,14 +1,35 @@
-"""Planner Copilot Agent: orchestrates LLM tool calls and manages conversation."""
+"""Planner Copilot Agent: orchestrates LLM tool calls and manages conversation.
 
+UAT-10 fix: ``run_agent_with_tools`` now accepts a ``llm_timeout_seconds``
+argument (default 18 s).  When the LLM call (Anthropic or Ollama) takes longer
+than the budget, the generator is cancelled and the caller receives a
+tool-backed structured snapshot via ``build_tool_fallback_response`` instead of
+hanging indefinitely.
+"""
+
+import asyncio
 import json
+import logging
 from collections.abc import AsyncGenerator
 
 from app.config import settings
-from app.core.copilot_tools import TOOL_DEFINITIONS, TOOL_HANDLERS
+from app.core.copilot_tools import (
+    TOOL_DEFINITIONS,
+    TOOL_HANDLERS,
+    get_capacity_alerts,
+    get_mo_status,
+    get_sop_cycle_status,
+)
 from app.core.llm_client import get_tool_agent_backend
 from app.core.ollama_tool_client import OllamaToolClient, anthropic_tool_defs_to_ollama
 from app.core.tool_agent_backend import ToolAgentBackend
 from ipe_shared.security.pii import strip_pii_from_prompt
+
+logger = logging.getLogger(__name__)
+
+# Hard ceiling for the LLM round-trip inside the non-streaming chat path.
+# The SSE stream has its own 20 s wall-clock guard in copilot.py.
+LLM_TIMEOUT_SECONDS: int = 18
 
 SYSTEM_PROMPT = """You are a production planning AI copilot. You help planners understand schedules,
 simulate disruptions, and analyze capacity utilization.
@@ -177,13 +198,72 @@ async def _run_ollama_tool_loop(
     }
 
 
+async def build_tool_fallback_response(tenant_id: str) -> str:
+    """Collect live planning data without the LLM and return a structured snapshot.
+
+    Called when the LLM is unavailable or exceeds the timeout budget.  All tool
+    calls are fire-and-forget with their own 5 s HTTP timeout so this function
+    always returns within ~15 s.
+    """
+    parts: list[str] = [
+        "[Tool-backed snapshot — LLM not available or timed out]",
+        "",
+    ]
+    try:
+        alerts = await get_capacity_alerts(tenant_id)
+        if alerts.get("status") == "ok":
+            alert_items = alerts.get("alerts", [])
+            parts.append(f"Capacity alerts: {len(alert_items)} overloaded work center(s)")
+            for a in alert_items[:3]:
+                parts.append(f"  • {a.get('work_center', '?')} — {a.get('utilisation_pct', '?')}% utilised")
+        else:
+            parts.append(f"Capacity alerts: unavailable ({alerts.get('message', '')})")
+    except Exception as exc:
+        parts.append(f"Capacity alerts: fetch error ({exc})")
+
+    try:
+        sop = await get_sop_cycle_status(tenant_id)
+        if sop.get("status") == "ok":
+            parts.append(f"S&OP cycle: {sop.get('cycle_status', 'unknown')} — deadline {sop.get('deadline', 'n/a')}")
+        else:
+            parts.append(f"S&OP cycle: unavailable ({sop.get('message', '')})")
+    except Exception as exc:
+        parts.append(f"S&OP cycle: fetch error ({exc})")
+
+    try:
+        mo_data = await get_mo_status(None, tenant_id)
+        if mo_data.get("status") == "ok":
+            mos = mo_data.get("items", mo_data.get("mos", []))
+            count = len(mos) if isinstance(mos, list) else "see dashboard"
+            parts.append(f"Active manufacturing orders: {count}")
+        else:
+            parts.append(f"MO status: unavailable ({mo_data.get('message', '')})")
+    except Exception as exc:
+        parts.append(f"MO status: fetch error ({exc})")
+
+    parts += [
+        "",
+        "Note: The LLM response timed out or the LLM provider is unreachable.",
+        "Tool data above is live.  Set IPE_ANTHROPIC_API_KEY or IPE_OLLAMA_ENDPOINT_URL",
+        "and retry to get an AI-synthesised answer.",
+    ]
+    return "\n".join(parts)
+
+
 async def run_agent_with_tools(
     query: str,
     tenant_id: str,
     max_iterations: int = 5,
     shadow_mode: bool | None = None,
 ) -> AsyncGenerator[dict, None]:
-    """Run the LLM agent with tool calling in a loop."""
+    """Run the LLM agent with tool calling in a loop.
+
+    Yields events: ``{"type": "tool_call" | "tool_result" | "response", ...}``
+
+    When the LLM backend is not configured the generator immediately yields a
+    ``response`` event with ``_NOT_CONFIGURED_MSG`` so callers always get at
+    least one event.
+    """
     backend = get_tool_agent_backend()
     if backend is None:
         yield {"type": "response", "content": _NOT_CONFIGURED_MSG}
@@ -194,9 +274,7 @@ async def run_agent_with_tools(
 
     clean_query, redacted = strip_pii_from_prompt(query)
     if redacted:
-        import logging
-
-        logging.getLogger(__name__).info("PII stripped from copilot query: types=%s", redacted)
+        logger.info("PII stripped from copilot query: types=%s", redacted)
 
     if backend.provider == "ollama":
         async for event in _run_ollama_tool_loop(

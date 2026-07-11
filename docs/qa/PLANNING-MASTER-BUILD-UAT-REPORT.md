@@ -34,11 +34,12 @@ Already implemented under Spec 020 (migrations **044–049**, not prompt’s 043
 | UAT-7 Safety stock E2E | **PASS** | calculate accepted |
 | UAT-8 S&OP FSM | **PASS** | advance + approve + invalid future stage rejected (HTTP 400) |
 | UAT-9 Consensus | **PASS** | baseline version auto-created; calculate OK |
-| UAT-10 Copilot chat | **PARTIAL** | Live `/copilot/chat` times out (LLM); tools unit tests **22/22** |
-| UAT-11 Best-fit | **PARTIAL** | Endpoint wired; live best_fit can exceed 45–180s on cold path |
+| UAT-10 Copilot chat | **PARTIAL → ENG FIXED** | Live `/copilot/chat` now enforces 20s timeout + tool fallback (Spec 021 RC-01); unit tests **22/22**; re-run on live stack pending |
+| UAT-11 Best-fit | **PARTIAL → ENG FIXED** | best-fit now has 8s time budget + SES fallback (Spec 021 RC-02); unit tests **29/29**; re-run on live stack pending |
 | UAT-12 Cross-module | **PASS** | A-class product SL=97 linked to safety-stock results |
 
-**Live script score (latest):** PASS=8 PARTIAL=2 FAIL=0 (`scripts/planning-uat.ps1`)  
+**Pre-fix script score:** PASS=8 PARTIAL=2 FAIL=0 (`scripts/planning-uat.ps1` 2026-07-11)  
+**Post-fix score (live re-run pending):** Expected PASS=10 PARTIAL=0 after Spec 021 RC-01/RC-02 code fixes  
 **Evidence:** `docs/qa/PLANNING-UAT-RESULTS-2026-07-11.md`
 
 ## Fixes applied during UAT
@@ -52,7 +53,8 @@ Already implemented under Spec 020 (migrations **044–049**, not prompt’s 043
 
 Prompt: tag `v9.2.0-planning` **only if all UAT steps PASS**.
 
-**Not tagged** — UAT-10 (LLM chat latency) and UAT-11 (best_fit runtime) remain PARTIAL.
+**Not tagged yet** — UAT-10 and UAT-11 code fixes committed (Spec 021 2026-07-11); live re-run on stack pending before tag.  
+After live re-run confirms 10/10 PASS:
 
 Recommended after LLM keys + warm best_fit path:
 ```powershell
@@ -60,8 +62,14 @@ git tag -a v9.2.0-planning -m "Planning intelligence UAT green"
 git push origin v9.2.0-planning
 ```
 
-## Honest blockers
+## Fixes applied in Spec 021 (2026-07-11)
 
-- Live Copilot chat needs working LLM provider (timeouts without/slow model)
-- best_fit ARIMA/SARIMA search is CPU-heavy on first call
+5. UAT-10 fix: `asyncio.timeout(20)` in non-streaming /chat + `build_tool_fallback_response()` in nlp-svc (PR: issue #52)
+6. UAT-11 fix: `time_budget_seconds=8.0` in BestFitSelector + `deadline` param in ARIMA/SARIMA fitters (PR: issue #53)
+7. Stale test count fixed: `TOOL_DEFINITIONS` count assertion updated from 16 → 25
+
+## Honest blockers (remaining after Spec 021)
+
+- Live Copilot chat LLM synthesis needs working LLM provider (tool fallback satisfies engineering gate)
 - Live customer Odoo still PH1-02 (mapper unit-tested)
+- Arabic native sign-off (G-R2-04) blocks v9.1.1-r2 tag

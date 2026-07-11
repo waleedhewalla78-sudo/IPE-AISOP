@@ -1,4 +1,10 @@
-"""Enhanced Copilot endpoint with tool calling and scenario simulation."""
+"""Enhanced Copilot endpoint with tool calling and scenario simulation.
+
+UAT-10 fix: both the streaming (SSE) and non-streaming /chat paths now enforce
+a hard 20-second wall-clock budget.  When the LLM is unavailable or slow the
+non-streaming path returns a tool-backed structured snapshot via
+``build_tool_fallback_response`` within that window.
+"""
 
 import asyncio
 import json
@@ -13,7 +19,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.copilot_agent import run_agent_streaming, run_agent_with_tools
+from app.core.copilot_agent import build_tool_fallback_response, run_agent_streaming, run_agent_with_tools
 from ipe_shared.audit.service import log_audit_event
 from ipe_shared.auth.jwt import TokenPayload
 from ipe_shared.auth.rbac import require_roles
@@ -25,7 +31,7 @@ from ipe_shared.schemas.common import APIResponse
 
 logger = logging.getLogger(__name__)
 
-_TIMEOUT_SECONDS = 30
+_TIMEOUT_SECONDS = 20          # wall-clock budget for both SSE and non-streaming paths
 _HEARTBEAT_INTERVAL = 15
 _MAX_BUFFER_SIZE = 100
 
@@ -180,9 +186,23 @@ async def copilot_chat(
             },
         )
 
-    events = []
-    async for event in run_agent_with_tools(req.message, tenant_id):
-        events.append(event)
+    # Non-streaming path: enforce a hard 20 s timeout so the endpoint never
+    # hangs when the LLM is slow or unreachable.
+    timed_out = False
+    try:
+        async with asyncio.timeout(_TIMEOUT_SECONDS):
+            events = []
+            async for event in run_agent_with_tools(req.message, tenant_id):
+                events.append(event)
+    except asyncio.TimeoutError:
+        timed_out = True
+        logger.warning(
+            "copilot /chat LLM timeout after %ds; returning tool fallback for tenant %s",
+            _TIMEOUT_SECONDS,
+            tenant_id,
+        )
+        fallback_text = await build_tool_fallback_response(tenant_id)
+        events = [{"type": "response", "content": fallback_text}]
 
     final_response = next(
         (e["content"] for e in reversed(events) if e["type"] == "response"),
@@ -227,6 +247,7 @@ async def copilot_chat(
         data={
             "response": final_response,
             "tool_calls": tool_calls,
+            **({"timeout": True} if timed_out else {}),
         },
         error=None,
     )

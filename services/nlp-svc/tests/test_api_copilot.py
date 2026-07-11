@@ -113,3 +113,38 @@ async def test_query_with_tenant_and_mocked_llm(client, auth_headers):
 async def test_unauthorized_access_returns_401(rbac_client):
     response = await rbac_client.post("/api/v1/copilot/query", json={"query": "hello"})
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_copilot_chat_timeout_returns_tool_fallback(client, auth_headers):
+    """RC-01 / UAT-10: when LLM times out, /chat returns tool-backed fallback within budget."""
+    import asyncio
+
+    token = tenant_ctx.set(DEMO_TENANT)
+    try:
+        async def _hanging_agent(*_args, **_kwargs):
+            await asyncio.sleep(60)  # simulates hung LLM
+            if False:
+                yield {}  # make it an async generator
+
+        async def _fast_fallback(tenant_id: str) -> str:
+            return "[Tool-backed snapshot]\nCapacity alerts: 0 overloaded work centers\nNote: LLM timed out."
+
+        with patch("app.api.v1.copilot.run_agent_with_tools", side_effect=_hanging_agent), \
+             patch("app.api.v1.copilot.build_tool_fallback_response", side_effect=_fast_fallback), \
+             patch("app.api.v1.copilot._TIMEOUT_SECONDS", 1), \
+             patch("app.api.v1.copilot.kafka_producer") as mock_kp:
+            mock_kp.send_event = AsyncMock()
+            response = await client.post(
+                "/api/v1/copilot/chat",
+                json={"message": "What is happening on the shop floor?", "stream": False},
+                headers=auth_headers,
+            )
+        assert response.status_code == 200
+        body = response.json()
+        assert body["success"] is True
+        data = body["data"]
+        assert data.get("timeout") is True
+        assert "Tool-backed snapshot" in data["response"]
+    finally:
+        tenant_ctx.reset(token)

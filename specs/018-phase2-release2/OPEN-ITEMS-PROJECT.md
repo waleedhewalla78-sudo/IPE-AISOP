@@ -22,8 +22,9 @@
 | Spec 016 Sprint 7 ecosystem cohesion | Emitters / migration 038 claimed done | Close related GH issues after push; verify Gate 11 waiver docs |
 | Spec 017 First release plan | Wave 1 eng ✅; C-08–C-16 + PH1-* still open | See A2; push commits; commercial PH1; stock.quant / mat-svc compose |
 | Spec 018 Phase 2 Release 2 | Engineering ~90%; gates mostly PASS | See **Section B**; human Arabic + tag HOLD |
-| Spec 019 `program-converge` | mat-svc + promote + stock.quant mock done | #47–#49 closed; #51 closed; #50 human-open |
-| Spec 020 `planning-intelligence` | **ENG DONE 2026-07-11** — Modules A–F + Copilot + Kong | Apply mig 044–049; smoke sop-svc; Odoo E2E = PH1-02; see `docs/qa/PLANNING-INTELLIGENCE-FINALIZE-REPORT.md` |
+| Spec 019 `program-converge` | **DONE** — mat-svc + promote + stock.quant mock done | #47–#49 closed; #51 closed; #50 human-open |
+| Spec 020 `planning-intelligence` | **ENG COMPLETE** — Modules A–F + Copilot + Kong; mig 044–049 applied; 68 tests green; UAT 8/10 | UAT-10/11 code-fixed in Spec 021; Odoo E2E = PH1-02 |
+| Spec 021 `release-closure` | **ACTIVE (2026-07-11)** — UAT-10/11 code fixed; 199 tests green; tag readiness documented | Pending: live UAT re-run, GitHub issues, push |
 
 ### A2. Spec 017 converge carry-over (still open)
 

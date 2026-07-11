@@ -14,7 +14,8 @@ from app.core.copilot_tools import (
 
 class TestToolDefinitions:
     def test_all_tools_defined(self):
-        assert len(TOOL_DEFINITIONS) == 16
+        # 16 original tools + 9 planning-intelligence tools added in Spec 020 = 25 total
+        assert len(TOOL_DEFINITIONS) == 25
         tool_names = {t["name"] for t in TOOL_DEFINITIONS}
         assert "get_order_status" in tool_names
         assert "get_resource_utilization" in tool_names

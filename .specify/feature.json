@@ -1,24 +1,30 @@
 ﻿{
-  "feature_directory": "specs/020-planning-intelligence",
-  "active_implementation": "specs/020-planning-intelligence",
-  "active_plan": "specs/020-planning-intelligence/tasks.md",
-  "readiness_score": 88,
-  "readiness_note": "020 planning intelligence: Modules A-F + Copilot + Kong eng done; mig 044-049; apply migrate + smoke; Odoo live = PH1-02",
-  "release_target": "v9.2.0",
-  "phase": "020-planning-intelligence",
+  "feature_directory": "specs/021-release-closure",
+  "active_implementation": "specs/021-release-closure",
+  "active_plan": "specs/021-release-closure/tasks.md",
+  "readiness_score": 90,
+  "readiness_note": "021 release-closure: UAT-10 LLM timeout fixed, UAT-11 best-fit cold path fixed; tag v9.2.0-planning pending live UAT green; v9.1.1-r2 pending G-R2-04 Arabic human sign-off",
+  "release_target": "v9.2.0-planning",
+  "phase": "021-release-closure",
   "prior_specs": [
     "005-ipe-program-status",
     "017-first-release-plan",
     "018-phase2-release2",
-    "019-program-converge"
+    "019-program-converge",
+    "020-planning-intelligence"
   ],
-  "constitution_version": "1.2.5",
-  "last_speckit_run": "2026-07-11-020-planning-intelligence",
+  "constitution_version": "1.2.6",
+  "last_speckit_run": "2026-07-11-021-release-closure",
   "speckit_phases_complete": [
+    "constitution",
     "specify",
+    "clarify",
+    "analyze",
     "plan",
     "tasks",
-    "implement"
+    "taskstoissues",
+    "implement",
+    "converge"
   ],
   "commercial_blockers_open": [
     "PH1-01-SOW",

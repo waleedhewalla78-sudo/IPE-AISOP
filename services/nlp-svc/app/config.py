@@ -30,6 +30,6 @@ class Settings(BaseSettings):
     DEMAND_SVC_URL: str = "http://demand-svc:8040"
     SOP_SVC_URL: str = "http://sop-svc:8110"
     COPILOT_SHADOW_MODE: bool = True
-    COPILOT_TIMEOUT_SECONDS: int = 300
+    COPILOT_TIMEOUT_SECONDS: int = 20
     model_config = {"env_prefix": "IPE_", "case_sensitive": False}
 settings = Settings()

@@ -1,11 +1,11 @@
 # IPE Platform Constitution
 
 <!--
-Sync Impact Report (Speckit — 2026-07-10 program converge)
-Version: 1.2.4 → 1.2.5 (PATCH)
-Updated: Development Workflow — Spec 019-program-converge is active Speckit feature for remaining whole-project work
-Updated: Principle VIII — R2 eng gates PASS; G-R2-04 Arabic human sign-off and PH1 commercial remain open (not faked)
-Clarified: Do not dilute Principle VII three-screen minimum; Wave 2/3 features stay POST-R1 unless contracted
+Sync Impact Report (Speckit — 2026-07-11 release-closure)
+Version: 1.2.5 → 1.2.6 (PATCH)
+Updated: Development Workflow — Spec 020 planning intelligence ENG COMPLETE (mig 044-049, nlp-svc tools, sop-svc); Spec 021-release-closure is now the active Speckit feature targeting UAT-10/11 closure and tag readiness
+Updated: Principle VIII — OQ-13 apply path documented; UAT-10 LLM timeout fixed (<=20 s, tool fallback); UAT-11 best-fit cold path fixed (8 s budget, SES fallback); commercial/Arabic blockers (PH1-01, PH1-02, G-R2-04) remain OPEN — not faked
+Clarified: Tag v9.1.1-r2 HOLD until G-R2-04; tag v9.2.0-planning HOLD until UAT-10/11 fully green on live stack
 Templates: no structural change (PATCH only)
 -->
 
@@ -163,7 +163,9 @@ Every **deployed** service MUST be observable.
 - **Sprint 7 cohesion (016):** Tier 1 activity emitters (T717–T719) complete; migration 038 (T730) applied compose + K8s.
 - **First Release Plan (017):** Phase 0 **closed** (`v9.4.0-p3`); Wave 1 engineering delivered (W1-01–08). Waves 2–3 tracked via open GitHub issues #37–#46.
 - **Phase 2 Release 2 (018):** Engineering gates G-R2-01/02/03/05 PASS; G-R2-04 Arabic **human** sign-off OPEN; tag HOLD pending policy.
-- **Program Converge (019):** Active Speckit feature for remaining whole-project gaps (compose parity, scenario promote, stock.quant mock fidelity, issue triage). Commercial blockers (PH1-01 SOW, PH1-02 Odoo staging, native Arabic sign-off) MUST remain OPEN until humans close them.
+- **Program Converge (019):** **DONE** — compose parity, scenario promote, stock.quant mock fidelity, issue triage complete. Commercial blockers (PH1-01 SOW, PH1-02 Odoo staging, native Arabic sign-off) MUST remain OPEN until humans close them.
+- **Planning Intelligence (020):** **ENG COMPLETE 2026-07-11** — Modules A–F + Copilot tools + Kong; migrations 044–049 applied; 68 tests green; UAT PASS=8 PARTIAL=2. UAT-10 (LLM timeout) and UAT-11 (best-fit cold path) fixed in Spec 021.
+- **Release Closure (021):** **Active Speckit feature** — engineering gaps UAT-10/11 closed; OQ-13 migration apply path scripted; tag readiness documented; GitHub issue triage; tag v9.2.0-planning pending live UAT green; v9.1.1-r2 pending G-R2-04 human sign-off.
 - **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
 
 ---
@@ -192,4 +194,4 @@ All `/speckit.analyze` reports MUST use this map when comparing downloaded roadm
 
 ---
 
-**Version**: 1.2.5 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-10
+**Version**: 1.2.6 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-11
