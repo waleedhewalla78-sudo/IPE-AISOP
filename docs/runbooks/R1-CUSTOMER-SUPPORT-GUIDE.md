@@ -242,5 +242,114 @@ A: Contract covers Sun–Thu. P0 on off-days: best-effort reply; plan critical a
 
 ---
 
+---
+
+## 12. Emergency Procedures (System Down)
+
+**Use when:** IPE is completely inaccessible; all users get 404 or timeout.
+
+### 12.1 Immediate (do before calling Diligent)
+
+1. Confirm your internet is working (open any other website)
+2. Confirm other people in your office also cannot access IPE
+3. Check if Odoo is also affected — if Odoo is down, IPE cannot sync but may still be accessible
+
+### 12.2 Restart sequence (Customer IT + Diligent together)
+
+```powershell
+# On IPE server — run in order:
+docker compose ps              # check which containers are down
+docker compose restart         # restart all containers
+Start-Sleep 30
+docker compose ps              # verify all back up
+```
+
+### 12.3 Check disk space (common cause)
+
+```powershell
+# On IPE server:
+Get-PSDrive -PSProvider FileSystem   # Windows
+# or: df -h                          # Linux
+# If any drive >90% full: call Diligent immediately — do not try to delete files
+```
+
+### 12.4 Check database health
+
+```powershell
+docker compose exec -T db pg_isready -U ipe
+# "accepting connections" = DB is healthy
+# Timeout or error = DB container down; restart with: docker compose restart db
+```
+
+---
+
+## 13. Maintenance Windows
+
+### 13.1 Scheduled monthly updates
+
+- Diligent performs IPE software updates on the **first Sunday of each month**, between **11pm–1am Cairo time** (off business hours)
+- **Downtime:** 10–15 minutes during container restart
+- **Notice:** Diligent sends WhatsApp message 3 days before: "IPE update scheduled for Sunday [date] at 11pm. Brief downtime expected."
+- **No action needed from customer** unless a critical update requires Odoo reconnection
+
+### 13.2 Database migration downtime
+
+- Migrations (schema changes) require service restart — typically 5–10 minutes
+- Migration windows are included in monthly updates unless urgent (P0 fix)
+- Urgent migrations: Diligent notifies via WhatsApp with 2-hour notice
+
+### 13.3 Customer Odoo maintenance
+
+- If Customer IT plans Odoo downtime: notify Diligent via WhatsApp **48 hours in advance**
+- IPE will show sync errors during Odoo downtime — this is expected
+- IPE sync automatically resumes when Odoo is restored
+- **No data is lost** — IPE retains the last successful sync data while Odoo is down
+
+---
+
+## 14. Backup Verification
+
+### 14.1 How to confirm daily backup ran
+
+IPE database is backed up nightly via the Docker volume backup script. To verify:
+
+```powershell
+# On IPE server — check backup directory:
+Get-ChildItem -Path "C:\ipe-backups\" -Filter "*.dump" | Sort-Object LastWriteTime -Descending | Select-Object -First 5
+
+# Expected: at least 1 file created in the last 24 hours
+# File naming: ipe-backup-YYYY-MM-DD.dump
+```
+
+If no recent backup file exists, send WhatsApp P1 to Diligent with:
+- Screenshot of the backup directory listing
+- Output of: `docker compose logs backup-svc` (if backup service exists)
+
+### 14.2 Backup retention
+
+Diligent's default retention:
+- Daily backups: 7 days
+- Weekly backups: 4 weeks
+- Monthly backups: 3 months
+
+Customer is responsible for their Odoo server backup separately.
+
+---
+
+## 15. Support SLA Summary Card
+
+| Priority | Example | Response | Resolution |
+|----------|---------|----------|------------|
+| **P0 Critical** | Sync down before morning meeting; all users cannot login | **2 hours** | **4 hours** |
+| **P1 High** | Approve button broken; wrong dates in Odoo after write-back | Same business day | 1 business day |
+| **P2 Normal** | One MO shows wrong score; Arabic text issue on one screen | Next business day | 1 week |
+| **P3 Question** | "How do I...?"; training reminder | Same or next day | N/A |
+
+**Support hours:** Sunday–Thursday, 09:00–18:00 Cairo time  
+**Out-of-hours P0:** Best-effort; no SLA. Plan critical approvals before Thursday 5pm.
+
+---
+
+*Updated: 2026-07-11 (Sprint 2 — added Sections 12–15: Emergency Procedures, Maintenance Windows, Backup Verification, SLA Summary)*  
 *Engineer runbook (Diligent internal): `R1-SUPPORT-RUNBOOK.md`*  
-*SOW support terms: `R1-CUSTOMER-SOW-TEMPLATE.md` §8*
+*SOW support terms: `docs/customer/star-trans/IPE-Star-Trans-SOW-v1.md` Section 6*
