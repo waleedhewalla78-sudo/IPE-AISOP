@@ -2,8 +2,8 @@
 
 **Last Updated:** 2026-07-11  
 **Release Tag:** v9.2.0-planning (applied @ b04434d), v9.4.0-p3 (platform)  
-**Active Speckit feature:** `specs/022-sprint3-golive`  
-**Constitution:** 1.2.7  
+**Active Speckit feature:** `specs/023-sprint4-wave1`  
+**Constitution:** 1.2.8  
 **Workspace:** `E:\AISOP\ipe`
 
 ---
@@ -17,7 +17,8 @@
 | Resource Management | BUILT | res-svc | — | Machines, WC utilisation |
 | Capacity Planning | BUILT | cap-svc | 048 | Alerts, utilisation |
 | Material Management | BUILT | mat-svc | 044, 047 | ABC/XYZ, safety stock |
-| Odoo Connector | BUILT | connector | 046 | XML-RPC sync, lead time history; Odoo 17+19 aliases |
+| Odoo Connector | BUILT | connector | 046, **050** | XML-RPC sync; Odoo Config v2 encrypted connections (W1-03..05); Odoo 17+19 aliases |
+| OTD Analytics | BUILT | dpe-svc | 039 | KPI/trend/root-cause/baseline/snapshot + dashboard (W1-06..08) |
 | API Gateway | BUILT | Kong | — | R1 + R2 + star-trans profiles |
 | Web UI (R1) | BUILT | web-ui | — | `VITE_RELEASE_PROFILE=release1` |
 
@@ -92,4 +93,5 @@
 |------|--------|
 | 020 planning-intelligence | ENG COMPLETE |
 | 021 release-closure | ENG COMPLETE |
-| **022 sprint3-golive** | **ACTIVE** |
+| 022 sprint3-golive | ENG COMPLETE (residuals #70–#72 best-effort via 023) |
+| **023 sprint4-wave1** | **ENG COMPLETE** — Odoo Config v2 + OTD polish; COM OPEN; validate residuals #70/#72 OPEN (Docker) |

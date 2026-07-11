@@ -4,7 +4,7 @@
 
 **Created**: 2026-07-11
 
-**Status**: Active
+**Status**: ENG COMPLETE (2026-07-11) — COM / validate residuals #70/#72 remain OPEN
 
 **Input**: Sprint 4 Wave 1 delivery after Spec 022 go-live eng closure. Complete Spec 017 Wave 1 items W1-03..W1-08: Admin Odoo Config v2 (encrypted ERP connections) and OTD Analytics dashboard polish. Source checklist: `ipe/tasks/sprint4-todo.md`. Commercial blockers remain OPEN (do not fake).
 

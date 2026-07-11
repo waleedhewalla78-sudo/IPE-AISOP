@@ -8,6 +8,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased] — Sprint 4 Wave 1 (Spec 023)
+
+### Added
+- Admin Odoo Config v2: `cdm_erp_connection` + audit log (migration 050, RLS), Fernet password encryption (`IPE_ENCRYPTION_KEY`), connector REST `/api/v1/erp/connections` (CRUD/test/activate/sync-now/logs)
+- React `OdooConnectionsPage` + EN/AR i18n; Platform hub route `/platform/odoo-config`
+- OTD Analytics polish: `OTDAggregator` (daily snapshot + historical backfill), extended `/api/v1/analytics/otd/*` endpoints, dashboard/nav for R1+R2
+
+### Fixed
+- Validate script write-back probe now uses canonical `POST /api/v1/sync/odoo/activate` (was bare `/api/v1/activate` → 404)
+- OTD `SnapshotRequest.date` annotation shadowing that broke FastAPI route registration under tests
+
+### Tests
+- `services/connector/tests/test_erp_connections.py` — 9 passed
+- `services/dpe-svc/tests/test_otd_analytics.py` — 6 passed
+
+---
+
 ## [v9.2.0-planning] — 2026-07-11
 
 ### Added

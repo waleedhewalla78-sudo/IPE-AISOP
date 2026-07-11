@@ -389,10 +389,11 @@ if ($script:token) {
         "X-Tenant-ID"   = $TenantId
     }
 
-    # Check the activate endpoint exists (dry-run  -  just check it responds, don't execute)
+    # Activate lives under connector sync/odoo prefix (not bare /api/v1/activate)
+    # Canonical: POST /api/v1/sync/odoo/activate — Spec 023 T022 / GH #71
     try {
         $wbResp = Invoke-WebRequest `
-            -Uri "$BaseUrl/api/v1/activate" `
+            -Uri "$BaseUrl/api/v1/sync/odoo/activate" `
             -Method "GET" `
             -Headers $authHeaders `
             -TimeoutSec 10 `

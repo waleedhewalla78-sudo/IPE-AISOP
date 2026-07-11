@@ -1,6 +1,6 @@
 ﻿---
-status: ACTIVE
-note: Wave 1 in progress
+status: WAVE1_DONE
+note: Wave 1 eng complete via Spec 023
 date: 2026-07-11
 ---
 
@@ -9,10 +9,10 @@ date: 2026-07-11
 **Feature**: `017-first-release-plan`  
 **Version**: 2.0  
 **Date**: 2026-07-10  
-**Status**: Phase 0 **COMPLETE** · Wave 1 **IN PROGRESS** (2/8) · Phase 1 UAT **BLOCKED** (commercial)  
+**Status**: Phase 0 **COMPLETE** · Wave 1 **ENG COMPLETE via Spec 023** (8/8) · Phase 1 UAT **BLOCKED** (commercial)  
 **Sources**: IPE-UAT-Phases-0-3.docx, IPE-Strategy-Assessment (July 2026), IPE-First-Release-Plan.docx, PRD  
-**Constitution**: v1.2.4  
-**Depends on**: Spec 015 (gates), Spec 016 (Sprint 7), Star Trans Phase 1 blueprint  
+**Constitution**: v1.2.8  
+**Depends on**: Spec 015 (gates), Spec 016 (Sprint 7), Star Trans Phase 1 blueprint, Spec 023 (Wave 1 delivery)  
 **Release**: `v9.4.0-p3` @ `4629119` · HEAD `ad494e0`
 
 ---
@@ -48,18 +48,18 @@ Deliver a **customer-validated, revenue-ready** IPE Release 1 for MENA mid-marke
 | FR-017-PH1-06 | Write-back validation | As planner, approved schedule updates Odoo MO dates |
 | FR-017-PH1-07 | Production go-live | As customer, I run IPE on 8GB VM compose |
 
-### 2.3 Wave 1 — Foundation (Weeks 2–5) 🔄 25%
+### 2.3 Wave 1 — Foundation (Weeks 2–5) ✅ ENG COMPLETE (Spec 023)
 
 | ID | Feature | User story | Status |
 |----|---------|------------|--------|
 | FR-017-W1-01 | Copilot R1 nav | US-W1-01: Planner sees Copilot in R1 sidebar | ✅ |
 | FR-017-W1-02 | Copilot smoke (auth + route + 401) | US-W1-02a: Unauthenticated users cannot access Copilot | ✅ 12/12 |
-| FR-017-W1-03 | Admin Odoo Config v2 schema + API | US-W1-02: Admin validates mappings, tests connection <5s | ⬜ |
-| FR-017-W1-04 | Odoo connection test endpoint | US-W1-02b: Admin verifies Odoo reachability in <5s | ⬜ |
-| FR-017-W1-05 | Odoo multi-entity + versioning | US-W1-02c: Admin manages multiple Odoo instances | ⬜ |
-| FR-017-W1-06 | Odoo Config v2 React UI | US-W1-02d: Admin configures Odoo without SQL | ⬜ |
-| FR-017-W1-07 | OTD aggregation service | US-W1-03a: Manager queries OTD baseline API | ✅ |
-| FR-017-W1-08 | OTD dashboard UI (5 KPIs) | US-W1-03: Manager views 5 OTD KPIs with filters | ✅ |
+| FR-017-W1-03 | Admin Odoo Config v2 schema + API | US-W1-02: Admin validates mappings, tests connection <5s | ✅ Spec 023 |
+| FR-017-W1-04 | Odoo connection test endpoint | US-W1-02b: Admin verifies Odoo reachability in <5s | ✅ Spec 023 |
+| FR-017-W1-05 | Odoo multi-entity + versioning | US-W1-02c: Admin manages multiple Odoo instances | ✅ Spec 023 (one active + audit log) |
+| FR-017-W1-06 | Odoo Config v2 React UI | US-W1-02d: Admin configures Odoo without SQL | ✅ Spec 023 |
+| FR-017-W1-07 | OTD aggregation service | US-W1-03a: Manager queries OTD baseline API | ✅ Spec 023 |
+| FR-017-W1-08 | OTD dashboard UI (5 KPIs) | US-W1-03: Manager views 5 OTD KPIs with filters | ✅ Spec 023 |
 
 ### 2.4 Wave 2 — Intelligence (Weeks 6–11) ⬜
 
