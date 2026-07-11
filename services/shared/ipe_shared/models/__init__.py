@@ -22,6 +22,7 @@ from ipe_shared.models.mdr_score import MdrScore
 from ipe_shared.models.model_registry import ModelRegistry
 from ipe_shared.models.manufacturing_order import ManufacturingOrder
 from ipe_shared.models.odoo_config_version import OdooConfigVersion
+from ipe_shared.models.erp_connection import ErpConnection, ErpConnectionLog
 from ipe_shared.models.otd_snapshot import OtdSnapshot
 from ipe_shared.models.operator import Operator
 from ipe_shared.models.plant import Plant
@@ -96,6 +97,8 @@ __all__ = [
     "MaterialCarbon",
     "Operator",
     "OdooConfigVersion",
+    "ErpConnection",
+    "ErpConnectionLog",
     "OtdSnapshot",
     "Plant",
     "Product",

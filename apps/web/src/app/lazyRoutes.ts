@@ -119,6 +119,10 @@ export const OdooConfigPage = lazyNamed(
   () => import('@/features/odoo-config/components/OdooConfigPage'),
   'OdooConfigPage',
 );
+export const OdooConnectionsPage = lazyNamed(
+  () => import('@/features/odoo-config/components/OdooConnectionsPage'),
+  'OdooConnectionsPage',
+);
 export const OnboardingWizard = lazyNamed(
   () => import('@/features/onboarding/components/OnboardingWizard'),
   'OnboardingWizard',

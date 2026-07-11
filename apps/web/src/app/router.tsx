@@ -36,6 +36,7 @@ import {
   SustainabilityPage,
   AdminPage,
   OdooConfigPage,
+  OdooConnectionsPage,
   OnboardingWizard,
   MLOpsDashboard,
   OpsDashboard,
@@ -112,7 +113,8 @@ export function AppRouter() {
           <Route path={ROUTES.PLATFORM} element={<PlatformHub />}>
             <Route index element={<Navigate to="admin" replace />} />
             <Route path="admin" element={<AdminPage />} />
-            <Route path="odoo-config" element={<OdooConfigPage />} />
+            <Route path="odoo-config" element={<OdooConnectionsPage />} />
+            <Route path="odoo-config/versions" element={<OdooConfigPage />} />
             <Route path="onboarding" element={<OnboardingWizard />} />
             <Route path="ml-ops" element={<MLOpsDashboard tenantId={tenantId} />} />
             <Route path="ops" element={<OpsDashboard />} />
