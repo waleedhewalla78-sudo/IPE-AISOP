@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: Release 2 — Commercial Growth & Agentic Planning
 
 **Feature**: `014-release2-growth`  

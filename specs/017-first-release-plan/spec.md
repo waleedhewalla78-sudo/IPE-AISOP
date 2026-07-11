@@ -1,3 +1,9 @@
+﻿---
+status: ACTIVE
+note: Wave 1 in progress
+date: 2026-07-11
+---
+
 # Feature Specification: IPE First Release Plan (017)
 
 **Feature**: `017-first-release-plan`  

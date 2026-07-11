@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: IPE V6.0 — AI-First Strategic Reassessment
 
 **Feature Branch**: `004-ai-first-v6`

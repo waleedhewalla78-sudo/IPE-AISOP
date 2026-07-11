@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: Star Trans Client Demo (Today)
 
 **Feature Branch**: `012-startrans-client-demo`  

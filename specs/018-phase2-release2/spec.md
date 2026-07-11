@@ -1,4 +1,10 @@
-﻿# Feature Specification: IPE Phase 2 — Release 2 (018)
+﻿---
+status: CLOSED
+closed_by: v9.1.1-r2
+date: 2026-07-11
+---
+
+# Feature Specification: IPE Phase 2 — Release 2 (018)
 
 **Feature**: `018-phase2-release2`  
 **Version**: 1.2  

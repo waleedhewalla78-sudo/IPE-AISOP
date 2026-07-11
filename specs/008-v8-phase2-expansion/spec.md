@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: IPE v8.1.0 Phase 2 Expansion
 
 **Feature Branch**: `008-v8-phase2-expansion`  

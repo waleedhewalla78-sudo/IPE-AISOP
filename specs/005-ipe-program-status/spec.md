@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: IPE Program — Full Phases & Tasks Status
 
 **Feature Branch**: `005-ipe-program-status`

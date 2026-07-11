@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: Release 1 — Odoo Live + MENA Customer Go-Live
 
 **Feature**: `013-release1-odoo-mena`  

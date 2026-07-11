@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: Autonomous Production Planning — IPE V5.0 Convergence
 
 **Feature Branch**: `003-autonomous-planning-v5`

@@ -1,3 +1,9 @@
+﻿---
+status: CLOSED
+closed_by: sprint-3 engineering closure
+date: 2026-07-11
+---
+
 # Feature Specification: Sprint 3 Star Trans Go-Live Readiness
 
 **Feature Branch**: `022-sprint3-golive`

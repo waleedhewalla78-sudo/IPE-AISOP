@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: IPE v8.2.0 Phase 3 Design & Procurement
 
 **Feature Branch**: `009-v8-phase3-design-procurement`  

@@ -1,3 +1,8 @@
+﻿---
+status: CLOSED
+closed_by: foundation
+date: 2026-07-11
+---
 # Feature Specification: Release Stabilization & Deployment Gates
 
 **Feature Branch**: `002-release-stabilization-gates`

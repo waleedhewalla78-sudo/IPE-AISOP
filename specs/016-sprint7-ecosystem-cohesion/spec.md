@@ -1,3 +1,9 @@
+﻿---
+status: CLOSED
+closed_by: v9.4.0-p3
+date: 2026-07-11
+---
+
 # Feature Specification: Sprint 7 Ecosystem Cohesion (016)
 
 **Feature**: `016-sprint7-ecosystem-cohesion`  

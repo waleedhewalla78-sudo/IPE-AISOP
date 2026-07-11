@@ -1,3 +1,9 @@
+﻿---
+status: CLOSED
+closed_by: v9.2.0-planning
+date: 2026-07-11
+---
+
 # Spec 020 — Planning Intelligence (SAP IBP Gap Closure)
 
 **Version:** 1.0  

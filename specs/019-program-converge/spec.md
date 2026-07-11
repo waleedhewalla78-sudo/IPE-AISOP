@@ -1,3 +1,9 @@
+﻿---
+status: CLOSED
+closed_by: analysis complete
+date: 2026-07-11
+---
+
 # Feature Specification: IPE Program Converge (Whole-Project Remaining Work)
 
 **Feature Branch**: `019-program-converge`  
