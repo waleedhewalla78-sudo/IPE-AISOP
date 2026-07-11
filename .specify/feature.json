@@ -2,8 +2,8 @@
   "active_feature": "specs/023-sprint4-wave1",
   "active_implementation": "specs/023-sprint4-wave1",
   "active_plan": "specs/023-sprint4-wave1/tasks.md",
-  "readiness_score": 70,
-  "readiness_note": "023 sprint4-wave1 active; constitution 1.2.8; COM OPEN",
+  "readiness_score": 88,
+  "readiness_note": "023 Wave 1 eng COMPLETE; converge residuals; COM OPEN",
   "phase": "023-sprint4-wave1",
   "constitution_version": "1.2.8",
   "last_speckit_run": "2026-07-11-023-sprint4-wave1"
