@@ -1,0 +1,18 @@
+﻿=== Release 2 smoke test ===
+[PASS] nlp-svc container
+[PASS] demand-svc container
+[PASS] scenario-svc container
+[PASS] dpe-svc container
+[PASS] fea-svc container
+[PASS] res-svc container
+[PASS] cap-svc container
+[PASS] connector container
+[PASS] Login via Kong
+[PASS] Kong health
+[PASS] Sync status (R1)
+[PASS] Feasibility queue (R1)
+[PASS] nlp-svc authenticated health
+[PASS] Kong scenario route
+[PASS] Kong demand route
+
+Result: 15 passed, 0 failed

@@ -1,0 +1,21 @@
+﻿=== API E2E 2026-07-12T06:11:20.8407001+03:00 ===
+[PASS] feasibility/queue -> 200 len=3790
+[PASS] feasibility/kpis -> 200 len=136
+[PASS] OTD kpis -> 200 len=246
+[PASS] OTD trend -> 200 len=589
+[PASS] inventory-summary -> 200 len=1415
+[PASS] sync/status -> 200 len=931
+[PASS] erp connections list (direct) -> 200 len=51
+[FAIL] erp connections via Kong -> 404 The remote server returned an error: (404) Not Found.
+[PASS] mock-odoo health -> 200 len=41
+[PASS] web login page -> 200 len=753
+[PASS] project-plan schema -> 200 len=1166
+[INFO] project-plan upload: {"detail":[{"type":"missing","loc":["body","mode"],"msg":"Field required","input":null}]} HTTP:422
+[FAIL] sync/run The remote server returned an error: (422) Unprocessable Entity.
+=== Extended API E2E follow-up ===
+[PASS] project-plan upload mode=new -> PLAN-STARTRANS-W12 v1, 3 ops
+[PASS] sync/run mock-odoo -> status=success
+[PASS] sync/status last_sync.status=success
+[PASS] OTD kpis otd_pct=50 orders_at_risk=4 chaos_cost_usd=17770
+[PASS] schedule/active, resolution/scenarios
+[FAIL] Kong /api/v1/erp/connections -> 404 (use :8016)

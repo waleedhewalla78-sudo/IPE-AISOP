@@ -1,0 +1,4 @@
+﻿IPE Star Trans Deployment Validation — 2026-07-12
+PASS: 16  FAIL: 1 (Last sync status unknown — cleared later by mock sync)  SKIP: 1 (Odoo test-connection)
+Total: 18
+Overall: FAILED on sync-status at script time; post-run mock sync succeeded (see api-e2e / PRE-TEST report).
