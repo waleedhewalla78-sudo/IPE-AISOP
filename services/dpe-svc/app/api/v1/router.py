@@ -14,6 +14,7 @@ from app.api.v1 import (
     demand,
     demand_sense,
     dsar,
+    exceptions,
     financial,
     health,
     keycloak_config,
@@ -36,6 +37,7 @@ from app.api.v1 import (
     planner_assist,
     activity,
     unified_dashboard,
+    phase3_agents,
 )
 
 api_router = APIRouter()
@@ -75,3 +77,5 @@ api_router.include_router(feature_store.router)
 api_router.include_router(planner_assist.router)
 api_router.include_router(activity.router)
 api_router.include_router(unified_dashboard.router)
+api_router.include_router(phase3_agents.router)
+api_router.include_router(exceptions.router)

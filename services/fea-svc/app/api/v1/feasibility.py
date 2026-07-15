@@ -7,6 +7,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auto_confirm import should_auto_confirm
+from app.core.predictive_scorer import PredictiveRiskScorer
+from app.core.root_cause_analyzer import RootCauseAnalyzer
 from app.core.scorer import calculate_feasibility, score_from_mo
 from ipe_shared.audit.service import log_audit_event
 from ipe_shared.auth.jwt import TokenPayload
@@ -60,6 +62,54 @@ async def get_mdr_score(
             error={"code": "MDR_ERROR", "message": result["error"]},
         )
     return APIResponse(success=True, data=format_mdr_response(tenant_id, result), error=None)
+
+
+@router.get("/predict/{mo_id}")
+async def predict_feasibility(
+    mo_id: UUID,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: TokenPayload = Depends(require_roles(["admin", "planner", "manager", "auditor"])),
+) -> APIResponse:
+    """Ops Phase 3 — predictive risk at T+3/7/14 for a manufacturing order."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(
+            success=False,
+            data=None,
+            error={"code": "NO_TENANT", "message": "X-Tenant-ID required"},
+        )
+    scorer = PredictiveRiskScorer()
+    try:
+        result = await scorer.score_future(session, str(tenant_id), str(mo_id))
+    except Exception:
+        # DB unavailable or MO missing — degrade to offline projection defaults
+        result = await scorer.score_future(None, str(tenant_id), str(mo_id))
+    return APIResponse(success=True, data=result, error=None)
+
+
+@router.get("/root-cause/{mo_id}")
+async def root_cause_feasibility(
+    mo_id: UUID,
+    session: AsyncSession = Depends(get_db_session),
+    current_user: TokenPayload = Depends(require_roles(["admin", "planner", "manager", "auditor"])),
+) -> APIResponse:
+    """Ops Phase 3 — automated 5-why root cause chain for an MO."""
+    tenant_id = tenant_ctx.get()
+    if not tenant_id:
+        return APIResponse(
+            success=False,
+            data=None,
+            error={"code": "NO_TENANT", "message": "X-Tenant-ID required"},
+        )
+    analyzer = RootCauseAnalyzer()
+    try:
+        chain = await analyzer.analyze(session, str(tenant_id), str(mo_id))
+    except Exception:
+        chain = await analyzer.analyze(None, str(tenant_id), str(mo_id))
+    data = chain.to_dict()
+    data["levels"] = data.get("chain", [])
+    data["root_cause_type"] = (data.get("root_cause") or {}).get("cause_type")
+    return APIResponse(success=True, data=data, error=None)
 
 
 @router.post("/score")

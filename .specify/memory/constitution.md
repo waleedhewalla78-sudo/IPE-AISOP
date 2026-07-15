@@ -1,13 +1,15 @@
 # IPE Platform Constitution
 
 <!--
-Sync Impact Report (Speckit - 2026-07-11 sprint4-wave1)
-Version: 1.2.7 -> 1.2.8 (PATCH)
-Updated: Development Workflow - Spec 022 sprint3-golive ENG COMPLETE (smoke 15/15; validate residuals #70-#72); Spec 023-sprint4-wave1 is now the active Speckit feature (Odoo Config v2 W1-03..05 + OTD Analytics W1-06..08)
-Updated: Principle VII - honesty rule unchanged; commercial blockers OQ-7 / OQ-1 / PH1-02 / G-R2-04 remain OPEN
-Clarified: Tag v9.1.1-r2 still HOLD until G-R2-04; never push stale v9.1.0-r2; Fernet IPE_ENCRYPTION_KEY required for ERP connection passwords
-Templates: no structural change (PATCH only)
-Root .specify/memory/constitution.md synced to this canonical ipe copy
+Sync Impact Report (Speckit - 2026-07-15 phase3-ops-intelligence)
+Version: 1.2.8 -> 1.3.0 (MINOR)
+Added: Principle IX — Operations Intelligence Program (Blueprint Phases 3→5)
+Updated: Development Workflow — Spec 023 ENG COMPLETE; Spec 024-phase3-ops-intelligence ACTIVE
+Clarified: Platform Phase 3 tag v9.4.0-p3 (K8s/Helm) ≠ Blueprint Ops Phase 3 (7 agents / predictive risk)
+Updated: Principle VII honesty — COM blockers OQ-7 / OQ-1 / PH1-02 / G-R2-04 remain OPEN
+Clarified: Migrations 051–059 Phase-agent deltas absorbed into Spec 024; do not recreates
+Templates: no structural change (MINOR principle addition only)
+Root .specify/memory/constitution.md MUST stay synced to this canonical ipe copy
 -->
 
 IPE (Intelligent Planning Engine) is a microservices-based, event-driven platform for **feasibility-first manufacturing planning** in MENA mid-market discrete manufacturing. These principles are binding on all changes.
@@ -48,8 +50,9 @@ Every behavioral change MUST be accompanied by automated tests.
 - **Tests MUST pass before merge.**
 - **Odoo connector changes MUST include:** unit tests (mapper), integration tests (mock Odoo XML-RPC), and at least one end-to-end sync test with testcontainers or recorded fixtures.
 - **ERP scaffold changes (SAP/D365) MUST include:** import/unit tests proving registry factory and no-op sync paths do not raise.
+- **Phase 3 ops agents MUST include:** unit tests for scorers/analyzers/batchers with stubbed DB; no live Odoo or external LLM required for merge.
 - **No real network in unit tests.** External services MUST be stubbed.
-- **Release 1 gate:** Connector sync + feasibility pipeline MUST have integration test proving MO ingest ? Control Tower queue.
+- **Release 1 gate:** Connector sync + feasibility pipeline MUST have integration test proving MO ingest → Control Tower queue.
 
 **Rationale:** Bad Odoo data in production will be the norm, not the exception. Tests must cover defensive paths.
 
@@ -62,6 +65,7 @@ The event bus is the backbone of inter-service communication in the **full platf
 - **Full stack (22 services):** Kafka topics, Avro schemas, producer/consumer pairs as documented.
 - **Release 1 profile (`docker-compose.release1.yml` and Helm `values-dev.yaml`):** Kafka MAY be omitted. Set `IPE_KAFKA_BOOTSTRAP_SERVERS=""` so health probes return `not_configured` instead of probing `localhost:9092`.
 - **Consumer resilience:** Idempotent processing, deserialization error handling, 30s timeout.
+- **Agent orchestrator:** Chain steps MAY call HTTP endpoints when Kafka is not configured; MUST still log activity to `cdm_agent_activity_log`.
 
 **Rationale:** Event mesh is v3.0 architecture. Customer #1 needs reliability over architectural purity.
 
@@ -76,6 +80,7 @@ All services follow a uniform layered architecture.
 - **Frontend-backend contract alignment.** Every UI API call MUST have a corresponding backend route.
 - **Port scheme:** Dockerfile ports are canonical; docker-compose, Kong, and Helm values MUST stay reconciled.
 - **Release 1 deployed services:** `kong`, `dpe-svc`, `fea-svc`, `cap-svc`, `mat-svc`, `connector`, `res-svc`, `web-ui`, `db`, (`redis` if sessions). All other services remain in monorepo but OFF the customer compose file until requested.
+- **New services (e.g. upload-svc:8120):** MUST land in compose/Kong before customer enablement; MAY ship behind feature flag until Wave complete.
 
 **Rationale:** 22 services in repo; 8 in production for customer #1 (Release 1 profile).
 
@@ -89,6 +94,7 @@ Every **deployed** service MUST be observable.
 - **Structured JSON logging** with correlation IDs.
 - **Performance baselines:** k6 SLO profile (normal load) and stress profile (rate limiter) MUST both pass before enterprise phase tags; they measure different things and MUST NOT be combined into one script.
 - **Sync observability (Release 1):** Every Odoo sync run MUST log and persist: start time, end time, records synced, records skipped, errors, data quality flags. UI MUST show "Last synced at" timestamp.
+- **Agent observability (Phase 3):** Every agent chain run MUST persist activity log + exceptions with SLA timestamps; UI MUST surface open exceptions.
 - **Graceful degradation:** `/ready` surfaces DB/Odoo connectivity; planner sees actionable message, not 500 stack trace.
 
 **Rationale:** Phase 2 closed with Grafana dashboards, Alertmanager rules, and documented SLO baselines (`docs/qa/PERFORMANCE-BASELINE-v9.1.0.md`).
@@ -102,31 +108,45 @@ Every **deployed** service MUST be observable.
 - **One ERP first:** Odoo (XML-RPC + optional `ipe_connector` module). SAP/D365 scaffolds MUST NOT block Odoo production path until customer #2 is contracted.
 - **One value proposition:** Planners see at-risk MOs from **live Odoo data** before the shift starts, with structured resolution options.
 - **Three screens minimum:** Control Tower, Resolution Center, Executive OTD. Copilot, Scenarios, Supply Network, Quality, Sustainability are **POST-R1** unless customer contract explicitly includes them.
-- **Data quality before planning:** MOs missing BOM, routing, or work center capacity MUST be flagged as "unscorable" ? never silent misleading feasibility scores.
+- **Data quality before planning:** MOs missing BOM, routing, or work center capacity MUST be flagged as "unscorable" — never silent misleading feasibility scores.
 - **Conflict policy:** Odoo wins on master data; IPE wins on approved schedule until next sync flags conflict (Gate 4 verified).
-- **Arabic MVP:** Control Tower, Resolution Center, navigation, and alerts MUST support Arabic before customer go-live. **Human native QA sign-off (G-R2-04) remains OPEN** ? engineering Arabic keys MUST NOT be treated as commercial sign-off.
-- **Deployment options:** MUST support (a) Diligent-managed cloud VM and (b) customer on-prem single-VM compose. Full K8s is Phase 3 enterprise track, NOT required for Star Trans R1 go-live.
-- **Customer readiness package:** Deployment guide, SOW v1, UAT plan, field mapping worksheet, training curriculum, sales one-pagers, support guide, release notes, and `scripts/star-trans-validate.ps1` MUST exist before SOW signature. As of Sprint 2 close (**2026-07-11**), these artifacts EXIST under `docs/customer/star-trans/`, `docs/sales/`, `docs/runbooks/`, and `deploy/star-trans/`. **SOW send remains blocked by OQ-7 pricing** until commercial owner fills amounts.
+- **Arabic MVP:** Control Tower, Resolution Center, navigation, and alerts MUST support Arabic before customer go-live. **Human native QA sign-off (G-R2-04) remains OPEN** — engineering Arabic keys MUST NOT be treated as commercial sign-off.
+- **Deployment options:** MUST support (a) Diligent-managed cloud VM and (b) customer on-prem single-VM compose. Full K8s is enterprise track (platform Phase 3 DONE @ `v9.4.0-p3`), NOT required for Star Trans R1 go-live.
+- **Customer readiness package:** Deployment guide, SOW v1, UAT plan, field mapping worksheet, training curriculum, sales one-pagers, support guide, release notes, and `scripts/star-trans-validate.ps1` MUST exist before SOW signature. Artifacts EXIST under `docs/customer/star-trans/`, `docs/sales/`, `docs/runbooks/`, and `deploy/star-trans/`. **SOW send remains blocked by OQ-7 pricing** until commercial owner fills amounts.
 - **Honesty rule:** Agents and engineers MUST NOT invent Arabic sign-off, live Odoo staging proof, Odoo version confirmation, or pricing. Document COM blockers; implement only engineering-feasible work.
 
-**Rationale:** Engineering and GTM packages are ready; remaining blockers are commercial and customer-IT ? not code gaps.
+**Rationale:** Engineering and GTM packages are ready; remaining blockers are commercial and customer-IT — not code gaps.
 
 ---
 
-### VIII. Enterprise Gate Verification (NEW ? Phase 2+)
+### VIII. Enterprise Gate Verification
 
 **No enterprise phase tag without scripted gate evidence.**
 
-- **Gates 1?5 are mandatory** before `v9.3.0-p2`-class tags: observability, security, multi-tenant, Odoo sync, full E2E (R1+R2+audit).
+- **Gates 1–5 are mandatory** before `v9.3.0-p2`-class tags: observability, security, multi-tenant, Odoo sync, full E2E (R1+R2+audit).
 - **Option B (Phase 0 combined)** MUST pass when enterprise flags are ON: Keycloak, Vault, TLS, Audit, Combined demo.
-- **Phase 3 gates (6?11)** MUST pass before `v9.4.0-p3`: Helm lint/render, kind deploy health, compose?K8s parity, HPA smoke, ERP scaffold imports, R1 demo on K8s ingress. As of **2026-07-10**: Gates **6?10 PASS**; **Gate 11: 12/14 PASS** with documented **OQ-9 waiver** (`docs/demo-data/gate11-oq9-waiver.md`, `docs/demo-data/gate11-k8s-demo.txt`). Compose validation **14/14** (`docs/demo-data/release1-integration-demo.txt`). Tag **`v9.4.0-p3`** applied at `4629119`; closure commits through `ad494e0` include W1-02 smoke and UAT corrections.
-- **Phase 4 gates** (GTM): Stripe sandbox billing, tenant self-service API, developer portal ? MUST NOT start until Phase 3 tag `v9.4.0-p3` is applied.
-- **Phase 5** (enterprise maturity, SOC 2 Type II, v8 SAP gap features): post-GTM backlog; MUST NOT block Phase 3 close-out or Star Trans R1 compose go-live.
+- **Platform Phase 3 gates (6–11)** MUST pass before `v9.4.0-p3`: Helm lint/render, kind deploy health, compose–K8s parity, HPA smoke, ERP scaffold imports, R1 demo on K8s ingress. **DONE** with OQ-9 waiver for Gate 11 partials.
+- **Platform Phase 4 gates** (GTM SaaS): Stripe sandbox billing, tenant self-service API, developer portal — tracked as backlog; MUST NOT invent PASS.
+- **Platform Phase 5** (SOC 2 Type II, live SAP/D365): post-GTM backlog; MUST NOT block Star Trans R1 compose go-live.
 - **Gate scripts are the source of truth.** Markdown status tables MUST reference script paths and last PASS output; manual claims without script evidence do not satisfy this principle.
 - **Regression:** R1 14/14 HTTPS and R2 5/5 MUST re-run after each phase gate that touches auth, networking, or connector paths.
-- **Planning intelligence tag:** `v9.2.0-planning` applied at `b04434d` (Sprint 1 engineering closure). Spec 021 UAT-10/11 code fixes are in tree; live stack re-verification is an ops checklist item, not a reason to invent PASS evidence.
+- **Planning intelligence tag:** `v9.2.0-planning` applied at `b04434d` (Sprint 1 engineering closure).
 
-**Rationale:** Phase 2 closure required reproducible verification, not checklist theater. Phase 3 inherits the same discipline for K8s and ERP expansion.
+**Rationale:** Phase 2 closure required reproducible verification, not checklist theater.
+
+---
+
+### IX. Operations Intelligence Program (Blueprint Phases 3→5) — NEW
+
+**Ops Blueprint Phases 3–5 are a product program distinct from platform K8s/GTM phase numbers.**
+
+- **Spec 024** governs Blueprint Phase 3 (7 AI agents, predictive risk, exceptions, Excel upload wizard) as the **active engineering slice**. Migrations **051–059** (or ALTER equivalents where tables already exist) are the schema spine.
+- **Blueprint Phase 4** (6 Command modules, agents A8–A12) and **Phase 5** (Planning Cockpit / MPS / MRP / ATP deep UI) are **program backlog** under the same Speckit analyze surface until their own feature numbers are cut — tracked, not silently claimed DONE.
+- **Concurrent Phase agents:** Speckit MUST absorb peer agent deltas (migrations, models, UI) and implement **remaining gaps** only — never recreate tables or force-fight peer edits.
+- **COM blockers remain OPEN** and MUST never be auto-closed by Speckit or Phase agents.
+- **Tag discipline:** Never push stale `v9.1.0-r2`. Cut `v9.1.1-r2` only after G-R2-04. Ops Phase 3 eng completion MAY use a separate tag (e.g. `v9.5.0-ops3`) only with test evidence — never invent tag application.
+
+**Rationale:** Without a binding Ops-vs-Platform map, agents collide on phase numbers and duplicate schema work.
 
 ---
 
@@ -134,19 +154,19 @@ Every **deployed** service MUST be observable.
 
 | Constraint | Requirement |
 |------------|-------------|
-| **Buyer persona** | CEO / Operations Director ? not IT steering committee |
-| **Competition** | Excel + Odoo MRP ? not Kinaxis/SAP IBP in sales pitch |
-| **Pricing fit** | License $18K?30K/yr + implementation $12K?25K one-time (**OQ-7 OPEN ? blocks SOW send**) |
+| **Buyer persona** | CEO / Operations Director — not IT steering committee |
+| **Competition** | Excel + Odoo MRP — not Kinaxis/SAP IBP in sales pitch |
+| **Pricing fit** | License $18K–30K/yr + implementation $12K–25K one-time (**OQ-7 OPEN — blocks SOW send**) |
 | **Connectivity** | Tolerate intermittent factory internet; batch sync > fragile webhooks |
 | **ROI timeline** | Measurable within 90 days: adoption, 2+ MOs saved, OTD trend |
-| **Implementation** | Fixed-scope SOW, data migration checklist, training curriculum ? not demo script alone |
+| **Implementation** | Fixed-scope SOW, data migration checklist, training curriculum — not demo script alone |
 
 ---
 
 ## Security & Cross-Platform Constraints
 
 - **Cross-platform.** PowerShell equivalents for all customer-facing and gate verification scripts.
-- **Secret management.** Odoo credentials in tenant config / Vault ? never in source or logs.
+- **Secret management.** Odoo credentials in tenant config / Vault — never in source or logs. Never commit `.kms_keys/` material.
 - **Input validation.** Pydantic models on all API boundaries.
 - **Formatting.** `ruff check`, `mypy`, `prettier` MUST pass.
 
@@ -157,47 +177,44 @@ Every **deployed** service MUST be observable.
 - **Branch naming:** `feat/<short-slug>`, `fix/<short-slug>`, `chore/<short-slug>`, `docs/<short-slug>`.
 - **PR requirements:** CI green, tests for new behavior, API docs if routes change.
 - **Release 1 gate (013):** Before customer go-live:
-  1. MO ingest from Odoo ? Control Tower queue (live or recorded integration test)
-  2. `docker-compose.release1.yml` / `deploy/star-trans/` starts in ?10 min on 8GB RAM VM
+  1. MO ingest from Odoo → Control Tower queue (live or recorded integration test)
+  2. `docker-compose.release1.yml` / `deploy/star-trans/` starts in ≤10 min on 8GB RAM VM
   3. Arabic strings on 3 core screens
   4. Implementation playbook + support runbook published
   5. 90-day ROI metrics instrumented
-- **Enterprise gate (015):** Gates 1?5 + k6 profiles + Option B before Phase 2 tag; Gates 6?11 before Phase 3 tag.
-- **Sprint 7 cohesion (016):** Tier 1 activity emitters (T717?T719) complete; migration 038 (T730) applied compose + K8s.
-- **First Release Plan (017):** Phase 0 **closed** (9.4.0-p3); Wave 1 W1-01/02 DONE; W1-03..W1-08 delivered via Spec 023. Waves 2-3 tracked via open GitHub issues #37-#46.
-- **Phase 2 Release 2 (018):** Engineering gates G-R2-01/02/03/05 PASS; G-R2-04 Arabic **human** sign-off OPEN; tag HOLD ? cut `v9.1.1-r2` only after sign-off; **never push stale `v9.1.0-r2`**.
-- **Program Converge (019):** **DONE** ? compose parity, scenario promote, stock.quant mock fidelity, issue triage complete.
-- **Planning Intelligence (020):** **ENG COMPLETE** ? Modules A?F + Copilot tools + Kong; migrations 044?049; tests green.
-- **Release Closure (021):** **ENG COMPLETE** ? UAT-10/11 fixed; OQ-13 script; tag `v9.2.0-planning` applied; commercial blockers documented.
-- **Sprint 3 Go-Live (022):** **ENG COMPLETE** - deploy dry-run, validate/smoke evidence, status honesty, GH hygiene; converge residuals #70-#72 may remain until Spec 023 absorbs or closes them.
-- **Sprint 4 Wave 1 (023):** **Active Speckit feature** - Admin Odoo Config v2 (encrypted ERP connections CRUD/test/activate/sync) + OTD Analytics dashboard polish (aggregator, API, UI, i18n); completes Spec 017 W1-03..W1-08. Commercial blockers remain OPEN.
+- **Enterprise gate (015):** Gates 1–5 + k6 profiles + Option B before Phase 2 tag; Gates 6–11 before platform Phase 3 tag (`v9.4.0-p3` DONE).
+- **Planning Intelligence (020):** **ENG COMPLETE** — Modules A–F + Copilot tools + Kong; migrations 044–049; tests green.
+- **Release Closure (021):** **ENG COMPLETE** — UAT-10/11 fixed; OQ-13 script; tag `v9.2.0-planning` applied; commercial blockers documented.
+- **Sprint 3 Go-Live (022):** **ENG COMPLETE** — deploy dry-run, validate/smoke evidence, status honesty, GH hygiene; residuals #70/#72 may remain OPEN.
+- **Sprint 4 Wave 1 (023):** **ENG COMPLETE** @ ~31d4840 — Admin Odoo Config v2 + OTD Analytics; COM blockers remain OPEN.
+- **Ops Phase 3 (024):** **Active Speckit feature** — Blueprint Phase 3 agents + predictive risk + exception lifecycle + upload foundation; Phase 4/5 backlog tracked in analyze; absorb concurrent Phase-agent migrations 051–059.
 - **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
 
 ---
 
 ## Governance
 
-- **Authority.** Principles I?III, VII, and VIII are binding gates. Violations MUST be resolved by changing code, not diluting principles.
+- **Authority.** Principles I–III, VII, VIII, and IX are binding gates. Violations MUST be resolved by changing code, not diluting principles.
 - **Amendments.** Changes require PR with rationale and SemVer bump. Update Sync Impact Report (HTML comment at top).
 - **Versioning.** MAJOR = principled removal; MINOR = new principle or materially expanded doctrine; PATCH = clarifications.
 - **Compliance review.** Every PR MUST verify compliance.
 - **Canonical constitution path:** `ipe/.specify/memory/constitution.md`. Workspace root `.specify/memory/constitution.md` MUST stay in sync when Speckit runs from AISOP root.
 
-## Phase Naming Map (Roadmap vs Spec 015)
+## Phase Naming Map (Roadmap vs Spec 015 vs Ops Blueprint)
 
-External **Enterprise Deployment Roadmap** (36-week) and internal **Spec 015** use overlapping but not identical phase numbers:
+External documents use overlapping phase numbers. All Speckit analyze reports MUST use this map:
 
-| Roadmap | Spec 015 | Focus |
-|---------|----------|-------|
-| Phase 0 Security | Phase 0 | Keycloak, Vault, TLS, audit |
-| Phase 1 K8s/Obs | Phase 1?2 | CI/CD, metrics, Gates 1?5 |
-| Phase 2 ERP | Phase 3 Stream 2 | Odoo live; SAP/D365 scaffold |
-| Phase 3 Scale | Phase 3 Streams 1, 3 | Helm, K8s gates, compliance prep |
-| Phase 4 GTM | Phase 4 | SaaS, Stripe, SDKs, onboarding |
-| ? | **Phase 5** (Gap Audit) | SOC 2 II, WCAG, Copilot prod, live SAP/D365 |
-
-All `/speckit.analyze` reports MUST use this map when comparing downloaded roadmap documents to executed program status.
+| Label | Meaning | Status (2026-07-15) |
+|-------|---------|---------------------|
+| Platform Phase 0–2 | Keycloak/Vault/TLS; Gates 1–5; obs | DONE (`v9.3.0-p2`) |
+| Platform Phase 3 | Helm/K8s Gates 6–11; ERP scaffolds | DONE (`v9.4.0-p3`) |
+| Platform Phase 4–5 | GTM SaaS / SOC2 / live SAP | BACKLOG (do not fake) |
+| **Ops Blueprint Phase 3** | 7 agents, predictive risk, upload wizard | **ACTIVE — Spec 024** |
+| **Ops Blueprint Phase 4** | 6 Command modules; agents A8–A12 | BACKLOG (Premium Proposal) |
+| **Ops Blueprint Phase 5** | Planning Cockpit / MPS / MRP / ATP deep | BACKLOG (Planning-Command-Deep) |
+| Spec 023 Wave 1 | Odoo Config v2 + OTD | ENG COMPLETE |
+| Spec 020 Planning Intelligence | Modules A–F | ENG COMPLETE @ `v9.2.0-planning` |
 
 ---
 
-**Version**: 1.2.8 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-11
+**Version**: 1.3.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-15
