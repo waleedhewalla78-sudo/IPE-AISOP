@@ -8,6 +8,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased] — Spec 026 Phase 5 Planning-Command (Wave 1)
+
+### Added
+- Planning Cockpit, MPS, MRP explode, ATP/CTP/PTP promise, production leveling, RCCP/CRP, scenario cascade
+- Command Center ops live, war room, shift handover, action tracker, performance cockpit, predictive 3/7/14d
+- UI: `/planning/cockpit`, `/command-center/ops-live` with tool actions
+- Kong R2: `/api/v1/planning-command`, `/api/v1/intelligence`
+- Spec `026-phase5-planning-command`; report `docs/qa/PHASE5-EXECUTION-AND-TEST-REPORT.md`
+
+### Tests
+- Phase 5: **13/13 PASS** (`test_phase5_planning.py`)
+
+### Honesty
+- COM OPEN unchanged; collaborative UI / WhatsApp hub deferred; no live Odoo write-back claim
+
+---
+
 ## [Unreleased] — Spec 025 Phase 4 Premium (Wave 1)
 
 ### Added
@@ -19,36 +36,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Speckit feature `specs/025-phase4-premium` + `docs/qa/PHASE4-EXECUTION-AND-TEST-REPORT.md`
 
 ### Tests
-- dpe Phase 4 suite 9 passed; procurement/quality/sustain/order Phase 4 unit tests GREEN; Phase 3 orchestrator regression 7 passed
+- Phase 4: **21 PASS** (dpe/order/quality/sustain/procurement); Phase 3 orchestrator regression 7 passed
 
 ### Honesty
 - COM blockers remain OPEN; no live Odoo PH1-02 claim; Digital Factory polish deferred
-
----
-
-## [Unreleased] — Spec 026 Phase 5 Planning-Command (Wave 1)
-
-### Added
-- Planning Cockpit, MPS, MRP explode, ATP/CTP promise, production leveling
-- Command Center ops live dashboard, war room, shift handover, action tracker
-- UI: `/planning/cockpit`, `/command-center/ops-live`
-- Spec `026-phase5-planning-command`; report `docs/qa/PHASE5-EXECUTION-AND-TEST-REPORT.md`
-
-### Tests
-- Phase 5: **8/8 PASS** (`test_phase5_planning.py`)
-
----
-
-## [Unreleased] — Spec 025 Phase 4 Premium (Wave 1)
-
-### Added
-- Intelligence pulse M1–M6; agents A8–A12; autonomous overnight guardrails
-- Customer portal (read-only); procurement PO recs; quality CAPA; sustain carbon/ESG
-- UI `/intelligence/*` + `/customer-portal`
-- Spec `025-phase4-premium`; report `docs/qa/PHASE4-EXECUTION-AND-TEST-REPORT.md`
-
-### Tests
-- Phase 4: **21/21 PASS** (dpe/order/quality/sustain/procurement)
 
 ---
 

@@ -77,7 +77,10 @@
 | Live Odoo quality/finance/PO sync | DEFERRED | Needs PH1-02 |
 | Digital Factory animation polish | DEFERRED | Shop-floor linked only |
 | Planning Cockpit / MPS / MRP / ATP / Ops Live | **BUILT Wave 1** | Spec 026 / Phase5 Planning-Command-Deep |
+| RCCP/CRP + leveling + scenario cascade | **BUILT Wave 1** | Spec 026 |
+| Performance + Predictive Command | **BUILT Wave 1** | Spec 026 |
 | Collaborative multi-user conflict UI | DEFERRED | Spec 026 residual |
+| WhatsApp / Comms Hub | DEFERRED | Spec 026 residual |
 
 ## Customer Enablement (Sprint 2 — COMPLETE)
 
@@ -98,7 +101,7 @@
 | Backend unit tests | GREEN | 199+ | All services |
 | Spec 024 Phase 3 Wave 1 | GREEN | **18/18** | fea/cap/demand/mat/dpe/nlp/sop/upload Phase 3 suites |
 | Spec 025 Phase 4 Premium Wave 1 | GREEN | **21** | A8–A12 / pulse / autonomy / CAPA / carbon / portal |
-| Spec 026 Phase 5 Planning-Command | GREEN | **8** | cockpit / MPS / MRP / promise / ops / actions |
+| Spec 026 Phase 5 Planning Command | GREEN | **13/13** | Cockpit/MPS/MRP/ATP/RCCP/ops/performance/predictive |
 | Planning module tests | GREEN | 70+ | mat/demand/cap/connector/sop/nlp |
 | Planning UAT | GREEN (code) | 10/10 code path | Live LLM optional |
 | R2 smoke | PRIOR GREEN | 15/15 | Phase 3 services added; re-verify when stack healthy |
@@ -137,4 +140,4 @@
 | **024 phase3-ops-intelligence** | **ENG COMPLETE (Wave 1 MVP)** — migrations 051–059, upload-svc, UI; COM OPEN |
 | 024-phase3-ai-agents | Companion execution pack — see PHASE3 report |
 | **025 phase4-premium** | **ENG COMPLETE (Wave 1 MVP)** — M1–M6 pulse, A8–A12, autonomy, portal; COM OPEN |
-| **026 phase5-planning-command** | **ENG COMPLETE (Wave 1 MVP)** — Planning Cockpit, MPS/MRP/ATP, Ops Live/War Room; COM OPEN |
+| **026 phase5-planning-command** | **ENG COMPLETE (Wave 1 MVP)** — Cockpit/MPS/MRP/ATP/RCCP/leveling/scenario + Ops Live/War Room/performance/predictive; COM OPEN |

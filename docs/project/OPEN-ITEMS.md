@@ -23,6 +23,8 @@
 | Spec 025 Digital Factory polish | Shop-floor linked only |
 | Spec 025 live Odoo quality/finance/PO | Blocked on PH1-02 |
 | Spec 026 collaborative planning conflict UI | Deferred beyond Wave 1 |
+| Spec 026 WhatsApp / Comms Hub | Deferred |
+| Spec 026 alert inbox SLA UI | Partial (ops live alerts only) |
 | Spec 026 MPS/MRP persistence migrations | Wave 1 request-driven |
 
 ## Tags
