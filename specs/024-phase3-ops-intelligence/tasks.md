@@ -57,7 +57,7 @@
 - [x] T033 Update `PRODUCT-STATUS.md` for Spec 024 active; Phase 4/5 BACKLOG; COM OPEN
 - [ ] T034 Update CHANGELOG entry for Ops Phase 3 Speckit start/delivery
 - [x] T035 Refresh analyze coverage after implement
-- [ ] T036 Commit Speckit 024 artifacts + eng with author `IPE Agent <ipe-agent@local>` (no secrets)
+- [x] T036 Commit Speckit 024 artifacts + eng with author `IPE Agent <ipe-agent@local>` (no secrets)
 
 ## Phase 9: Human / commercial (DOCUMENT ONLY)
 
