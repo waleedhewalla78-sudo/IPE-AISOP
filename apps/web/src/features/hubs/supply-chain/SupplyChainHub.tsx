@@ -5,6 +5,7 @@ const TABS = [
   { to: ROUTES.SUPPLY_PLANNING, label: 'Supply Planning' },
   { to: ROUTES.SUPPLY_ORDERS, label: 'Orders' },
   { to: ROUTES.SUPPLY_PROCUREMENT, label: 'Procurement' },
+  { to: ROUTES.SUPPLY_SUPPLIERS, label: 'Suppliers' },
   { to: ROUTES.SUPPLY_TARIFF, label: 'Tariff' },
   { to: ROUTES.SUPPLY_SCN, label: 'SCN Portal' },
   { to: ROUTES.SUPPLY_INVENTORY, label: 'Inventory' },

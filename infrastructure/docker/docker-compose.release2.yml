@@ -361,6 +361,32 @@ services:
       retries: 5
       start_period: 15s
 
+  upload-svc:
+    env_file:
+      - ipe-common.env
+    build:
+      context: ../../
+      dockerfile: services/upload-svc/Dockerfile
+    ports:
+      - "8120:8120"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
+      REDIS_URL: redis://redis:6379/0
+      IPE_RELEASE_PROFILE: release2
+      IPE_OTEL_TRACING_ENABLED: "false"
+      AUTH_MODE: local
+      AUTH_PROVIDER: local
+    volumes: *jwt-public-volume
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8120/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   kong:
     image: kong:3.7
     environment:
@@ -401,6 +427,8 @@ services:
       scenario-svc:
         condition: service_healthy
       sop-svc:
+        condition: service_healthy
+      upload-svc:
         condition: service_healthy
 
   web-ui:

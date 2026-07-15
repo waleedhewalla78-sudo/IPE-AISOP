@@ -12,6 +12,8 @@ const ALL_TABS = [
 
   { to: ROUTES.COMMAND_DASHBOARD, label: 'Dashboard', release1: false },
 
+  { to: ROUTES.COMMAND_OPS_LIVE, label: 'Ops Live', release1: false },
+
   { to: ROUTES.COMMAND_WAR_ROOM, label: 'War Room', release1: false },
 
   { to: ROUTES.COMMAND_OUTCOMES, labelKey: 'outcomes.title', label: 'Outcomes' },

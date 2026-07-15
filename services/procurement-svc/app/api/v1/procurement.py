@@ -9,6 +9,7 @@ from app.core.procurement_intel import (
     DEFAULT_SPEND,
     aggregate_spend,
     check_supplier_compliance,
+    recommend_purchase_orders,
     score_supplier_risk,
 )
 from ipe_shared.auth.rbac import require_roles
@@ -23,6 +24,10 @@ router = APIRouter(tags=["procurement"])
 
 class ComplianceCheckRequest(BaseModel):
     supplier_id: UUID | None = None
+
+
+class PORecommendationRequest(BaseModel):
+    candidates: list[dict] | None = None
 
 
 async def _ensure_spend(session: AsyncSession, tenant_id: str) -> list[ProcurementSpend]:
@@ -123,3 +128,14 @@ async def procurement_compliance_check(
     await session.commit()
     overall = all(c["compliant"] for c in all_checks)
     return APIResponse(success=True, data={"compliant": overall, "suppliers": all_checks}, error=None)
+
+
+@router.get("/procurement/po-recommendations")
+@router.post("/procurement/po-recommendations")
+async def po_recommendations(
+    req: PORecommendationRequest | None = None,
+    _user=Depends(require_roles(["planner", "admin", "manager", "executive", "procurement"])),
+):
+    """A9 weekly PO recommendations."""
+    data = recommend_purchase_orders(None if req is None else req.candidates)
+    return APIResponse(success=True, data=data, error=None)

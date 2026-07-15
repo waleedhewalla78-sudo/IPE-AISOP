@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.core.scorer import calculate_circularity_score
 from app.core.eol_planner import calculate_eol_plan
 from app.core.recyclability import calculate_recyclability_score
+from app.core.carbon import calculate_product_carbon, score_supplier_esg
 from ipe_shared.auth.jwt import TokenPayload
 from ipe_shared.auth.rbac import require_roles
 from ipe_shared.middleware.tenant_context import tenant_ctx
@@ -27,6 +28,21 @@ class EolPlanRequest(BaseModel):
 class RecyclabilityRequest(BaseModel):
     product_id: str
     bom_components: list[dict] = []
+
+
+class CarbonFootprintRequest(BaseModel):
+    product_id: str
+    materials: list[dict] | None = None
+    processes: list[str] | None = None
+    transport_kg_co2e: float = 320.0
+    industry_benchmark: float | None = 2100.0
+
+
+class SupplierESGRequest(BaseModel):
+    supplier_name: str
+    environmental: float = 50
+    social: float = 50
+    governance: float = 50
 
 
 @router.get("/dashboard")
@@ -105,3 +121,38 @@ async def recyclability_score(
             contributing_factors={"recyclability": round(result.get("score", 0) / 100, 4)},
         ).model_dump(),
     }, error=None)
+
+
+@router.get("/carbon-footprint")
+@router.post("/carbon-footprint")
+async def carbon_footprint(
+    req: CarbonFootprintRequest | None = None,
+    product_id: str = "FG-DT100",
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "sustainability", "executive"])),
+):
+    """A12 product carbon footprint."""
+    if req is None:
+        data = calculate_product_carbon(product_id)
+    else:
+        data = calculate_product_carbon(
+            req.product_id,
+            materials=req.materials,
+            processes=req.processes,
+            transport_kg_co2e=req.transport_kg_co2e,
+            industry_benchmark=req.industry_benchmark,
+        )
+    return APIResponse(success=True, data=data, error=None)
+
+
+@router.post("/supplier-esg")
+async def supplier_esg(
+    req: SupplierESGRequest,
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "sustainability", "procurement"])),
+):
+    data = score_supplier_esg(
+        req.supplier_name,
+        environmental=req.environmental,
+        social=req.social,
+        governance=req.governance,
+    )
+    return APIResponse(success=True, data=data, error=None)

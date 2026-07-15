@@ -5,6 +5,7 @@ import { LoginForm } from '@/features/auth/components/LoginForm';
 import {
   PlanningHub,
   CommandCenterHub,
+  IntelligenceHub,
   SupplyChainHub,
   AIGovernanceHub,
   PlatformHub,
@@ -43,6 +44,23 @@ import {
   SOPReport,
   ShopFloorPage,
   UnifiedWorkspacePage,
+  PredictiveViewPage,
+  RootCauseExplorerPage,
+  DataUploadCenterPage,
+  AgentDashboardPage,
+  ExceptionManagerPage,
+  SupplierScorecardPage,
+  MeetingPrepPage,
+  IntelligencePulsePage,
+  DemandCommandPage,
+  ProductionCommandPage,
+  SupplyCommandPage,
+  QualityCommandPage,
+  FinanceCommandPage,
+  CustomerCommandPage,
+  CustomerPortalPage,
+  PlanningCockpitPage,
+  OpsLivePage,
 } from '@/app/lazyRoutes';
 import { ROUTES } from '@/lib/constants';
 
@@ -66,17 +84,22 @@ export function AppRouter() {
           <Route path={ROUTES.PLANNING} element={<PlanningHub />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<PlanningDashboardPage />} />
+            <Route path="cockpit" element={<PlanningCockpitPage />} />
             <Route path="demand" element={<DemandForecastPage />} />
             <Route path="scenarios" element={<ScenarioWorkbenchPage />} />
             <Route path="control-tower" element={<ControlTowerPage />} />
             <Route path="resolution" element={<ResolutionCenterPage />} />
             <Route path="schedule" element={<SchedulePage />} />
+            <Route path="predictions" element={<PredictiveViewPage />} />
+            <Route path="root-cause" element={<RootCauseExplorerPage />} />
+            <Route path="root-cause/:moId" element={<RootCauseExplorerPage />} />
           </Route>
 
           {/* Command Center */}
           <Route path={ROUTES.COMMAND_CENTER} element={<CommandCenterHub />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CommandCenterDashboardPage />} />
+            <Route path="ops-live" element={<OpsLivePage />} />
             <Route path="war-room" element={<WarRoomPage />} />
             <Route path="executive" element={<ExecutiveDashboardPage />} />
             <Route path="outcomes" element={<OutcomesPage />} />
@@ -85,6 +108,20 @@ export function AppRouter() {
             <Route path="otd-analytics" element={<OTDDashboardPage />} />
             <Route path="sop-report" element={<SOPReport />} />
           </Route>
+
+          {/* Phase 4 Manufacturing Intelligence */}
+          <Route path={ROUTES.INTELLIGENCE} element={<IntelligenceHub />}>
+            <Route index element={<Navigate to="pulse" replace />} />
+            <Route path="pulse" element={<IntelligencePulsePage />} />
+            <Route path="demand" element={<DemandCommandPage />} />
+            <Route path="production" element={<ProductionCommandPage />} />
+            <Route path="supply" element={<SupplyCommandPage />} />
+            <Route path="quality" element={<QualityCommandPage />} />
+            <Route path="finance" element={<FinanceCommandPage />} />
+            <Route path="customer" element={<CustomerCommandPage />} />
+          </Route>
+
+          <Route path={ROUTES.CUSTOMER_PORTAL} element={<CustomerPortalPage />} />
 
           {/* Supply Chain Hub */}
           <Route path={ROUTES.SUPPLY_CHAIN} element={<SupplyChainHub />}>
@@ -95,12 +132,15 @@ export function AppRouter() {
             <Route path="tariff" element={<TariffPage />} />
             <Route path="scn-portal" element={<SCNDashboard tenantId={tenantId} />} />
             <Route path="inventory" element={<InventoryPage />} />
+            <Route path="suppliers" element={<SupplierScorecardPage />} />
           </Route>
 
           {/* AI & Governance */}
           <Route path={ROUTES.AI_GOVERNANCE} element={<AIGovernanceHub />}>
             <Route index element={<Navigate to="copilot" replace />} />
             <Route path="copilot" element={<CopilotPanel />} />
+            <Route path="meeting-prep" element={<MeetingPrepPage />} />
+            <Route path="meeting-prep/:type" element={<MeetingPrepPage />} />
             <Route path="design-ai" element={<DesignAIPage />} />
             <Route path="ai-trust" element={<AITrustPage />} />
             <Route path="mdr" element={<MdrDashboardPage />} />
@@ -113,6 +153,9 @@ export function AppRouter() {
           <Route path={ROUTES.PLATFORM} element={<PlatformHub />}>
             <Route index element={<Navigate to="admin" replace />} />
             <Route path="admin" element={<AdminPage />} />
+            <Route path="upload" element={<DataUploadCenterPage />} />
+            <Route path="agents" element={<AgentDashboardPage />} />
+            <Route path="exceptions" element={<ExceptionManagerPage />} />
             <Route path="odoo-config" element={<OdooConnectionsPage />} />
             <Route path="odoo-config/versions" element={<OdooConfigPage />} />
             <Route path="onboarding" element={<OnboardingWizard />} />
@@ -139,6 +182,9 @@ export function AppRouter() {
           <Route path="/quality" element={<LegacyRedirect to={ROUTES.AI_QUALITY} />} />
           <Route path="/sustainability" element={<LegacyRedirect to={ROUTES.AI_SUSTAINABILITY} />} />
           <Route path="/admin" element={<LegacyRedirect to={ROUTES.PLATFORM_ADMIN} />} />
+          <Route path="/admin/upload" element={<LegacyRedirect to={ROUTES.PLATFORM_UPLOAD} />} />
+          <Route path="/material/suppliers" element={<LegacyRedirect to={ROUTES.SUPPLY_SUPPLIERS} />} />
+          <Route path="/copilot/meeting/:type" element={<LegacyRedirect to={ROUTES.AI_MEETING_PREP} />} />
           <Route path="/onboarding" element={<LegacyRedirect to={ROUTES.PLATFORM_ONBOARDING} />} />
           <Route path="/ml-ops" element={<LegacyRedirect to={ROUTES.PLATFORM_MLOPS} />} />
         </Route>

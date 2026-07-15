@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.promising import compute_atp_promise
+from app.core.customer_portal import build_portal_summary
 from ipe_shared.auth.rbac import require_roles
 from ipe_shared.database.session import get_session as get_db_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
@@ -106,6 +107,44 @@ async def list_orders(
         },
         error=None,
     )
+
+
+@router.get("/portal/summary")
+async def customer_portal_summary(
+    session: AsyncSession = Depends(get_db_session),
+    _user=Depends(require_roles(["planner", "admin", "manager", "executive", "customer"])),
+):
+    """A8 read-only customer portal order tracking."""
+    tenant_id = tenant_ctx.get()
+    rows = (
+        await session.execute(
+            select(CustomerOrder)
+            .where(CustomerOrder.tenant_id == tenant_id)
+            .order_by(CustomerOrder.created_at.desc())
+            .limit(50)
+        )
+    ).scalars().all()
+    now = datetime.now(UTC)
+    payload = []
+    for o in rows:
+        days = None
+        if o.promised_date:
+            days = (o.promised_date - now).days
+        elif o.requested_date:
+            days = (o.requested_date - now).days
+        payload.append(
+            {
+                "id": str(o.id),
+                "order_number": o.order_number,
+                "status": o.status,
+                "promised_date": o.promised_date.isoformat() if o.promised_date else None,
+                "requested_date": o.requested_date.isoformat() if o.requested_date else None,
+                "days_to_due": days,
+                "otd_risk": 0.15 if (days is not None and days < 2) else 0.05,
+                "invoice_status": "open" if o.status not in ("delivered", "closed") else "paid",
+            }
+        )
+    return APIResponse(success=True, data=build_portal_summary(payload), error=None)
 
 
 @router.get("/{order_id}")

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from app.core.spc import calculate_xbar_chart, calculate_p_chart
 from app.core.predictor import predict_defect
+from app.core.capa import create_capa, list_capas
 from ipe_shared.auth.jwt import TokenPayload
 from ipe_shared.auth.rbac import require_roles
 from ipe_shared.middleware.tenant_context import tenant_ctx
@@ -33,6 +34,14 @@ class DefectPredictRequest(BaseModel):
     operator_id: str | None = None
     material_batch: str | None = None
     days_since_maintenance: int | None = None
+
+
+class CAPACreateRequest(BaseModel):
+    mo_id: str
+    defect_type: str
+    root_cause: str | None = None
+    severity: str = "medium"
+    owner: str = "quality_manager"
 
 
 @router.get("/dashboard")
@@ -129,3 +138,23 @@ async def predict(
             contributing_factors={"defect_probability": result.defect_probability, "risk_score": {"low": 0.2, "medium": 0.5, "high": 0.8}.get(result.risk_level, 0.0)},
         ).model_dump(),
     }, error=None)
+
+
+@router.post("/capa")
+async def capa_create(
+    req: CAPACreateRequest,
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "quality"])),
+):
+    """A10 CAPA auto-create after defect."""
+    tenant_id = tenant_ctx.get()
+    capa = create_capa(**req.model_dump())
+    capa["tenant_id"] = tenant_id
+    return APIResponse(success=True, data=capa, error=None)
+
+
+@router.get("/capa")
+async def capa_list(
+    status: str | None = None,
+    current_user: TokenPayload = Depends(require_roles(["planner", "admin", "manager", "quality", "executive"])),
+):
+    return APIResponse(success=True, data={"capas": list_capas(status=status)}, error=None)

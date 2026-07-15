@@ -61,6 +61,15 @@ services:
       - name: r2-outcomes
         paths: [/api/v1/outcomes]
         strip_path: false
+      - name: r2-agents
+        paths: [/api/v1/agents, /api/v1/exceptions]
+        strip_path: false
+      - name: r2-intelligence
+        paths: [/api/v1/intelligence]
+        strip_path: false
+      - name: r2-planning-command
+        paths: [/api/v1/planning-command]
+        strip_path: false
 
   - name: fea-svc
     url: http://fea-svc:8004
@@ -183,6 +192,18 @@ services:
     routes:
       - name: r2-sop
         paths: [/api/v1/sop]
+        strip_path: false
+
+  - name: upload-svc
+    url: http://upload-svc:8120
+    connect_timeout: 30000
+    read_timeout: 120000
+    write_timeout: 120000
+    plugins:
+      - name: ipe-tenant-strip
+    routes:
+      - name: r2-upload
+        paths: [/api/v1/upload]
         strip_path: false
 
 consumers:

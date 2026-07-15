@@ -2,9 +2,12 @@
 
 **Last Updated:** 2026-07-15  
 **Release Tag:** v9.2.0-planning (applied @ b04434d), v9.4.0-p3 (platform)  
-**Active Speckit feature:** `specs/024-phase3-ops-intelligence`  
+**Active Speckit feature:** `specs/026-phase5-planning-command` (prior: `025-phase4-premium`, `024-phase3-*`)  
 **Constitution:** 1.3.0  
-**Workspace:** `E:\AISOP\ipe`
+**Workspace:** `E:\AISOP\ipe`  
+**Phase 3 report:** `docs/qa/PHASE3-EXECUTION-AND-TEST-REPORT.md`  
+**Phase 4 report:** `docs/qa/PHASE4-EXECUTION-AND-TEST-REPORT.md`  
+**Phase 5 report:** `docs/qa/PHASE5-EXECUTION-AND-TEST-REPORT.md`
 
 ---
 
@@ -23,7 +26,7 @@
 | Odoo Connector | BUILT | connector | 046, **050** | XML-RPC sync; Odoo Config v2; Odoo 17+19 aliases |
 | OTD Analytics | BUILT | dpe-svc | 039 | KPI/trend/root-cause/baseline/snapshot + dashboard |
 | **Agent orchestrator / exceptions (Ops P3)** | **BUILT (eng)** | dpe-svc | **051–052** | `AgentOrchestrator` dry-run + exception ack/resolve API; tests GREEN |
-| **Excel upload-svc (Ops P3)** | **SCAFFOLD** | upload-svc | **053** | Health + upload API present; compose/Kong wiring residual |
+| **Excel upload-svc (Ops P3)** | **BUILT** | upload-svc :8120 | **053** | Wizard + multi-stage validation; R2 compose + Kong `/api/v1/upload` |
 | API Gateway | BUILT | Kong | — | R1 + R2 + star-trans profiles |
 | Web UI (R1) | BUILT | web-ui | — | `VITE_RELEASE_PROFILE=release1` |
 
@@ -47,14 +50,34 @@
 | Capacity Utilisation Alerts | BUILT | cap-svc | 048 | Overload thresholds |
 | S&OP Process Engine | BUILT | sop-svc | 049 | 4-stage cycle |
 
-## Ops Blueprint Phase 4 / 5 (BACKLOG — do not claim DONE)
+## Phase 3 AI Agents + Onboarding (Spec 024 — Wave 1)
+
+| Module | Status | Service | Migration | Notes |
+|--------|--------|---------|-----------|-------|
+| Data Upload / Onboarding Wizard | BUILT | upload-svc :8120 | 053 | 5-phase wizard, multi-stage validation |
+| Predictive Risk Scoring | BUILT | fea-svc | 057 | T+3/7/14 predictions |
+| Root Cause Chain (5-why) | BUILT | fea-svc | 056 | Recommendations by horizon |
+| Smart Batching | BUILT | cap-svc | 059 | Changeover minimisation |
+| Capacity Auction | BUILT | cap-svc | 058 | Financial priority resolution |
+| Demand Signal Fusion | BUILT | demand-svc | 054 | Multi-source fused demand |
+| Predictive Stockout + Supplier Scorecard | BUILT | mat-svc | 055 (ALTER 041) | Phase 3 columns on supplier_score |
+| Agent Orchestrator + Exceptions | BUILT | dpe-svc | 051–052 | Dry-run chain + SLA lifecycle |
+| Contextual Copilot / Meeting Prep | BUILT | nlp-svc | — | Morning brief + meeting templates |
+| S&OP Executive Brief | BUILT | sop-svc | — | Auto-generated brief API |
+| Phase 3 Frontend pages | BUILT | web-ui | — | Upload, agents, exceptions, predictions, root-cause, suppliers, meeting-prep |
+
+## Ops Blueprint Phase 4 / 5
 
 | Item | Status | Source |
 |------|--------|--------|
-| M1–M6 Command modules | BACKLOG | Phase4 Premium Proposal |
-| Agents A8–A12 | BACKLOG | Phase4 Premium Proposal |
-| Customer portal | BACKLOG | Phase4 |
-| Planning Cockpit / MPS / MRP / ATP deep | BACKLOG | Phase5 Planning-Command-Deep |
+| M1–M6 Command modules (pulse + shells) | **BUILT Wave 1** | Spec 025 / Phase4 Premium Proposal |
+| Agents A8–A12 | **BUILT Wave 1** | Spec 025 |
+| Autonomous overnight rules (guardrailed) | **BUILT Wave 1** | Spec 025 |
+| Customer portal (read-only) | **BUILT Wave 1** | Spec 025 |
+| Live Odoo quality/finance/PO sync | DEFERRED | Needs PH1-02 |
+| Digital Factory animation polish | DEFERRED | Shop-floor linked only |
+| Planning Cockpit / MPS / MRP / ATP / Ops Live | **BUILT Wave 1** | Spec 026 / Phase5 Planning-Command-Deep |
+| Collaborative multi-user conflict UI | DEFERRED | Spec 026 residual |
 
 ## Customer Enablement (Sprint 2 — COMPLETE)
 
@@ -73,11 +96,13 @@
 | Suite | Status | Count | Notes |
 |-------|--------|-------|-------|
 | Backend unit tests | GREEN | 199+ | All services |
-| Spec 024 Ops P3 core | GREEN | 11 | predictive/root-cause/batch/auction/orchestrator |
+| Spec 024 Phase 3 Wave 1 | GREEN | **18/18** | fea/cap/demand/mat/dpe/nlp/sop/upload Phase 3 suites |
+| Spec 025 Phase 4 Premium Wave 1 | GREEN | **21** | A8–A12 / pulse / autonomy / CAPA / carbon / portal |
+| Spec 026 Phase 5 Planning-Command | GREEN | **8** | cockpit / MPS / MRP / promise / ops / actions |
 | Planning module tests | GREEN | 70+ | mat/demand/cap/connector/sop/nlp |
 | Planning UAT | GREEN (code) | 10/10 code path | Live LLM optional |
-| R2 smoke | GREEN (prior) | 15/15 | Re-verify Spec 022 |
-| Playwright | GREEN | 22/22 | Eng Arabic ≠ G-R2-04 COM |
+| R2 smoke | PRIOR GREEN | 15/15 | Phase 3 services added; re-verify when stack healthy |
+| Playwright | GREEN (prior) | 22/22 | Eng Arabic ≠ G-R2-04 COM; Phase 3 pages pending dedicated e2e |
 | k6 SLO | GREEN | p95 293ms | Under 300ms target |
 
 ## Tags
@@ -109,4 +134,7 @@
 | 021 release-closure | ENG COMPLETE |
 | 022 sprint3-golive | ENG COMPLETE (residuals #70–#72) |
 | 023 sprint4-wave1 | ENG COMPLETE — Odoo Config v2 + OTD; COM OPEN |
-| **024 phase3-ops-intelligence** | **ACTIVE** — Ops Blueprint Phase 3 eng + Phase 4/5 backlog; constitution 1.3.0 |
+| **024 phase3-ops-intelligence** | **ENG COMPLETE (Wave 1 MVP)** — migrations 051–059, upload-svc, UI; COM OPEN |
+| 024-phase3-ai-agents | Companion execution pack — see PHASE3 report |
+| **025 phase4-premium** | **ENG COMPLETE (Wave 1 MVP)** — M1–M6 pulse, A8–A12, autonomy, portal; COM OPEN |
+| **026 phase5-planning-command** | **ENG COMPLETE (Wave 1 MVP)** — Planning Cockpit, MPS/MRP/ATP, Ops Live/War Room; COM OPEN |

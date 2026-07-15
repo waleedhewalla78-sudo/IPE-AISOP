@@ -38,6 +38,8 @@ from app.api.v1 import (
     activity,
     unified_dashboard,
     phase3_agents,
+    phase4_premium,
+    phase5_planning,
 )
 
 api_router = APIRouter()
@@ -78,4 +80,6 @@ api_router.include_router(planner_assist.router)
 api_router.include_router(activity.router)
 api_router.include_router(unified_dashboard.router)
 api_router.include_router(phase3_agents.router)
+api_router.include_router(phase4_premium.router)
+api_router.include_router(phase5_planning.router)
 api_router.include_router(exceptions.router)

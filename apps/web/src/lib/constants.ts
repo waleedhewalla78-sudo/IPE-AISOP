@@ -7,6 +7,8 @@ export const ROUTES = {
   // Hub roots
   PLANNING: '/planning',
   COMMAND_CENTER: '/command-center',
+  INTELLIGENCE: '/intelligence',
+  CUSTOMER_PORTAL: '/customer-portal',
   SUPPLY_CHAIN: '/supply-chain',
   AI_GOVERNANCE: '/ai-governance',
   PLATFORM: '/platform',
@@ -20,16 +22,29 @@ export const ROUTES = {
   PLANNING_SCHEDULE: '/planning/schedule',
   PLANNING_DEMAND: '/planning/demand',
   PLANNING_SCENARIOS: '/planning/scenarios',
+  PLANNING_PREDICTIONS: '/planning/predictions',
+  PLANNING_ROOT_CAUSE: '/planning/root-cause',
+  PLANNING_COCKPIT: '/planning/cockpit',
 
   // Command Center tabs
   COMMAND_DASHBOARD: '/command-center/dashboard',
   COMMAND_WAR_ROOM: '/command-center/war-room',
+  COMMAND_OPS_LIVE: '/command-center/ops-live',
   COMMAND_EXECUTIVE: '/command-center/executive',
   COMMAND_OUTCOMES: '/command-center/outcomes',
   COMMAND_COST_OF_CHAOS: '/command-center/cost-of-chaos',
   COMMAND_EQUIPMENT: '/command-center/equipment',
   COMMAND_SOP_REPORT: '/command-center/sop-report',
   COMMAND_OTD_ANALYTICS: '/command-center/otd-analytics',
+
+  // Phase 4 Manufacturing Intelligence modules
+  INTELLIGENCE_PULSE: '/intelligence/pulse',
+  INTELLIGENCE_DEMAND: '/intelligence/demand',
+  INTELLIGENCE_PRODUCTION: '/intelligence/production',
+  INTELLIGENCE_SUPPLY: '/intelligence/supply',
+  INTELLIGENCE_QUALITY: '/intelligence/quality',
+  INTELLIGENCE_FINANCE: '/intelligence/finance',
+  INTELLIGENCE_CUSTOMER: '/intelligence/customer',
 
   // Supply Chain tabs
   SUPPLY_TARIFF: '/supply-chain/tariff',
@@ -38,9 +53,12 @@ export const ROUTES = {
   SUPPLY_PLANNING: '/supply-chain/supply-planning',
   SUPPLY_ORDERS: '/supply-chain/orders',
   SUPPLY_PROCUREMENT: '/supply-chain/procurement',
+  SUPPLY_SUPPLIERS: '/supply-chain/suppliers',
+  // Phase 3 also exposes /material/suppliers alias via hub tab
 
   // AI & Governance tabs
   AI_COPILOT: '/ai-governance/copilot',
+  AI_MEETING_PREP: '/ai-governance/meeting-prep',
   AI_DESIGN: '/ai-governance/design-ai',
   AI_TRUST: '/ai-governance/ai-trust',
   AI_MDR: '/ai-governance/mdr',
@@ -50,10 +68,16 @@ export const ROUTES = {
 
   // Platform tabs
   PLATFORM_ADMIN: '/platform/admin',
+  PLATFORM_UPLOAD: '/platform/upload',
+  PLATFORM_AGENTS: '/platform/agents',
+  PLATFORM_EXCEPTIONS: '/platform/exceptions',
   PLATFORM_ODOO_CONFIG: '/platform/odoo-config',
   PLATFORM_ONBOARDING: '/platform/onboarding',
   PLATFORM_MLOPS: '/platform/ml-ops',
   PLATFORM_OPS: '/platform/ops',
+  // Spec aliases
+  ADMIN_UPLOAD: '/admin/upload',
+  MATERIAL_SUPPLIERS: '/material/suppliers',
 
   // Legacy aliases (redirects in router)
   CONTROL_TOWER: '/control-tower',

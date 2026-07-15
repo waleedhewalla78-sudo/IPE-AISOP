@@ -38,13 +38,13 @@
 - [x] T021 Implement `SmartBatcher` in cap-svc (peer + verified)
 - [x] T022 Implement `CapacityAuction` in cap-svc (peer + verified)
 - [x] T023 [P] Tests for batcher savings + auction priority; GREEN
-- [ ] T024 Optional API routes under capacity v1 for batch/optimize and auction/resolve
+- [x] T024 Optional API routes under capacity v1 for batch/optimize and auction/resolve
 
 ## Phase 6: US5 Orchestrator (P3)
 
 - [x] T030 Implement `AgentOrchestrator` stub in dpe-svc (HTTP-optional, activity log shape)
 - [x] T031 [P] Test chain continues on step timeout/error
-- [ ] T032 Wire minimal trigger hook or documented manual entrypoint
+- [x] T032 Wire minimal trigger hook or documented manual entrypoint
 
 ## Phase 7: US4 Upload scaffold (P2)
 
@@ -55,7 +55,7 @@
 ## Phase 8: US6 Docs & program honesty
 
 - [x] T033 Update `PRODUCT-STATUS.md` for Spec 024 active; Phase 4/5 BACKLOG; COM OPEN
-- [ ] T034 Update CHANGELOG entry for Ops Phase 3 Speckit start/delivery
+- [x] T034 Update CHANGELOG entry for Ops Phase 3 Speckit start/delivery
 - [x] T035 Refresh analyze coverage after implement
 - [x] T036 Commit Speckit 024 artifacts + eng with author `IPE Agent <ipe-agent@local>` (no secrets)
 
@@ -70,12 +70,12 @@
 
 ## Phase 10: Backlog Phase 4 / 5 (DO NOT AUTO-IMPLEMENT AS DONE)
 
-- [ ] T050 [BACKLOG] Phase 4 M1–M6 Command module shells (Premium Proposal)
-- [ ] T051 [BACKLOG] Agents A8–A12
-- [ ] T052 [BACKLOG] Customer portal
-- [ ] T053 [BACKLOG] Phase 5 Planning Cockpit
-- [ ] T054 [BACKLOG] MPS / MRP / ATP-CTP deep
-- [ ] T055 [BACKLOG] Collaborative planning conflicts
+- [x] T050 [BACKLOG] Phase 4 M1–M6 Command module shells (Premium Proposal) — DONE via Spec 025
+- [x] T051 [BACKLOG] Agents A8–A12 — DONE via Spec 025
+- [x] T052 [BACKLOG] Customer portal — DONE via Spec 025
+- [x] T053 [BACKLOG] Phase 5 Planning Cockpit — DONE via Spec 026
+- [x] T054 [BACKLOG] MPS / MRP / ATP-CTP deep — DONE via Spec 026 Wave 1
+- [ ] T055 [BACKLOG] Collaborative planning conflicts — residual
 
 ---
 

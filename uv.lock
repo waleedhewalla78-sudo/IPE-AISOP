@@ -33,6 +33,7 @@ members = [
     "ipe-sop-svc",
     "ipe-supply-svc",
     "ipe-sustain-svc",
+    "ipe-upload-svc",
 ]
 
 [[package]]
@@ -2080,6 +2081,37 @@ dev = [
     { name = "pytest", specifier = ">=9.1.0" },
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
+]
+
+[[package]]
+name = "ipe-upload-svc"
+version = "0.1.0"
+source = { virtual = "services/upload-svc" }
+dependencies = [
+    { name = "ipe-shared" },
+    { name = "openpyxl" },
+    { name = "python-multipart" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "ipe-shared", editable = "services/shared" },
+    { name = "openpyxl", specifier = ">=3.1.0" },
+    { name = "python-multipart", specifier = ">=0.0.9" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pytest", specifier = ">=9.1.0" },
+    { name = "pytest-asyncio", specifier = ">=1.4.0" },
 ]
 
 [[package]]

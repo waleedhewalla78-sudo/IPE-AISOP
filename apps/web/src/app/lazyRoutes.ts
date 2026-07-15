@@ -14,6 +14,10 @@ export const CommandCenterHub = lazyNamed(
   () => import('@/features/hubs/command-center/CommandCenterHub'),
   'CommandCenterHub',
 );
+export const IntelligenceHub = lazyNamed(
+  () => import('@/features/intelligence/IntelligenceHub'),
+  'IntelligenceHub',
+);
 export const SupplyChainHub = lazyNamed(() => import('@/features/hubs/supply-chain/SupplyChainHub'), 'SupplyChainHub');
 export const AIGovernanceHub = lazyNamed(
   () => import('@/features/hubs/ai-governance/AIGovernanceHub'),
@@ -46,6 +50,75 @@ export const DemandForecastPage = lazyNamed(
 export const ScenarioWorkbenchPage = lazyNamed(
   () => import('@/features/hubs/planning/ScenarioWorkbenchPage'),
   'ScenarioWorkbenchPage',
+);
+export const PredictiveViewPage = lazyNamed(
+  () => import('@/features/predictions/PredictiveViewPage'),
+  'PredictiveViewPage',
+);
+export const RootCauseExplorerPage = lazyNamed(
+  () => import('@/features/root-cause/RootCauseExplorerPage'),
+  'RootCauseExplorerPage',
+);
+export const DataUploadCenterPage = lazyNamed(
+  () => import('@/features/upload/DataUploadCenterPage'),
+  'DataUploadCenterPage',
+);
+export const AgentDashboardPage = lazyNamed(
+  () => import('@/features/agents/AgentDashboardPage'),
+  'AgentDashboardPage',
+);
+export const ExceptionManagerPage = lazyNamed(
+  () => import('@/features/exceptions/ExceptionManagerPage'),
+  'ExceptionManagerPage',
+);
+export const SupplierScorecardPage = lazyNamed(
+  () => import('@/features/suppliers/SupplierScorecardPage'),
+  'SupplierScorecardPage',
+);
+export const MeetingPrepPage = lazyNamed(
+  () => import('@/features/meeting-prep/MeetingPrepPage'),
+  'MeetingPrepPage',
+);
+
+export const IntelligencePulsePage = lazyNamed(
+  () => import('@/features/intelligence/IntelligencePulsePage'),
+  'IntelligencePulsePage',
+);
+export const DemandCommandPage = lazyNamed(
+  () => import('@/features/intelligence/ModuleShellPages'),
+  'DemandCommandPage',
+);
+export const ProductionCommandPage = lazyNamed(
+  () => import('@/features/intelligence/ModuleShellPages'),
+  'ProductionCommandPage',
+);
+export const SupplyCommandPage = lazyNamed(
+  () => import('@/features/intelligence/ModuleShellPages'),
+  'SupplyCommandPage',
+);
+export const QualityCommandPage = lazyNamed(
+  () => import('@/features/intelligence/ModuleShellPages'),
+  'QualityCommandPage',
+);
+export const FinanceCommandPage = lazyNamed(
+  () => import('@/features/intelligence/ModuleShellPages'),
+  'FinanceCommandPage',
+);
+export const CustomerCommandPage = lazyNamed(
+  () => import('@/features/intelligence/ModuleShellPages'),
+  'CustomerCommandPage',
+);
+export const CustomerPortalPage = lazyNamed(
+  () => import('@/features/customer-portal/CustomerPortalPage'),
+  'CustomerPortalPage',
+);
+export const PlanningCockpitPage = lazyNamed(
+  () => import('@/features/planning-command/PlanningCockpitPage'),
+  'PlanningCockpitPage',
+);
+export const OpsLivePage = lazyNamed(
+  () => import('@/features/planning-command/OpsLivePage'),
+  'OpsLivePage',
 );
 
 // Command Center tabs

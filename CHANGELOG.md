@@ -8,6 +8,76 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased] — Spec 025 Phase 4 Premium (Wave 1)
+
+### Added
+- Manufacturing Intelligence pulse (`GET /api/v1/intelligence/pulse`) with M1–M6 Command module shells
+- Agents **A8–A12**: customer health/delay drafts, PO recommendations, CAPA, MO margin/decision P&L/cash sketch, carbon + supplier ESG
+- Autonomous overnight rule engine with guardrails (A-customer block, PO caps, quality inspection add-only)
+- Customer portal read-only page + `GET /api/v1/orders/portal/summary`
+- UI routes `/intelligence/*` and `/customer-portal` (R2 sidebar)
+- Speckit feature `specs/025-phase4-premium` + `docs/qa/PHASE4-EXECUTION-AND-TEST-REPORT.md`
+
+### Tests
+- dpe Phase 4 suite 9 passed; procurement/quality/sustain/order Phase 4 unit tests GREEN; Phase 3 orchestrator regression 7 passed
+
+### Honesty
+- COM blockers remain OPEN; no live Odoo PH1-02 claim; Digital Factory polish deferred
+
+---
+
+## [Unreleased] — Spec 026 Phase 5 Planning-Command (Wave 1)
+
+### Added
+- Planning Cockpit, MPS, MRP explode, ATP/CTP promise, production leveling
+- Command Center ops live dashboard, war room, shift handover, action tracker
+- UI: `/planning/cockpit`, `/command-center/ops-live`
+- Spec `026-phase5-planning-command`; report `docs/qa/PHASE5-EXECUTION-AND-TEST-REPORT.md`
+
+### Tests
+- Phase 5: **8/8 PASS** (`test_phase5_planning.py`)
+
+---
+
+## [Unreleased] — Spec 025 Phase 4 Premium (Wave 1)
+
+### Added
+- Intelligence pulse M1–M6; agents A8–A12; autonomous overnight guardrails
+- Customer portal (read-only); procurement PO recs; quality CAPA; sustain carbon/ESG
+- UI `/intelligence/*` + `/customer-portal`
+- Spec `025-phase4-premium`; report `docs/qa/PHASE4-EXECUTION-AND-TEST-REPORT.md`
+
+### Tests
+- Phase 4: **21/21 PASS** (dpe/order/quality/sustain/procurement)
+
+---
+
+## [Unreleased] — Spec 024 Phase 3 Ops Intelligence (Wave 1)
+
+### Added
+- Migrations **051–059** (agent activity, exceptions/SLA, upload history, demand signals, supplier_score Phase 3 ALTER, root-cause, predictions, auction log, batch groups)
+- **upload-svc** (:8120): 5-phase onboarding wizard + multi-stage Excel/CSV validation + Kong R2 route
+- Predictive risk scoring (fea-svc T+3/7/14) and 5-why root-cause analyzer
+- Smart batching + capacity auction (cap-svc)
+- Demand signal fusion (demand-svc); predictive stockout + supplier scorecard (mat-svc)
+- Agent orchestrator + exception lifecycle + financial optioning (dpe-svc)
+- Contextual Copilot morning brief / meeting prep (nlp-svc); S&OP executive brief (sop-svc)
+- Frontend: Data Upload, Agents, Exceptions, Predictions, Root Cause, Supplier Scorecard, Meeting Prep (+ EN/AR i18n)
+
+### Conflicts documented
+- Migration 055 ALTERs existing `cdm_supplier_score` (041) instead of CREATE
+- A5 generate-resolutions lives under `/api/v1/agents/*` (res-svc owns `/api/v1/resolution`)
+
+### Tests
+- Phase 3 new suites: **18/18 PASS** (fea/cap/demand/mat/dpe/nlp/sop/upload)
+- Report: `docs/qa/PHASE3-EXECUTION-AND-TEST-REPORT.md`
+
+### Deferred / OPEN (COM unchanged)
+- Full CDM persist for every upload row; WhatsApp exception push; full S&OP 4-week UI
+- OQ-7 / SOW / Odoo staging / G-R2-04 Arabic COM — **OPEN**
+
+---
+
 ## [Unreleased] — Sprint 4 Wave 1 (Spec 023)
 
 ### Added

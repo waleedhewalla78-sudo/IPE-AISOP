@@ -45,6 +45,12 @@ class AgentOrchestrator:
         AgentStep("A1-fuse", "demand-svc", "/api/v1/demand/signal-fusion", "if_data_changed:demand", 15),
         AgentStep("A2", "mat-svc", "/api/v1/material/safety-stock/calculate", "if_data_changed:demand,inventory", 30),
         AgentStep("A2-supplier", "mat-svc", "/api/v1/material/suppliers/score", "if_data_changed:supply", 15),
+        # Phase 4 Premium agents (dry-run stubs unless service_urls wired)
+        AgentStep("A8", "dpe-svc", "/api/v1/intelligence/customer/health", "if_data_changed:demand,customer", 15),
+        AgentStep("A9", "procurement-svc", "/api/v1/procurement/po-recommendations", "if_data_changed:inventory,supply", 20),
+        AgentStep("A10", "quality-svc", "/api/v1/quality-events/predict", "if_data_changed:production", 20),
+        AgentStep("A11", "dpe-svc", "/api/v1/intelligence/finance/mo-margin", "if_data_changed:production,finance", 15),
+        AgentStep("A12", "sustain-svc", "/api/v1/sustainability/carbon-footprint", "if_data_changed:master,supply", 15),
     ]
 
     def __init__(self, service_urls: dict[str, str] | None = None, dry_run: bool = True):

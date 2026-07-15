@@ -1,6 +1,6 @@
 # IPE Project Progress
 
-> **Current (2026-07-11):** Constitution **1.2.8** · Active Speckit **`specs/023-sprint4-wave1`** · Tag **`v9.2.0-planning`** applied · Sprint 2 GTM complete · Commercial blockers OQ-7 / OQ-1 / PH1-02 / G-R2-04 remain OPEN. See `PRODUCT-STATUS.md`.
+> **Current (2026-07-15):** Constitution **1.3.0** · Active Speckit **`specs/026-phase5-planning-command`** · Ops Blueprint Phase **3/4/5 Wave 1 ENG COMPLETE** (18+21+8 unit tests) · Tag **`v9.2.0-planning`** · COM blockers OQ-7 / OQ-1 / PH1-02 / G-R2-04 remain OPEN. See `PRODUCT-STATUS.md` + `docs/qa/PHASE{3,4,5}-EXECUTION-AND-TEST-REPORT.md`.
 
 ## Phase 0: Foundation (COMPLETE)
 

@@ -9,6 +9,8 @@ const ALL_NAV = [
   { to: ROUTES.WORKSPACE, labelKey: 'nav.workspace', icon: '🧩', match: ROUTES.WORKSPACE },
   { to: ROUTES.PLANNING, labelKey: 'nav.planning', icon: '📊', match: ROUTES.PLANNING },
   { to: ROUTES.COMMAND_CENTER, labelKey: 'nav.commandCenter', icon: '🎯', match: ROUTES.COMMAND_CENTER },
+  { to: ROUTES.INTELLIGENCE, labelKey: 'nav.intelligence', icon: '🧠', match: ROUTES.INTELLIGENCE, release1: false },
+  { to: ROUTES.CUSTOMER_PORTAL, labelKey: 'nav.customerPortal', icon: '📦', match: ROUTES.CUSTOMER_PORTAL, release1: false },
   { to: ROUTES.AI_COPILOT, labelKey: 'nav.copilot', icon: '💬', match: ROUTES.AI_COPILOT, release1Only: true },
   { to: ROUTES.SUPPLY_CHAIN, labelKey: 'nav.supplyChain', icon: '🌐', match: ROUTES.SUPPLY_CHAIN, release1: false },
   { to: ROUTES.AI_GOVERNANCE, labelKey: 'nav.aiGovernance', icon: '🤖', match: ROUTES.AI_GOVERNANCE, release1: false },
