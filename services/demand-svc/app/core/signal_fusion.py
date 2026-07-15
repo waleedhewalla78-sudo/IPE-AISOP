@@ -119,7 +119,7 @@ class DemandSignalFusion:
 
         await db.execute(
             text("""
-                INSERT INTO cdm_demand_signal (
+                INSERT INTO cdm_demand_fusion (
                     tenant_id, product_id, product_code, horizon_days,
                     fused_qty, confidence, confidence_label, seasonal_factor,
                     signals, explanation

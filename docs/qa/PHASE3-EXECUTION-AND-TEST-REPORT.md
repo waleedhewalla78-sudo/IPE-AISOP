@@ -10,10 +10,9 @@
 ## Verdict
 
 **Phase 3 Wave 1 engineering COMPLETE** for the Technical Spec §7 ten-item MVP.  
-Unit tests for all Phase 3 cores: **PASS (18/18)** (re-verified 2026-07-15).  
-Optional residuals T024/T032 closed (capacity routes + `/agents/run-chain`).  
-Commercial blockers remain **OPEN** (unchanged).  
-**Engineering chain may proceed to Phase 4/5.** Live Kong/R2 smoke of Phase 3 additive APIs not re-proven in this close-out session (unit coverage is the Wave 1 gate).
+Unit tests: **18/18 PASS**. Migrations **051–059 applied** on R2 `ipe_test` (head=059).  
+Direct service + Kong smokes: **PASS** (2026-07-15 this session).  
+Commercial blockers remain **OPEN** (unchanged).
 
 ---
 
@@ -22,6 +21,7 @@ Commercial blockers remain **OPEN** (unchanged).
 | Topic | Prefer | Resolution shipped |
 |-------|--------|--------------------|
 | Migration 055 CREATE `cdm_supplier_score` | Blueprint inventory + honest code | **ALTER** existing 041 table (quality/concentration/trend/overall_score columns) |
+| Migration 054 CREATE `cdm_demand_signal` | Tech Spec fusion table | Name already used by raw signal-ingest ledger → created **`cdm_demand_fusion`** for fused outputs |
 | Orchestrator A5 → `/api/v1/resolution/generate-all` on dpe | Tech Spec “how” but Kong/res-svc ownership | `POST /api/v1/agents/generate-resolutions` on dpe-svc (res-svc keeps `/api/v1/resolution`) |
 | Full S&OP 4-week process / WhatsApp | Blueprint “what” | Deferred: API executive brief + meeting prep shipped; WhatsApp push not built |
 
@@ -53,7 +53,7 @@ Commercial blockers remain **OPEN** (unchanged).
 | 051 | `cdm_agent_activity_log` |
 | 052 | `cdm_agent_exception`, `cdm_exception_sla` |
 | 053 | `cdm_upload_history`, `cdm_upload_error`, `cdm_upload_wizard_state` |
-| 054 | `cdm_demand_signal` |
+| 054 | `cdm_demand_fusion` (not reuse of existing ingest `cdm_demand_signal`) |
 | 055 | ALTER `cdm_supplier_score` (Phase 3 columns) |
 | 056 | `cdm_root_cause_chain` |
 | 057 | `cdm_prediction_log` |
@@ -80,16 +80,23 @@ Apply: `cd migrations; alembic upgrade head` against R2 Postgres when stack is u
 
 ---
 
-## R2 smoke / E2E
+## R2 smoke / E2E (2026-07-15 this session)
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| Phase 3 unit gate | **GREEN** | 18/18 this session |
-| Capacity batch/auction HTTP | **WIRED** | `cap-svc` phase3 router |
-| Orchestrator trigger | **WIRED** | `POST /api/v1/agents/run-chain` |
-| Live Kong smoke of Phase 3 paths | NOT RE-RUN | Additive; prior R2 smoke remains reference |
-| `star-trans-validate.ps1` | NOT RE-RUN | Sprint 3 validate remains reference |
-| Playwright Phase 3 pages | NOT RUN this session | Pages wired |
+| alembic upgrade → 059 | **PASS** | host port 5433 / `ipe_test` |
+| upload-wizard :8120 | **PASS** | 200 |
+| fea predict (+ JWT) | **PASS** | 200 |
+| mat scorecard :8002 | **PASS** | 200 |
+| dpe agents/status :8020 | **PASS** | 200 |
+| cap batch/optimize :8003 | **PASS** | 200 |
+| demand signal-fusion :8040 | **PASS** | 200 |
+| sop executive-brief :8110 | **PASS** | 200 |
+| nlp morning-brief :8007 | **PASS** | 200 |
+| Kong upload + scorecard :8000 | **PASS** | 200 |
+| Container docker healthchecks | DEGRADED | kafka/vault probes fail in R2; APIs still 200 |
+| `star-trans-validate.ps1` | NOT RE-RUN | Additive APIs; prior Sprint 3 validate remains reference |
+| Playwright Phase 3 pages | NOT RUN | Routes/i18n wired |
 | Live Odoo PH1-02 | OPEN / SKIP | do not fake |
 
 ---

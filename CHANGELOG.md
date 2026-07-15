@@ -46,7 +46,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased] — Spec 024 Phase 3 Ops Intelligence (Wave 1)
 
 ### Added
-- Migrations **051–059** (agent activity, exceptions/SLA, upload history, demand signals, supplier_score Phase 3 ALTER, root-cause, predictions, auction log, batch groups)
+- Migrations **051–059** (agent activity, exceptions/SLA, upload history, **`cdm_demand_fusion`**, supplier_score Phase 3 ALTER, root-cause, predictions, auction log, batch groups)
 - **upload-svc** (:8120): 5-phase onboarding wizard + multi-stage Excel/CSV validation + Kong R2 route
 - Predictive risk scoring (fea-svc T+3/7/14) and 5-why root-cause analyzer
 - Smart batching + capacity auction (cap-svc)
