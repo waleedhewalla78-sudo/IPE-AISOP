@@ -373,6 +373,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://ipe:ipe_test_pass@db:5432/ipe_test
       REDIS_URL: redis://redis:6379/0
       IPE_RELEASE_PROFILE: release2
+      IPE_KAFKA_BOOTSTRAP_SERVERS: ""
+      IPE_KAFKA_ENABLED: "false"
       IPE_OTEL_TRACING_ENABLED: "false"
       AUTH_MODE: local
       AUTH_PROVIDER: local
