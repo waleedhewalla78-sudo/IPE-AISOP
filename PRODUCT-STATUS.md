@@ -2,15 +2,17 @@
 
 **Last Updated:** 2026-07-16  
 **Release Tag:** v9.2.0-planning (applied @ b04434d), v9.4.0-p3 (platform)  
-**Active Speckit feature:** `specs/027-phase6-enterprise-agentic` (prior: `026-phase5-planning-command`, `025-phase4-premium`, `024-phase3-*`)  
-**Agents:** 17 (A1–A17) · **Modules:** 9 (M1–M9)  
+**Active Speckit feature:** `specs/028-phase7-deep-planning` (prior: `027-phase6-enterprise-agentic`, `026-phase5-planning-command`, `025-phase4-premium`, `024-phase3-*`)  
+**Agents:** 17 (A1–A17) · **Modules:** 9 (M1–M9) + Phase 7 deep-discipline extensions  
 **Constitution:** 1.4.0  
+**Migration head:** 067  
 **Workspace:** `E:\AISOP\ipe`  
 **Phase 3 report:** `docs/qa/PHASE3-EXECUTION-AND-TEST-REPORT.md`  
 **Phase 4 report:** `docs/qa/PHASE4-EXECUTION-AND-TEST-REPORT.md`  
 **Phase 5 report:** `docs/qa/PHASE5-EXECUTION-AND-TEST-REPORT.md`  
 **Phase 6 report:** `docs/qa/PHASE6-EXECUTION-AND-TEST-REPORT.md`  
-**Phase 3-5 E2E gate:** `docs/qa/PHASES3-5-E2E-TEST-REPORT.md` (verdict FAIL = strategy-harness path mismatch; dpe-svc phase4/phase5 foundations verified green → Phase 6 PROCEED)
+**Phase 7 report:** `docs/qa/PHASE7-EXECUTION-AND-TEST-REPORT.md`  
+**Phase 3-5 E2E gate:** `docs/qa/PHASES3-5-E2E-TEST-REPORT.md` (re-run @ `50c908f` — verdict **CONDITIONAL** 86 PASS / 0 FAIL / 15 SKIP / 1 BLOCKED; no genuine product defects → Phase 7 PROCEED)
 
 ---
 
@@ -100,7 +102,25 @@
 | IoT / machine telemetry (A16) | **STUB** | — | — | No live MQTT/REST |
 | Odoo PO/invoice write-back (A15) | **NOT executed** | — | — | PH1-02 OPEN |
 | Phase 6D (tuning / SOC 2 / multi-plant) | **DEFERRED** | — | — | Not in Wave 1 |
-| Live Kong :8000 `/enterprise/*` smoke | **NOT confirmed** | — | — | R2 upload-svc unhealthy residual; ASGI smoke 6/6 covers handlers |
+| Live Kong :8000 `/enterprise/*` smoke | **NOT confirmed** | — | — | Kong has no `/api/v1/enterprise` route object (200 direct-to-dpe-svc); ASGI smoke 6/6 covers handlers |
+
+## Ops Blueprint Phase 7 — Deep Planning & Operations Intelligence (Spec 028 — Wave 1)
+
+Deepens 5 disciplines on the A1–A17 platform; all APIs under existing `/api/v1/planning-command/*` (Kong-routed).
+
+| Item | Status | Service | Migration | Notes |
+|------|--------|---------|-----------|-------|
+| §1 Multi-Horizon Planning (3-horizon + cascade) | **BUILT Wave 1** | dpe-svc | 064 | `GET/POST /planning-command/horizons(/cascade)`; horizon health + board escalation |
+| §2 Financial S&OP (P&L per consensus) | **BUILT Wave 1** | dpe-svc | 065 | Margin-floor A11 alerts |
+| §2 Rolling S&OP + Demand Shaping + Portfolio | **BUILT Wave 1** | dpe-svc | — | Event recalc + 4-stage governance; mix per constraint hour |
+| §3 Demand decomposition + collaboration + NPI | **BUILT Wave 1** | dpe-svc | 066 | 6 components + 95% CI; weighted consensus + bias decay; analogy/cannibalization/market-sizing |
+| §4 Scheduling (setup/multi-resource/campaign) + Labour SPOF + Make-or-Buy | **BUILT Wave 1** | dpe-svc | — | Exact≤8/greedy setup; dynamic bottleneck rule |
+| §5 OEE programme + Andon + KPI tree + Standard Work | **BUILT Wave 1** | dpe-svc | 067 | Andon trigger→resolve lifecycle; A16 >120% flags |
+| §5 Digital Gemba real-time machine status | **STUB** | dpe-svc | — | `iot_live=false` — PH1-02 OPEN |
+| §6 Integrated Planning Calendar | **BUILT Wave 1** | dpe-svc | — | `GET /planning-command/calendar` |
+| UI: Planning Horizons / Command Ops Deep / Intelligence S&OP·Demand·Production Deep | **BUILT Wave 1** | web-ui | — | `features/deep-planning/*`; tsc clean |
+| Live Kong :8000 smoke of Phase 7 endpoints | **CONFIRMED** | — | — | 13/13 + Andon lifecycle (dpe-svc image rebuilt) |
+| Operator tablet UI / Andon DB persistence / S&OP interactive stage-gate / monetary net-saving | **DEFERRED** | — | — | Wave 2 |
 
 ## Customer Enablement (Sprint 2 — COMPLETE)
 

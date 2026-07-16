@@ -6,6 +6,7 @@ import { t } from '@/lib/i18n';
 const ALL_TABS = [
   { to: ROUTES.PLANNING_DASHBOARD, label: 'Dashboard', release1: false },
   { to: ROUTES.PLANNING_COCKPIT, label: 'Cockpit', release1: false },
+  { to: ROUTES.PLANNING_HORIZONS, label: 'Horizons', release1: false },
   { to: ROUTES.PLANNING_DEMAND, label: 'Demand', release1: false },
   { to: ROUTES.PLANNING_SCENARIOS, label: 'Scenarios', release1: false },
   { to: ROUTES.PLANNING_CONTROL_TOWER, labelKey: 'controlTower.title', label: 'Control Tower' },

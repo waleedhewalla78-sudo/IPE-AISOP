@@ -26,6 +26,7 @@ const ALL_TABS = [
 
   { to: ROUTES.COMMAND_COST_OF_CHAOS, label: 'Cost of Chaos', release1: false },
   { to: ROUTES.COMMAND_SOP_REPORT, label: 'S&OP Report', release1: false },
+  { to: ROUTES.COMMAND_OPERATIONS_DEEP, label: 'Operations Deep', release1: false },
 
 ];
 

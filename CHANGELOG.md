@@ -8,6 +8,35 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased] — Spec 028 Phase 7 Deep Planning & Operations Intelligence (Wave 1)
+
+### Gate
+- Waited for the in-flight **Phases 3-5 E2E strategy RE-RUN** to close: commit `50c908f` landed; `docs/qa/PHASES3-5-E2E-TEST-REPORT.md` regenerated — verdict **CONDITIONAL** (102 cases: **86 PASS / 0 FAIL / 15 SKIP / 1 BLOCKED**), all 10 baseline suites PASS, **no genuine product defects** (prior FAILs were harness bugs / stale image / compose-env). Phase 6 artifacts confirmed → **PROCEED**.
+
+### Added
+- **§1 Multi-Horizon Planning:** three-horizon model (strategic/tactical/operational) + coverage health + cascade (decisions down / constraints up → board escalation) — `GET/POST /planning-command/horizons(/cascade)`
+- **§2 S&OP Deep:** financial S&OP (P&L per consensus + margin-floor A11 alerts), rolling S&OP (event-driven recalc + 4-stage governance), demand shaping (mix-shift/pull-forward/outsource), portfolio mix (margin per constraint hour) — `POST /planning-command/sop/{financial,rolling,demand-shaping,portfolio}`
+- **§3 Demand Deep:** decomposition (base/trend/seasonal/promo/event/noise + 95% CI), collaboration consensus (weighted + disagreement + bias decay), NPI forecast (analogy/cannibalization/market-sizing) — `POST /planning-command/demand/{decompose,collaborate,npi}`
+- **§4 Production Deep:** sequence-dependent setup optimisation, multi-resource scheduling, campaign planning, labour skills matrix + single-point-of-failure flags, dynamic make-or-buy — `POST /planning-command/production/{setup-sequence,multi-resource,campaign,labour,make-or-buy}`
+- **§5 Operations Deep:** OEE improvement programme (payback), Digital Gemba (IoT **STUB**), Andon red/yellow/blue/white trigger→resolve lifecycle, KPI tree factory→dept→WC→operator, Standard Work A16 step tracking — `GET/POST /planning-command/operations/*`
+- **§6 Integrated Planning Calendar** — `GET /planning-command/calendar`
+- API `app/api/v1/phase7_deep.py` under existing `/api/v1/planning-command/*` Kong route; router registered
+- Migrations **064–067** (planning-horizon + cascade / sop-financial-plan / demand-consensus / andon-alert) — RLS on every table
+- UI: Planning Hub **Horizons** tab, Command Center **Operations Deep** tab, Intelligence Hub **S&OP/Demand/Production Deep** tabs (`features/deep-planning/*`)
+- Spec `028-phase7-deep-planning`; report `docs/qa/PHASE7-EXECUTION-AND-TEST-REPORT.md`
+
+### Tests
+- Phase 7: **40/40 PASS** (`test_phase7_horizons` 4, `_sop_financial` 5, `_demand_decomp` 5, `_scheduling` 6, `_operations` 6, `_api` 14)
+- dpe-svc full regression: **320 passed / 2 skipped**; ruff clean; frontend `tsc --noEmit` clean
+- **Kong :8000 live smoke: 13/13 endpoints + Andon lifecycle** (dpe-svc image rebuilt)
+
+### Honesty
+- Digital Gemba machine status = **IoT STUB** (`iot_live=false`); operator tablet UI minimal; Andon Wave 1 board in-memory (table 067 for durability); S&OP interactive stage-gate + monetary net-saving DEFERRED
+- Pre-existing (not a Phase 7 regression): Kong has no `/api/v1/enterprise` route → Phase 6 `/enterprise/*` 404 via Kong (200 direct); Phase 7 lives under the routed `/planning-command/*`
+- COM OPEN unchanged: OQ-7, PH1-02, G-R2-04, Odoo 17/19; **no tag applied**
+
+---
+
 ## [Unreleased] — Spec 027 Phase 6 Enterprise Agentic (Wave 1: 6A+6B+6C)
 
 ### Gate

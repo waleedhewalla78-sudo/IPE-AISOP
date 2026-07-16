@@ -12,6 +12,9 @@ const TABS = [
   { to: ROUTES.INTELLIGENCE_ANALYTICS, label: 'M7 Analytics' },
   { to: ROUTES.INTELLIGENCE_COMMERCIAL, label: 'M8 Commercial' },
   { to: ROUTES.INTELLIGENCE_PROCUREMENT, label: 'M9 Procurement' },
+  { to: ROUTES.INTELLIGENCE_SOP_DEEP, label: 'S&OP Deep' },
+  { to: ROUTES.INTELLIGENCE_DEMAND_DEEP, label: 'Demand Deep' },
+  { to: ROUTES.INTELLIGENCE_PRODUCTION_DEEP, label: 'Production Deep' },
 ];
 
 export function IntelligenceHub() {

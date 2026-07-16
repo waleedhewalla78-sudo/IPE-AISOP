@@ -133,6 +133,28 @@ export const OpsLivePage = lazyNamed(
   'OpsLivePage',
 );
 
+// Phase 7 Deep Planning pages
+export const ThreeHorizonsPage = lazyNamed(
+  () => import('@/features/deep-planning/ThreeHorizonsPage'),
+  'ThreeHorizonsPage',
+);
+export const SopDeepPage = lazyNamed(
+  () => import('@/features/deep-planning/DeepDisciplinePages'),
+  'SopDeepPage',
+);
+export const DemandDeepPage = lazyNamed(
+  () => import('@/features/deep-planning/DeepDisciplinePages'),
+  'DemandDeepPage',
+);
+export const ProductionDeepPage = lazyNamed(
+  () => import('@/features/deep-planning/DeepDisciplinePages'),
+  'ProductionDeepPage',
+);
+export const OperationsDeepPage = lazyNamed(
+  () => import('@/features/deep-planning/DeepDisciplinePages'),
+  'OperationsDeepPage',
+);
+
 // Command Center tabs
 export const CommandCenterDashboardPage = lazyNamed(
   () => import('@/features/hubs/command-center/CommandCenterDashboardPage'),

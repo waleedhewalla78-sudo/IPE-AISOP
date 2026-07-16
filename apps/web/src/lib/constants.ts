@@ -25,6 +25,7 @@ export const ROUTES = {
   PLANNING_PREDICTIONS: '/planning/predictions',
   PLANNING_ROOT_CAUSE: '/planning/root-cause',
   PLANNING_COCKPIT: '/planning/cockpit',
+  PLANNING_HORIZONS: '/planning/horizons',
 
   // Command Center tabs
   COMMAND_DASHBOARD: '/command-center/dashboard',
@@ -36,6 +37,7 @@ export const ROUTES = {
   COMMAND_EQUIPMENT: '/command-center/equipment',
   COMMAND_SOP_REPORT: '/command-center/sop-report',
   COMMAND_OTD_ANALYTICS: '/command-center/otd-analytics',
+  COMMAND_OPERATIONS_DEEP: '/command-center/operations-deep',
 
   // Phase 4 Manufacturing Intelligence modules
   INTELLIGENCE_PULSE: '/intelligence/pulse',
@@ -49,6 +51,10 @@ export const ROUTES = {
   INTELLIGENCE_ANALYTICS: '/intelligence/analytics',
   INTELLIGENCE_COMMERCIAL: '/intelligence/commercial',
   INTELLIGENCE_PROCUREMENT: '/intelligence/procurement',
+  // Phase 7 Deep Planning modules
+  INTELLIGENCE_SOP_DEEP: '/intelligence/sop-deep',
+  INTELLIGENCE_DEMAND_DEEP: '/intelligence/demand-deep',
+  INTELLIGENCE_PRODUCTION_DEEP: '/intelligence/production-deep',
 
   // Supply Chain tabs
   SUPPLY_TARIFF: '/supply-chain/tariff',

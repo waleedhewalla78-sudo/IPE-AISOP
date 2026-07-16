@@ -1,6 +1,6 @@
 # OPEN Items — Program (honest tracker)
 
-**Updated:** 2026-07-15  
+**Updated:** 2026-07-16  
 **Do not auto-close COM items.**
 
 ## Commercial / Human (OPEN)
@@ -26,6 +26,12 @@
 | Spec 026 WhatsApp / Comms Hub | Deferred |
 | Spec 026 alert inbox SLA UI | Partial (ops live alerts only) |
 | Spec 026 MPS/MRP persistence migrations | Wave 1 request-driven |
+| Kong `/api/v1/enterprise/*` route | Missing route object → Phase 6 `/enterprise/*` 404 via Kong (200 direct-to-dpe-svc); add Kong route to expose |
+| Spec 028 Phase 7 Digital Gemba live IoT/MES | STUB (`iot_live=false`) — PH1-02 |
+| Spec 028 Phase 7 operator tablet UI (Standard Work) | Minimal Wave 1 |
+| Spec 028 Phase 7 Andon DB persistence + notifications | Table 067 exists; Wave 1 board in-memory |
+| Spec 028 Phase 7 S&OP interactive stage-gate | Deferred (governance modelled as config; was E2E-SOP-03 BLOCKED) |
+| Spec 028 Phase 7 monetary net-saving in leveling | Deferred (was P5-LEV-02 SKIP) |
 
 ## Tags
 
@@ -41,3 +47,5 @@
 | Ops Phase 3 Wave 1 cores | 024 |
 | Phase 4 Premium Wave 1 (A8–A12, M1–M6, autonomy, portal) | 025 |
 | Phase 5 Planning-Command Wave 1 (cockpit/MPS/MRP/ops) | 026 |
+| Phase 6 Enterprise Agentic Wave 1 (A13–A17, M7–M9) | 027 |
+| Phase 7 Deep Planning Wave 1 (§1–§6, 5 disciplines) | 028 |

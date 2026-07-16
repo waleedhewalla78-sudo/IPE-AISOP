@@ -64,6 +64,11 @@ import {
   CustomerPortalPage,
   PlanningCockpitPage,
   OpsLivePage,
+  ThreeHorizonsPage,
+  SopDeepPage,
+  DemandDeepPage,
+  ProductionDeepPage,
+  OperationsDeepPage,
 } from '@/app/lazyRoutes';
 import { ROUTES } from '@/lib/constants';
 
@@ -88,6 +93,7 @@ export function AppRouter() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<PlanningDashboardPage />} />
             <Route path="cockpit" element={<PlanningCockpitPage />} />
+            <Route path="horizons" element={<ThreeHorizonsPage />} />
             <Route path="demand" element={<DemandForecastPage />} />
             <Route path="scenarios" element={<ScenarioWorkbenchPage />} />
             <Route path="control-tower" element={<ControlTowerPage />} />
@@ -110,6 +116,7 @@ export function AppRouter() {
             <Route path="cost-of-chaos" element={<CostOfChaosPage />} />
             <Route path="otd-analytics" element={<OTDDashboardPage />} />
             <Route path="sop-report" element={<SOPReport />} />
+            <Route path="operations-deep" element={<OperationsDeepPage />} />
           </Route>
 
           {/* Phase 4 Manufacturing Intelligence */}
@@ -125,6 +132,9 @@ export function AppRouter() {
             <Route path="analytics" element={<AnalyticsCommandPage />} />
             <Route path="commercial" element={<CommercialCommandPage />} />
             <Route path="procurement" element={<ProcurementCommandPage />} />
+            <Route path="sop-deep" element={<SopDeepPage />} />
+            <Route path="demand-deep" element={<DemandDeepPage />} />
+            <Route path="production-deep" element={<ProductionDeepPage />} />
           </Route>
 
           <Route path={ROUTES.CUSTOMER_PORTAL} element={<CustomerPortalPage />} />
