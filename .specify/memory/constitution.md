@@ -1,15 +1,17 @@
 # IPE Platform Constitution
 
 <!--
-Sync Impact Report (Speckit - 2026-07-15 phase3-ops-intelligence)
-Version: 1.2.8 -> 1.3.0 (MINOR)
-Added: Principle IX — Operations Intelligence Program (Blueprint Phases 3→5)
-Updated: Development Workflow — Spec 023 ENG COMPLETE; Spec 024-phase3-ops-intelligence ACTIVE
-Clarified: Platform Phase 3 tag v9.4.0-p3 (K8s/Helm) ≠ Blueprint Ops Phase 3 (7 agents / predictive risk)
-Updated: Principle VII honesty — COM blockers OQ-7 / OQ-1 / PH1-02 / G-R2-04 remain OPEN
-Clarified: Migrations 051–059 Phase-agent deltas absorbed into Spec 024; do not recreates
+Sync Impact Report (Speckit - 2026-07-16 phase6-enterprise-agentic)
+Version: 1.3.0 -> 1.4.0 (MINOR)
+Added: Principle X — Agentic Autonomy Governance (Ops Blueprint Phase 6, 17 agents, Levels 1-4)
+Updated: Development Workflow — Spec 027-phase6-enterprise-agentic ACTIVE (Wave 1 ENG COMPLETE)
+Updated: Phase Naming Map — Ops Blueprint Phase 6 (agents A13-A17, modules M7-M9) ENG COMPLETE Wave 1
+Clarified: Migrations 060–063 are the Phase 6 schema spine; continue head numbering (do not recreate)
+Reaffirmed: PH1-02 live Odoo/Accounting/market-data/IoT remain OPEN; Phase 6 live integrations MUST be MOCK/STUB
 Templates: no structural change (MINOR principle addition only)
 Root .specify/memory/constitution.md MUST stay synced to this canonical ipe copy
+
+Prior (2026-07-15 phase3-ops-intelligence): 1.2.8 -> 1.3.0 (MINOR) — added Principle IX
 -->
 
 IPE (Intelligent Planning Engine) is a microservices-based, event-driven platform for **feasibility-first manufacturing planning** in MENA mid-market discrete manufacturing. These principles are binding on all changes.
@@ -150,6 +152,20 @@ Every **deployed** service MUST be observable.
 
 ---
 
+### X. Agentic Autonomy Governance (Blueprint Phase 6) — NEW
+
+**Phase 6 expands the platform to 17 agents (A1–A17) and 9 modules (M1–M9); autonomy MUST be governed and auditable.**
+
+- **Spec 027** governs Blueprint Phase 6 (A13 Commercial, A14 Analytics, A15 Procurement Execution, A16 Shop Floor, A17 Cross-Functional Orchestrator; modules M7 Analytics / M8 Commercial / M9 Procurement). Migrations **060–063** are the schema spine — continue head numbering, never recreate.
+- **Four-level governance is binding.** Every autonomous or recommended action MUST declare a governance level: L1 Autonomous (reversible ≤4h, logged), L2 Supervised (notify + override window), L3 Approved (human approval before execution), L4 Escalated (management decision with executive brief). High-impact or below-guardrail actions MUST NOT self-execute.
+- **A17 is the only cross-functional arbiter.** Conflicts between domain agents MUST be resolved via the documented resolution hierarchy (safety > customer_sla > revenue_protection > margin_protection > cost_optimization > efficiency > sustainability) and the six enterprise policies. The two hard gates — **Margin Floor (P4)** and **Quality Non-Negotiable (P6)** — MUST be able to BLOCK, not merely warn.
+- **Honesty for live integrations (reaffirms VII).** Odoo Accounting/Sales/Purchases write-back, market/FX/commodity feeds, and IoT/shop-floor telemetry are **PH1-02 OPEN**. Phase 6 MUST ship these as MOCK/STUB with an explicit `live:false` + blocker; agents MUST NOT present mock output as live ERP data.
+- **Test discipline (reaffirms III).** Each new agent MUST have unit tests with no live network; the headline cross-functional ATP/CTP (A17 coordinating A1/A3/A11/A13) MUST have a test. No COM blocker auto-closed; no tag applied without scripted evidence.
+
+**Rationale:** Autonomous cross-functional decisions are only safe with a bright-line governance ladder, hard safety/quality/margin gates, a single arbiter, and honest boundaries around un-integrated ERP data.
+
+---
+
 ## MENA Market Constraints (Binding on Release 1)
 
 | Constraint | Requirement |
@@ -187,14 +203,16 @@ Every **deployed** service MUST be observable.
 - **Release Closure (021):** **ENG COMPLETE** — UAT-10/11 fixed; OQ-13 script; tag `v9.2.0-planning` applied; commercial blockers documented.
 - **Sprint 3 Go-Live (022):** **ENG COMPLETE** — deploy dry-run, validate/smoke evidence, status honesty, GH hygiene; residuals #70/#72 may remain OPEN.
 - **Sprint 4 Wave 1 (023):** **ENG COMPLETE** @ ~31d4840 — Admin Odoo Config v2 + OTD Analytics; COM blockers remain OPEN.
-- **Ops Phase 3 (024):** **Active Speckit feature** — Blueprint Phase 3 agents + predictive risk + exception lifecycle + upload foundation; Phase 4/5 backlog tracked in analyze; absorb concurrent Phase-agent migrations 051–059.
+- **Ops Phase 3 (024):** **ENG COMPLETE Wave 1** — Blueprint Phase 3 agents + predictive risk + exception lifecycle + upload foundation; migrations 051–059.
+- **Ops Phase 4 (025) / Phase 5 (026):** **ENG COMPLETE Wave 1** — M1–M6 + A8–A12 + autonomy + portal; Planning/Command deep.
+- **Ops Phase 6 (027):** **Active Speckit feature — ENG COMPLETE Wave 1 (6A+6B+6C)** — agents A13–A17, modules M7–M9, migrations 060–063; live Odoo/market/IoT MOCK/STUB (PH1-02 OPEN); Phase 6D deferred.
 - **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
 
 ---
 
 ## Governance
 
-- **Authority.** Principles I–III, VII, VIII, and IX are binding gates. Violations MUST be resolved by changing code, not diluting principles.
+- **Authority.** Principles I–III, VII, VIII, IX, and X are binding gates. Violations MUST be resolved by changing code, not diluting principles.
 - **Amendments.** Changes require PR with rationale and SemVer bump. Update Sync Impact Report (HTML comment at top).
 - **Versioning.** MAJOR = principled removal; MINOR = new principle or materially expanded doctrine; PATCH = clarifications.
 - **Compliance review.** Every PR MUST verify compliance.
@@ -210,11 +228,12 @@ External documents use overlapping phase numbers. All Speckit analyze reports MU
 | Platform Phase 3 | Helm/K8s Gates 6–11; ERP scaffolds | DONE (`v9.4.0-p3`) |
 | Platform Phase 4–5 | GTM SaaS / SOC2 / live SAP | BACKLOG (do not fake) |
 | **Ops Blueprint Phase 3** | 7 agents, predictive risk, upload wizard | **ACTIVE — Spec 024** |
-| **Ops Blueprint Phase 4** | 6 Command modules; agents A8–A12 | BACKLOG (Premium Proposal) |
-| **Ops Blueprint Phase 5** | Planning Cockpit / MPS / MRP / ATP deep | BACKLOG (Planning-Command-Deep) |
+| **Ops Blueprint Phase 4** | 6 Command modules; agents A8–A12 | ENG COMPLETE Wave 1 — Spec 025 |
+| **Ops Blueprint Phase 5** | Planning Cockpit / MPS / MRP / ATP deep | ENG COMPLETE Wave 1 — Spec 026 |
+| **Ops Blueprint Phase 6** | Enterprise agentic: agents A13–A17, modules M7–M9 | **ENG COMPLETE Wave 1 — Spec 027** (Odoo/market/IoT MOCK/STUB; Phase 6D deferred) |
 | Spec 023 Wave 1 | Odoo Config v2 + OTD | ENG COMPLETE |
 | Spec 020 Planning Intelligence | Modules A–F | ENG COMPLETE @ `v9.2.0-planning` |
 
 ---
 
-**Version**: 1.3.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-15
+**Version**: 1.4.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-16

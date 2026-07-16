@@ -9,13 +9,16 @@ const TABS = [
   { to: ROUTES.INTELLIGENCE_QUALITY, label: 'M4 Quality' },
   { to: ROUTES.INTELLIGENCE_FINANCE, label: 'M5 Finance' },
   { to: ROUTES.INTELLIGENCE_CUSTOMER, label: 'M6 Customer' },
+  { to: ROUTES.INTELLIGENCE_ANALYTICS, label: 'M7 Analytics' },
+  { to: ROUTES.INTELLIGENCE_COMMERCIAL, label: 'M8 Commercial' },
+  { to: ROUTES.INTELLIGENCE_PROCUREMENT, label: 'M9 Procurement' },
 ];
 
 export function IntelligenceHub() {
   return (
     <HubShell
       title="Manufacturing Intelligence"
-      subtitle="Six command modules · 12 agents · autonomous overnight actions"
+      subtitle="Nine command modules · 17 agents · autonomous cross-functional orchestration"
       tabs={TABS}
     />
   );

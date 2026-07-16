@@ -40,6 +40,7 @@ from app.api.v1 import (
     phase3_agents,
     phase4_premium,
     phase5_planning,
+    phase6_enterprise,
 )
 
 api_router = APIRouter()
@@ -82,4 +83,5 @@ api_router.include_router(unified_dashboard.router)
 api_router.include_router(phase3_agents.router)
 api_router.include_router(phase4_premium.router)
 api_router.include_router(phase5_planning.router)
+api_router.include_router(phase6_enterprise.router)
 api_router.include_router(exceptions.router)

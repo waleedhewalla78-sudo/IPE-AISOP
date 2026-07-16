@@ -45,6 +45,10 @@ export const ROUTES = {
   INTELLIGENCE_QUALITY: '/intelligence/quality',
   INTELLIGENCE_FINANCE: '/intelligence/finance',
   INTELLIGENCE_CUSTOMER: '/intelligence/customer',
+  // Phase 6 Enterprise Agentic modules
+  INTELLIGENCE_ANALYTICS: '/intelligence/analytics',
+  INTELLIGENCE_COMMERCIAL: '/intelligence/commercial',
+  INTELLIGENCE_PROCUREMENT: '/intelligence/procurement',
 
   // Supply Chain tabs
   SUPPLY_TARIFF: '/supply-chain/tariff',

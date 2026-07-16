@@ -8,6 +8,34 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased] — Spec 027 Phase 6 Enterprise Agentic (Wave 1: 6A+6B+6C)
+
+### Gate
+- Consumed `docs/qa/PHASES3-5-E2E-TEST-REPORT.md` (verdict FAIL = strategy-harness `ModuleNotFoundError` path mismatch; all 10 baseline suites incl. dpe-svc phase4/phase5 PASS). Foundations independently re-verified green (22/22) → **PROCEED**.
+
+### Added
+- **A13 Commercial Intelligence** (SD): pricing optimization (tier/volume/competitive discount, margin floor, discount authority), deal profitability P&L, contract compliance
+- **A14 Analytics Intelligence** (SAC): automated insight generation, trend detection, anomaly alerting (z-score), predictive analytics (linreg)
+- **A15 Procurement Execution** (MM): 3-way match (PO↔receipt↔invoice) + routing, receipt confirmation
+- **A16 Shop Floor Intelligence** (PP): digital work instructions, operator time tracking, live production progress (IoT **STUB**)
+- **A17 Cross-Functional Orchestrator**: resolution hierarchy, 6 enterprise policies, cascading events, cross-functional ATP/CTP (A1·A3·A11·A13)
+- Odoo Accounting **scaffold** (`OdooAccountingConnector`, mock) + `/api/v1/enterprise/integrations/status`
+- API `/api/v1/enterprise/*` (agents A13–A17, modules M7–M9); router registered
+- Migrations **060–063** (commercial quote / analytics insight / 3-way match / orchestrator decision) — RLS on every table
+- UI: Intelligence hub **M7 Analytics · M8 Commercial · M9 Procurement** tabs + `EnterpriseCommandPages.tsx`
+- Spec `027-phase6-enterprise-agentic`; report `docs/qa/PHASE6-EXECUTION-AND-TEST-REPORT.md`
+- Constitution 1.3.0 → 1.4.0 (Principle X — Agentic Autonomy Governance)
+
+### Tests
+- Phase 6: **40/40 PASS** (`test_phase6_commercial` 7, `test_phase6_analytics` 9, `test_phase6_orchestrator` 10, `test_phase6_execution` 8, `test_phase6_api` 6)
+- dpe-svc full regression: **280 passed / 2 skipped**; ruff clean; frontend `tsc --noEmit` clean
+
+### Honesty
+- Live Odoo Accounting / Sales / PO write-back, market/FX feed, IoT telemetry = **MOCK/STUB**, flagged `live:false` + blocker
+- COM OPEN unchanged: OQ-7, PH1-02, G-R2-04, Odoo 17/19; Phase 6D deferred; no tag applied; live Kong :8000 smoke not confirmed (R2 upload-svc residual)
+
+---
+
 ## [Unreleased] — Spec 026 Phase 5 Planning-Command (Wave 1)
 
 ### Added

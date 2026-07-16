@@ -58,6 +58,9 @@ import {
   QualityCommandPage,
   FinanceCommandPage,
   CustomerCommandPage,
+  AnalyticsCommandPage,
+  CommercialCommandPage,
+  ProcurementCommandPage,
   CustomerPortalPage,
   PlanningCockpitPage,
   OpsLivePage,
@@ -119,6 +122,9 @@ export function AppRouter() {
             <Route path="quality" element={<QualityCommandPage />} />
             <Route path="finance" element={<FinanceCommandPage />} />
             <Route path="customer" element={<CustomerCommandPage />} />
+            <Route path="analytics" element={<AnalyticsCommandPage />} />
+            <Route path="commercial" element={<CommercialCommandPage />} />
+            <Route path="procurement" element={<ProcurementCommandPage />} />
           </Route>
 
           <Route path={ROUTES.CUSTOMER_PORTAL} element={<CustomerPortalPage />} />

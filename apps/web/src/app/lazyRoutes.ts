@@ -108,6 +108,18 @@ export const CustomerCommandPage = lazyNamed(
   () => import('@/features/intelligence/ModuleShellPages'),
   'CustomerCommandPage',
 );
+export const AnalyticsCommandPage = lazyNamed(
+  () => import('@/features/intelligence/EnterpriseCommandPages'),
+  'AnalyticsCommandPage',
+);
+export const CommercialCommandPage = lazyNamed(
+  () => import('@/features/intelligence/EnterpriseCommandPages'),
+  'CommercialCommandPage',
+);
+export const ProcurementCommandPage = lazyNamed(
+  () => import('@/features/intelligence/EnterpriseCommandPages'),
+  'ProcurementCommandPage',
+);
 export const CustomerPortalPage = lazyNamed(
   () => import('@/features/customer-portal/CustomerPortalPage'),
   'CustomerPortalPage',
