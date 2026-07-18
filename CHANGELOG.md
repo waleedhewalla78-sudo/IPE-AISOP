@@ -23,10 +23,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Reports: `docs/qa/PHASE8-EXECUTION-AND-TEST-REPORT.md`, `docs/qa/R1-RELEASE-READINESS.md`
 
 ### Tests
-- Phase 8 new: **31 PASS** (shared 12 + dpe 16 incl. Spec 029 + upload 3)
-- Phase 4–8 dpe regression bundle: **102 PASS**
-- Frontend `tsc --noEmit` clean
-- fea-svc rescore NoneType guard fixed (pre-existing flake blocker)
+- Phase 8 + Spec 029 unit gate: **31 PASS** (shared 12 + dpe phase8 9 + Spec 029 7 + upload 3)
+- Kong `/api/v1/phase8` routes added (`r2-phase8` / `st-phase8`)
+- No claim of under-load k6 SLO close; validate #70/#72/#110 remain OPEN (stack)
 
 ### Honesty
 - No live GPU Ollama / 70B / fine-tuned `ipe-planner` weights claimed
