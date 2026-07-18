@@ -1,55 +1,60 @@
-# IPE QA Upload Templates
+# IPE Upload Templates (aligned to upload-svc)
 
-**Generated:** 2026-07-12  
-**Tenant (demo):** `a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11`  
-**Aligned to:** CDM seed schemas, Star Trans CSV spec, connector Odoo mapper, cap-svc project-plan upload
+**Regenerated:** 2026-07-18
+**Source of truth:** `services/upload-svc/app/core/validator.py` `FILE_SCHEMAS`
 
-## How data actually loads today
+## Important — superseded 2026-07-12 pack
 
-| Path | Mechanism | UI? |
-|------|-----------|-----|
-| Master data (products, WC, BOM, MO, demand, suppliers, inventory) | SQL via `scripts/seed-data.ps1` + `seed-startrans-demo.ps1` | No |
-| Project plan | `POST /api/v1/capacity/project-plans/upload` (`.xlsx` only) | Yes — Schedule → Upload |
-| Odoo ERP | Connector XML-RPC sync (`/api/v1/sync/run`, `/erp/connections/{id}/sync-now`) | Platform → Odoo Config |
-| Tariff matrix | Parser exists in cap/dpe code; **no HTTP upload wired** | No |
+The July 12 templates used CDM/seed-style **UPPER_SNAKE** headers (`PRODUCT_CODE`, …).
+Data Upload Center / upload-svc requires **lowercase** headers (`product_code`, …).
+This pack matches upload-svc **Phases 1–5 + Phase 8** types.
 
-These `.xlsx` files are **QA upload templates** matching field names used by seeds/APIs. Use them for isolated testing prep, customer data collection, and future importers. Each workbook has a `README` sheet with type/validation hints; header cells also carry Excel comments.
+## How data loads
+
+| Path | Mechanism | Persists? |
+|------|-----------|-----------|
+| Data Upload Center | `POST /api/v1/upload/{file_type}` | Validate + wizard state (**not** full CDM row import) |
+| Project plan | Schedule UI → `.xlsx` | **Yes** (cap-svc) |
+| SQL seed | `seed-data.ps1` / `seed-startrans-demo.ps1` | **Yes** |
+| Odoo sync | Platform → Odoo Connections | **Yes** when live (PH1-02 OPEN → mock) |
+| Tariff matrix | Template only | **No HTTP upload** |
 
 ## Template index
 
-| File | Entity / CDM | Sample rows | Load path |
-|------|--------------|-------------|-----------|
-| `products_upload_template.xlsx` | `cdm_product` | 3 | SQL seed / Odoo `product.product` sync |
-| `work_centers_upload_template.xlsx` | `cdm_work_center` | 3 | SQL seed / Odoo `mrp.workcenter` |
-| `bom_routing_upload_template.xlsx` | `cdm_bill_of_material`, `cdm_bom_line`, `cdm_routing_operation` | 3 | SQL seed / Odoo `mrp.bom` |
-| `mrp_orders_upload_template.xlsx` | `cdm_manufacturing_order` | 3 | SQL seed / Odoo `mrp.production` |
-| `demand_lines_upload_template.xlsx` | `cdm_demand_line` | 3 | SQL seed / Odoo `sale.order.line` |
-| `suppliers_upload_template.xlsx` | `cdm_supplier` | 3 | SQL seed / Odoo `res.partner` (supplier) |
-| `customers_upload_template.xlsx` | `cdm_customer` | 3 | SQL seed / Odoo partner (customer) |
-| `inventory_upload_template.xlsx` | `cdm_inventory_position` | 3 | SQL seed (Odoo quants map to product safety_stock today) |
-| `supply_orders_upload_template.xlsx` | `cdm_supply_order` | 3 | SQL seed / Odoo `purchase.order.line` |
-| `operators_upload_template.xlsx` | `cdm_operator` | 3 | SQL seed |
-| `project_plan_upload_template.xlsx` | Project plan (cap-svc) | 3 | **UI upload** Schedule page |
-| `tariff_matrix_upload_template.xlsx` | Tariff shock input | 3 | Parser ready; **no upload API** |
-| `odoo_sync_entities_reference.xlsx` | Field map reference | 10 | Not an upload — mapping doc |
+| File | file_type | Phase | Required columns |
+|------|-----------|-------|------------------|
+| `product_master_upload_template.xlsx` | `product_master` | 1 | product_code, name, type, uom, name_ar |
+| `customer_master_upload_template.xlsx` | `customer_master` | 1 | customer_code, name, tier, credit_limit |
+| `supplier_master_upload_template.xlsx` | `supplier_master` | 1 | supplier_code, name, reliability_pct, lead_time_days |
+| `work_centre_master_upload_template.xlsx` | `work_centre_master` | 1 | work_centre_code, name, capacity_hrs_day |
+| `bom_upload_template.xlsx` | `bom` | 2 | product_code, component_code, quantity, scrap_pct |
+| `routing_upload_template.xlsx` | `routing` | 2 | product_code, operation_seq, work_centre_code, run_minutes |
+| `capacity_calendar_upload_template.xlsx` | `capacity_calendar` | 3 | work_centre_code, date, shift, available_hours |
+| `lead_time_upload_template.xlsx` | `lead_time` | 3 | product_code, supplier_code, lead_time_days |
+| `cost_data_upload_template.xlsx` | `cost_data` | 3 | product_code, unit_cost, currency |
+| `inventory_upload_template.xlsx` | `inventory` | 4 | product_code, on_hand, location, reserved |
+| `production_orders_upload_template.xlsx` | `production_orders` | 4 | mo_number, product_code, quantity, planned_start, planned_end, status, priority |
+| `sales_orders_upload_template.xlsx` | `sales_orders` | 4 | order_number, customer_code, product_code, quantity, order_date, requested_delivery, status |
+| `purchase_orders_upload_template.xlsx` | `purchase_orders` | 4 | po_number, supplier_code, product_code, quantity, unit_price, expected_delivery |
+| `historical_otd_upload_template.xlsx` | `historical_otd` | 5 | mo_number, planned_end, actual_end, delay_days |
+| `demand_forecast_upload_template.xlsx` | `demand_forecast` | 8 | product_code, period, forecast_qty, source |
+| `quality_results_upload_template.xlsx` | `quality_results` | 8 | mo_number, inspection_date, result, measured_value, defect_type |
+| `sop_sales_input_upload_template.xlsx` | `sop_sales_input` | 8 | product_family, period, sales_forecast_qty, rationale |
+| `project_plan_upload_template.xlsx` | `project_plan (cap-svc)` | Schedule UI | MO_ID, OPERATION_SEQ, WORK_CENTER_CODE, PLANNED_START, PLANNED_END, DURATION_HRS |
 
-## Related artifacts
+| `tariff_matrix_upload_template.xlsx` | *(unwired)* | — | Parser only |
+| `odoo_sync_entities_reference.xlsx` | *(reference)* | — | Not an upload |
 
-- Star Trans CSV originals: `docs/demo-data/startrans/*.csv`
-- Spec: `docs/demo-data/STARTRANS-CSV-UPLOAD-SPEC.md`
-- Project plan schema: `docs/PROJECT-PLAN-EXCEL-SCHEMA.md`
-- Generator for demo plan: `scripts/generate-project-plan-template.py`
+## UI
 
-## Recommended load order (SQL / future importer)
+1. Open http://localhost:8082 → login `Ahmed@nour` / `admin`
+2. **Platform → Data Upload** — pick file_type matching the template
+3. **Planning → Schedule** — Upload Project Plan (`project_plan_upload_template.xlsx`)
 
-1. Products → Work centers → Operators → Customers → Suppliers  
-2. BOM/routing → Inventory → Supply orders  
-3. Manufacturing orders → Demand lines  
-4. Project plan (`.xlsx` via Schedule UI after MOs exist)
+## Regenerator
 
-## Validation tips
+```powershell
+cd E:\AISOP\ipe
+.\.venv\Scripts\python.exe scripts\generate_upload_templates.py
+```
 
-- `MO_ID` in project plan must match `erp_mo_id` already in DB (`MO-ST-*` after Star Trans seed).
-- `WORK_CENTER_CODE` must match seeded WC codes (`WC001`…).
-- Project plan max size 5 MB; sheet name preferably `ProjectPlan`.
-- Do not invent live Odoo connectivity for COM/PH1-02 — use `mock-odoo-api` (:8010) or SQL seed for eng tests.
