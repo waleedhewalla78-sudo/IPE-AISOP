@@ -165,6 +165,11 @@ async def create_projection(
 
     tid = UUID(tenant_id)
     data = await _generate_projection(req, tid, session)
+    # Phase 8 — filter financial visibility by role (A11)
+    from ipe_shared.roles import AgentRoleContext
+
+    role = getattr(current_user, "role", None) or "planner"
+    data = AgentRoleContext.filter_financials(role, data, agent_id="A11")
     return APIResponse(success=True, data=data, error=None)
 
 

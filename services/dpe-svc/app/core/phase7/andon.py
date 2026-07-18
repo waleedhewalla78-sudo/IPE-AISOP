@@ -1,8 +1,8 @@
 """Phase 7 §5.3 — Andon System (digital problem escalation).
 
 In-memory board (mirrors the phase5 ActionTracker pattern) so behaviour is
-deterministic and testable without a live DB. A companion table (migration 065)
-provides durable persistence when wired to the DB layer.
+deterministic and testable without a live DB. Spec 029 dual-writes to
+`cdm_andon_alert` (migration 067) via `andon_persist` when a DB session is available.
 """
 
 from __future__ import annotations

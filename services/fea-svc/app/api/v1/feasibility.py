@@ -349,10 +349,13 @@ async def rescore_mo(
             success=False, data=None, error={"code": "NOT_FOUND", "message": result["error"]}
         )
 
+    score = result.get("feasibility_score")
+    if score is None:
+        score = 0.0
     result["xai_explanation"] = XAIExplanation(
-        constraints=[result["primary_constraint"]] if result["primary_constraint"] != "none" else [],
+        constraints=[result["primary_constraint"]] if result.get("primary_constraint") not in (None, "none") else [],
         assumptions=["db_backed_capacity_and_labor_scoring"],
-        confidence_score=round(result["feasibility_score"] / 100.0, 4),
+        confidence_score=round(float(score) / 100.0, 4),
         contributing_factors={
             "demand": round(result.get("gate_scores", {}).get("demand", 0) / 100.0 * 0.05, 4),
             "bom": round(result.get("gate_scores", {}).get("bom", 0) / 100.0 * 0.05, 4),

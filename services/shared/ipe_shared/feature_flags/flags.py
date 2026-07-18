@@ -138,6 +138,24 @@ IPE_FEATURE_FLAGS: list[FeatureFlag] = [
             "parameters": {"enabled": "false"},
         }],
     ),
+    FeatureFlag(
+        name="ipe.odoo.live_writeback",
+        enabled=False,
+        description="Phase 8 live Odoo write-back execute path (PH1-02 gated; default OFF)",
+        strategies=[{
+            "name": "default",
+            "parameters": {"enabled": "false"},
+        }],
+    ),
+    FeatureFlag(
+        name="ipe.ollama.enabled",
+        enabled=True,
+        description="Use Ollama for agent narratives when reachable; else rule-based degrade",
+        strategies=[{
+            "name": "default",
+            "parameters": {"enabled": "true"},
+        }],
+    ),
 ]
 
 

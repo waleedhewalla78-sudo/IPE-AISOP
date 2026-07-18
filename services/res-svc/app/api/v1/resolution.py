@@ -19,6 +19,7 @@ from ipe_shared.events.schemas import EventEnvelope
 from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.models.manufacturing_order import ManufacturingOrder
 from ipe_shared.models.resolution import ResolutionScenario
+from ipe_shared.roles import AgentRoleContext
 from ipe_shared.schemas.common import APIResponse
 from ipe_shared.schemas.xai import XAIExplanation
 
@@ -162,6 +163,28 @@ async def approve_scenario(
     mo = mo_result.scalar_one_or_none()
     if not mo:
         return APIResponse(success=False, data=None, error={"code": "NOT_FOUND", "message": "MO not found"})
+
+    # Phase 8 role gates — employee cannot approve; financial thresholds $1K/$10K/$50K
+    user_role = getattr(current_user, "role", None) or "planner"
+    financial_impact = float(
+        getattr(scenario, "cost_impact", None)
+        or getattr(scenario, "estimated_cost", None)
+        or 0.0
+    )
+    if not AgentRoleContext.can_execute(user_role, "approve_resolution", financial_impact):
+        return APIResponse(
+            success=False,
+            data={
+                "role": AgentRoleContext.normalize_role(user_role),
+                "financial_impact": financial_impact,
+                "escalation_required": True,
+                "escalation_target": AgentRoleContext.get_context(user_role)["escalation_target"],
+            },
+            error={
+                "code": "ROLE_AUTHORITY",
+                "message": "Role cannot approve this resolution at the given financial impact",
+            },
+        )
 
     # Optimistic lock: UPDATE ... WHERE version = :v
     current_version = mo.version

@@ -8,6 +8,33 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased] — Spec 030 Phase 8 Wave 1 (8A) R1 Production Scaffold
+
+### Justification
+- Spec **029** remains ENG COMPLETE Wave 1; Phase 8 tracked as **Spec 030** to avoid thrashing converged productionization work. 029 residuals (#70/#72/#110) absorbed into honest re-test only.
+
+### Added
+- Shared **Ollama client** (`IPE_OLLAMA_URL`, health `/api/tags`, rule-based degrade, amber banner API + UI)
+- **AgentRoleContext** ($1K / $10K / $50K) — resolution approve gate, financial visibility filter, write-back authority
+- **Write-back safety** — migration **070** `cdm_write_back_log`, dry-run / approve / queue APIs; live flag `ipe.odoo.live_writeback` default **false** (PH1-02)
+- Excel: upload types `demand_forecast`, `quality_results`, `sop_sales_input`; CT risk-queue + MPS CSV exports
+- Agents **A18/A19/A20** stubs (multi-site / learning / exception monitor) — full behaviour deferred to 8B
+- Ops Modelfile stubs `ops/ollama/` — **no fine-tuned weights claimed**
+- Reports: `docs/qa/PHASE8-EXECUTION-AND-TEST-REPORT.md`, `docs/qa/R1-RELEASE-READINESS.md`
+
+### Tests
+- Phase 8 new: **31 PASS** (shared 12 + dpe 16 incl. Spec 029 + upload 3)
+- Phase 4–8 dpe regression bundle: **102 PASS**
+- Frontend `tsc --noEmit` clean
+- fea-svc rescore NoneType guard fixed (pre-existing flake blocker)
+
+### Honesty
+- No live GPU Ollama / 70B / fine-tuned `ipe-planner` weights claimed
+- No live Odoo write-back success (MOCK + PH1-02 OPEN)
+- G-R2-04 / OQ-7 remain OPEN; **no `v9.1.1-r2` tag**
+
+---
+
 ## [Unreleased] — Spec 028 Phase 7 Deep Planning & Operations Intelligence (Wave 1)
 
 ### Gate

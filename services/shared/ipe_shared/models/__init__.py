@@ -1,4 +1,7 @@
+from ipe_shared.models.andon_alert import AndonAlert
 from ipe_shared.models.activity_cost import ActivityCostDriver
+from ipe_shared.models.mps_mrp_run import MpsRun, MrpRun
+from ipe_shared.models.write_back_log import WriteBackLog
 from ipe_shared.models.chaos_cost_snapshot import ChaosCostSnapshot
 from ipe_shared.models.landed_cost import LandedCostProfile
 from ipe_shared.models.material_attributes import MaterialAttribute
@@ -68,8 +71,12 @@ from ipe_shared.models.planning_intelligence import (
 )
 
 __all__ = [
+    "AndonAlert",
     "ActivityCostDriver",
     "AuditLog",
+    "WriteBackLog",
+    "MpsRun",
+    "MrpRun",
     "ChaosCostSnapshot",
     "BillOfMaterial",
     "BomLine",

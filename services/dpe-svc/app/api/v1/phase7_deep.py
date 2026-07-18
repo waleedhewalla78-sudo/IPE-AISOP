@@ -9,8 +9,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Depends, Header
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.phase7 import (
     AndonBoard,
@@ -34,6 +35,9 @@ from app.core.phase7 import (
     recalc_rolling_sop,
     schedule_multi_resource,
 )
+from app.core.phase7.andon_persist import persist_andon_alert, persist_andon_resolve
+from app.core.phase7.sop_stage_gate import get_default_gate
+from ipe_shared.database.session import get_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.schemas.common import APIResponse
 
@@ -306,20 +310,57 @@ async def operations_gemba():
 
 @router.get("/operations/andon")
 async def operations_andon_board():
-    return _ok(_andon.board())
+    data = _andon.board()
+    data["persistence"] = "dual_write"
+    return _ok(data)
 
 
 @router.post("/operations/andon")
-async def operations_andon_trigger(req: AndonTriggerRequest):
-    return _ok(_andon.trigger(**req.model_dump()))
+async def operations_andon_trigger(
+    req: AndonTriggerRequest,
+    session: AsyncSession = Depends(get_session),
+    x_tenant_id: str | None = Header(default=None, alias="X-Tenant-ID"),
+):
+    alert = _andon.trigger(**req.model_dump())
+    persisted = await persist_andon_alert(session, tenant_id=_tenant(x_tenant_id), alert=alert)
+    alert = {**alert, "persisted": persisted}
+    return _ok(alert)
 
 
 @router.post("/operations/andon/{alert_id}/resolve")
-async def operations_andon_resolve(alert_id: str, req: AndonResolveRequest):
+async def operations_andon_resolve(
+    alert_id: str,
+    req: AndonResolveRequest,
+    session: AsyncSession = Depends(get_session),
+    x_tenant_id: str | None = Header(default=None, alias="X-Tenant-ID"),
+):
     item = _andon.resolve(alert_id, req.resolution)
     if not item:
         return APIResponse(success=False, data=None, error="andon_alert_not_found")
+    persisted = await persist_andon_resolve(
+        session, tenant_id=_tenant(x_tenant_id), alert_ref=alert_id, resolution=req.resolution
+    )
+    item = {**item, "persisted": persisted}
     return _ok(item)
+
+
+class StageGateNoteRequest(BaseModel):
+    note: str | None = None
+
+
+@router.get("/sop/stage-gate")
+async def sop_stage_gate_status():
+    return _ok(get_default_gate().snapshot())
+
+
+@router.post("/sop/stage-gate/advance")
+async def sop_stage_gate_advance(req: StageGateNoteRequest = StageGateNoteRequest()):
+    return _ok(get_default_gate().advance(note=req.note))
+
+
+@router.post("/sop/stage-gate/skip")
+async def sop_stage_gate_skip(req: StageGateNoteRequest = StageGateNoteRequest()):
+    return _ok(get_default_gate().skip_to_management_review(note=req.note))
 
 
 @router.get("/operations/kpi-tree")

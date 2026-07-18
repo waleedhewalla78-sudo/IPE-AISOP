@@ -1,17 +1,18 @@
 # IPE Platform Constitution
 
 <!--
-Sync Impact Report (Speckit - 2026-07-16 phase6-enterprise-agentic)
-Version: 1.3.0 -> 1.4.0 (MINOR)
-Added: Principle X — Agentic Autonomy Governance (Ops Blueprint Phase 6, 17 agents, Levels 1-4)
-Updated: Development Workflow — Spec 027-phase6-enterprise-agentic ACTIVE (Wave 1 ENG COMPLETE)
-Updated: Phase Naming Map — Ops Blueprint Phase 6 (agents A13-A17, modules M7-M9) ENG COMPLETE Wave 1
-Clarified: Migrations 060–063 are the Phase 6 schema spine; continue head numbering (do not recreate)
-Reaffirmed: PH1-02 live Odoo/Accounting/market-data/IoT remain OPEN; Phase 6 live integrations MUST be MOCK/STUB
-Templates: no structural change (MINOR principle addition only)
+Sync Impact Report (Speckit - 2026-07-18 phase8-r1-production)
+Version: 1.4.1 -> 1.4.2 (PATCH)
+Updated: Development Workflow — Spec 030-phase8-r1-production ACTIVE; Spec 029 ENG COMPLETE Wave 1
+Updated: Phase Naming Map — Productionization COMPLETE Wave 1; Phase 8 Wave 1 (8A) active
+Clarified: Migrations continue from head 069 (070 write-back log); Ollama degrade + role thresholds binding for Wave 1
+Reaffirmed: COM blockers (OQ-7, PH1-02, G-R2-04, OQ-1) remain OPEN — never fake; no live write-back without PH1-02
+Templates: no structural change (PATCH pointer/workflow only)
 Root .specify/memory/constitution.md MUST stay synced to this canonical ipe copy
 
-Prior (2026-07-15 phase3-ops-intelligence): 1.2.8 -> 1.3.0 (MINOR) — added Principle IX
+Prior (2026-07-18 productionization): 1.4.0 -> 1.4.1 (PATCH) — Spec 029 active
+Prior (2026-07-16 phase6-enterprise-agentic): 1.3.0 -> 1.4.0 (MINOR) — Principle X
+Prior (2026-07-15 phase3-ops-intelligence): 1.2.8 -> 1.3.0 (MINOR) — Principle IX
 -->
 
 IPE (Intelligent Planning Engine) is a microservices-based, event-driven platform for **feasibility-first manufacturing planning** in MENA mid-market discrete manufacturing. These principles are binding on all changes.
@@ -205,8 +206,12 @@ Every **deployed** service MUST be observable.
 - **Sprint 4 Wave 1 (023):** **ENG COMPLETE** @ ~31d4840 — Admin Odoo Config v2 + OTD Analytics; COM blockers remain OPEN.
 - **Ops Phase 3 (024):** **ENG COMPLETE Wave 1** — Blueprint Phase 3 agents + predictive risk + exception lifecycle + upload foundation; migrations 051–059.
 - **Ops Phase 4 (025) / Phase 5 (026):** **ENG COMPLETE Wave 1** — M1–M6 + A8–A12 + autonomy + portal; Planning/Command deep.
-- **Ops Phase 6 (027):** **Active Speckit feature — ENG COMPLETE Wave 1 (6A+6B+6C)** — agents A13–A17, modules M7–M9, migrations 060–063; live Odoo/market/IoT MOCK/STUB (PH1-02 OPEN); Phase 6D deferred.
+- **Ops Phase 6 (027):** **ENG COMPLETE Wave 1 (6A+6B+6C)** — agents A13–A17, modules M7–M9, migrations 060–063; live Odoo/market/IoT MOCK/STUB (PH1-02 OPEN); Phase 6D deferred.
+- **Ops Phase 7 (028):** **ENG COMPLETE Wave 1** — deep planning/ops disciplines; migrations 064–067; Kong planning-command smoke green.
+- **Productionization (029):** **ENG COMPLETE Wave 1** — Kong enterprise route, Andon DB wire, RLS 068, MPS/MRP 069, stage-gate scaffold, QA notes; validate #70/#72/#110 OPEN (stack); COM OPEN.
+- **Phase 8 R1 Production (030):** **Active Speckit feature** — Wave 1 (8A): Ollama scaffold + rule-based degrade, AgentRoleContext ($1K/$10K/$50K), Excel upload types + CSV export, write-back safety log (migration 070, live flag default false), Arabic Phase 8 keys (G-R2-04 OPEN), A18–A20 stubs; 8B–8D deferred. COM blockers remain OPEN.
 - **Constitution compliance:** Every `/speckit.analyze` or `/speckit.implement` MUST verify compliance. Violations block merge.
+- **Phase 8 honesty (Wave 1):** Ollama fine-tuned weights are ops Modelfile stubs only; live Odoo write-back MUST remain behind `ipe.odoo.live_writeback=false` until PH1-02; never claim G-R2-04 or marketing tag `v9.1.1-r2`.
 
 ---
 
@@ -227,13 +232,16 @@ External documents use overlapping phase numbers. All Speckit analyze reports MU
 | Platform Phase 0–2 | Keycloak/Vault/TLS; Gates 1–5; obs | DONE (`v9.3.0-p2`) |
 | Platform Phase 3 | Helm/K8s Gates 6–11; ERP scaffolds | DONE (`v9.4.0-p3`) |
 | Platform Phase 4–5 | GTM SaaS / SOC2 / live SAP | BACKLOG (do not fake) |
-| **Ops Blueprint Phase 3** | 7 agents, predictive risk, upload wizard | **ACTIVE — Spec 024** |
+| **Ops Blueprint Phase 3** | 7 agents, predictive risk, upload wizard | ENG COMPLETE Wave 1 — Spec 024 |
 | **Ops Blueprint Phase 4** | 6 Command modules; agents A8–A12 | ENG COMPLETE Wave 1 — Spec 025 |
 | **Ops Blueprint Phase 5** | Planning Cockpit / MPS / MRP / ATP deep | ENG COMPLETE Wave 1 — Spec 026 |
-| **Ops Blueprint Phase 6** | Enterprise agentic: agents A13–A17, modules M7–M9 | **ENG COMPLETE Wave 1 — Spec 027** (Odoo/market/IoT MOCK/STUB; Phase 6D deferred) |
+| **Ops Blueprint Phase 6** | Enterprise agentic: agents A13–A17, modules M7–M9 | ENG COMPLETE Wave 1 — Spec 027 (Odoo/market/IoT MOCK/STUB) |
+| **Ops Blueprint Phase 7** | Deep planning & ops intelligence | ENG COMPLETE Wave 1 — Spec 028 |
+| **Productionization** | Kong/Andon/RLS/QA hardening | ENG COMPLETE Wave 1 — Spec 029 |
+| **Phase 8 Wave 1 (8A)** | Ollama/roles/Excel/write-back safety | **ACTIVE — Spec 030** |
 | Spec 023 Wave 1 | Odoo Config v2 + OTD | ENG COMPLETE |
 | Spec 020 Planning Intelligence | Modules A–F | ENG COMPLETE @ `v9.2.0-planning` |
 
 ---
 
-**Version**: 1.4.0 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-16
+**Version**: 1.4.2 | **Ratified**: 2026-06-20 | **Last Amended**: 2026-07-18

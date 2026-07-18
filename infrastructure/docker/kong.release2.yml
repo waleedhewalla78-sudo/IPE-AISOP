@@ -70,6 +70,12 @@ services:
       - name: r2-planning-command
         paths: [/api/v1/planning-command]
         strip_path: false
+      - name: r2-enterprise
+        paths: [/api/v1/enterprise]
+        strip_path: false
+      - name: r2-phase8
+        paths: [/api/v1/phase8]
+        strip_path: false
 
   - name: fea-svc
     url: http://fea-svc:8004

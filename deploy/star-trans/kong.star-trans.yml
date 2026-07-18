@@ -58,6 +58,15 @@ services:
       - name: st-outcomes
         paths: [/api/v1/outcomes]
         strip_path: false
+      - name: st-enterprise
+        paths: [/api/v1/enterprise]
+        strip_path: false
+      - name: st-planning-command
+        paths: [/api/v1/planning-command]
+        strip_path: false
+      - name: st-phase8
+        paths: [/api/v1/phase8]
+        strip_path: false
 
   - name: fea-svc
     url: http://fea-svc:8004

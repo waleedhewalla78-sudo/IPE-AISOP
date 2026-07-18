@@ -441,5 +441,11 @@
   "meeting.productionMeeting": "Production Meeting",
   "meeting.demandReview": "Demand Review",
   "meeting.sopExecutive": "S&OP Executive",
-  "meeting.supplierReview": "Supplier Review"
+  "meeting.supplierReview": "Supplier Review",
+  "ai.degradedBanner": "AI explanations temporarily unavailable. Core planning functions continue.",
+  "controlTower.exportRiskQueue": "Export Risk Queue",
+  "phase8.writeBackDryRun": "Write-back dry-run (not sent to Odoo)",
+  "upload.demandForecast": "Demand Forecast",
+  "upload.qualityResults": "Quality Results",
+  "upload.sopSalesInput": "S&OP Sales Input"
 }

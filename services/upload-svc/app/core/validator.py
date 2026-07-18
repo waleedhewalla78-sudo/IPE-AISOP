@@ -87,6 +87,22 @@ FILE_SCHEMAS: dict[str, dict[str, Any]] = {
         "phase": 5,
         "agents": ["A6"],
     },
+    # Phase 8 Wave 1 — high-value operational uploads
+    "demand_forecast": {
+        "required": ["product_code", "period", "forecast_qty"],
+        "phase": 8,
+        "agents": ["A1", "A4"],
+    },
+    "quality_results": {
+        "required": ["mo_number", "inspection_date", "result", "measured_value"],
+        "phase": 8,
+        "agents": ["A10"],
+    },
+    "sop_sales_input": {
+        "required": ["product_family", "period", "sales_forecast_qty"],
+        "phase": 8,
+        "agents": ["A1", "A14"],
+    },
 }
 
 # Aliases matching existing QA template names
@@ -99,6 +115,9 @@ ALIASES = {
     "mrp_orders": "production_orders",
     "demand_lines": "sales_orders",
     "supply_orders": "purchase_orders",
+    "forecast": "demand_forecast",
+    "quality_inspection": "quality_results",
+    "sop_sales": "sop_sales_input",
 }
 
 
@@ -131,7 +150,21 @@ def normalize_file_type(file_type: str) -> str:
     return ALIASES.get(key, key)
 
 
+def _invalid_format_message(filename: str, content: bytes) -> str | None:
+    name = filename.lower()
+    if name.endswith((".csv", ".tsv", ".txt")):
+        return None
+    if not name.endswith((".xlsx", ".xlsm")):
+        return "Invalid file format. Expected .xlsx or .csv"
+    if content[:4] != b"PK\x03\x04" and not content.startswith(b"PK\x05\x06"):
+        return "Invalid file format. Expected .xlsx or .csv"
+    return None
+
+
 def parse_tabular(content: bytes, filename: str) -> tuple[list[str], list[dict[str, str]]]:
+    fmt_err = _invalid_format_message(filename, content)
+    if fmt_err:
+        raise ValueError(fmt_err)
     name = filename.lower()
     if name.endswith(".xlsx") or name.endswith(".xlsm"):
         try:
@@ -187,7 +220,18 @@ class UploadValidator:
             )
 
         known_codes = known_codes or {}
-        headers, rows = parse_tabular(content, filename)
+        try:
+            headers, rows = parse_tabular(content, filename)
+        except ValueError as exc:
+            return ValidationResult(
+                file_type=file_type,
+                stage_1_structure={"status": "fail", "message": str(exc)},
+                stage_2_types={"status": "fail", "errors": 0},
+                stage_3_referential={"status": "fail", "errors": 0},
+                stage_4_business={"status": "fail"},
+                rejected=1,
+            )
+
         required = schema["required"]
         missing = [c for c in required if c not in headers]
         stage1 = (
@@ -195,10 +239,13 @@ class UploadValidator:
             if missing
             else {"status": "pass", "message": f"All {len(required)} required columns found"}
         )
+        if stage1["status"] == "pass" and not rows:
+            stage1 = {"status": "pass", "message": "0 rows found. Nothing to import."}
 
         errors: list[RowError] = []
         warnings: list[RowError] = []
-        if stage1["status"] == "pass":
+        seen_keys: dict[str, int] = {}
+        if stage1["status"] == "pass" and rows:
             for idx, row in enumerate(rows, start=2):
                 for col in required:
                     val = row.get(col, "")
@@ -208,11 +255,40 @@ class UploadValidator:
                 for qty_col in ("quantity", "on_hand", "unit_cost", "available_hours", "lead_time_days"):
                     if qty_col in row and row[qty_col] != "":
                         try:
-                            float(row[qty_col])
+                            val = float(row[qty_col])
+                            if qty_col in ("quantity", "on_hand") and val < 0:
+                                errors.append(
+                                    RowError(idx, qty_col, row[qty_col], f"{qty_col} must be non-negative")
+                                )
                         except ValueError:
                             errors.append(
                                 RowError(idx, qty_col, row[qty_col], f"{qty_col} must be numeric")
                             )
+                pk_col = "product_code" if file_type in ("product_master", "bom") else None
+                if pk_col and row.get(pk_col):
+                    code = row[pk_col]
+                    if code in seen_keys:
+                        errors.append(
+                            RowError(
+                                idx,
+                                pk_col,
+                                code,
+                                f"Duplicate {pk_col} (first seen row {seen_keys[code]})",
+                            )
+                        )
+                    else:
+                        seen_keys[code] = idx
+                if file_type == "bom" and known_codes.get("products"):
+                    parent = row.get("product_code", "")
+                    if parent and parent not in known_codes["products"]:
+                        errors.append(
+                            RowError(
+                                idx,
+                                "product_code",
+                                parent,
+                                f"{parent} not found in Product Master.",
+                            )
+                        )
                 if "priority" in row and row["priority"] and row["priority"].lower() not in (
                     "low",
                     "normal",

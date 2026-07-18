@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     MINIO_AUDIT_BUCKET: str = "ipe-audit-archive"
     TENANT_QUOTA_OVERRIDES: str = "config/tenant-quotas.json"
     ODOO_CONFLICT_STRATEGIES: str = "config/odoo-conflict-strategies.json"
+    OLLAMA_URL: str = "http://localhost:11434"
 
     model_config = {"env_prefix": "IPE_", "case_sensitive": False}
 

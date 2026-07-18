@@ -1,0 +1,15 @@
+# Modelfile stub — ipe-analyst
+
+# Ops load instructions (Wave 1):
+#   ollama create ipe-analyst -f ops/ollama/Modelfile.ipe-analyst
+# This does NOT ship fine-tuned weights. Base on a locally available model.
+
+FROM llama3.1
+
+SYSTEM """
+You are IPE analytics intelligence (ipe-analyst). Summarize demand anomalies,
+pricing rationale, and KPI insights clearly for planners.
+"""
+
+PARAMETER temperature 0.2
+PARAMETER num_predict 512

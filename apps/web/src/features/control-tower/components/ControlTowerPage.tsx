@@ -1,75 +1,50 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { KPICard } from './KPICard';
 import { Card } from '@/components/ui/Card';
 import { Table, TableHead, TableRow, TableHeader, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ControlTowerSkeleton } from '@/components/ui/Skeleton';
+import { FeatureErrorBoundary } from '@/components/ui/FeatureErrorBoundary';
 import { TariffShockPanel } from '@/features/tariff/components/TariffShockPanel';
 import { SyncStatusBar } from './SyncStatusBar';
 import { PlannerAssistPanel } from './PlannerAssistPanel';
 import { ForecastOverlayWidget } from './ForecastOverlayWidget';
+import { HeroMetrics } from './HeroMetrics';
+import { InlineResolutionPanel } from './InlineResolutionPanel';
 import { ROUTES } from '@/lib/constants';
 import { IS_RELEASE1 } from '@/lib/releaseProfile';
 import { t } from '@/lib/i18n';
+import {
+  scoreTextClass,
+  scoreBadgeClass,
+  scoreRowBg,
+  scoreTier,
+  scoreTierLabelKey,
+  constraintIcon,
+} from '@/lib/scoreVisuals';
 import { fetchQueue, fetchKPIs, getMockBottlenecks } from '../api';
 import { FeasibilityWebSocket } from '@/lib/ws';
+import api from '@/lib/api';
 import type { MOQueueItem, KPI, BottleneckItem } from '../types';
 
 const wsClient = new FeasibilityWebSocket();
 
-function scoreColor(score: number | null): string {
-  if (score === null) return 'text-ipe-text-muted';
-  if (score >= 90) return 'text-green-600';
-  if (score >= 70) return 'text-yellow-600';
-  return 'text-red-600';
-}
-
-function scoreBadge(score: number | null): 'success' | 'warning' | 'danger' | 'default' {
-  if (score === null) return 'default';
-  if (score >= 90) return 'success';
-  if (score >= 70) return 'warning';
-  return 'danger';
-}
-
-function scoreLabel(score: number | null): string {
-  if (score === null) return t('controlTower.pending');
-  if (score >= 90) return t('controlTower.onTrack');
-  if (score >= 70) return t('controlTower.atRisk');
-  return t('controlTower.critical');
-}
-
-function rowBg(score: number | null): string {
-  if (score === null) return '';
-  if (score >= 90) return 'bg-green-50';
-  if (score >= 70) return 'bg-yellow-50';
-  return 'bg-red-50';
-}
-
-function constraintIcon(constraint: string | null): string {
-  if (!constraint) return '\u2713';
-  const icons: Record<string, string> = { material: 'M', capacity: 'C', labor: 'L', demand: 'D', bom: 'B' };
-  return icons[constraint] ?? '?';
-}
-
 function bottleneckColor(pct: number): string {
-  if (pct > 95) return 'bg-red-600';
-  if (pct > 85) return 'bg-orange-500';
-  if (pct > 70) return 'bg-yellow-400';
-  return 'bg-green-500';
+  if (pct > 95) return 'bg-score-critical';
+  if (pct > 85) return 'bg-score-warning';
+  if (pct > 70) return 'bg-score-good';
+  return 'bg-score-excellent';
 }
 
-function kpiScoreColor(score: number | null): 'up' | 'down' | 'neutral' {
-  if (score === null) return 'neutral';
-  if (score >= 70) return 'up';
-  return 'down';
-}
-
-function kpiBgColor(score: number | null): string {
-  if (score === null) return 'bg-white';
-  if (score >= 90) return 'bg-green-50 border-green-200';
-  if (score >= 70) return 'bg-yellow-50 border-yellow-200';
-  return 'bg-red-50 border-red-200';
+function relativeSyncLabel(iso: string | undefined): { label: string; healthy: boolean } {
+  if (!iso) return { label: '—', healthy: false };
+  const ms = Date.now() - new Date(iso).getTime();
+  const mins = Math.max(0, Math.round(ms / 60_000));
+  const healthy = mins <= 30;
+  if (mins < 1) return { label: t('controlTower.syncJustNow'), healthy: true };
+  return { label: t('controlTower.syncMinutesAgo', undefined, { mins }), healthy };
 }
 
 export function ControlTowerPage() {
@@ -78,6 +53,11 @@ export function ControlTowerPage() {
   const [kpis, setKPIs] = useState<KPI | null>(null);
   const [bottlenecks, setBottlenecks] = useState<BottleneckItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedMoId, setExpandedMoId] = useState<string | null>(null);
+  const [syncMeta, setSyncMeta] = useState<{ label: string; healthy: boolean }>({
+    label: '—',
+    healthy: false,
+  });
 
   const handleWsMessage = useCallback((data: unknown) => {
     const item = data as Partial<MOQueueItem>;
@@ -93,13 +73,21 @@ export function ControlTowerPage() {
     });
   }, []);
 
-  useEffect(() => {
-    Promise.all([fetchQueue(), fetchKPIs(), getMockBottlenecks()]).then(([q, k, b]) => {
+  const reload = useCallback(() => {
+    return Promise.all([fetchQueue(), fetchKPIs(), getMockBottlenecks()]).then(([q, k, b]) => {
       setQueue(q);
       setKPIs(k);
       setBottlenecks(b);
-      setLoading(false);
     });
+  }, []);
+
+  useEffect(() => {
+    reload().finally(() => setLoading(false));
+
+    api
+      .get<{ success: boolean; data: { last_sync?: { finished_at?: string } | null } }>('/api/v1/sync/status')
+      .then((res) => setSyncMeta(relativeSyncLabel(res.data.data?.last_sync?.finished_at)))
+      .catch(() => setSyncMeta({ label: '—', healthy: false }));
 
     wsClient.onMessage(handleWsMessage);
     wsClient.connect();
@@ -107,14 +95,18 @@ export function ControlTowerPage() {
     return () => {
       wsClient.disconnect();
     };
-  }, [handleWsMessage]);
+  }, [handleWsMessage, reload]);
+
+  const worstMo = useMemo(() => {
+    const scored = queue.filter((q) => q.feasibility_score != null);
+    if (scored.length === 0) return null;
+    return scored.reduce((a, b) =>
+      (a.feasibility_score ?? 100) <= (b.feasibility_score ?? 100) ? a : b,
+    );
+  }, [queue]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-ipe-border border-t-ipe-primary" />
-      </div>
-    );
+    return <ControlTowerSkeleton />;
   }
 
   const avgScore = kpis?.avg_feasibility_score ?? null;
@@ -122,139 +114,230 @@ export function ControlTowerPage() {
   const ordersAtRisk = kpis?.orders_at_risk ?? null;
   const otdPct = kpis?.otd_pct ?? null;
 
+  const toggleExpand = (moId: string) => {
+    setExpandedMoId((prev) => (prev === moId ? null : moId));
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="control-tower space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-ipe-text">{t('controlTower.title')}</h1>
         <p className="text-sm text-ipe-text-muted">{t('controlTower.subtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KPICard
-          title={t('controlTower.avgFeasibility')}
-          value={avgScore !== null ? `${avgScore}%` : '-'}
-          trend={kpiScoreColor(avgScore)}
-          subtitle={t('controlTower.overallAvg')}
-          className={kpiBgColor(avgScore)}
-        />
-        <KPICard
-          title={t('controlTower.bottlenecks')}
-          value={activeBottlenecks !== null ? activeBottlenecks : '-'}
-          trend={activeBottlenecks !== null && activeBottlenecks > 0 ? 'down' : 'neutral'}
-          subtitle={t('controlTower.wcUtil')}
-        />
-        <KPICard
-          title={t('controlTower.ordersAtRisk')}
-          value={ordersAtRisk !== null ? ordersAtRisk : '-'}
-          trend={ordersAtRisk !== null && ordersAtRisk > 0 ? 'down' : 'neutral'}
-          subtitle={t('controlTower.scoreBelow70')}
-        />
-        {otdPct !== null ? (
-          <KPICard
-            title={t('controlTower.otd')}
-            value={`${otdPct}%`}
-            trend={otdPct >= 80 ? 'up' : 'down'}
-            subtitle={t('controlTower.otdSubtitle')}
-          />
-        ) : (
-          <div className="rounded-lg border border-ipe-border bg-gray-50 p-5 shadow-sm opacity-60">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-ipe-text-muted">{t('controlTower.otd')}</p>
-                <p className="mt-1 text-xl font-semibold text-ipe-text-muted">{t('controlTower.shadowMode')}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <HeroMetrics
+        ordersAtRisk={ordersAtRisk}
+        activeMoCount={queue.length}
+        otdPct={otdPct}
+        avgScore={avgScore}
+        activeBottlenecks={activeBottlenecks}
+        syncLabel={syncMeta.label}
+        syncHealthy={syncMeta.healthy}
+        worstMo={worstMo}
+      />
 
       {IS_RELEASE1 ? <SyncStatusBar /> : null}
 
-      <PlannerAssistPanel />
+      <FeatureErrorBoundary fallbackTitle={t('controlTower.assistError')}>
+        <PlannerAssistPanel />
+      </FeatureErrorBoundary>
 
       <ForecastOverlayWidget />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Card>
-            <h3 className="mb-3 font-medium">{t('controlTower.moQueue')} ({queue.length})</h3>
-            <div className="overflow-x-auto">
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeader>{t('resolution.moId')}</TableHeader>
-                  <TableHeader>{t('controlTower.product')}</TableHeader>
-                  <TableHeader>{t('controlTower.customer')}</TableHeader>
-                  <TableHeader>{t('controlTower.required')}</TableHeader>
-                  <TableHeader>{t('controlTower.feasibility')} <span className="text-xs font-normal text-ipe-text-muted" title={t('controlTower.scorePendingNote')}>*</span></TableHeader>
-                  <TableHeader>{t('controlTower.constraint')}</TableHeader>
-                  <TableHeader />
-                </TableRow>
-              </TableHead>
-              <tfoot>
-                <TableRow>
-                  <TableCell colSpan={7} className="text-xs text-ipe-text-muted italic pt-2">
-                    * {t('controlTower.scorePendingNote')}
-                  </TableCell>
-                </TableRow>
-              </tfoot>
-              <tbody>
-                {queue.map((item) => (
-                  <TableRow key={item.mo_id} className={rowBg(item.feasibility_score)}>
-                    <TableCell className="font-medium">
-                      <span>{item.erp_mo_id ?? item.mo_id.slice(0, 8)}</span>
-                      {(item.sync_conflict ||
-                        item.data_quality_flags?.some((f) => f.flag_code === 'SYNC_CONFLICT')) && (
-                        <Badge variant="warning" className="ms-2" title={JSON.stringify(item.sync_conflict ?? {})}>
-                          {t('controlTower.syncConflict')}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>{item.product_name}</TableCell>
-                    <TableCell>{item.customer_name}</TableCell>
-                    <TableCell>{new Date(item.required_date).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      {item.unscorable || (item.feasibility_score === null && item.data_quality_flags?.length) ? (
-                        <Badge variant="warning">{t('controlTower.unscorable')}</Badge>
-                      ) : (
-                        <>
-                          <span className={`font-semibold ${scoreColor(item.feasibility_score)}`}>
-                            {item.feasibility_score !== null ? item.feasibility_score : '-'}
-                          </span>
-                          <Badge variant={scoreBadge(item.feasibility_score)} className="ms-2">
-                            {scoreLabel(item.feasibility_score)}
-                          </Badge>
-                        </>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {item.primary_constraint ? (
-                        <span className="inline-flex items-center gap-1 rounded bg-ipe-surface-alt px-2 py-0.5 text-xs font-medium">
-                          <span className="font-bold">{constraintIcon(item.primary_constraint)}</span>
-                          {item.primary_constraint}
+          {queue.length === 0 ? (
+            <EmptyState
+              title={t('controlTower.emptyTitle')}
+              description={t('controlTower.emptyHint')}
+              action={
+                <Button size="sm" variant="secondary" onClick={() => navigate(ROUTES.PLATFORM_ODOO_CONFIG)}>
+                  {t('controlTower.openOdooSettings')}
+                </Button>
+              }
+            />
+          ) : (
+            <Card>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h3 className="font-medium">
+                  {t('controlTower.moQueue')} ({queue.length})
+                </h3>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    const base = import.meta.env.VITE_API_BASE_URL ?? '';
+                    window.open(`${base}/api/v1/phase8/export/risk-queue.csv`, '_blank');
+                  }}
+                >
+                  {t('controlTower.exportRiskQueue')}
+                </Button>
+              </div>
+
+              {/* Desktop table */}
+              <div className="control-tower-table hidden overflow-x-auto md:block">
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeader>{t('resolution.moId')}</TableHeader>
+                      <TableHeader>{t('controlTower.product')}</TableHeader>
+                      <TableHeader>{t('controlTower.customer')}</TableHeader>
+                      <TableHeader>{t('controlTower.required')}</TableHeader>
+                      <TableHeader>
+                        {t('controlTower.feasibility')}{' '}
+                        <span className="text-xs font-normal text-ipe-text-muted" title={t('controlTower.scorePendingNote')}>
+                          *
                         </span>
-                      ) : (
-                        <span className="text-xs text-ipe-text-muted">{t('controlTower.none')}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button size="sm" variant="secondary" onClick={() => navigate(`${ROUTES.PLANNING_RESOLUTION}?mo_id=${item.mo_id}`)}>
+                      </TableHeader>
+                      <TableHeader>{t('controlTower.constraint')}</TableHeader>
+                      <TableHeader />
+                    </TableRow>
+                  </TableHead>
+                  <tfoot>
+                    <TableRow>
+                      <TableCell colSpan={7} className="pt-2 text-xs italic text-ipe-text-muted">
+                        * {t('controlTower.scorePendingNote')}
+                      </TableCell>
+                    </TableRow>
+                  </tfoot>
+                  <tbody>
+                    {queue.map((item) => (
+                      <Fragment key={item.mo_id}>
+                        <TableRow className={scoreRowBg(item.feasibility_score)}>
+                          <TableCell className="font-medium">
+                            <span className="tabular-nums" dir="ltr">
+                              {item.erp_mo_id ?? item.mo_id.slice(0, 8)}
+                            </span>
+                            {(item.sync_conflict ||
+                              item.data_quality_flags?.some((f) => f.flag_code === 'SYNC_CONFLICT')) && (
+                              <Badge variant="warning" className="ms-2" title={JSON.stringify(item.sync_conflict ?? {})}>
+                                {t('controlTower.syncConflict')}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>{item.product_name}</TableCell>
+                          <TableCell>{item.customer_name}</TableCell>
+                          <TableCell>
+                            <span className="tabular-nums" dir="ltr">
+                              {new Date(item.required_date).toLocaleDateString()}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {item.unscorable || (item.feasibility_score === null && item.data_quality_flags?.length) ? (
+                              <Badge variant="warning">{t('controlTower.unscorable')}</Badge>
+                            ) : (
+                              <span className="inline-flex items-center gap-2">
+                                <span className="relative inline-flex h-6 w-14 items-center justify-center overflow-hidden rounded-md bg-ipe-surface-alt">
+                                  <span
+                                    className="absolute inset-y-0 start-0 opacity-35"
+                                    style={{
+                                      width: `${item.feasibility_score ?? 0}%`,
+                                      background:
+                                        'linear-gradient(90deg, var(--score-critical), var(--score-warning), var(--score-excellent))',
+                                    }}
+                                  />
+                                  <span
+                                    className={`relative text-xs font-bold tabular-nums ${scoreTextClass(item.feasibility_score)}`}
+                                    dir="ltr"
+                                  >
+                                    {item.feasibility_score !== null ? item.feasibility_score : '-'}
+                                  </span>
+                                </span>
+                                <span
+                                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${scoreBadgeClass(item.feasibility_score)}`}
+                                >
+                                  {t(scoreTierLabelKey(scoreTier(item.feasibility_score)))}
+                                </span>
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {item.primary_constraint ? (
+                              <span className="inline-flex items-center gap-1 rounded bg-ipe-surface-alt px-2 py-0.5 text-xs font-medium">
+                                <span aria-hidden>{constraintIcon(item.primary_constraint)}</span>
+                                {item.primary_constraint}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-ipe-text-muted">{t('controlTower.none')}</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="secondary" onClick={() => toggleExpand(item.mo_id)}>
+                              {expandedMoId === item.mo_id ? t('resolution.collapse') : t('controlTower.resolve')}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        {expandedMoId === item.mo_id ? (
+                          <tr>
+                            <td colSpan={7} className="p-0">
+                              <InlineResolutionPanel
+                                moId={item.mo_id}
+                                productName={item.product_name}
+                                primaryConstraint={item.primary_constraint}
+                                onClose={() => setExpandedMoId(null)}
+                                onApproved={() => void reload()}
+                              />
+                            </td>
+                          </tr>
+                        ) : null}
+                      </Fragment>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="control-tower-cards flex flex-col gap-3 md:hidden">
+                {queue.map((item) => (
+                  <div
+                    key={item.mo_id}
+                    className={`rounded-lg border border-ipe-border p-4 ${scoreRowBg(item.feasibility_score)}`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold tabular-nums text-ipe-text" dir="ltr">
+                          {item.erp_mo_id ?? item.mo_id.slice(0, 8)}
+                        </p>
+                        <p className="text-sm text-ipe-text-muted">{item.product_name}</p>
+                      </div>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${scoreBadgeClass(item.feasibility_score)}`}
+                        dir="ltr"
+                      >
+                        {item.feasibility_score ?? '—'}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1 text-xs text-ipe-text-muted">
+                        {item.primary_constraint ? (
+                          <>
+                            <span aria-hidden>{constraintIcon(item.primary_constraint)}</span>
+                            {item.primary_constraint}
+                          </>
+                        ) : (
+                          t('controlTower.none')
+                        )}
+                      </span>
+                      <Button size="sm" variant="secondary" onClick={() => toggleExpand(item.mo_id)}>
                         {t('controlTower.resolve')}
                       </Button>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                    {expandedMoId === item.mo_id ? (
+                      <div className="-mx-4 mt-3">
+                        <InlineResolutionPanel
+                          moId={item.mo_id}
+                          productName={item.product_name}
+                          primaryConstraint={item.primary_constraint}
+                          onClose={() => setExpandedMoId(null)}
+                          onApproved={() => void reload()}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
                 ))}
-                {queue.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="py-8 text-center text-sm text-ipe-text-muted">
-                      {t('controlTower.noQueue')}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </tbody>
-            </Table>
-            </div>
-          </Card>
+              </div>
+            </Card>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -267,8 +350,10 @@ export function ControlTowerPage() {
                 return (
                   <div key={b.work_center_id}>
                     <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="font-medium truncate">{b.work_center_name}</span>
-                      <span className="text-ipe-text-muted tabular-nums">{b.utilization_pct}%</span>
+                      <span className="truncate font-medium">{b.work_center_name}</span>
+                      <span className="tabular-nums text-ipe-text-muted" dir="ltr">
+                        {b.utilization_pct}%
+                      </span>
                     </div>
                     <div className="h-3 w-full overflow-hidden rounded-full bg-gray-100">
                       <div
@@ -277,7 +362,11 @@ export function ControlTowerPage() {
                       />
                     </div>
                     <div className="mt-0.5 text-xs text-ipe-text-muted">
-                      {b.utilization_pct > 95 ? t('controlTower.criticalOverload') : b.utilization_pct > 85 ? t('controlTower.bottleneckRisk') : t('controlTower.moderateLoad')}
+                      {b.utilization_pct > 95
+                        ? t('controlTower.criticalOverload')
+                        : b.utilization_pct > 85
+                          ? t('controlTower.bottleneckRisk')
+                          : t('controlTower.moderateLoad')}
                     </div>
                   </div>
                 );

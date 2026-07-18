@@ -1,6 +1,6 @@
 # IPE Platform — Open Topics Register
 
-**Compiled:** 2026-07-17
+**Compiled:** 2026-07-17 · **Updated:** 2026-07-18 (Phase 8 Wave 1 / Spec 030)
 **Workspace:** `E:\AISOP\ipe` (canonical)
 **GitHub repo:** `waleedhewalla78-sudo/IPE-AISOP` (open issues pulled live via `gh issue list --state open`)
 **Maintainer split:** Commercial/Human items — Waleed / Star Trans; Engineering items — Engineering Lead
@@ -21,7 +21,7 @@ This register consolidates every open issue, risk, action, integration gap, defe
 | 6. Ops / support | 5 | 0 | 3 | 2 |
 | **Total** | **41** | **9** | **21** | **11** |
 
-**Honesty boundary (critical):** The program's true blockers are **HUMAN / COMMERCIAL**, not engineering. All Wave 1 engineering for Ops Blueprint Phases 3–7 is **ENG COMPLETE** with green unit suites, and the customer enablement package (SOW, mapping, training, support, validate) is artifact-ready. What remains gating are decisions and access only humans/customer can provide: **OQ-7 pricing** (blocks SOW send), **PH1-02 live Odoo staging** (blocks every live-integration item — Accounting, market-data, IoT, PO write-back), **G-R2-04 Arabic native QA sign-off** (blocks `v9.1.1-r2` tag), and **OQ-1 Odoo 17/19 confirmation**. Engineering **cannot and must not** close these, nor fake Arabic sign-off or live Odoo sync. Under-load k6 p95 SLO is the one genuine engineering risk that is neither closed nor commercially blocked.
+**Honesty boundary (critical):** The program's true blockers are **HUMAN / COMMERCIAL**, not engineering. All Wave 1 engineering for Ops Blueprint Phases 3–7 **plus Spec 029 productionization and Spec 030 Phase 8 Wave 1 (8A)** is **ENG COMPLETE** with green unit suites (Phase 8: 31 new PASS; Phase 4–8 dpe bundle 102 PASS). Customer enablement package remains artifact-ready. What remains gating: **OQ-7**, **PH1-02**, **G-R2-04**, **OQ-1**. Phase 8B–8D (live multi-site, full Excel everywhere, partner launch) and validate #70/#72/#110 remain eng residuals. Under-load k6 p95 is the genuine non-COM engineering risk.
 
 Owner legend: **ENG** = Engineering · **COM** = Commercial (Waleed / sales) · **OPS** = Operations/SRE · **CUST** = Customer (Star Trans IT/Ops) · **HUMAN** = named human reviewer/signer (non-engineering).
 
@@ -50,7 +50,7 @@ Most live integrations are gated by PH1-02 (C-03). The Kong `/enterprise/*` rout
 
 | ID | Topic | Category | Current state | Needed action | Owner | Priority | Reference |
 |----|-------|----------|---------------|---------------|-------|----------|-----------|
-| INT-01 | Kong `/api/v1/enterprise/*` route missing | Integration | Phase 6 `/enterprise/*` returns 404 via Kong :8000; 200 direct-to-dpe-svc :8020. No Kong route object. ASGI smoke 6/6 covers handlers. | ENG add Kong route object for `/api/v1/enterprise` to expose Phase 6 through the gateway; re-run live smoke. | ENG | P1 | `docs/project/OPEN-ITEMS.md`; `PRODUCT-STATUS.md`; `docs/qa/PHASE7-EXECUTION-AND-TEST-REPORT.md` |
+| INT-01 | Kong `/api/v1/enterprise/*` route missing | Integration | **ENG CLOSED (Spec 029)** — route objects `r2-enterprise` / `st-enterprise` shipped. Live smoke still stack-dependent. | Re-run live Kong smoke when R2 healthy. | ENG | P2 | Spec 029; `PRODUCT-STATUS.md` |
 | INT-02 | Live Odoo XML-RPC sync (connector) | Integration | Connector BUILT (mock validated locally, Odoo 17+19 aliases). Live sync unverified — mock-odoo only. | On PH1-02: run connector against real Odoo staging; execute live sync UAT. | CUST / ENG | P0 | `PRODUCT-STATUS.md`; GH#108 |
 | INT-03 | Odoo Accounting integration | Integration | SCAFFOLD/MOCK (`OdooAccountingConnector`, `is_live=false`). | On PH1-02: wire live accounting; flip `is_live`. Do not fake. | ENG (blocked by CUST) | P1 | `PRODUCT-STATUS.md` (Phase 6 table); `CHANGELOG.md` |
 | INT-04 | Market-data / FX feed (A14) | Integration | NOT WIRED. Analytics runs on supplied history only. | On PH1-02 / data-source availability: connect live market-data feed. | ENG (blocked by CUST) | P2 | `PRODUCT-STATUS.md` (Phase 6 table) |
@@ -70,10 +70,11 @@ All are Wave 1 deferrals or open GitHub task-issues; none block Wave 1 ENG-COMPL
 | ENG-01 | #70 seed/sync demo MOs for validate queue | Issue | OPEN. Feasibility queue has 2 MOs via Kong (some unscorable/DQ). | Seed/sync demo MOs so `star-trans-validate` queue PASS; re-run when R2 stack healthy. | ENG | P1 | GH#70; `docs/qa/FULL-TEST-CAMPAIGN-REPORT.md` |
 | ENG-02 | #72 re-run star-trans-validate after seed | Issue | OPEN. Depends on #70. Write-back route reachable (405). | Re-run `scripts/star-trans-validate.ps1` after ENG-01; capture full PASS. | ENG | P1 | GH#72, GH#95 |
 | ENG-03 | #110 re-run validate when Docker up (issues 70/72) | Issue | OPEN (Spec 024 tracking issue for the above). | Bring R2 stack up healthy; execute validate; close #70/#72/#110 together. | ENG | P1 | GH#110 |
-| ENG-04 | Andon board DB persistence + notifications | Deferral | Table `cdm_andon_alert` (migration 067) exists; Wave 1 board is in-memory; no real notifications. | Wave 2: wire Andon board to DB layer; add real notification channel. | ENG | P1 | `docs/qa/PHASE7-EXECUTION-AND-TEST-REPORT.md`; `docs/project/OPEN-ITEMS.md` |
-| ENG-05 | S&OP interactive stage-gate state machine | Deferral | DEFERRED. Governance modelled as config, not interactive gate. Was E2E-SOP-03 BLOCKED. | Wave 2: implement skip-to-management_review interactive stage-gate. | ENG | P1 | `docs/qa/PHASES3-5-E2E-TEST-REPORT.md` (E2E-SOP-03); `docs/qa/PHASE7-EXECUTION-AND-TEST-REPORT.md` |
+| ENG-04 | Andon board DB persistence + notifications | Deferral | Spec 029 dual-write **BUILT**; real push notifications still Wave 2. | Wave 2: real notification channel + tablet UI. | ENG | P2 | Spec 029; Phase 8 report |
+| ENG-05 | S&OP interactive stage-gate state machine | Deferral | Spec 029 stage-gate scaffold **BUILT** (`/sop/stage-gate*`). Full UI polish Wave 2. | Wave 2 UI polish. | ENG | P2 | Spec 029 |
 | ENG-06 | Collaborative multi-user conflict/locking UI | Deferral | DEFERRED beyond Wave 1 (Spec 026 residual). | Wave 2: build collaborative planning conflict resolution + locking UI. | ENG | P1 | `PRODUCT-STATUS.md`; `docs/project/OPEN-ITEMS.md` |
-| ENG-07 | MPS/MRP DB persistence migrations | Deferral | Wave 1 is request-driven (compute over supplied inputs); persistence deferred. | Wave 2: add MPS/MRP persistence migrations if durable plan storage required. | ENG | P2 | `docs/project/OPEN-ITEMS.md` (Spec 026) |
+| ENG-07 | MPS/MRP DB persistence migrations | Deferral | Spec 029 migration **069** + save helpers **BUILT**. | Optional richer plan history UI. | ENG | P2 | Spec 029 |
+| ENG-12 | Phase 8B–8D (A18 live, Excel everywhere, launch) | Deferral | 8A stubs shipped (Spec 030). | Execute 8B–8D roadmap. | ENG | P1 | `docs/qa/PHASE8-EXECUTION-AND-TEST-REPORT.md` |
 | ENG-08 | Monetary net-saving in R2 leveling engine | Deferral | DEFERRED. Leveling returns operational metrics only (peaks_smoothed/residual_spill/feasible). Was P5-LEV-02 SKIP. | Wave 2: add monetary net-saving quantification to leveling. | ENG | P2 | `docs/qa/PHASES3-5-E2E-TEST-REPORT.md` (P5-LEV-02) |
 | ENG-09 | Operator tablet UI (Standard Work §5.5) | Deferral | MINIMAL Wave 1 (compute + tracking contract; no live tablet UX). | Wave 2: build operator tablet UI for Standard Work. | ENG | P2 | `docs/qa/PHASE7-EXECUTION-AND-TEST-REPORT.md`; `docs/project/OPEN-ITEMS.md` |
 | ENG-10 | Alert inbox SLA UI (Spec 026) | Deferral | PARTIAL (ops live alerts only). | Wave 2: complete alert inbox SLA UI. | ENG | P2 | `docs/project/OPEN-ITEMS.md` |

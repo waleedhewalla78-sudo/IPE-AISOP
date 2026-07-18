@@ -25,10 +25,12 @@ from app.core.phase7.scheduling import (
 )
 from app.core.phase7.sop_financial import build_financial_sop
 from app.core.phase7.sop_rolling import recalc_rolling_sop
+from app.core.phase7.sop_stage_gate import SopStageGateMachine, get_default_gate, reset_default_gate
 from app.core.phase7.standard_work import build_standard_work
 
 __all__ = [
     "AndonBoard",
+    "SopStageGateMachine",
     "analyze_make_or_buy",
     "build_consensus",
     "build_demand_shaping",
@@ -42,10 +44,12 @@ __all__ = [
     "cascade_plan",
     "decompose_demand",
     "forecast_npi",
+    "get_default_gate",
     "optimize_portfolio",
     "optimize_setup_sequence",
     "plan_campaign",
     "plan_labour",
     "recalc_rolling_sop",
+    "reset_default_gate",
     "schedule_multi_resource",
 ]

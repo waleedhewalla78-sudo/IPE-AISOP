@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Depends, Header
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.phase5 import (
     ActionTracker,
@@ -23,6 +24,8 @@ from app.core.phase5 import (
     run_rccp,
     run_scenario_cascade,
 )
+from app.core.phase5.plan_persist import save_mps_run, save_mrp_run
+from ipe_shared.database.session import get_session
 from ipe_shared.middleware.tenant_context import tenant_ctx
 from ipe_shared.schemas.common import APIResponse
 
@@ -40,6 +43,7 @@ class MPSRequest(BaseModel):
     safety_stock: float = 15
     opening_inventory: float = 45
     weeks: list[dict[str, Any]] | None = None
+    persist: bool = False
 
 
 class MRPRequest(BaseModel):
@@ -48,6 +52,7 @@ class MRPRequest(BaseModel):
     bom: list[dict[str, Any]] | None = None
     inventory: dict[str, dict[str, float]] | None = None
     scrap_pct: float = 0.0
+    persist: bool = False
 
 
 class PromiseRequest(BaseModel):
@@ -134,13 +139,43 @@ async def planning_cockpit(x_tenant_id: str | None = Header(default=None, alias=
 
 
 @router.post("/mps")
-async def mps_update(req: MPSRequest):
-    return APIResponse(success=True, data=build_mps(**req.model_dump()), error=None)
+async def mps_update(
+    req: MPSRequest,
+    session: AsyncSession = Depends(get_session),
+    x_tenant_id: str | None = Header(default=None, alias="X-Tenant-ID"),
+):
+    payload = req.model_dump()
+    persist = bool(payload.pop("persist", False))
+    data = build_mps(**payload)
+    if persist:
+        meta = await save_mps_run(
+            session,
+            tenant_id=_tenant(x_tenant_id),
+            product_id=req.product_id,
+            payload=data,
+        )
+        data = {**data, "persistence": meta}
+    return APIResponse(success=True, data=data, error=None)
 
 
 @router.post("/mrp/explode")
-async def mrp_explode(req: MRPRequest):
-    return APIResponse(success=True, data=explode_mrp(**req.model_dump()), error=None)
+async def mrp_explode(
+    req: MRPRequest,
+    session: AsyncSession = Depends(get_session),
+    x_tenant_id: str | None = Header(default=None, alias="X-Tenant-ID"),
+):
+    payload = req.model_dump()
+    persist = bool(payload.pop("persist", False))
+    data = explode_mrp(**payload)
+    if persist:
+        meta = await save_mrp_run(
+            session,
+            tenant_id=_tenant(x_tenant_id),
+            root_product_id=req.product_id,
+            payload=data,
+        )
+        data = {**data, "persistence": meta}
+    return APIResponse(success=True, data=data, error=None)
 
 
 @router.post("/promise")

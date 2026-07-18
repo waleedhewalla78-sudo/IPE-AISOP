@@ -441,5 +441,11 @@
   "meeting.productionMeeting": "اجتماع الإنتاج",
   "meeting.demandReview": "مراجعة الطلب",
   "meeting.sopExecutive": "ملخص تخطيط العمليات والمبيعات",
-  "meeting.supplierReview": "مراجعة الموردين"
+  "meeting.supplierReview": "مراجعة الموردين",
+  "ai.degradedBanner": "تفسيرات الذكاء الاصطناعي غير متاحة مؤقتاً. تستمر وظائف التخطيط الأساسية.",
+  "controlTower.exportRiskQueue": "تصدير قائمة المخاطر",
+  "phase8.writeBackDryRun": "تشغيل تجريبي للكتابة العكسية (لم يُرسل إلى أودو)",
+  "upload.demandForecast": "توقعات الطلب",
+  "upload.qualityResults": "نتائج الجودة",
+  "upload.sopSalesInput": "مدخلات مبيعات تخطيط العمليات"
 }
