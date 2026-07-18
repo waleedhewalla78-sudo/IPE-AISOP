@@ -1,35 +1,45 @@
-﻿# IPE Platform — Screen-by-Screen End-User Guide
-
-> **Authoritative exhaustive guide:** **[USER-GUIDE-COMPLETE.md](./USER-GUIDE-COMPLETE.md)** — includes Excel Master, Odoo Master, E2E workflows, Phase 8 upload types, role thresholds, and write-back safety. **This BY-SCREEN file is kept** for a lighter screen index; it is **superseded in depth** by COMPLETE.
+﻿# IPE Platform — Complete End-User Guide (Authoritative)
 
 **Product:** IPE — Intelligent Planning Engine  
-**Audience:** Planners, supervisors, managers, executives, and admins who need exact field names, button labels, and validation rules  
-**Companion:** High-level overview lives in [`USER-GUIDE.md`](./USER-GUIDE.md). This document goes deeper — every screen, form, workflow, and component as shipped in `apps/web`.  
-**Grounding:** Routes from `apps/web/src/app/router.tsx` + `lib/constants.ts`; labels from page components and `locales/en.json` / `ar.json`; validators from `services/upload-svc`; planning APIs from `dpe-svc` phase5/phase7.  
-**Language:** English primary. Arabic/RTL exists via the sidebar language switcher; native Arabic QA (**G-R2-04**) is **OPEN**.  
-**As of:** 2026-07-18
+**Document:** `USER-GUIDE-COMPLETE.md` — **the definitive exhaustive end-user guide**  
+**Audience:** Planners, supervisors, managers, executives, admins, and trainers who need every screen, form field, validation, Excel/Odoo integration, and E2E workflow  
+**Companions (lighter):** [`USER-GUIDE.md`](./USER-GUIDE.md) (overview) · [`USER-GUIDE-BY-SCREEN.md`](./USER-GUIDE-BY-SCREEN.md) (screen index; superseded in depth by this file)  
+**Grounding:** `apps/web` router/`lazyRoutes`/`constants`; `locales/en.json`/`ar.json`; `services/upload-svc` validator + wizard; `services/connector` mapper/sync; `dpe-svc` phase5/phase7/phase8; `docs/integration/ODOO-19-FIELD-MAPPING.md`; `docs/project/FINAL-PROGRAM-STATUS.md`  
+**Language:** English primary. Arabic/RTL via sidebar switcher; native Arabic QA (**G-R2-04**) is **OPEN**.  
+**As of:** 2026-07-18 · Phase 8 Wave 1 (**8A**) ENG COMPLETE · Constitution 1.4.2
 
-> **Honesty first:** IPE is an intelligence layer over ERP (Odoo), not a replacement. Live Odoo staging (**PH1-02**) is **OPEN**. Several screens are raw-JSON workbenches, offline shells, or stubs — each is flagged below. Do not invent polish that is not in the code.
+> **Honesty first:** IPE is an intelligence layer over ERP (Odoo), not a replacement. Live Odoo staging (**PH1-02**) is **OPEN**. Write-back is dry-run / mock-odoo only in Wave 1. Several screens are raw-JSON workbenches, offline shells, or stubs — each is flagged below. Do not invent polish that is not in the code.
 
 ---
 
 ## Table of contents
 
+### Functional areas (by screen / workflow)
+
 1. [Access & Login](#1-access--login)
 2. [Data Onboarding / Upload Wizard](#2-data-onboarding--upload-wizard)
 3. [Control Tower / Feasibility](#3-control-tower--feasibility)
-4. [Resolution Center](#4-resolution-center)
+4. [Resolution Center (+ role thresholds)](#4-resolution-center)
 5. [Copilot (Ctrl+K)](#5-copilot-ctrlk)
 6. [Planning Center](#6-planning-center)
 7. [Command Center](#7-command-center)
 8. [OTD Analytics](#8-otd-analytics)
 9. [Intelligence Hub / M1–M9](#9-intelligence-hub--m1m9)
 10. [Deep Planning Phase 7](#10-deep-planning-phase-7)
-11. [Odoo Config / ERP Connections](#11-odoo-config--erp-connections)
+11. [Odoo Config / ERP Connections / Write-back](#11-odoo-config--erp-connections)
 12. [Customer Portal](#12-customer-portal)
 13. [Shop Floor / A16](#13-shop-floor--a16)
 14. [Platform / Admin](#14-platform--admin)
 15. [Daily / Weekly / Monthly Routines](#15-daily--weekly--monthly-routines)
+
+### Dedicated master chapters
+
+18. [Excel Master Chapter](#18-excel-master-chapter)
+19. [Odoo Master Chapter](#19-odoo-master-chapter)
+20. [E2E Workflow Chapter](#20-e2e-workflow-chapter)
+
+### Appendices
+
 16. [Appendix — Stub / mock / deferred inventory](#16-appendix--stub--mock--deferred-inventory)
 17. [Appendix — Full route index](#17-appendix--full-route-index)
 
@@ -149,8 +159,9 @@ Users authenticate before any hub loads. The app boots `AuthProvider`, which cal
 | **dpe-svc** auth | login / refresh / logout / me / info |
 | **Keycloak** | Optional SSO (PKCE S256) |
 | **Kong** | All subsequent `/api/v1/*` calls; JWT + `X-Tenant-ID` from claim |
+| **Ollama (Phase 8)** | Amber banner via `GET /api/v1/phase8/ai-status` when unreachable — core planning continues; narratives degrade to rule-based (`AiDegradedBanner`) |
 
-**Failure:** Kong/dpe down → login fails or session cannot refresh → returned to `/login`.
+**Failure:** Kong/dpe down → login fails or session cannot refresh → returned to `/login`. Ollama down → amber banner only (not a login block).
 
 ### Component Interactions
 
@@ -227,6 +238,16 @@ Three distinct onboarding paths exist — do not confuse them:
 | 4 | Current State | الحالة الحالية | `inventory`, `production_orders`, `sales_orders`, `purchase_orders` |
 | 5 | Historical Data | البيانات التاريخية | `historical_otd` |
 
+**Phase 8 Wave 1 operational types** (validated by upload-svc; **not** part of the 5-phase wizard lock sequence — use file-type dropdown / API with aliases `forecast`, `quality_inspection`, `sop_sales`):
+
+| file_type | Required columns | Agents tagged |
+|-----------|------------------|---------------|
+| `demand_forecast` | product_code, period, forecast_qty | A1, A4 |
+| `quality_results` | mo_number, inspection_date, result, measured_value | A10 |
+| `sop_sales_input` | product_family, period, sales_forecast_qty | A1, A14 |
+
+See [§18 Excel Master](#18-excel-master-chapter) for full column rules, templates, and CT/MPS CSV exports.
+
 **Upload form**
 
 | Control | Required | Notes |
@@ -254,8 +275,11 @@ Three distinct onboarding paths exist — do not confuse them:
 | `sales_orders` | order_number, customer_code, product_code, quantity, order_date, requested_delivery, status | A1, A4 |
 | `purchase_orders` | po_number, supplier_code, product_code, quantity | A2 |
 | `historical_otd` | mo_number, planned_end, actual_end | A6 |
+| `demand_forecast` | product_code, period, forecast_qty | A1, A4 |
+| `quality_results` | mo_number, inspection_date, result, measured_value | A10 |
+| `sop_sales_input` | product_family, period, sales_forecast_qty | A1, A14 |
 
-Aliases accepted: `products`→product_master, `customers`, `suppliers`, `work_centers`/`work_centres`, `mrp_orders`→production_orders, `demand_lines`→sales_orders, `supply_orders`→purchase_orders.
+Aliases accepted: `products`→product_master, `customers`, `suppliers`, `work_centers`/`work_centres`, `mrp_orders`→production_orders, `demand_lines`→sales_orders, `supply_orders`→purchase_orders, `forecast`→demand_forecast, `quality_inspection`→quality_results, `sop_sales`→sop_sales_input.
 
 #### Project Plan Upload (on Schedule) — `/planning/schedule`
 
@@ -419,6 +443,7 @@ Full-page compare-and-approve trade-offs for unresolved MOs (A5 Resolution). Use
 - **Reject** button has **no API handler**.
 - Constraints list is often empty (payload may not hydrate constraints).
 - Financial projection uses fixed `selling_price: 500` and qty from queue or **100**.
+- **Phase 8 role thresholds** (`ipe_shared.roles.AgentRoleContext`) gate write-back / approve authority by financial impact — see table below. Copilot **Agent role** select (Planner / Manager / Supervisor / Executive) maps onto these agent roles via aliases (`planner`→supervisor, `admin`/`executive`→manager).
 
 ### Step-by-Step Instructions
 
@@ -441,6 +466,18 @@ Full-page compare-and-approve trade-offs for unresolved MOs (A5 Resolution). Use
 | Right selected | Constraints, financials, scenario cards, **Approve** / **Reject** |
 
 No free-text fields.
+
+#### Role thresholds (Phase 8 — Employee / Supervisor / Manager)
+
+| Agent role | JWT aliases | Max financial impact (USD) | Approve resolution | Override AI | Financial visibility | Escalation target |
+|------------|-------------|----------------------------|--------------------|-------------|----------------------|-------------------|
+| **employee** | operator, viewer | 1,000 | No | No | cost_impact | supervisor |
+| **supervisor** | planner | 10,000 | Yes | No | cost_impact, department_pnl | manager |
+| **manager** | admin, executive | 50,000 | Yes | Yes | cost_impact, margin, pnl, cash_flow | executive |
+
+- Impact above role max → `escalation_required=true`; write-back approve returns `insufficient_authority`.
+- A11 Finance agent: non-managers only see `cost_impact` (margin stripped).
+- UI Resolution **Approve** still calls res-svc; Phase 8 write-back safety is under Platform/API `POST /api/v1/phase8/write-back` (dry-run default). See [§19](#19-odoo-master-chapter).
 
 ### Validations & Restrictions
 
@@ -987,13 +1024,14 @@ Planning calendar GET ↔ routines in §15
 
 ### Main Process
 
-Configure ERP connections for sync into IPE CDM. Primary self-service UI is **Odoo Connections**; a versioned **Odoo Configuration** screen and R1 Admin wizard also exist.
+Configure ERP connections for sync into IPE CDM. Primary self-service UI is **Odoo Connections**; a versioned **Odoo Configuration** screen and R1 Admin wizard also exist. Phase 8 adds **write-back safety** (dry-run → approve → mock execute) via `/api/v1/phase8/write-back*` — full map in [§19 Odoo Master](#19-odoo-master-chapter).
 
 **Warnings**
 
-- **PH1-02 live Odoo staging is OPEN.** Testing typically uses **mock-odoo-api** or SQL seed — do not assume production sync.
+- **PH1-02 live Odoo staging is OPEN.** Testing typically uses **mock-odoo-api** (:8010) or SQL seed — do not assume production sync.
 - Password required for **new** connections.
 - Sync may report success against mock without real plant data.
+- Feature flag `ipe.odoo.live_writeback` defaults **false**. Even with `execute=true`, Wave 1 records **MOCK** execute (`is_live=false`, `ph1_02_blocker` message) — never claim live Odoo success.
 
 ### Step-by-Step Instructions
 
@@ -1318,6 +1356,11 @@ Screens and capabilities to treat as **non-production-polished** or **non-live**
 | Shop Floor / SCN / MLOps tenant | **Hardcoded UUID** | Router constant |
 | Tariff matrix upload | **No HTTP upload** | Parser only |
 | Live Odoo staging | **PH1-02 OPEN** | Use mock/seed |
+| Phase 8 write-back | **Dry-run / MOCK execute** | `ipe.odoo.live_writeback` false; PH1-02 |
+| Phase 8 A18–A20 | **STUB** | Full behaviour in 8B–8D |
+| Ollama narratives | **Degrade banner** | Core planning continues |
+| CT/MPS CSV export | **API available** | UI download not first-class |
+| Phase 8 Excel types in wizard lock | **Types exist; not in PHASES 1–5 list** | Use file_type / API aliases |
 | Shift handover / Actions tracker | **API without dedicated UI** | phase5 endpoints |
 | S&OP stage-gate interactive UI | **Deferred** | |
 | Operator tablet polish / WhatsApp hub | **Deferred** | |
@@ -1376,4 +1419,374 @@ Screens and capabilities to treat as **non-production-polished** or **non-live**
 
 ---
 
-*Grounded in `apps/web/src` routes/pages/i18n and `services/upload-svc` + `dpe-svc` planning-command APIs. Where a capability is mock, stubbed, deferred, offline-shelled, or not Kong-routed, it is stated plainly. Companion overview: [`USER-GUIDE.md`](./USER-GUIDE.md).*
+---
+
+## 18. Excel Master Chapter
+
+Every Excel/CSV path IPE exposes today — uploads, validation stages, templates, and exports.
+
+### 18.1 How data actually loads (do not confuse paths)
+
+| Path | Mechanism | Persists to CDM? | UI |
+|------|-----------|------------------|-----|
+| SQL seed | `scripts/seed-data.ps1`, `seed-startrans-demo.ps1` | **Yes** | No |
+| Odoo sync | Connector `/erp/connections/{id}/sync-now`, `/sync/run` | **Yes** (when connected) | Platform → Odoo Connections |
+| Data Upload Center | upload-svc multi-stage validate + wizard state | **No** (validate + in-memory progress only) | Platform → Data Upload |
+| Project plan | `POST /api/v1/capacity/project-plans/upload` | **Yes** (cap-svc plans) | Planning → Schedule |
+| Phase 8 CT/MPS export | `GET /api/v1/phase8/export/risk-queue.csv`, `/export/mps.csv` | N/A (download) | API / future UI wiring |
+| Tariff matrix | Parser in code | No HTTP upload | **Unwired** |
+
+### 18.2 Upload-svc file types (complete)
+
+Source: `services/upload-svc/app/core/validator.py` `FILE_SCHEMAS` + `ALIASES`.
+
+| file_type | Phase | Required columns | Agents | Aliases |
+|-----------|-------|------------------|--------|---------|
+| product_master | 1 | product_code, name, type, uom | A2, A4 | products |
+| customer_master | 1 | customer_code, name | A1 | customers |
+| supplier_master | 1 | supplier_code, name | A2 | suppliers |
+| work_centre_master | 1 | work_centre_code, name | A3, A4 | work_centers, work_centres |
+| bom | 2 | product_code, component_code, quantity | A4 | — |
+| routing | 2 | product_code, operation_seq, work_centre_code | A3, A4 | — |
+| capacity_calendar | 3 | work_centre_code, date, shift, available_hours | A3 | — |
+| lead_time | 3 | product_code, supplier_code, lead_time_days | A2 | — |
+| cost_data | 3 | product_code, unit_cost | A5, A6 | — |
+| inventory | 4 | product_code, on_hand | A2, A4 | — |
+| production_orders | 4 | mo_number, product_code, quantity, planned_start, planned_end, status | A3, A4 | mrp_orders |
+| sales_orders | 4 | order_number, customer_code, product_code, quantity, order_date, requested_delivery, status | A1, A4 | demand_lines |
+| purchase_orders | 4 | po_number, supplier_code, product_code, quantity | A2 | supply_orders |
+| historical_otd | 5 | mo_number, planned_end, actual_end | A6 | — |
+| **demand_forecast** | **8** | product_code, period, forecast_qty | A1, A4 | forecast |
+| **quality_results** | **8** | mo_number, inspection_date, result, measured_value | A10 | quality_inspection |
+| **sop_sales_input** | **8** | product_family, period, sales_forecast_qty | A1, A14 | sop_sales |
+
+**Formats accepted:** `.xlsx`, `.xlsm`, `.csv`, `.tsv`, `.txt`. Magic-byte check for Excel (`PK…`). Message on failure: **Invalid file format. Expected .xlsx or .csv**.
+
+### 18.3 Four validation stages
+
+Every upload response includes:
+
+| Stage | Key | Pass criteria | Typical fail messages |
+|-------|-----|---------------|------------------------|
+| 1 Structure | `stage_1_structure` | All required headers present | Missing columns: … · Invalid file format… · Unknown file_type… · 0 rows found… |
+| 2 Types | `stage_2_types` | Required cells filled; qty fields numeric ≥0 | {col} is required · {qty_col} must be numeric · must be non-negative · Duplicate product_code… |
+| 3 Referential | `stage_3_referential` | Codes exist in known_codes catalogs when provided | Product/Customer not found in master · {parent} not found in Product Master |
+| 4 Business | `stage_4_business` | Structure passed | Fail if stage 1 failed |
+
+**Warnings (non-blocking):** Unknown priority → **Unknown priority. Defaulting to 'high'** (allowed: low/normal/high/urgent).
+
+**Error report download (API):** `GET /api/v1/upload/{upload_id}/errors.xlsx` — columns `row`, `column`, `value`, `message`, `severity`. **UI does not expose a download button today.**
+
+**Template download (API):** `GET /api/v1/upload/templates/{file_type}` — **UI does not expose download buttons today.**
+
+### 18.4 QA Excel templates (paths)
+
+Directory: `docs/qa/upload-templates/`
+
+| Template file | Entity / use | Load path today |
+|---------------|--------------|-----------------|
+| products_upload_template.xlsx | cdm_product | SQL seed / Odoo sync |
+| work_centers_upload_template.xlsx | cdm_work_center | SQL / Odoo |
+| bom_routing_upload_template.xlsx | BOM + routing | SQL / Odoo |
+| mrp_orders_upload_template.xlsx | cdm_manufacturing_order | SQL / Odoo |
+| demand_lines_upload_template.xlsx | cdm_demand_line | SQL / Odoo |
+| suppliers_upload_template.xlsx | cdm_supplier | SQL / Odoo |
+| customers_upload_template.xlsx | cdm_customer | SQL / Odoo |
+| inventory_upload_template.xlsx | inventory position | SQL seed |
+| supply_orders_upload_template.xlsx | cdm_supply_order | SQL / Odoo |
+| operators_upload_template.xlsx | cdm_operator | SQL seed |
+| **project_plan_upload_template.xlsx** | Project plan | **UI — Schedule upload** |
+| tariff_matrix_upload_template.xlsx | Tariff shock | Parser only — **no upload API** |
+| odoo_sync_entities_reference.xlsx | Field map reference | Not an upload |
+
+Star Trans CSV originals: `docs/demo-data/startrans/*.csv` · Spec: `docs/demo-data/STARTRANS-CSV-UPLOAD-SPEC.md`.
+
+**Recommended load order:** Products → WC → Operators → Customers → Suppliers → BOM/routing → Inventory → Supply → MOs → Demand → Project plan Excel.
+
+### 18.5 Project plan Excel (Schedule — live UI upload)
+
+Schema: `docs/PROJECT-PLAN-EXCEL-SCHEMA.md` · cap-svc.
+
+| Rule | Value |
+|------|--------|
+| Format | **.xlsx only** (CSV rejected in UI) |
+| Max size | **5 MB** |
+| Sheet | First worksheet (prefer name `ProjectPlan`) |
+| Mode | Create new plan / Update existing (new version) |
+
+| Column | Required | Type | Rules |
+|--------|----------|------|-------|
+| PLAN_CODE | Yes | text | Same on every row |
+| PLAN_NAME | Yes | text | Same on every row |
+| MO_ID | Yes | text | Must exist in DB (`MO-ST-*` after Star Trans seed) |
+| OPERATION_SEQUENCE | Yes | int | Unique per MO_ID in file |
+| OPERATION_NAME | Yes | text | Gantt label |
+| WORK_CENTER_CODE | Yes | text | Must match WC master (e.g. WC001–WC003) |
+| START_HOUR | Yes | number | Hours from horizon start |
+| DURATION_HOURS | Yes | number | Must be > 0 |
+| STATUS | No | text | planned / frozen / disrupted / ai_suggested |
+| NOTES | No | text | Optional |
+
+**UI labels:** **Upload Project Plan** · **Create new plan** · **Update existing plan (new version)** · **Upload New Plan** / **Upload New Version** · **Activate** · view radio **Uploaded project plan** · **View Excel schema**.
+
+**UI errors:** Select an Excel (.xlsx) file first · Select an existing plan to update · API `details[]` (up to 8 shown).
+
+### 18.6 Phase 8 CSV exports (Control Tower / MPS)
+
+| Endpoint | Filename | Columns | Notes |
+|----------|----------|---------|-------|
+| `GET /api/v1/phase8/export/risk-queue.csv` | risk_queue.csv | mo_id, product, customer, feasibility_score, primary_constraint, status | Demo rows when no live queue injected |
+| `GET /api/v1/phase8/export/mps.csv` | mps_export.csv | product_id, period, demand, supply, projected_on_hand | Demo period schedule |
+
+Kong route: `/api/v1/phase8` (R2 + deploy/star-trans). UI download buttons for these exports are **not** first-class on Control Tower today — call API or wire in 8B+.
+
+### 18.7 Excel error handling — planner checklist
+
+1. Confirm file extension and UTF-8 CSV (BOM OK — `utf-8-sig`).
+2. Match **upload-svc** headers (not necessarily QA template display names — check README sheet).
+3. Upload masters before BOM/sales (referential stage).
+4. For project plan: seed MOs first; convert CSV→XLSX (`scripts/convert-project-plan-to-xlsx.ps1`).
+5. If Upload Center unavailable: **"Upload service unavailable — ensure upload-svc is running on :8120"**.
+6. Remember: wizard green ≠ Control Tower populated — still need seed or Odoo sync.
+
+---
+
+## 19. Odoo Master Chapter
+
+Entity sync map, write-back safety, mock vs PH1-02 honesty.
+
+### 19.1 Role of Odoo in IPE
+
+```
+Odoo (SoR) ──15min / Sync now──► Connector ──► CDM (Postgres)
+                                      ▲
+IPE decisions (schedule/resolution) ──┘ write-back (Wave 1: dry-run / MOCK only)
+```
+
+IPE does **not** replace Odoo master data. Empty Control Tower usually means no seed and no successful sync.
+
+### 19.2 Entity sync map (Odoo → IPE)
+
+Source of truth: `docs/integration/ODOO-19-FIELD-MAPPING.md` ← `connector` mapper + sync_engine. Frequency: **every 15 minutes** scheduled + on-demand **Sync now**.
+
+| # | Odoo model | CDM | Direction | Filter highlights |
+|---|------------|-----|-----------|-------------------|
+| 1 | mrp.production | cdm_manufacturing_order | Read (+ write-back dates) | state not cancel |
+| 2 | mrp.bom | cdm_bill_of_material | Read | active=True |
+| 3 | mrp.bom.line | cdm_bom_line | Read | via BOM lines |
+| 4 | mrp.routing.workcenter | cdm_routing_operation | Read | via BOM operation_ids |
+| 5 | mrp.workcenter | cdm_work_center | Read | active=True |
+| 6 | product.product | cdm_product | Read | active=True |
+| 7 | res.partner | cdm_customer | Read | customer_rank > 0 |
+| 8 | res.partner | cdm_supplier | Read | supplier_rank > 0 |
+| 9 | sale.order.line | cdm_demand_line | Read | state in sale/done |
+| 10 | purchase.order.line | cdm_supply_order | Read | state in purchase/done |
+| 11 | stock.quant | updates product safety_stock proxy | Read | internal locations, qty>0 |
+| 12 | PO + picking | cdm_lead_time_history | Read | receipts last 90d |
+| 13 | mrp.production (write) | approved schedule dates | **IPE → Odoo** | Event-driven (not batch) |
+
+**Odoo 17 vs 19:** Connector reads both `date_planned_start`/`date_start` and `date_planned_finished`/`date_finished`. Capacity: Odoo 17 `default_capacity` vs Odoo 19 `time_efficiency`.
+
+### 19.3 UI — Connections & Config
+
+| Screen | Route | Key actions |
+|--------|-------|-------------|
+| Odoo Connections | `/platform/odoo-config` | Add · Save · Test Connection · Activate · Sync now · Activity log |
+| Odoo Configuration (versions) | `/platform/odoo-config/versions` | Entity mappings · Test · Save · Rollback |
+
+**Connection fields:** Display name, Odoo URL, Database name, Username, Password (**required on create**), Sync interval 5/15/30/60 min (default 15), Environment Production/Staging.
+
+**APIs:** `/api/v1/erp/connections*`, `/api/v1/admin/odoo-config`, `/api/v1/sync/status`.
+
+### 19.4 Write-back safety (Phase 8 Wave 1)
+
+Source: `dpe-svc/app/core/phase8/write_back.py`, API `phase8_production.py`, migration **070** `cdm_write_back_log`.
+
+| Step | API | Default behaviour |
+|------|-----|-------------------|
+| Propose | `POST /api/v1/phase8/write-back` | `dry_run=true` → status `dry_run`, preview only, **never hits live Odoo** |
+| List | `GET /api/v1/phase8/write-back` | Tenant-scoped proposals |
+| Approve | `POST /api/v1/phase8/write-back/{id}/approve` | Role check; `execute=false` → pending/queue message |
+| Execute (opt-in) | same + `execute=true` | If flag `ipe.odoo.live_writeback` false → queued, **not sent**. If flag true → still **MOCK** (`mock_odoo=true`, `is_live=false`, message cites PH1-02) |
+
+**Request fields (propose):** entity_type (default `mrp.production`), entity_id, field_name (default `date_planned_start`), old_value, new_value, action, requested_by, user_role, financial_impact, dry_run, payload.
+
+**Role gate:** `AgentRoleContext.can_execute(user_role, "approve_resolution", financial_impact)` — see [§4](#4-resolution-center).
+
+**Rollback window (mock execute):** `rollback_deadline` = now + 4 hours (recorded on mock execute).
+
+### 19.5 What works on mock-odoo vs blocked on PH1-02
+
+| Capability | mock-odoo-api / seed | Live customer Odoo (PH1-02) |
+|------------|----------------------|-----------------------------|
+| Read sync entities 1–12 | **Works** against mock or SQL seed | **Blocked** until staging credentials + checklist |
+| Control Tower queue from synced MOs | Works with seed/mock data | Needs live staging |
+| Schedule / resolution approve in IPE | Works in IPE DB | Works in IPE; write to Odoo blocked |
+| Write-back dry-run / approve queue | **Works** (Phase 8) | Same APIs; live send blocked |
+| Live write-back to mrp.production dates | **MOCK only** even if flag flipped in Wave 1 | **OPEN** — PH1-02 |
+| A15 3-way match / PO write-back | MOCK | OPEN |
+| IoT / Digital Gemba live | STUB (`iot_live=false`) | OPEN |
+| Accounting / FX live | Not claimed | OPEN |
+
+**Do not claim:** “Odoo is connected in production” or “schedule changes appear in customer Odoo” until PH1-02 closes.
+
+### 19.6 Failure / delay impact
+
+| Symptom | Likely cause | Resolve |
+|---------|--------------|---------|
+| Control Tower empty + Open Odoo Settings | No CDM MOs | Seed or Sync now / fix connection |
+| Sync badge stale (>30 min) | Connector/Odoo down | Activity log; Test Connection; restart connector |
+| Outcomes Odoo sync health degraded | Same | Check `/sync/status` |
+| Write-back `insufficient_authority` | Role vs financial_impact | Escalate to supervisor/manager |
+| Write-back queued not sent | live_writeback=false or PH1-02 | Expected in Wave 1 |
+| Login/API 502 | Kong upstream | Recreate Kong / check service health |
+
+### 19.7 Pre-go-live checklist (from field-mapping doc)
+
+Odoo modules: mrp, sale, purchase, stock · sample MOs/BOMs/WCs/SOs · XML-RPC reachable · API user READ on listed models + WRITE on mrp.production · version 17/19 documented · custom fields noted. Full checklist: `docs/integration/ODOO-19-FIELD-MAPPING.md`.
+
+---
+
+## 20. E2E Workflow Chapter
+
+End-to-end processes with decision points, Excel/Odoo fit, prerequisites, and completion criteria. **Flags stub/mock/deferred plainly.**
+
+### 20.1 Prerequisites (all flows)
+
+1. Stack up: `docker compose -f infrastructure/docker/docker-compose.release2.yml up -d` (or project equivalent).
+2. Web **http://localhost:8082** · Kong **http://localhost:8000**.
+3. Seed: `.\scripts\seed-data.ps1` (+ Star Trans overlay for demo MOs).
+4. Login: e.g. `Ahmed@nour` / `admin`.
+5. Optional: Ollama for narratives; if down → amber degrade banner (planning continues).
+
+### 20.2 Order-to-cash (intelligence layer view)
+
+**Intent:** Confirmed demand → feasible production → schedule → delivery confidence → customer visibility.
+
+```
+[Odoo SO confirm / seed demand]
+        │
+        ▼
+Demand classify (A1) → Material pATP (A2) → Capacity (A3) → Feasibility (A4)
+        │
+        ├─ score ≥90 + autonomous → auto_confirm path
+        ├─ score 70–89 → planner queue (Control Tower)
+        └─ score <70 → Resolution (A5) → Approve
+        │
+        ▼
+Cockpit Promise / MPS / MRP → Schedule regenerate or project-plan Excel
+        │
+        ▼
+Shop Floor progress (client/local) · Customer Portal confidence (A8)
+        │
+        ▼
+OTD / Outcomes capture  ·  Write-back schedule to Odoo = MOCK/PH1-02
+```
+
+| Step | Screen / system | Excel / Odoo |
+|------|-----------------|--------------|
+| Demand in | Seed / Odoo SO sync / sales_orders upload validate | Odoo sale.order.line · Excel sales_orders |
+| Triage | Control Tower | CT export CSV (phase8) |
+| Decide | Resolution | Role thresholds |
+| Plan | Cockpit + Schedule | Project plan xlsx |
+| Inform customer | Customer Portal | — |
+| Close loop ERP | phase8 write-back | **Dry-run/MOCK** |
+
+**Completion criteria:** MO feasible or approved scenario; schedule active; portal shows order (if data present). **Not complete:** live Odoo date write.
+
+**Branches:** Empty queue → seed/Odoo; Reject button → noop (do not rely); VERSION_CONFLICT on schedule approve → reload and retry.
+
+### 20.3 Weekly planning cycle
+
+| # | Action | Screen | Completion signal |
+|---|--------|--------|-------------------|
+| 1 | Review health | Planning Cockpit | Health tiles load (or offline shell acknowledged) |
+| 2 | Update MPS | Cockpit **Update MPS** | JSON result (UI does not persist=true) |
+| 3 | Run MRP | **Run MRP** | JSON |
+| 4 | Promise check | **Check ATP/CTP** | JSON |
+| 5 | RCCP / Level | **RCCP** · **Level production** | JSON |
+| 6 | Demand sense | Demand **Run sense cycle** | Forecast chart |
+| 7 | What-if | Scenario Workbench (≤3 compare) | Simulated KPIs (baseline hardcoded) |
+| 8 | Solve schedule | Schedule **Regenerate schedule** | Gantt populated |
+| 9 | Optional upload | **Upload Project Plan** | Plan active + Uploaded view |
+| 10 | Supplier/inventory | Supply Chain tabs | Plans / scorecards |
+
+**Excel fit:** demand_forecast / sop_sales_input (Phase 8 validate); project plan xlsx; MPS export CSV.  
+**Odoo fit:** overnight sync refreshes MOs/inventory before Monday cockpit.
+
+### 20.4 Crisis / War Room
+
+| # | Action | Screen | Notes |
+|---|--------|--------|-------|
+| 1 | Detect disruption | Ops Live alerts / War Room KPIs | Offline shell if API down |
+| 2 | Optional activate | Ops Live **Activate War Room** | Different API from War Room page |
+| 3 | Impact | War Room events + MO table | Revenue at risk |
+| 4 | Mitigate | Mitigation scenarios | **Assign Task = UI noop** |
+| 5 | Resolve MOs | Control Tower / Resolution | Approve real API |
+| 6 | Andon | Operations Deep **Trigger Andon** / board | In-memory caveat / Spec 029 DB path |
+| 7 | Digital twin | Schedule Digital Twin disrupt | network-svc |
+| 8 | Chaos cost | Cost of Chaos / OTD | Soft-empty OK |
+
+**Completion:** Approved mitigation path + risk queue reduced. **Not:** Slack/Teams guaranteed without webhook config; Assign Task persistence.
+
+### 20.5 Autonomous overnight → morning triage
+
+```
+Night: agents score / Pulse auto-actions (where autonomy allows)
+        │
+Morning: Intelligence → Today's Pulse  →  Control Tower  →  Ops Live
+        │
+        └─ Amber Ollama banner? Narratives rule-based; scores still material-driven footnote
+```
+
+| Autonomy mode (Admin) | Behaviour |
+|-----------------------|-----------|
+| shadow | Observe / suggest; no auto-confirm expectation for demos |
+| suggest | Queue recommendations |
+| autonomous | High-score auto_confirm path (server thresholds) |
+
+**Completion:** Pulse reviewed; at-risk MOs owned. Flag offline shells if APIs down.
+
+### 20.6 S&OP (honest stage-gate)
+
+| Layer | What exists | What does **not** |
+|-------|-------------|-------------------|
+| Analysis | S&OP Deep tools (financial/rolling/shaping/portfolio) — raw JSON | Interactive stage-gate governance UI (**deferred**) |
+| Report | S&OP Report **Generate** + **Export** JSON | PDF export |
+| Executive | S&OP gap `POST /sop/solve`, P&L views | Certified commercial sign-off |
+| Excel | sop_sales_input upload type (validate) | Full S&OP workbook round-trip UI |
+| Horizons | Cascade / escalate JSON | Automatic cross-horizon locking UI |
+
+**Monthly routine:** S&OP Deep → Horizons → Executive + S&OP Report → OTD/Outcomes → AI Trust. Treat as **analysis scaffold**, not closed-loop IBP governance.
+
+### 20.7 Upload → agent chain
+
+```
+Upload Center phases 1–5 (validate + wizard agents A1–A7 labels)
+        ≠
+CDM population (seed / Odoo)
+        →
+Kafka agent pipelines (when services consume CDM events)
+        →
+Control Tower / Pulse / Copilot
+```
+
+Phase 8 types (`demand_forecast`, `quality_results`, `sop_sales_input`) tag A1/A4/A10/A14 — same honesty: **validation ≠ CDM insert** in Wave 1 Upload Center.
+
+**Completion of onboarding wizard:** Phase 5 message **"All 14 files loaded. IPE agents are now active."** — means wizard state complete, **not** that plant data is in Postgres.
+
+### 20.8 Decision-point cheat sheet
+
+| Decision | Where | If Yes | If No / blocked |
+|----------|-------|--------|-----------------|
+| Feasibility ≥90 + autonomous | fea-svc | auto_confirm | else queue/resolution |
+| Approve scenario | Resolution / CT inline | Optimistic lock approve | Reject noop; conflict → retry |
+| Financial impact > role max | Phase 8 roles | Escalate | insufficient_authority |
+| Live Odoo write | phase8 execute | MOCK message | PH1-02 OPEN |
+| Ollama up? | ai-status | LLM narratives | Amber banner / rule-based |
+| Enterprise tools via Kong R2 | M7–M9 | May be offline | Call dpe-svc direct / accept unavailable |
+
+---
+
+*Grounded in `apps/web` routes/pages/i18n, `upload-svc` validator/wizard, `connector` Odoo map, `dpe-svc` phase5/7/8, and program honesty in `FINAL-PROGRAM-STATUS.md`. Mock, stub, deferred, offline-shell, and PH1-02 items are stated plainly. Overview: [`USER-GUIDE.md`](./USER-GUIDE.md) · Screen index: [`USER-GUIDE-BY-SCREEN.md`](./USER-GUIDE-BY-SCREEN.md).*
+
