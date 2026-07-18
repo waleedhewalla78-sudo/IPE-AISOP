@@ -5,6 +5,8 @@
 **Scope:** The full platform as it actually ships today — every hub, screen, agent (A1–A17) and command module (M1–M9), grounded in the real frontend routes, pages, and APIs in `E:\AISOP\ipe`.
 **Language:** English. IPE ships with an Arabic/RTL locale (in-app language switcher); Arabic native-language QA sign-off (**G-R2-04**) is still **OPEN**, so Arabic copy is engineering-level and not yet certified.
 
+> **Need field-level detail?** This overview covers concepts, routines, and module walkthroughs. For an exhaustive screen-by-screen guide — every route, form field, button label, validation message, stub/mock flag, and cross-screen dependency — see **[USER-GUIDE-BY-SCREEN.md](./USER-GUIDE-BY-SCREEN.md)**.
+
 > **Honesty note (read this first):** IPE is an intelligence layer *over* your ERP (Odoo), not a replacement for it. Several enterprise-grade capabilities are **engineering-complete but run on scaffold/mock data** because live Odoo staging (**PH1-02**) and IoT telemetry are not yet connected. Every such area is flagged inline and summarised in [Section 8 — Honest limitations](#8-honest-limitations--whats-mock-or-stubbed). Nothing in this guide invents a feature that isn't in the code.
 
 ---
