@@ -1,21 +1,30 @@
-# taskstoissues — Spec 030
+# taskstoissues — Spec 030 (residuals only)
 
-**Date**: 2026-07-18 · **Repo**: waleedhewalla78-sudo/IPE-AISOP
+**Date**: 2026-07-18 · **Repo**: waleedhewalla78-sudo/IPE-AISOP  
+**Policy**: Wave 1 delivery issues #124–#135 already **closed**. Create **no new** Wave 1 eng issues. Track residuals only.
 
-| Task | Issue | Disposition |
-|------|-------|-------------|
-| T001 Spec + plan | #124 | CLOSE (done) |
-| T002 Ollama client | #125 | CLOSE (done) |
-| T003 AgentRoleContext | #126 | CLOSE (done) |
-| T004 Write-back 070 | #127 | CLOSE (done) |
-| T005 Excel schemas | #128 | CLOSE (done) |
-| T006 CSV exports | #129 | CLOSE (done) |
-| T007 Arabic keys | #130 | CLOSE (done) |
-| T008 A18–A20 stubs | #131 | CLOSE (done) |
-| T009 Modelfile stubs | #132 | CLOSE (done) |
-| T010 Kong phase8 | #133 | CLOSE (done) |
-| T011 Reports + tests | #134 | CLOSE (done) |
-| T012 Status pointers | #135 | CLOSE (done) |
-| T301 Validate residual | #136 | **LEAVE OPEN** (stack) |
+## Residual / OPEN
 
-Prior Spec 029 issues #111–#122 remain as historical tracking; Wave 1 eng delivered per Spec 029 converge.
+| Task | Issue | State | Notes |
+|------|-------|-------|-------|
+| T301 Validate when R2 healthy | **#136** | **OPEN** | Absorbs #70 / #72 / #110 — do not fake PASS |
+| #70 seed/sync demo MOs | #70 | OPEN | Prior Spec 022/023 |
+| #72 re-run star-trans-validate | #72 | OPEN | Depends #70 |
+| #110 re-run validate when Docker up | #110 | OPEN | Spec 024 tracking |
+
+## COM (pre-existing — leave OPEN)
+
+| Item | Issue | State |
+|------|-------|-------|
+| OQ-7 pricing | #106 | OPEN |
+| OQ-1 Odoo version | #107 | OPEN |
+| PH1-02 staging | #108 | OPEN |
+| G-R2-04 Arabic QA | #109 | OPEN |
+
+## Deferred 8B–8D
+
+No GitHub issues filed this run (avoid issue spam). Tracked in `tasks.md` T401–T403 as backlog for a future Speckit feature cut — not Wave 1 scope.
+
+## Closed Wave 1 (reference)
+
+#124–#135 closed after Spec 030 Wave 1 delivery @ `38e78fa`.

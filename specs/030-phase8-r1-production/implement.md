@@ -1,32 +1,40 @@
 # Implement — Spec 030 Phase 8 Wave 1 (8A)
 
-**Date**: 2026-07-18 · **Constitution**: 1.4.2 · **Author**: IPE Agent
+**Date**: 2026-07-18 · **Constitution**: 1.4.2 · **Author**: IPE Agent  
+**Shipped product code**: `38e78fa` · **Evidence docs**: `6f51c02`
 
-## Delivered
+## This Speckit run (gaps only — no Phase 8 rebuild)
 
-| Task | Deliverable | Evidence |
-|------|-------------|----------|
-| T001–T009 | Peer Phase 8 scaffold absorbed | ollama/roles/write-back/upload/UI/ops |
-| T010 | Kong `/api/v1/phase8` | `kong.release2.yml` `r2-phase8`; `kong.star-trans.yml` `st-phase8` |
-| T011 | Reports + tests | `docs/qa/PHASE8-EXECUTION-AND-TEST-REPORT.md`, `R1-RELEASE-READINESS.md`; **24 passed** |
-| T012 | Pointers | feature.json, PRODUCT-STATUS, AGENTS, constitution **1.4.2** |
-| T013 | Speckit pipeline | specify→clarify→analyze→plan→tasks→issues→implement→converge |
+| Gap | Action | Evidence |
+|-----|--------|----------|
+| feature.json still on constitution 1.4.1 | Bumped to **1.4.2** + shipped commit pointers | `.specify/feature.json` |
+| analyze/plan stale (pre-ship) | Refreshed against `38e78fa`/`6f51c02` | `analyze.md`, `plan.md` |
+| tasks/taskstoissues | Residuals-only; Wave 1 marked DONE @ ship | `tasks.md`, `taskstoissues.md` |
+| converge | Final ENG COMPLETE + OPEN residual list | `converge.md` |
 
-## Tests run
+## Product delivery (already shipped — cited, not re-implemented)
 
-```text
-shared:  12 passed (ollama + roles)
-dpe-svc: 9 passed (phase8 production)
-upload:  3 passed (phase8 schemas)
-TOTAL:   24 passed
-```
-
-## Stack-dependent (honest)
-
-| Task | Result |
+| Area | Commit |
 |------|--------|
-| T301 #70/#72/#110 | **OPEN** — not faked |
+| Ollama / roles / write-back 070 / Excel / A18–A20 / Kong / UI / Spec 029 absorb | `38e78fa` |
+| Test evidence alignment (102 dpe + live smoke notes) | `6f51c02` |
 
-## COM (unchanged — never faked)
+## Tests (cite shipped evidence — not re-run required for Speckit close)
 
-OQ-7, PH1-02, G-R2-04, OQ-1 remain **OPEN**.
+From `docs/qa/PHASE8-EXECUTION-AND-TEST-REPORT.md`:
+
+- Phase 8 unit TOTAL **24–31** passed
+- dpe Phase 4–8 + Spec 029 regression **102** passed
+- Live `/api/v1/phase8/ai-status` → 200 (degrade banner path)
+
+## Not implemented (honest)
+
+| Item | Reason |
+|------|--------|
+| T301 #70/#72/#110 validate PASS | Stack-dependent — remains OPEN (#136) |
+| 8B–8D | Deferred |
+| COM closes | Never fake |
+
+## Verdict
+
+**Speckit implement slice complete** (docs/pointers only). Product Wave 1 already **ENG COMPLETE** at `38e78fa`.

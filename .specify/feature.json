@@ -1,35 +1,19 @@
-﻿{
-
-  "active_feature": "specs/030-phase8-r1-production",
-
-  "active_implementation": "specs/030-phase8-r1-production",
-
-  "active_plan": "specs/030-phase8-r1-production/tasks.md",
-
-  "prior_features": [
-
-    "specs/029-productionization",
-
-    "specs/028-phase7-deep-planning",
-
-    "specs/027-phase6-enterprise-agentic",
-
-    "specs/026-phase5-planning-command",
-
-    "specs/025-phase4-premium",
-
-    "specs/024-phase3-ops-intelligence"
-
-  ],
-
-  "readiness_score": 92,
-
-  "readiness_note": "Specs 022-029 Wave 1 ENG COMPLETE; Spec 030 Phase 8 Wave 1 (8A) ENG COMPLETE scaffold; COM OPEN (OQ-7/PH1-02/G-R2-04); R1 = ENG READY / COM CONDITIONAL; constitution 1.4.1",
-
-  "phase": "030-phase8-r1-production",
-
-  "constitution_version": "1.4.1",
-
-  "last_speckit_run": "2026-07-18-spec030-phase8-wave1"
-
-}
+﻿{
+  "active_feature": "specs/030-phase8-r1-production",
+  "active_implementation": "specs/030-phase8-r1-production",
+  "active_plan": "specs/030-phase8-r1-production/tasks.md",
+  "prior_features": [
+    "specs/029-productionization",
+    "specs/028-phase7-deep-planning",
+    "specs/027-phase6-enterprise-agentic",
+    "specs/026-phase5-planning-command",
+    "specs/025-phase4-premium",
+    "specs/024-phase3-ops-intelligence"
+  ],
+  "readiness_score": 93,
+  "readiness_note": "Specs 022-029 Wave 1 ENG COMPLETE; Spec 030 Phase 8 Wave 1 (8A) ENG COMPLETE @ 38e78fa/6f51c02 — R1 ENG READY / COM CONDITIONAL; constitution 1.4.2; migration head 070; residuals #70/#72/#110/#136 OPEN",
+  "phase": "030-phase8-r1-production",
+  "constitution_version": "1.4.2",
+  "last_speckit_run": "2026-07-18-spec030-converge",
+  "shipped_commits": ["38e78fa", "6f51c02"]
+}
