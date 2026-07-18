@@ -1,28 +1,50 @@
-# Tasks → Issues — Spec 029
+# GitHub Issues — Spec 029 (`/speckit.taskstoissues`)
 
-**Date**: 2026-07-18 · Repo: `waleedhewalla78-sudo/IPE-AISOP`
+**Repo**: [waleedhewalla78-sudo/IPE-AISOP](https://github.com/waleedhewalla78-sudo/IPE-AISOP)  
+**Created**: 2026-07-18  
+**Constitution**: 1.4.1 (tree advanced to **1.4.2** under Spec 030)
 
-## Mapping
+## Primary issue set (first Speckit pass)
 
-| Task | GH title | Notes |
-|------|----------|-------|
-| T101 | [029] Kong /api/v1/enterprise route on R2 (+ deploy mirror) | FR-001 / INT-01 |
-| T102 | [029] Andon dual-write to cdm_andon_alert | FR-002 / ENG-04 |
-| T103 | [029] Migration 068 RLS coverage gaps | FR-003 / QA-04 |
-| T201 | [029] MPS/MRP persistence (migration 069) | FR-004 / ENG-07 |
-| T202 | [029] S&OP stage-gate scaffold | FR-005 / ENG-05 |
-| T401/T402 | [029] k6 p95 + Playwright flake notes | FR-006 |
-| T301 | [029][STACK] Seed MOs + validate | Links #70/#72/#110 |
-| COM | [029][COM] Track only | Links #106/#107/#108/#109 |
+| Task ID | Issue | URL | Status |
+|---------|-------|-----|--------|
+| T001 | #111 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/111 | DONE |
+| T002 | #112 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/112 | DONE |
+| T101 | #113 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/113 | DONE |
+| T102 | #114 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/114 | DONE |
+| T103 | #115 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/115 | DONE |
+| T104 | #116 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/116 | DONE |
+| T201 | #117 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/117 | DONE |
+| T202 | #118 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/118 | DONE |
+| T203 | #119 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/119 | DONE |
+| T301 | #120 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/120 | **OPEN** — stack; links #70/#72/#110 |
+| T401 | #121 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/121 | DONE |
+| T402 | #122 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/122 | DONE |
 
-## Pre-existing COM / validate issues (do not duplicate close)
+## Resume-agent duplicates (this run after crash; keep for audit)
 
-- #106 OQ-7 pricing
-- #107 OQ-1 Odoo version
-- #108 PH1-02 Odoo staging
-- #109 G-R2-04 Arabic
-- #70 / #72 / #110 validate residuals
+| Issue | URL | Notes |
+|-------|-----|-------|
+| #123 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/123 | Dup T101 Kong |
+| #137 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/137 | Dup T102 Andon |
+| #138 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/138 | Dup T103 RLS |
+| #139 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/139 | Dup T201 MPS/MRP |
+| #140 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/140 | Dup T202 stage-gate |
+| #141 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/141 | Dup T401/T402 notes |
+| #142 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/142 | Dup T301 stack |
+| #143 | https://github.com/waleedhewalla78-sudo/IPE-AISOP/issues/143 | COM tracker |
 
-## Creation log
+Close duplicates as duplicates of #111–#122 when convenient.
 
-See `_issues_created.txt` (populated when `gh issue create` succeeds in this environment).
+## COM / HUMAN (never auto-close)
+
+| Topic | Tracking |
+|-------|----------|
+| OQ-7 pricing | #106 |
+| PH1-02 Odoo staging | #108 |
+| G-R2-04 Arabic QA | #109 |
+| OQ-1 Odoo 17/19 | #107 |
+
+## Code landing
+
+Spec 029 Wave 1 code absorbed in `38e78fa` (with Spec 030 Phase 8). Tests: `test_spec029_productionization.py` green in Wave 1 suite.
