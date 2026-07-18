@@ -1,6 +1,7 @@
 # R1 Release Readiness — Phase 8 Wave 1 Snapshot
 
-**Date**: 2026-07-18 · **Constitution**: 1.4.2 · **Spec**: 030-phase8-r1-production
+**Date**: 2026-07-18 · **Constitution**: 1.4.2 · **Spec**: 030-phase8-r1-production  
+**Authoritative program finalize:** `docs/project/FINAL-PROGRAM-STATUS.md`
 
 ## Engineering readiness
 
@@ -12,15 +13,18 @@
 | Ollama degrade + amber banner | BUILT (Spec 030) |
 | Role thresholds | BUILT (Spec 030) |
 | Write-back dry-run safety | BUILT; live flag false (Spec 030) |
-| deploy/star-trans + validate script | Artifact ready |
+| Kong `/api/v1/enterprise` + `/api/v1/phase8` | **SHIPPED** (R2 + star-trans); live smoke stack-dependent |
+| deploy/star-trans + validate script | Artifact ready; validate #70/#72/#110 **OPEN** (Docker down finalize pass) |
 | Specs 022–029 Wave 1 | ENG COMPLETE |
-| Spec 030 Wave 1 (8A) | ENG COMPLETE (this report) |
+| Spec 030 Wave 1 (8A) | ENG COMPLETE; **8B–8D deferred** |
+| Migration head | **070** |
 
 ## Commercial / human blockers (MUST remain OPEN)
 
 | ID | Blocker | Blocks |
 |----|---------|--------|
 | OQ-7 | Pricing | SOW send |
+| PH1-01 | SOW send | Customer commercial track |
 | PH1-02 | Live Odoo staging | Live sync / write-back |
 | G-R2-04 | Native Arabic QA | Tag `v9.1.1-r2` |
 | OQ-1 | Odoo 17 vs 19 confirm | Pre-engagement clarity |

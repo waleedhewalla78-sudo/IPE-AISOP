@@ -1,11 +1,13 @@
 # Converge — Spec 026 Phase 5
 
-**Date:** 2026-07-15  
+**STATUS:** ENG COMPLETE Wave 1  
+**Date:** 2026-07-15 · **Finalize refresh:** 2026-07-18  
 **Mode:** Codebase vs Planning-Command-Deep + Phase 4 gate
 
 ## Verdict
 
-Phase 5 Wave 1 **eng complete**. Builds on Spec 024/025 without wipe. Unit gate **13/13 GREEN**. COM OPEN unchanged.
+Phase 5 Wave 1 **ENG COMPLETE**. Builds on Spec 024/025 without wipe. Unit gate **13/13 GREEN**. COM OPEN unchanged.  
+**Residuals (only):** Collaborative UI / WhatsApp / alert inbox SLA — Wave 2.
 
 ## Satisfied
 

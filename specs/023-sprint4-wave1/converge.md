@@ -1,7 +1,9 @@
 # Converge — Spec 023 Sprint 4 Wave 1
 
-**Date:** 2026-07-11  
-**Method:** Assess codebase vs spec/plan/tasks after implement
+**STATUS:** ENG COMPLETE Wave 1  
+**Date:** 2026-07-11 · **Finalize refresh:** 2026-07-18  
+**Method:** Assess codebase vs spec/plan/tasks after implement  
+**Residuals (only):** #70/#72/#95 validate when R2 healthy; COM blockers
 
 ---
 

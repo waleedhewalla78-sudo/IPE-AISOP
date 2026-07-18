@@ -11,9 +11,9 @@
     "specs/024-phase3-ops-intelligence"
   ],
   "readiness_score": 93,
-  "readiness_note": "Specs 022-029 Wave 1 ENG COMPLETE; Spec 030 Phase 8 Wave 1 (8A) ENG COMPLETE @ 38e78fa/6f51c02 — R1 ENG READY / COM CONDITIONAL; constitution 1.4.2; migration head 070; residuals #70/#72/#110/#136 OPEN",
+  "readiness_note": "FINALIZE 2026-07-18: Specs 022-030 Wave 1 ENG COMPLETE (030=8A); R1 ENG READY / COM CONDITIONAL; constitution 1.4.2; migration head 070; OPEN #70/#72/#110/#120/#136 validate + COM #106-#109; see docs/project/FINAL-PROGRAM-STATUS.md",
   "phase": "030-phase8-r1-production",
   "constitution_version": "1.4.2",
-  "last_speckit_run": "2026-07-18-spec030-converge",
-  "shipped_commits": ["38e78fa", "6f51c02"]
+  "last_speckit_run": "2026-07-18-program-finalize",
+  "shipped_commits": ["38e78fa", "6f51c02", "6bf76ee"]
 }

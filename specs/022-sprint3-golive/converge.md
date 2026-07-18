@@ -1,7 +1,9 @@
 # Converge — Spec 022 Sprint 3 Go-Live
 
-**Date:** 2026-07-11  
-**Method:** Assess codebase + evidence against spec/plan/tasks (append-only tasks for gaps)
+**STATUS:** ENG COMPLETE Wave 1  
+**Date:** 2026-07-11 · **Finalize refresh:** 2026-07-18  
+**Method:** Assess codebase + evidence against spec/plan/tasks (append-only tasks for gaps)  
+**Residuals (only):** #70/#72 stack validate; COM blockers (shared program register)
 
 ---
 

@@ -1,8 +1,10 @@
 # Converge — Spec 030 Phase 8 Wave 1 (8A)
 
+**STATUS:** ENG COMPLETE Wave 1 (8A)  
 **Date**: 2026-07-18 · **Constitution**: 1.4.2  
 **Shipped**: `38e78fa` / `6f51c02`  
-**Verdict**: **ENG COMPLETE Wave 1 (8A)** · R1 **ENG READY / COM CONDITIONAL**
+**Verdict**: **ENG COMPLETE Wave 1 (8A)** · R1 **ENG READY / COM CONDITIONAL**  
+**Authoritative:** `docs/project/FINAL-PROGRAM-STATUS.md`
 
 ## Spec ↔ shipped code
 

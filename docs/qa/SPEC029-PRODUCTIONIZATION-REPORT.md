@@ -2,8 +2,9 @@
 
 **Date**: 2026-07-18  
 **Feature**: `specs/029-productionization`  
-**Constitution**: 1.4.1 (PATCH from 1.4.0)  
+**Constitution**: 1.4.2 (Spec 030 active; Spec 029 Wave 1 ENG COMPLETE)  
 **HEAD baseline**: ~39ad033  
+**Authoritative:** `docs/project/FINAL-PROGRAM-STATUS.md` 
 
 ## Summary
 

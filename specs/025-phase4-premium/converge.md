@@ -1,7 +1,9 @@
 # Converge — Spec 025 Phase 4 Premium
 
-**Date**: 2026-07-15  
-**Verdict**: Wave 1 eng present and unit-tested. COM OPEN preserved. Phase 3 cores not regressed.
+**STATUS:** ENG COMPLETE Wave 1  
+**Date**: 2026-07-15 · **Finalize refresh:** 2026-07-18  
+**Verdict**: Wave 1 ENG COMPLETE. COM OPEN preserved. Phase 3 cores not regressed.  
+**Residuals (only):** Digital factory polish; live Odoo write-back (PH1-02); deep Ctrl+K synthesis — Wave 2 / COM.
 
 ## Satisfied
 

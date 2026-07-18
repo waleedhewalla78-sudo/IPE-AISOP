@@ -1,6 +1,7 @@
 # OPEN Items — Program (honest tracker)
 
-**Updated:** 2026-07-18  
+**Updated:** 2026-07-18 (finalize pass)  
+**Authoritative:** `docs/project/FINAL-PROGRAM-STATUS.md`  
 **Do not auto-close COM items.**
 
 ## Commercial / Human (OPEN)
@@ -13,29 +14,31 @@
 | PH1-02 | Live Odoo staging | Ops / Customer IT | Live sync UAT + live write-back |
 | G-R2-04 | Arabic native QA sign-off | Native reviewer | `v9.1.1-r2` tag |
 | OQ-9 | Gate 11 waiver signatures | Waleed | Formal waiver |
+| OQ-3 | UI route-level RBAC decision | COM | Support terms / SOW clarity |
+| OQ-8 | Customer 2+ pipeline prospects | COM | Pipeline only |
 
 ## Engineering residuals (OPEN)
 
 | Item | Notes |
 |------|-------|
-| Spec 022 #70/#72/#110 Docker validate | Re-run when R2 stack fully healthy |
-| Phase 8B multi-site A18 live + Odoo write-back expansion | Deferred (stubs in 8A) |
-| Phase 8C full Arabic + Excel everywhere + SOC 2 prep | Deferred |
-| Phase 8D partner programme + launch | Deferred |
-| Live Kong smoke `/api/v1/phase8/*` | After image rebuild + healthy gateway |
-| Spec 025 Digital Factory polish | Shop-floor linked only |
-| Spec 026 collaborative planning / WhatsApp / alert inbox | Deferred beyond Wave 1 |
-| Spec 028 Digital Gemba live IoT / operator tablet / Andon push | STUB / Wave 2 |
-| Spec 028 monetary net-saving in leveling | Deferred |
+| Spec 022/024/029/030 #70/#72/#110/#120/#136 Docker validate | Re-run when R2 stack healthy (Docker down 2026-07-18 finalize) |
+| Live Kong smoke `/enterprise/*` + `/phase8/*` | Routes shipped; smoke when gateway up |
 | Under-load k6 p95 | Spec 029 notes — residual risk |
+| Playwright flakes (Arabic tablet / mobile a11y) | Notes + stub; stabilize |
+| RLS residual tables (post-068 audit) | Close remaining if still off |
+| Phase 8B–8D | Deferred (stubs in 8A) |
+| Spec 026 collaborative / WhatsApp / alert inbox | Wave 2 |
+| Spec 028 live IoT / operator tablet / Andon push | STUB / Wave 2 |
+| Spec 028 monetary net-saving in leveling | Deferred |
 
-## Engineering CLOSED this run (Phase 8 / 029)
+## Engineering CLOSED (do not re-open)
 
 | Item | Notes |
 |------|-------|
-| Spec 029 Kong enterprise / Andon dual-write / RLS 068 / MPS-MRP 069 / stage-gate | ENG COMPLETE Wave 1 |
-| Spec 030 Ollama degrade + roles + write-back 070 + Excel types + A18–A20 stubs | ENG COMPLETE Wave 1 (8A) |
-| INT-01 Kong `/enterprise` route object | Shipped in Spec 029 (live smoke stack-dependent) |
+| Specs 022–030 Wave 1 (030 = 8A) | ENG COMPLETE |
+| INT-01 Kong `/api/v1/enterprise` (+ `/phase8`) | Shipped R2 + star-trans |
+| Spec 029 Andon dual-write / RLS 068 / MPS-MRP 069 / stage-gate | ENG COMPLETE Wave 1 |
+| Spec 030 Ollama degrade + roles + write-back 070 + Excel + A18–A20 stubs | ENG COMPLETE Wave 1 (8A) |
 
 ## Tags
 
@@ -44,6 +47,7 @@
 | v9.1.1-r2 | HOLD until G-R2-04 |
 | v9.1.0-r2 | **Do not push** (stale) |
 | v9.3.0-r1-eng | Not applied (COM CONDITIONAL) |
+| v9.2.0-planning | Applied @ b04434d |
 
 ## Completed (eng)
 

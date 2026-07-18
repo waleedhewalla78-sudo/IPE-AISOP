@@ -4,10 +4,11 @@
 **Release Tag:** v9.2.0-planning (applied @ b04434d), v9.4.0-p3 (platform) — **no v9.1.1-r2** (G-R2-04 HOLD)  
 **Active Speckit feature:** `specs/030-phase8-r1-production` (prior: `029`–`024`)  
 **Agents:** 17 built (A1–A17) + **A18–A20 stubs** (Phase 8 Wave 1) · **Modules:** 9 (M1–M9) + Phase 7 deep + Phase 8 scaffold  
-**Constitution:** 1.4.1  
+**Constitution:** **1.4.2**  
 **Migration head:** **070** (`cdm_write_back_log`)  
 **Workspace:** `E:\AISOP\ipe`  
-**Phase 3–7 reports:** `docs/qa/PHASE{3,4,5,6,7}-EXECUTION-AND-TEST-REPORT.md`  
+**Authoritative finalize:** `docs/project/FINAL-PROGRAM-STATUS.md` — verdict **ENG READY / COM CONDITIONAL**  
+**Phase 3–8 reports:** `docs/qa/PHASE{3,4,5,6,7,8}-EXECUTION-AND-TEST-REPORT.md`  
 **Spec 029 report:** `docs/qa/SPEC029-PRODUCTIONIZATION-REPORT.md`  
 **Phase 8 report:** `docs/qa/PHASE8-EXECUTION-AND-TEST-REPORT.md`  
 **R1 readiness:** `docs/qa/R1-RELEASE-READINESS.md` — verdict **ENG READY / COM CONDITIONAL**  
@@ -73,7 +74,8 @@
 | dpe Phase 4–8 + Spec 029 bundle | GREEN | **102** |
 | Frontend tsc | GREEN | 0 errors |
 | Phases 3–5 strategy (prior) | CONDITIONAL | 86/0/15/1 |
-| star-trans-validate #70/#72/#110 | OPEN | Stack partial |
+| star-trans-validate #70/#72/#110 | OPEN | Docker down on 2026-07-18 finalize — not faked |
+| Kong `/enterprise` + `/phase8` routes | **SHIPPED** | `r2-*` + `st-*`; live smoke stack-dependent |
 
 ## Tags
 
@@ -82,16 +84,18 @@
 | v9.2.0-planning | **APPLIED** @ b04434d |
 | v9.1.1-r2 | **HOLD** (G-R2-04) |
 | v9.1.0-r2 | **Do not push** (stale) |
-| v9.3.0-r1-eng | **NOT APPLIED** this run |
+| v9.3.0-r1-eng | **NOT APPLIED** (COM CONDITIONAL) |
 
 ## COM OPEN (never fake)
 
-OQ-7 · OQ-1 · PH1-01 · PH1-02 · G-R2-04 · OQ-9
+OQ-7 · OQ-1 · PH1-01 · PH1-02 · G-R2-04 · OQ-9 · OQ-3 · OQ-8
 
 ## Speckit
 
 | Spec | Status |
 |------|--------|
-| 022–028 | ENG COMPLETE Wave 1 |
-| **029** | ENG COMPLETE Wave 1 |
-| **030** | **ENG COMPLETE Wave 1 (8A)** — active |
+| 022–028 | **ENG COMPLETE Wave 1** |
+| **029** | **ENG COMPLETE Wave 1** |
+| **030** | **ENG COMPLETE Wave 1 (8A)** — active; **8B–8D deferred** |
+
+See `docs/project/FINAL-PROGRAM-STATUS.md` + `docs/project/OPEN-TOPICS-REGISTER.md`.

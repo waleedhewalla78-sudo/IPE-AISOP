@@ -1,11 +1,13 @@
 # Converge — Spec 024
 
-**Date**: 2026-07-15  
+**STATUS:** ENG COMPLETE Wave 1  
+**Date**: 2026-07-15 · **Finalize refresh:** 2026-07-18  
 **Mode**: Codebase vs spec/plan/tasks after implement
 
 ## Verdict
 
-Ops Phase 3 **application core is eng-present and unit-tested**. Schema 051–059 absorbed. Gaps remain on compose wiring, optional capacity HTTP routes, orchestrator trigger endpoint, CHANGELOG, live migration evidence, Phase 4/5 product work, and all COM blockers.
+Ops Phase 3 Wave 1 **ENG COMPLETE**. Schema 051–059 absorbed; predictive/root-cause/exceptions/batch/auction/orchestrator unit-tested green.  
+**Residuals (only):** #110 validate absorb (stack); COM blockers; Wave 2 polish — see `docs/project/FINAL-PROGRAM-STATUS.md`.
 
 ## Satisfied
 

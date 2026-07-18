@@ -1,6 +1,6 @@
 # IPE Project Progress
 
-> **Current (2026-07-18):** Constitution **1.4.2** · Speckit **`specs/030-phase8-r1-production` ENG COMPLETE Wave 1 (8A)** · Specs **022–029 Wave 1 ENG COMPLETE** · Phase 8: Ollama degrade, AgentRoleContext, Excel schemas, write-back safety (070), Kong `/phase8`, amber banner · validate #70/#72/#110 OPEN (stack) · Tag **`v9.2.0-planning`** · COM blockers OQ-7 / OQ-1 / PH1-02 / G-R2-04 remain OPEN. See `PRODUCT-STATUS.md` + `docs/qa/PHASE8-EXECUTION-AND-TEST-REPORT.md` + `docs/project/OPEN-TOPICS-REGISTER.md`.
+> **Current (2026-07-18 finalize):** Constitution **1.4.2** · Speckit **`specs/030-phase8-r1-production` ENG COMPLETE Wave 1 (8A)** · Specs **022–029 Wave 1 ENG COMPLETE** · R1 **ENG READY / COM CONDITIONAL** · Migration head **070** · validate #70/#72/#110/#120/#136 OPEN (Docker down) · Tag **`v9.2.0-planning`** · COM OQ-7 / OQ-1 / PH1-02 / G-R2-04 OPEN. See `docs/project/FINAL-PROGRAM-STATUS.md` + `PRODUCT-STATUS.md` + `docs/project/OPEN-TOPICS-REGISTER.md`.
 
 ## Phase 0: Foundation (COMPLETE)
 
