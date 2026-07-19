@@ -10,57 +10,142 @@ from typing import Any
 
 FILE_SCHEMAS: dict[str, dict[str, Any]] = {
     "product_master": {
-        "required": ["product_code", "name", "type", "uom"],
+        # Minimum operational product master (Star Trans / MES-style)
+        "required": [
+            "product_code",
+            "product_group",
+            "product_type",
+            "short_name",
+            "full_name",
+            "uom",
+            "main_storage_location",
+        ],
+        "optional": [
+            "name_ar",
+            "standard_cost",
+            "currency",
+            "safety_stock",
+            "reorder_point",
+            "lead_time_days",
+            "abc_class",
+            "active",
+            "weight_kg",
+            "hs_code",
+        ],
+        # Legacy July pack / thin API samples
+        "column_aliases": {
+            "name": "short_name",
+            "product_name": "full_name",
+            "type": "product_type",
+            "uom_code": "uom",
+            "unit_of_measure": "uom",
+            "storage_location": "main_storage_location",
+            "location": "main_storage_location",
+            "group": "product_group",
+            "product_category": "product_group",
+        },
         "phase": 1,
         "agents": ["A2", "A4"],
     },
     "customer_master": {
-        "required": ["customer_code", "name"],
+        "required": ["customer_code", "name", "tier", "country", "currency"],
+        "optional": [
+            "name_ar",
+            "credit_limit",
+            "payment_terms",
+            "city",
+            "contact_name",
+            "contact_email",
+            "contact_phone",
+            "tax_id",
+            "active",
+        ],
+        "column_aliases": {"customer_name": "name"},
         "phase": 1,
         "agents": ["A1"],
     },
     "supplier_master": {
-        "required": ["supplier_code", "name"],
+        "required": ["supplier_code", "name", "lead_time_days", "country", "currency"],
+        "optional": [
+            "name_ar",
+            "reliability_pct",
+            "payment_terms",
+            "city",
+            "contact_name",
+            "contact_email",
+            "min_order_qty",
+            "active",
+        ],
+        "column_aliases": {"supplier_name": "name"},
         "phase": 1,
         "agents": ["A2"],
     },
     "work_centre_master": {
-        "required": ["work_centre_code", "name"],
+        "required": ["work_centre_code", "name", "capacity_hrs_day", "location"],
+        "optional": [
+            "name_ar",
+            "shifts_per_day",
+            "efficiency_pct",
+            "calendar_code",
+            "cost_per_hour",
+            "active",
+        ],
+        "column_aliases": {
+            "work_center_code": "work_centre_code",
+            "wc_code": "work_centre_code",
+            "work_center_name": "name",
+        },
         "phase": 1,
         "agents": ["A3", "A4"],
     },
     "bom": {
-        "required": ["product_code", "component_code", "quantity"],
+        "required": ["product_code", "component_code", "quantity", "uom"],
+        "optional": ["scrap_pct", "operation_seq", "effective_from", "effective_to"],
         "phase": 2,
         "agents": ["A4"],
     },
     "routing": {
-        "required": ["product_code", "operation_seq", "work_centre_code"],
+        "required": ["product_code", "operation_seq", "work_centre_code", "run_minutes"],
+        "optional": ["setup_minutes", "description", "overlap_pct"],
+        "column_aliases": {"work_center_code": "work_centre_code"},
         "phase": 2,
         "agents": ["A3", "A4"],
     },
     "capacity_calendar": {
         "required": ["work_centre_code", "date", "shift", "available_hours"],
+        "optional": ["overtime_hours", "notes"],
+        "column_aliases": {"work_center_code": "work_centre_code"},
         "phase": 3,
         "agents": ["A3"],
     },
     "lead_time": {
         "required": ["product_code", "supplier_code", "lead_time_days"],
+        "optional": ["min_qty", "transport_mode", "incoterm"],
         "phase": 3,
         "agents": ["A2"],
     },
     "cost_data": {
-        "required": ["product_code", "unit_cost"],
+        "required": ["product_code", "unit_cost", "currency"],
+        "optional": ["cost_type", "effective_from", "standard_cost"],
         "phase": 3,
         "agents": ["A5", "A6"],
     },
     "inventory": {
-        "required": ["product_code", "on_hand"],
+        "required": ["product_code", "on_hand", "location"],
+        "optional": ["reserved", "available", "lot_number", "uom"],
         "phase": 4,
         "agents": ["A2", "A4"],
     },
     "production_orders": {
-        "required": ["mo_number", "product_code", "quantity", "planned_start", "planned_end", "status"],
+        "required": [
+            "mo_number",
+            "product_code",
+            "quantity",
+            "planned_start",
+            "planned_end",
+            "status",
+        ],
+        "optional": ["priority", "work_centre_code", "customer_code", "sales_order"],
         "phase": 4,
         "agents": ["A3", "A4"],
     },
@@ -74,32 +159,45 @@ FILE_SCHEMAS: dict[str, dict[str, Any]] = {
             "requested_delivery",
             "status",
         ],
+        "optional": ["unit_price", "currency", "line_number", "warehouse"],
         "phase": 4,
         "agents": ["A1", "A4"],
     },
     "purchase_orders": {
-        "required": ["po_number", "supplier_code", "product_code", "quantity"],
+        "required": [
+            "po_number",
+            "supplier_code",
+            "product_code",
+            "quantity",
+            "unit_price",
+            "expected_delivery",
+        ],
+        "optional": ["currency", "warehouse", "status"],
         "phase": 4,
         "agents": ["A2"],
     },
     "historical_otd": {
         "required": ["mo_number", "planned_end", "actual_end"],
+        "optional": ["delay_days", "product_code", "customer_code"],
         "phase": 5,
         "agents": ["A6"],
     },
     # Phase 8 Wave 1 — high-value operational uploads
     "demand_forecast": {
         "required": ["product_code", "period", "forecast_qty"],
+        "optional": ["source", "confidence_pct", "uom"],
         "phase": 8,
         "agents": ["A1", "A4"],
     },
     "quality_results": {
         "required": ["mo_number", "inspection_date", "result", "measured_value"],
+        "optional": ["defect_type", "inspector", "product_code", "notes"],
         "phase": 8,
         "agents": ["A10"],
     },
     "sop_sales_input": {
         "required": ["product_family", "period", "sales_forecast_qty"],
+        "optional": ["rationale", "region", "confidence_pct"],
         "phase": 8,
         "agents": ["A1", "A14"],
     },
@@ -148,6 +246,49 @@ class ValidationResult:
 def normalize_file_type(file_type: str) -> str:
     key = file_type.strip().lower().replace("-", "_").replace(" ", "_")
     return ALIASES.get(key, key)
+
+
+def _norm_header_key(header: str) -> str:
+    return str(header).strip().lower().replace(" ", "_").replace("-", "_")
+
+
+def normalize_columns(
+    headers: list[str],
+    rows: list[dict[str, str]],
+    aliases: dict[str, str] | None,
+) -> tuple[list[str], list[dict[str, str]]]:
+    """Map legacy/header variants to canonical schema names."""
+    aliases = aliases or {}
+    mapping: dict[str, str] = {}
+    new_headers: list[str] = []
+    seen: set[str] = set()
+    for h in headers:
+        key = _norm_header_key(h)
+        canon = aliases.get(key, key)
+        mapping[h] = canon
+        if canon not in seen:
+            new_headers.append(canon)
+            seen.add(canon)
+
+    new_rows: list[dict[str, str]] = []
+    for row in rows:
+        nr: dict[str, str] = {}
+        for old, val in row.items():
+            canon = mapping.get(old, _norm_header_key(old))
+            canon = aliases.get(canon, canon)
+            if canon not in nr or (not nr[canon] and val):
+                nr[canon] = val
+        # Convenience: legacy name-only → fill full_name if missing
+        if nr.get("short_name") and not nr.get("full_name"):
+            nr["full_name"] = nr["short_name"]
+        new_rows.append(nr)
+
+    # Ensure derived columns appear in header list when filled
+    for extra in ("full_name",):
+        if any(r.get(extra) for r in new_rows) and extra not in seen:
+            new_headers.append(extra)
+            seen.add(extra)
+    return new_headers, new_rows
 
 
 def _invalid_format_message(filename: str, content: bytes) -> str | None:
@@ -231,6 +372,8 @@ class UploadValidator:
                 stage_4_business={"status": "fail"},
                 rejected=1,
             )
+
+        headers, rows = normalize_columns(headers, rows, schema.get("column_aliases"))
 
         required = schema["required"]
         missing = [c for c in required if c not in headers]

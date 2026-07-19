@@ -16,6 +16,21 @@ from app.core.wizard import wizard_store
 router = APIRouter(prefix="/upload", tags=["upload"])
 _validator = UploadValidator()
 _upload_store: dict[str, dict[str, Any]] = {}
+_upload_history: list[dict[str, Any]] = []
+
+
+def _record_history(tenant: str, payload: dict[str, Any]) -> None:
+    _upload_history.append(
+        {
+            "tenant_id": tenant,
+            "upload_id": payload["upload_id"],
+            "file_type": payload["file_type"],
+            "file_name": payload.get("file_name"),
+            "status": "completed" if payload["result"]["rejected"] == 0 else "completed_with_errors",
+            "accepted": payload["result"]["accepted"],
+            "rejected": payload["result"]["rejected"],
+        }
+    )
 
 
 def _tenant(x_tenant_id: str | None) -> str:
@@ -35,13 +50,67 @@ async def complete_phase(
     return wizard_store.complete_phase(_tenant(x_tenant_id), phase_number)
 
 
+@router.get("/history")
+async def upload_history(x_tenant_id: str | None = Header(default=None, alias="X-Tenant-ID")):
+    tenant = _tenant(x_tenant_id)
+    items = [h for h in _upload_history if h["tenant_id"] == tenant]
+    return {"uploads": items, "count": len(items)}
+
+
+@router.get("/templates/{file_type}")
+async def download_template(file_type: str):
+    from app.core.validator import FILE_SCHEMAS, normalize_file_type
+
+    ft = normalize_file_type(file_type)
+    schema = FILE_SCHEMAS.get(ft)
+    if not schema:
+        return {"error": f"Unknown template: {file_type}"}
+    wb = Workbook()
+    ws = wb.active
+    ws.title = ft
+    headers = list(schema["required"]) + list(schema.get("optional", []))
+    ws.append(headers)
+    sample = {h: f"sample_{h}" for h in headers}
+    if "product_code" in sample:
+        sample["product_code"] = "FG-DT100"
+    if "product_type" in sample:
+        sample["product_type"] = "finished"
+    if "type" in sample:
+        sample["type"] = "finished"
+    if "short_name" in sample:
+        sample["short_name"] = "DT100"
+    if "full_name" in sample:
+        sample["full_name"] = "Distribution Transformer 100kVA"
+    if "product_group" in sample:
+        sample["product_group"] = "DT"
+    if "uom" in sample:
+        sample["uom"] = "EA"
+    if "main_storage_location" in sample:
+        sample["main_storage_location"] = "WH-FG"
+    ws.append([sample.get(h, "") for h in headers])
+    ws.append([f"Required: {h}" if h in schema["required"] else f"Optional: {h}" for h in headers])
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{ft}_template.xlsx"'},
+    )
+
+
 @router.get("/templates")
 async def list_templates():
     from app.core.validator import FILE_SCHEMAS
 
     return {
         "templates": [
-            {"file_type": k, "required_columns": v["required"], "phase": v["phase"]}
+            {
+                "file_type": k,
+                "required_columns": v["required"],
+                "optional_columns": v.get("optional", []),
+                "phase": v["phase"],
+            }
             for k, v in FILE_SCHEMAS.items()
         ]
     }
@@ -82,6 +151,7 @@ async def upload_file(
         "download_errors_url": f"/api/v1/upload/{upload_id}/errors.xlsx",
     }
     _upload_store[upload_id] = {"errors": result.errors, "payload": payload}
+    _record_history(tenant, payload)
     return payload
 
 
