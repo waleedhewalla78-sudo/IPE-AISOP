@@ -1,32 +1,57 @@
+/**
+ * Empty table state with helpful message + action (STREAM-6.4).
+ */
 import type { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
+import { t } from '@/lib/i18n';
 
-interface EmptyStateProps {
-  title: string;
-  description: string;
-  action?: ReactNode;
-  className?: string;
-  tone?: 'neutral' | 'success';
+interface Props {
+  title?: string;
+  message: string;
+  actionLabel?: string;
+  actionTo?: string;
+  onAction?: () => void;
+  children?: ReactNode;
 }
 
 export function EmptyState({
   title,
-  description,
-  action,
-  className,
-  tone = 'neutral',
-}: EmptyStateProps) {
+  message,
+  actionLabel,
+  actionTo,
+  onAction,
+  children,
+}: Props) {
   return (
     <div
-      className={cn(
-        'flex flex-col items-center justify-center rounded-lg border border-dashed border-ipe-border bg-white px-6 py-12 text-center',
-        tone === 'success' && 'border-emerald-200 bg-emerald-50/40',
-        className,
-      )}
+      className="flex flex-col items-center justify-center gap-2 px-4 py-10 text-center"
+      data-testid="empty-state"
     >
-      <p className="text-base font-medium text-ipe-text">{title}</p>
-      <p className="mt-2 max-w-md text-sm text-ipe-text-muted">{description}</p>
-      {action ? <div className="mt-4">{action}</div> : null}
+      {title ? <p className="text-sm font-semibold text-ipe-text">{title}</p> : null}
+      <p className="max-w-md text-sm text-ipe-text-muted">{message}</p>
+      {actionTo && actionLabel ? (
+        <Link
+          to={actionTo}
+          className="mt-2 rounded-md bg-ipe-primary px-3 py-1.5 text-xs font-medium text-white"
+        >
+          {actionLabel}
+        </Link>
+      ) : null}
+      {onAction && actionLabel && !actionTo ? (
+        <button
+          type="button"
+          className="mt-2 rounded-md bg-ipe-primary px-3 py-1.5 text-xs font-medium text-white"
+          onClick={onAction}
+        >
+          {actionLabel}
+        </button>
+      ) : null}
+      {children}
+      {!actionLabel ? (
+        <p className="text-[10px] text-ipe-text-muted">
+          {t('empty.hint', 'Seed demo data or upload Excel to populate this view.')}
+        </p>
+      ) : null}
     </div>
   );
 }
