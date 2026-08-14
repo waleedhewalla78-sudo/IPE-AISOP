@@ -130,6 +130,13 @@ export const PRODUCT_DOMAINS: ProductDomain[] = [
         description: 'Gantt & AI solver',
       },
       {
+        id: 'detailedSchedule',
+        to: ROUTES.PLAN_DETAILED_SCHEDULE,
+        labelKey: 'nav.module.detailedSchedule',
+        fallback: 'Detailed Schedule',
+        description: 'Work Center Gantt',
+      },
+      {
         id: 'scenarios',
         to: ROUTES.PLANNING_SCENARIOS,
         labelKey: 'nav.module.scenarios',

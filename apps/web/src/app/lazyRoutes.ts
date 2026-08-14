@@ -48,6 +48,10 @@ export const ResolutionCenterPage = lazyNamed(
   'ResolutionCenterPage',
 );
 export const SchedulePage = lazyNamed(() => import('@/features/schedule/SchedulePage'), 'SchedulePage');
+export const DetailedSchedulePage = lazyNamed(
+  () => import('@/features/schedule/DetailedSchedulePage'),
+  'DetailedSchedulePage',
+);
 export const DemandForecastPage = lazyNamed(
   () => import('@/features/hubs/planning/DemandForecastPage'),
   'DemandForecastPage',

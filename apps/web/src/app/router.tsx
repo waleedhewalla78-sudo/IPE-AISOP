@@ -13,6 +13,7 @@ import {
   ControlTowerPage,
   ResolutionCenterPage,
   SchedulePage,
+  DetailedSchedulePage,
   DemandForecastPage,
   ScenarioWorkbenchPage,
   CommandCenterDashboardPage,
@@ -94,10 +95,8 @@ export function AppRouter() {
 
           <Route path={ROUTES.WORKSPACE} element={<UnifiedWorkspacePage />} />
           <Route path="/admin/data/upload" element={<StarTransDataUploadPage />} />
-          <Route
-            path="/plan/detailed-schedule"
-            element={<LegacyRedirect to={ROUTES.PLANNING_SCHEDULE} />}
-          />
+          <Route path="/plan/detailed-schedule" element={<DetailedSchedulePage />} />
+          <Route path={ROUTES.PLAN_DETAILED_SCHEDULE} element={<DetailedSchedulePage />} />
 
           {/* Work OS hub — enterprise shell */}
           <Route path={ROUTES.WORK} element={<WorkHub />}>
