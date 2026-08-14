@@ -2,6 +2,7 @@
 status: CLOSED
 closed_by: foundation
 date: 2026-07-11
+superseded_for_aug18_demo: specs/040-startrans-demo-aug18
 ---
 # Feature Specification: Star Trans Client Demo (Today)
 
