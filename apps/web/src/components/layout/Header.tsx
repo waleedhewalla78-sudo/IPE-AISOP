@@ -11,6 +11,7 @@ import { ROUTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { ApprovalPanel } from '@/features/approvals/components/ApprovalPanel';
 import { GlobalSearch } from './GlobalSearch';
+import { DemoRoleSwitcher } from './DemoRoleSwitcher';
 
 type Notif = {
   notification_id: string;
@@ -114,6 +115,7 @@ export function Header() {
         <GlobalSearch />
       </div>
       <div className="flex items-center gap-2 sm:gap-3">
+        <DemoRoleSwitcher />
         <ApprovalPanel />
         <div className="relative" ref={panelRef}>
           <button
