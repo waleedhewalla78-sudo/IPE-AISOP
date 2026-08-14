@@ -14,7 +14,7 @@ $ApproveMoIds = @(
     "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
     "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380006"
 )
-$WidgetProduct = "e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01"
+$BomProduct = "e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01"
 $ChaosDir = Join-Path (Split-Path -Parent $PSScriptRoot) "docs\chaos"
 New-Item -ItemType Directory -Force -Path $ChaosDir | Out-Null
 
@@ -47,7 +47,7 @@ function Test-NonNlpPaths {
         $results += "capacity/schedule: $($r.StatusCode)"
     } catch { $results += "capacity/schedule: FAIL $($_.Exception.Message)" }
     try {
-        $body = (@{ product_id = $WidgetProduct; quantity = 10; required_date = "2026-07-01T00:00:00Z" } | ConvertTo-Json -Compress)
+        $body = (@{ product_id = $BomProduct; quantity = 10; required_date = "2026-07-01T00:00:00Z" } | ConvertTo-Json -Compress)
         $r = Invoke-WebRequest -Uri "$Base/api/v1/material/check-availability" -Headers $Headers -Method POST -Body $body -UseBasicParsing -TimeoutSec 20
         $results += "material/check-availability: $($r.StatusCode)"
     } catch { $results += "material/check-availability: FAIL $($_.Exception.Message)" }

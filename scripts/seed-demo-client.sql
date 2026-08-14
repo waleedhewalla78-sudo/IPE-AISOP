@@ -44,19 +44,19 @@ VALUES
   ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'SUPP003', 'QuickShip Logistics', 0.75, 5.0, 4.0)
 ON CONFLICT (tenant_id, erp_source_id) DO NOTHING;
 
--- BOMs (Widget A, Gadget B, Assembly D)
+-- BOMs (PROD001 / PROD002 / PROD004 — Star Trans transformers)
 INSERT INTO cdm_bill_of_material (id, tenant_id, product_id, erp_source_id, version, is_active)
-SELECT 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 'BOM-WIDGET-A', '1.0', true
+SELECT 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 'BOM-DT-500', '1.0', true
 FROM cdm_product p WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD001'
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cdm_bill_of_material (id, tenant_id, product_id, erp_source_id, version, is_active)
-SELECT 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 'BOM-GADGET-B', '1.0', true
+SELECT 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 'BOM-PM-250', '1.0', true
 FROM cdm_product p WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD002'
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cdm_bill_of_material (id, tenant_id, product_id, erp_source_id, version, is_active)
-SELECT 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a03', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 'BOM-ASSEMBLY-D', '1.0', true
+SELECT 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a03', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', p.id, 'BOM-PT-50M', '1.0', true
 FROM cdm_product p WHERE p.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND p.erp_source_id = 'PROD004'
 ON CONFLICT (id) DO NOTHING;
 
@@ -72,27 +72,27 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Routing (3 ops per BOM -> Schedule solver)
 INSERT INTO cdm_routing_operation (id, tenant_id, bom_id, sequence, work_center_id, operation_name, duration_planned_mins, setup_time_mins)
-SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 10, wc.id, 'Machine Widget Housing', 90, 15
+SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 10, wc.id, 'Wind LV/HV Coils', 90, 15
 FROM cdm_work_center wc WHERE wc.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND wc.erp_source_id = 'WC002'
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cdm_routing_operation (id, tenant_id, bom_id, sequence, work_center_id, operation_name, duration_planned_mins, setup_time_mins)
-SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 20, wc.id, 'Assemble Widget A', 120, 20
+SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 20, wc.id, 'Core & Coil Assembly', 120, 20
 FROM cdm_work_center wc WHERE wc.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND wc.erp_source_id = 'WC001'
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cdm_routing_operation (id, tenant_id, bom_id, sequence, work_center_id, operation_name, duration_planned_mins, setup_time_mins)
-SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c03', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 30, wc.id, 'Pack Widget A', 45, 10
+SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c03', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a01', 30, wc.id, 'Tank Fit-Up & Vacuum Test', 45, 10
 FROM cdm_work_center wc WHERE wc.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND wc.erp_source_id = 'WC003'
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cdm_routing_operation (id, tenant_id, bom_id, sequence, work_center_id, operation_name, duration_planned_mins, setup_time_mins)
-SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c04', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 10, wc.id, 'Fabricate Gadget B', 150, 25
+SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c04', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 10, wc.id, 'Wind Pad-Mount Coils', 150, 25
 FROM cdm_work_center wc WHERE wc.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND wc.erp_source_id = 'WC002'
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cdm_routing_operation (id, tenant_id, bom_id, sequence, work_center_id, operation_name, duration_planned_mins, setup_time_mins)
-SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c05', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 20, wc.id, 'QC Gadget B', 60, 5
+SELECT 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c05', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'e1eebc99-9c0b-4ef8-bb6d-6bb9bd380a02', 20, wc.id, 'Pad-Mount Final Test', 60, 5
 FROM cdm_work_center wc WHERE wc.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND wc.erp_source_id = 'WC003'
 ON CONFLICT (id) DO NOTHING;
 
@@ -242,7 +242,7 @@ VALUES
    (SELECT id FROM cdm_work_center WHERE erp_source_id='WC003' AND tenant_id='a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
    (SELECT id FROM cdm_operator WHERE erp_source_id='OP003' AND tenant_id='a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'), 20, 'pending');
 
--- V6-R1: Activity cost drivers (Widget A high margin, Gadget B lower after overhead)
+-- V6-R1: Activity cost drivers (DT-500 high margin, pad-mount lower after overhead)
 DELETE FROM cdm_activity_cost_drivers
 WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 

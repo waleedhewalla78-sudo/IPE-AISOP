@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "detail":  "JWT obtained (Keycloak or local)",
         "step":  "1. IPE login",
@@ -311,7 +311,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380007",
                                           "feasibility_score":  45.0,
                                           "primary_constraint":  "material_shortage",
-                                          "product_name":  "Widget A",
+                                          "product_name":  "Distribution Transformer 500 kVA",
                                           "required_date":  "2026-07-11T03:32:40.463773+00:00",
                                           "customer_name":  "Acme Corp",
                                           "erp_mo_id":  "MO-DEMO-007",
@@ -325,7 +325,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380001",
                                           "feasibility_score":  52.0,
                                           "primary_constraint":  "material_shortage",
-                                          "product_name":  "Widget A",
+                                          "product_name":  "Distribution Transformer 500 kVA",
                                           "required_date":  "2026-07-12T03:32:40.463773+00:00",
                                           "customer_name":  "Acme Corp",
                                           "erp_mo_id":  "MO-DEMO-001",
@@ -339,7 +339,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380008",
                                           "feasibility_score":  62.0,
                                           "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Gadget B",
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
                                           "required_date":  "2026-07-18T03:32:40.463773+00:00",
                                           "customer_name":  "Globex Inc",
                                           "erp_mo_id":  "MO-DEMO-008",
@@ -353,7 +353,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380002",
                                           "feasibility_score":  68.0,
                                           "primary_constraint":  "capacity_overload",
-                                          "product_name":  "Gadget B",
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
                                           "required_date":  "2026-07-14T03:32:40.463773+00:00",
                                           "customer_name":  "Globex Inc",
                                           "erp_mo_id":  "MO-DEMO-002",
@@ -381,7 +381,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380004",
                                           "feasibility_score":  81.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Widget A",
+                                          "product_name":  "Distribution Transformer 500 kVA",
                                           "required_date":  null,
                                           "customer_name":  null,
                                           "erp_mo_id":  "MO-DEMO-004",
@@ -423,7 +423,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380005",
                                           "feasibility_score":  88.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Gadget B",
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
                                           "required_date":  null,
                                           "customer_name":  null,
                                           "erp_mo_id":  "MO-DEMO-005",
@@ -451,7 +451,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380010",
                                           "feasibility_score":  93.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Gadget B",
+                                          "product_name":  "Pad-Mount Transformer 250 kVA",
                                           "required_date":  null,
                                           "customer_name":  null,
                                           "erp_mo_id":  "MO-DEMO-010",
@@ -465,7 +465,7 @@
                                           "mo_id":  "d1eebc99-9c0b-4ef8-bb6d-6bb9bd380009",
                                           "feasibility_score":  95.0,
                                           "primary_constraint":  null,
-                                          "product_name":  "Widget A",
+                                          "product_name":  "Distribution Transformer 500 kVA",
                                           "required_date":  null,
                                           "customer_name":  null,
                                           "erp_mo_id":  "MO-DEMO-009",
@@ -613,7 +613,7 @@
                                       "recommendations":  [
 
                                                           ],
-                                      "formula":  "composite = 0.40ÃBOM + 0.35Ãrouting + 0.25Ãinventory"
+                                      "formula":  "composite = 0.40�?BOM + 0.35�?routing + 0.25�?inventory"
                                   },
                          "error":  null,
                          "meta":  null

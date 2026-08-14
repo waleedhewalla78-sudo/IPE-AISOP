@@ -8,14 +8,14 @@ PG_DSN="${IPE_DATABASE_URL_SYNC:-postgresql://ipe:ipe_test_pass@localhost:5433/i
 psql "$PG_DSN" <<'SQL'
 -- Seed tenant
 INSERT INTO cdm_tenant (id, name, tier, erp_type, autonomy_mode)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Demo Manufacturing Inc', 'professional', 'odoo', 'shadow')
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Deploy Manufacturing Inc', 'professional', 'odoo', 'shadow')
 ON CONFLICT (id) DO NOTHING;
 
--- Seed users (password: demo or admin in development)
+-- Seed users (password: deploy or admin in development)
 INSERT INTO cdm_user (id, tenant_id, email, password_hash, full_name, role, is_active, created_at)
 VALUES
-  ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@demo.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Alice Admin', 'admin', true, NOW()),
-  ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'planner@demo.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Bob Planner', 'planner', true, NOW()),
+  ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c01', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@deploy.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Alice Admin', 'admin', true, NOW()),
+  ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c02', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'planner@deploy.com', '$2b$12$LJ3m4ys3Lk_xsHX7x7x7xO', 'Bob Planner', 'planner', true, NOW()),
   ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380c03', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Ahmed@nour', crypt('admin', gen_salt('bf')), 'Ahmed Nour', 'admin', true, NOW())
 ON CONFLICT (tenant_id, email) DO UPDATE SET
   password_hash = EXCLUDED.password_hash,
@@ -23,15 +23,17 @@ ON CONFLICT (tenant_id, email) DO UPDATE SET
   role = EXCLUDED.role,
   is_active = EXCLUDED.is_active;
 
--- Seed products
+-- Seed products (Star Trans catalog)
 INSERT INTO cdm_product (tenant_id, erp_source_id, erp_source_type, name, internal_ref, source_type, uom, standard_cost, lead_time_days, safety_stock)
 VALUES
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD001', 'odoo', 'Widget A', 'WGT-A-100', 'manufactured', 'unit', 15.50, 3, 100),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD002', 'odoo', 'Gadget B', 'GDT-B-200', 'manufactured', 'unit', 42.00, 5, 50),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD003', 'odoo', 'Component C', 'CMP-C-300', 'purchased', 'unit', 3.25, 10, 500),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD004', 'odoo', 'Assembly D', 'ASM-D-400', 'manufactured', 'unit', 89.99, 7, 25),
-  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD005', 'odoo', 'Raw Material E', 'RAW-E-500', 'purchased', 'kg', 1.10, 20, 1000)
-ON CONFLICT (tenant_id, erp_source_id) DO NOTHING;
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD001', 'odoo', 'Distribution Transformer 500 kVA', 'ST-DT-500', 'manufactured', 'unit', 15.50, 3, 100),
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD002', 'odoo', 'Pad-Mount Transformer 250 kVA', 'ST-PM-250', 'manufactured', 'unit', 42.00, 5, 50),
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD003', 'odoo', 'Copper Winding Wire', 'ST-CU-WIRE', 'purchased', 'unit', 3.25, 10, 500),
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD004', 'odoo', 'Power Transformer 50 MVA Core-Coil', 'ST-PT-50M', 'manufactured', 'unit', 89.99, 7, 25),
+  ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'PROD005', 'odoo', 'CRGO Electrical Steel', 'ST-CRGO', 'purchased', 'kg', 1.10, 20, 1000)
+ON CONFLICT (tenant_id, erp_source_id) DO UPDATE SET
+  name = EXCLUDED.name,
+  internal_ref = EXCLUDED.internal_ref;
 
 -- Seed customers
 INSERT INTO cdm_customer (tenant_id, erp_source_id, name, tier)
