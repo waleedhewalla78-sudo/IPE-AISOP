@@ -58,10 +58,10 @@ Legend: `[x]` done · `[ ]` open
 - [x] T060 Walkthrough markdown
 - [x] T061 Hygiene report markdown
 - [x] T062 Screenshot README checklist
-- [ ] T063 **Execute** walkthrough on warm R2 (8 steps PASS)
-- [ ] T064 Capture PNGs to `docs/star-trans-demo-screenshots/`
-- [ ] T065 Reload Kong; verify `POST /api/v1/data/upload` via gateway
-- [ ] T066 Apply seed + optional purge on live DB
+- [x] T063 **Execute** walkthrough on warm R2 (8 steps PASS)
+- [x] T064 Capture PNGs to `docs/star-trans-demo-screenshots/`
+- [x] T065 Reload Kong; verify `POST /api/v1/data/upload` via gateway
+- [x] T066 Apply seed + optional purge on live DB
 
 ## Phase H — Speckit / governance (this run)
 
@@ -80,11 +80,11 @@ Legend: `[x]` done · `[ ]` open
 
 ## Phase J — Appended by `/speckit.converge` (2026-08-14)
 
-- [ ] T090 Bring up R2 stack healthy
-- [ ] T091 Kong `/api/v1/data` live verify
-- [ ] T092 Seed + purge on live DB
-- [ ] T093 Walkthrough 8 steps PASS
-- [ ] T094 Screenshot PNGs
+- [x] T090 Bring up R2 stack healthy
+- [x] T091 Kong `/api/v1/data` live verify
+- [x] T092 Seed + purge on live DB
+- [x] T093 Walkthrough 8 steps PASS
+- [x] T094 Screenshot PNGs
 - [ ] T095 Send customer template email
 - [ ] T096 Sunday customer ingest (if file arrives)
 - [ ] T097 Hard stop discipline Sun 18:00 / Mon morning
