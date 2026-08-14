@@ -5,14 +5,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { KpiTile } from '@/components/planning/KpiTile';
 import { FeasibilityBadge } from '@/components/planning/FeasibilityBadge';
-import { FrappeGanttChart } from './FrappeGanttChart';
-import { fetchActiveSchedule } from '../api';
+import { FrappeGanttChart } from './components/FrappeGanttChart';
+import { fetchActiveSchedule } from './api';
 import {
   extractWorkCenters,
   rowsToFrappeTasks,
   type FrappeGanttTask,
-} from '../ganttAdapter';
-import type { GanttRow } from '../types';
+} from './ganttAdapter';
+import type { GanttRow } from './types';
 import { t } from '@/lib/i18n';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/constants';

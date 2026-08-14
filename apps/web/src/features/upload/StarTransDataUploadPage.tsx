@@ -4,7 +4,7 @@
  */
 import { useCallback, useState } from 'react';
 import { Upload, FileSpreadsheet, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { api } from '@/lib/api';
+import api from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 

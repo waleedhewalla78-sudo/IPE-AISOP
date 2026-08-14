@@ -3,7 +3,7 @@
  * Resources: work centers. Tasks: MO routing operations.
  * Colors by feasibility band.
  */
-import type { GanttOperation, GanttRow } from '../types';
+import type { GanttOperation, GanttRow } from './types';
 import { scoreTier, type ScoreTier } from '@/lib/scoreVisuals';
 
 export interface FrappeGanttTask {

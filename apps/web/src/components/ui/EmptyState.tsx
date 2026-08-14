@@ -1,34 +1,54 @@
 /**
- * Empty table state with helpful message + action (STREAM-6.4).
+ * Empty table/page state with helpful message + optional action (STREAM-6.4).
+ * Supports both legacy props (description/action/tone) and demo props (message/actionLabel).
  */
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { t } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 interface Props {
   title?: string;
-  message: string;
+  /** Preferred demo API */
+  message?: string;
+  /** Legacy alias for message */
+  description?: string;
   actionLabel?: string;
   actionTo?: string;
   onAction?: () => void;
+  /** Legacy: React node action (e.g. Button) */
+  action?: ReactNode;
+  tone?: 'default' | 'success' | 'warning' | 'danger' | string;
+  className?: string;
   children?: ReactNode;
 }
 
 export function EmptyState({
   title,
   message,
+  description,
   actionLabel,
   actionTo,
   onAction,
+  action,
+  tone = 'default',
+  className,
   children,
 }: Props) {
+  const body = message ?? description ?? '';
+
   return (
     <div
-      className="flex flex-col items-center justify-center gap-2 px-4 py-10 text-center"
+      className={cn(
+        'flex flex-col items-center justify-center gap-2 px-4 py-10 text-center',
+        tone === 'success' && 'text-score-excellent',
+        className,
+      )}
       data-testid="empty-state"
     >
       {title ? <p className="text-sm font-semibold text-ipe-text">{title}</p> : null}
-      <p className="max-w-md text-sm text-ipe-text-muted">{message}</p>
+      {body ? <p className="max-w-md text-sm text-ipe-text-muted">{body}</p> : null}
+      {action}
       {actionTo && actionLabel ? (
         <Link
           to={actionTo}
@@ -47,7 +67,7 @@ export function EmptyState({
         </button>
       ) : null}
       {children}
-      {!actionLabel ? (
+      {!actionLabel && !action ? (
         <p className="text-[10px] text-ipe-text-muted">
           {t('empty.hint', 'Seed demo data or upload Excel to populate this view.')}
         </p>
