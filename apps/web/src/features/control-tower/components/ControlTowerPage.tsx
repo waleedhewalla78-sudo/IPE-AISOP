@@ -9,7 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ControlTowerSkeleton } from '@/components/ui/Skeleton';
 import { FeatureErrorBoundary } from '@/components/ui/FeatureErrorBoundary';
 import { PlanPageHeader } from '@/components/planning/PlanPageHeader';
-import { DateCell } from '@/components/ui/DateCell';
+import { DateCell, isUnsetDate } from '@/components/ui/DateCell';
 import { TariffShockPanel } from '@/features/tariff/components/TariffShockPanel';
 import { SyncStatusBar } from './SyncStatusBar';
 import { PlannerAssistPanel } from './PlannerAssistPanel';
@@ -53,6 +53,26 @@ function relativeSyncLabel(iso: string | undefined): { label: string; healthy: b
   return { label: t('controlTower.syncMinutesAgo', undefined, { mins }), healthy };
 }
 
+function isNeedsData(item: MOQueueItem): boolean {
+  return Boolean(
+    item.unscorable ||
+      (item.feasibility_score == null && (item.data_quality_flags?.length ?? 0) > 0) ||
+      (item.feasibility_score == null && isUnsetDate(item.required_date)),
+  );
+}
+
+function unscoredReason(item: MOQueueItem): string {
+  const flags = item.data_quality_flags ?? [];
+  const blob = flags.map((f) => `${f.flag_code} ${f.message}`).join(' ').toLowerCase();
+  if (blob.includes('bom')) return t('controlTower.needs.bom', 'missing BOM');
+  if (blob.includes('routing') || blob.includes('route')) return t('controlTower.needs.routing', 'missing routing');
+  if (blob.includes('due') || blob.includes('date') || isUnsetDate(item.required_date)) {
+    return t('controlTower.needs.due', 'missing due date');
+  }
+  if (flags[0]?.message) return flags[0].message;
+  return t('controlTower.needs.incomplete', 'incomplete scoring data');
+}
+
 function sortValue(item: MOQueueItem, key: SortKey): string | number {
   switch (key) {
     case 'erp':
@@ -89,6 +109,7 @@ export function ControlTowerPage() {
     healthy: false,
   });
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [needsDataOpen, setNeedsDataOpen] = useState(false);
 
   const handleWsMessage = useCallback((data: unknown) => {
     const item = data as Partial<MOQueueItem>;
@@ -141,10 +162,12 @@ export function ControlTowerPage() {
     [bottlenecks],
   );
 
+  const needsDataQueue = useMemo(() => queue.filter(isNeedsData), [queue]);
+
   const filteredQueue = useMemo(() => {
-    let rows = [...queue];
+    let rows = queue.filter((r) => !isNeedsData(r));
     if (metricFilter === 'atRisk') {
-      rows = rows.filter((r) => (r.feasibility_score ?? 100) < 70 || r.unscorable);
+      rows = rows.filter((r) => (r.feasibility_score ?? 100) < 70);
     } else if (metricFilter === 'bottlenecks') {
       rows = rows.filter((r) => {
         const c = (r.primary_constraint ?? '').toLowerCase();
@@ -543,6 +566,45 @@ export function ControlTowerPage() {
               </div>
             </Card>
           )}
+
+          {needsDataQueue.length > 0 ? (
+            <Card className="mt-4 p-4">
+              <button
+                type="button"
+                className="flex w-full items-center justify-between text-start"
+                aria-expanded={needsDataOpen}
+                onClick={() => setNeedsDataOpen((o) => !o)}
+              >
+                <div>
+                  <h3 className="text-sm font-semibold text-ipe-text">
+                    {t('controlTower.needsData', 'Needs data ({count})', { count: needsDataQueue.length })}
+                  </h3>
+                  <p className="text-xs text-ipe-text-muted">
+                    {t(
+                      'controlTower.needsDataHint',
+                      'Unscored MOs are held here until BOM, routing, or due date is complete.',
+                    )}
+                  </p>
+                </div>
+                {needsDataOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              {needsDataOpen ? (
+                <ul className="mt-3 divide-y divide-ipe-border border-t border-ipe-border">
+                  {needsDataQueue.map((item) => (
+                    <li key={item.mo_id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+                      <div>
+                        <span className="font-medium tabular-nums" dir="ltr">
+                          {shortMoLabel(item.erp_mo_id, item.mo_id)}
+                        </span>
+                        <span className="ms-2 text-ipe-text-muted">{item.product_name}</span>
+                      </div>
+                      <Badge variant="warning">{unscoredReason(item)}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </Card>
+          ) : null}
         </div>
 
         <div className="space-y-4 xl:col-span-4">
