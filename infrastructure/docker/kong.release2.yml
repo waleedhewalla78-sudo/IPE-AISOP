@@ -44,7 +44,10 @@ services:
         paths: [/api/v1/auth]
         strip_path: false
       - name: r2-dashboard
-        paths: [/api/v1/dashboard, /api/v1/analytics]
+        paths: [/api/v1/dashboard, /api/v1/analytics, /api/v1/workspace]
+        strip_path: false
+      - name: r2-demo-portal
+        paths: [/api/v1/shop-floor, /api/v1/supply-chain, /api/v1/ai-trust]
         strip_path: false
       - name: r2-demand-classify
         paths: [/api/v1/demand/classify, /api/v1/demand/queue]
@@ -76,6 +79,15 @@ services:
       - name: r2-phase8
         paths: [/api/v1/phase8]
         strip_path: false
+      - name: r2-phase9
+        paths: [/api/v1/phase9]
+        strip_path: false
+      - name: r2-notifications
+        paths: [/api/v1/notifications]
+        strip_path: false
+      - name: r2-war-room
+        paths: [/api/v1/war-room]
+        strip_path: false
 
   - name: fea-svc
     url: http://fea-svc:8004
@@ -97,11 +109,17 @@ services:
 
   - name: cap-svc
     url: http://cap-svc:8003
+    connect_timeout: 60000
+    read_timeout: 300000
+    write_timeout: 300000
     plugins:
       - name: ipe-tenant-strip
     routes:
       - name: r2-capacity
         paths: [/api/v1/capacity]
+        strip_path: false
+      - name: r2-iot
+        paths: [/api/v1/iot]
         strip_path: false
 
   - name: connector
@@ -117,6 +135,9 @@ services:
         strip_path: false
       - name: r2-erp-odoo
         paths: [/api/v1/erp/odoo]
+        strip_path: false
+      - name: r2-erp-connections
+        paths: [/api/v1/erp/connections]
         strip_path: false
 
   - name: nlp-svc
@@ -210,6 +231,9 @@ services:
     routes:
       - name: r2-upload
         paths: [/api/v1/upload]
+        strip_path: false
+      - name: r2-data-upload
+        paths: [/api/v1/data]
         strip_path: false
 
 consumers:
