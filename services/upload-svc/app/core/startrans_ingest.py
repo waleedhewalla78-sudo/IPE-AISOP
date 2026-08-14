@@ -15,50 +15,55 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.startrans_workbook import NATURAL_KEYS, WorkbookParseResult
 
-# Sheet → demo staging table
+# Sheet → demo staging table (aligned to IPE_Data_Template_StarTrans_v1.xlsx)
 SHEET_TABLE: dict[str, str] = {
-    "01_Products": "demo_products",
+    "01_Plants": "demo_plants",
     "02_WorkCenters": "demo_work_centers",
-    "03_BOM": "demo_boms",
-    "04_Routing": "demo_routings",
-    "05_Customers": "demo_customers",
-    "06_Suppliers": "demo_suppliers",
-    "07_ManufacturingOrders": "demo_manufacturing_orders",
-    "08_SalesOrders": "demo_sales_orders",
-    "09_PurchaseOrders": "demo_purchase_orders",
-    "10_Inventory": "demo_inventory",
-    "11_CapacityCalendar": "demo_capacity_calendar",
-    "12_LeadTimes": "demo_lead_times",
-    "13_CostData": "demo_cost_data",
-    "14_DemandForecast": "demo_demand_forecast",
-    "15_DemandHistory": "demo_demand_history",
-    "16_QualityResults": "demo_quality_results",
+    "03a_Calendars": "demo_capacity_calendar",
+    "04_Products": "demo_products",
+    "05_Materials": "demo_materials",
+    "06a_BOMHeaders": "demo_boms",
+    "07a_RoutingHeaders": "demo_routings",
+    "08_Suppliers": "demo_suppliers",
+    "09_Customers": "demo_customers",
+    "11a_SalesOrderHeaders": "demo_sales_orders",
+    "12_ManufacturingOrders": "demo_manufacturing_orders",
+    "13a_PurchaseOrderHeaders": "demo_purchase_orders",
+    "14_Inventory": "demo_inventory",
+    "15_Forecasts": "demo_demand_forecast",
 }
 
 # FK checks: sheet → [(field, ref_table, ref_key)]
 FK_RULES: dict[str, list[tuple[str, str, str]]] = {
-    "07_ManufacturingOrders": [
+    "02_WorkCenters": [("plant_id", "demo_plants", "plant_id")],
+    "04_Products": [("plant_id_primary", "demo_plants", "plant_id")],
+    "06a_BOMHeaders": [("product_id", "demo_products", "product_id")],
+    "07a_RoutingHeaders": [("product_id", "demo_products", "product_id")],
+    "12_ManufacturingOrders": [
         ("product_id", "demo_products", "product_id"),
-        ("product_code", "demo_products", "product_id"),
+        ("plant_id", "demo_plants", "plant_id"),
     ],
-    "03_BOM": [("product_id", "demo_products", "product_id")],
-    "04_Routing": [("product_id", "demo_products", "product_id")],
-    "10_Inventory": [("product_id", "demo_products", "product_id")],
-    "08_SalesOrders": [("customer_id", "demo_customers", "customer_id")],
-    "09_PurchaseOrders": [("supplier_id", "demo_suppliers", "supplier_id")],
-    "22_BOMComponents": [("bom_id", "demo_boms", "bom_id")],
-    "23_RoutingOperations": [
+    "11a_SalesOrderHeaders": [("customer_id", "demo_customers", "customer_id")],
+    "13a_PurchaseOrderHeaders": [("supplier_id", "demo_suppliers", "supplier_id")],
+    "07b_RoutingOperations": [
         ("routing_id", "demo_routings", "routing_id"),
-        ("work_center_id", "demo_work_centers", "work_center_id"),
+        ("work_center_id_primary", "demo_work_centers", "work_center_id"),
     ],
+    "06b_BOMLines": [("bom_id", "demo_boms", "bom_id")],
 }
 
 
 async def ensure_demo_tables(session: AsyncSession) -> None:
     """Create simplified demo entity tables if missing."""
     ddl = """
+    CREATE TABLE IF NOT EXISTS demo_plants (
+      plant_id TEXT PRIMARY KEY, name TEXT, payload JSONB DEFAULT '{}'
+    );
     CREATE TABLE IF NOT EXISTS demo_products (
       product_id TEXT PRIMARY KEY, name TEXT, product_type TEXT, uom TEXT, payload JSONB DEFAULT '{}'
+    );
+    CREATE TABLE IF NOT EXISTS demo_materials (
+      material_id TEXT PRIMARY KEY, name TEXT, payload JSONB DEFAULT '{}'
     );
     CREATE TABLE IF NOT EXISTS demo_work_centers (
       work_center_id TEXT PRIMARY KEY, name TEXT, capacity_hours NUMERIC, payload JSONB DEFAULT '{}'
@@ -107,13 +112,8 @@ async def ensure_demo_tables(session: AsyncSession) -> None:
       quality_id TEXT PRIMARY KEY, payload JSONB DEFAULT '{}'
     );
     CREATE INDEX IF NOT EXISTS idx_demo_mo_feasibility ON demo_manufacturing_orders (feasibility);
-    CREATE INDEX IF NOT EXISTS idx_demo_mo_product ON demo.manufacturing_orders (product_id);
+    CREATE INDEX IF NOT EXISTS idx_demo_mo_product ON demo_manufacturing_orders (product_id);
     """
-    # Fix typo in index — use correct table name
-    ddl = ddl.replace(
-        "CREATE INDEX IF NOT EXISTS idx_demo_mo_product ON demo.manufacturing_orders (product_id);",
-        "CREATE INDEX IF NOT EXISTS idx_demo_mo_product ON demo_manufacturing_orders (product_id);",
-    )
     for stmt in ddl.split(";"):
         s = stmt.strip()
         if s:
@@ -297,8 +297,42 @@ async def _upsert_row(
             ),
             {
                 "id": key_val,
-                "name": row.get("name") or key_val,
-                "cap": row.get("capacity_hours") or row.get("capacity"),
+                "name": row.get("name") or row.get("work_center_name") or key_val,
+                "cap": row.get("capacity_per_shift")
+                or row.get("capacity_hours")
+                or row.get("capacity"),
+                "payload": payload,
+            },
+        )
+    elif table == "demo_plants":
+        await session.execute(
+            text(
+                """
+                INSERT INTO demo_plants (plant_id, name, payload)
+                VALUES (:id, :name, CAST(:payload AS jsonb))
+                ON CONFLICT (plant_id) DO UPDATE SET
+                  name = EXCLUDED.name, payload = EXCLUDED.payload
+                """
+            ),
+            {
+                "id": key_val,
+                "name": row.get("plant_name") or row.get("name") or key_val,
+                "payload": payload,
+            },
+        )
+    elif table == "demo_materials":
+        await session.execute(
+            text(
+                """
+                INSERT INTO demo_materials (material_id, name, payload)
+                VALUES (:id, :name, CAST(:payload AS jsonb))
+                ON CONFLICT (material_id) DO UPDATE SET
+                  name = EXCLUDED.name, payload = EXCLUDED.payload
+                """
+            ),
+            {
+                "id": key_val,
+                "name": row.get("material_name") or row.get("name") or key_val,
                 "payload": payload,
             },
         )
@@ -318,22 +352,79 @@ async def _upsert_row(
             {
                 "id": key_val,
                 "pid": row.get("product_id") or row.get("product_code"),
-                "qty": row.get("qty") or row.get("quantity"),
+                "qty": row.get("quantity_planned") or row.get("qty") or row.get("quantity"),
                 "feas": row.get("feasibility") or row.get("feasibility_score"),
                 "status": row.get("status") or "planned",
-                "due": row.get("due_date") or row.get("required_date"),
+                "due": row.get("required_date") or row.get("due_date"),
                 "payload": payload,
             },
+        )
+    elif table == "demo_sales_orders":
+        await session.execute(
+            text(
+                """
+                INSERT INTO demo_sales_orders (so_id, customer_id, payload)
+                VALUES (:id, :cid, CAST(:payload AS jsonb))
+                ON CONFLICT (so_id) DO UPDATE SET
+                  customer_id = EXCLUDED.customer_id, payload = EXCLUDED.payload
+                """
+            ),
+            {
+                "id": key_val,
+                "cid": row.get("customer_id"),
+                "payload": payload,
+            },
+        )
+    elif table == "demo_purchase_orders":
+        await session.execute(
+            text(
+                """
+                INSERT INTO demo_purchase_orders (po_id, supplier_id, payload)
+                VALUES (:id, :sid, CAST(:payload AS jsonb))
+                ON CONFLICT (po_id) DO UPDATE SET
+                  supplier_id = EXCLUDED.supplier_id, payload = EXCLUDED.payload
+                """
+            ),
+            {
+                "id": key_val,
+                "sid": row.get("supplier_id"),
+                "payload": payload,
+            },
+        )
+    elif table == "demo_inventory":
+        inv_id = f"{row.get('plant_id') or 'P'}:{key_val}:{row.get('location_code') or 'LOC'}"
+        await session.execute(
+            text(
+                """
+                INSERT INTO demo_inventory (inventory_id, product_id, qty, payload)
+                VALUES (:id, :pid, :qty, CAST(:payload AS jsonb))
+                ON CONFLICT (inventory_id) DO UPDATE SET
+                  product_id = EXCLUDED.product_id, qty = EXCLUDED.qty, payload = EXCLUDED.payload
+                """
+            ),
+            {
+                "id": inv_id,
+                "pid": key_val,
+                "qty": row.get("quantity_on_hand") or row.get("qty"),
+                "payload": payload,
+            },
+        )
+    elif table == "demo_capacity_calendar":
+        await session.execute(
+            text(
+                """
+                INSERT INTO demo_capacity_calendar (calendar_id, work_center_id, payload)
+                VALUES (:id, :wc, CAST(:payload AS jsonb))
+                ON CONFLICT (calendar_id) DO UPDATE SET payload = EXCLUDED.payload
+                """
+            ),
+            {"id": key_val, "wc": row.get("work_center_id"), "payload": payload},
         )
     elif table in (
         "demo_customers",
         "demo_suppliers",
         "demo_boms",
         "demo_routings",
-        "demo_sales_orders",
-        "demo_purchase_orders",
-        "demo_inventory",
-        "demo_capacity_calendar",
         "demo_lead_times",
         "demo_cost_data",
         "demo_demand_forecast",
@@ -341,18 +432,23 @@ async def _upsert_row(
         "demo_quality_results",
     ):
         # Generic: natural key + optional FK cols + payload
-        cols = {nk: key_val}
+        pk = nk
+        cols: dict[str, Any] = {pk: key_val}
+        if table == "demo_customers":
+            cols["name"] = row.get("customer_name") or row.get("name") or key_val
+        elif table == "demo_suppliers":
+            cols["name"] = row.get("supplier_name") or row.get("name") or key_val
         for opt in ("product_id", "customer_id", "supplier_id", "work_center_id", "qty", "name"):
-            if opt in row and opt != nk:
+            if opt in row and opt != pk and opt not in cols:
                 cols[opt] = row[opt]
         col_names = list(cols.keys()) + ["payload"]
         placeholders = [f":{c}" for c in cols] + ["CAST(:payload AS jsonb)"]
-        updates = ", ".join(f"{c} = EXCLUDED.{c}" for c in cols if c != nk)
+        updates = ", ".join(f"{c} = EXCLUDED.{c}" for c in cols if c != pk)
         updates = (updates + ", " if updates else "") + "payload = EXCLUDED.payload"
         sql = (
             f"INSERT INTO {table} ({', '.join(col_names)}) "
             f"VALUES ({', '.join(placeholders)}) "
-            f"ON CONFLICT ({nk}) DO UPDATE SET {updates}"
+            f"ON CONFLICT ({pk}) DO UPDATE SET {updates}"
         )
         params = {**cols, "payload": payload}
         await session.execute(text(sql), params)  # noqa: S608

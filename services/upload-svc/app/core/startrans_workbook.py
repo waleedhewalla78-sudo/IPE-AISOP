@@ -1,7 +1,7 @@
 """Star Trans multi-sheet Excel workbook parser (demo Sprint Stream 2).
 
-Expects IPE_Data_Template_StarTrans_v1.xlsx shape: 24 named sheets.
-Rows 1–5 are title/purpose/legend/header; data starts at row 6 (1-indexed).
+Canonical file: docs/demo-data/startrans/IPE_Data_Template_StarTrans_v1.xlsx
+Layout per sheet: row 1 title, 2 purpose, 3 legend, 4 headers, data from row 5.
 """
 
 from __future__ import annotations
@@ -12,63 +12,73 @@ from typing import Any
 
 from openpyxl import load_workbook
 
-# 24 sheets — must match customer template / demo contract
+# Exact 24 sheet names from IPE_Data_Template_StarTrans_v1.xlsx
 EXPECTED_SHEETS: list[str] = [
-    "00_README",
-    "01_Products",
+    "README",
+    "01_Plants",
     "02_WorkCenters",
-    "03_BOM",
-    "04_Routing",
-    "05_Customers",
-    "06_Suppliers",
-    "07_ManufacturingOrders",
-    "08_SalesOrders",
-    "09_PurchaseOrders",
-    "10_Inventory",
-    "11_CapacityCalendar",
-    "12_LeadTimes",
-    "13_CostData",
-    "14_DemandForecast",
-    "15_DemandHistory",
-    "16_QualityResults",
-    "17_HistoricalOTD",
-    "18_SOPSalesInput",
-    "19_ProjectPlan",
-    "20_TariffMatrix",
-    "21_WorkCenterCalendar",
-    "22_BOMComponents",
-    "23_RoutingOperations",
+    "03a_Calendars",
+    "03b_CalendarShifts",
+    "03c_CalendarExceptions",
+    "04_Products",
+    "05_Materials",
+    "06a_BOMHeaders",
+    "06b_BOMLines",
+    "07a_RoutingHeaders",
+    "07b_RoutingOperations",
+    "08_Suppliers",
+    "09_Customers",
+    "10a_Employees",
+    "10b_EmployeeSkills",
+    "11a_SalesOrderHeaders",
+    "11b_SalesOrderLines",
+    "12_ManufacturingOrders",
+    "13a_PurchaseOrderHeaders",
+    "13b_PurchaseOrderLines",
+    "14_Inventory",
+    "15_Forecasts",
+    "16_ExecutionEvents",
+]
+
+# Priority sheets for Aug 18 demo cycle (customer email)
+PRIORITY_SHEETS: list[str] = [
+    "01_Plants",
+    "02_WorkCenters",
+    "04_Products",
+    "05_Materials",
+    "09_Customers",
+    "12_ManufacturingOrders",
 ]
 
 # Natural key per sheet for upsert preview
 NATURAL_KEYS: dict[str, str] = {
-    "01_Products": "product_id",
+    "01_Plants": "plant_id",
     "02_WorkCenters": "work_center_id",
-    "03_BOM": "bom_id",
-    "04_Routing": "routing_id",
-    "05_Customers": "customer_id",
-    "06_Suppliers": "supplier_id",
-    "07_ManufacturingOrders": "mo_id",
-    "08_SalesOrders": "so_id",
-    "09_PurchaseOrders": "po_id",
-    "10_Inventory": "inventory_id",
-    "11_CapacityCalendar": "calendar_id",
-    "12_LeadTimes": "lead_time_id",
-    "13_CostData": "cost_id",
-    "14_DemandForecast": "forecast_id",
-    "15_DemandHistory": "history_id",
-    "16_QualityResults": "quality_id",
-    "17_HistoricalOTD": "otd_id",
-    "18_SOPSalesInput": "sop_id",
-    "19_ProjectPlan": "plan_line_id",
-    "20_TariffMatrix": "tariff_id",
-    "21_WorkCenterCalendar": "wc_calendar_id",
-    "22_BOMComponents": "bom_component_id",
-    "23_RoutingOperations": "operation_id",
+    "03a_Calendars": "calendar_id",
+    "03b_CalendarShifts": "calendar_id",  # composite with day/shift handled in ingest
+    "03c_CalendarExceptions": "calendar_id",
+    "04_Products": "product_id",
+    "05_Materials": "material_id",
+    "06a_BOMHeaders": "bom_id",
+    "06b_BOMLines": "bom_id",
+    "07a_RoutingHeaders": "routing_id",
+    "07b_RoutingOperations": "operation_id",
+    "08_Suppliers": "supplier_id",
+    "09_Customers": "customer_id",
+    "10a_Employees": "employee_id",
+    "10b_EmployeeSkills": "employee_id",
+    "11a_SalesOrderHeaders": "sales_order_id",
+    "11b_SalesOrderLines": "sales_order_id",
+    "12_ManufacturingOrders": "mo_id",
+    "13a_PurchaseOrderHeaders": "purchase_order_id",
+    "13b_PurchaseOrderLines": "purchase_order_id",
+    "14_Inventory": "item_id",
+    "15_Forecasts": "forecast_id",
+    "16_ExecutionEvents": "mo_id",
 }
 
-DATA_START_ROW = 6  # 1-indexed; rows 1–5 skipped
-HEADER_ROW = 5
+HEADER_ROW = 4  # 1-indexed column names
+DATA_START_ROW = 5  # first data row
 
 
 @dataclass
@@ -121,7 +131,7 @@ def parse_workbook(content: bytes, filename: str = "workbook.xlsx") -> WorkbookP
 
     try:
         wb = load_workbook(io.BytesIO(content), read_only=True, data_only=True)
-    except Exception as exc:  # noqa: BLE001 — surface parse failure to caller
+    except Exception as exc:  # noqa: BLE001
         errors.append(f"Cannot open workbook: {exc}")
         return WorkbookParseResult(
             sheets_found=[],
@@ -133,14 +143,15 @@ def parse_workbook(content: bytes, filename: str = "workbook.xlsx") -> WorkbookP
         )
 
     found = list(wb.sheetnames)
-    expected_set = set(EXPECTED_SHEETS)
     found_set = set(found)
     missing = [s for s in EXPECTED_SHEETS if s not in found_set]
-    extra = [s for s in found if s not in expected_set]
+    extra = [s for s in found if s not in set(EXPECTED_SHEETS)]
 
     if missing:
-        errors.append(f"Missing expected sheets ({len(missing)}): {', '.join(missing[:8])}"
-                      + ("…" if len(missing) > 8 else ""))
+        errors.append(
+            f"Missing expected sheets ({len(missing)}): {', '.join(missing[:8])}"
+            + ("…" if len(missing) > 8 else "")
+        )
     if extra:
         errors.append(f"Unexpected sheets ignored: {', '.join(extra[:8])}")
 
@@ -151,7 +162,7 @@ def parse_workbook(content: bytes, filename: str = "workbook.xlsx") -> WorkbookP
                 sheet_name=name, skipped=True, message="sheet missing"
             )
             continue
-        if name == "00_README":
+        if name == "README":
             sheet_results[name] = SheetParseResult(
                 sheet_name=name, skipped=True, message="metadata only"
             )
@@ -159,23 +170,21 @@ def parse_workbook(content: bytes, filename: str = "workbook.xlsx") -> WorkbookP
         sheet_results[name] = _parse_data_sheet(wb[name], name)
 
     wb.close()
-    # Valid for preview if structure opens; missing sheets are soft-fail for demo
-    # Hard-invalid only when file unreadable or zero data sheets parseable
-    data_ok = any(
-        (not r.skipped and len(r.rows) > 0) or (not r.skipped and not r.row_errors)
-        for r in sheet_results.values()
+
+    # Soft-valid when at least priority sheets have rows (demo-friendly)
+    priority_ok = any(
+        (r := sheet_results.get(s)) and not r.skipped and r.rows for s in PRIORITY_SHEETS
     )
-    valid = len(errors) == 0 or (not missing and data_ok)
-    # Soft: allow preview with missing sheets so UI can show batch report
-    if missing and any(not r.skipped and r.rows for r in sheet_results.values()):
-        valid = True
+    valid = (not missing and not errors) or priority_ok or bool(
+        any(not r.skipped and r.rows for r in sheet_results.values())
+    )
 
     return WorkbookParseResult(
         sheets_found=found,
         sheets_missing=missing,
         sheets_extra=extra,
         sheet_results=sheet_results,
-        valid=valid or bool(sheet_results),
+        valid=valid,
         errors=errors,
     )
 
@@ -191,14 +200,13 @@ def _parse_data_sheet(ws: Any, name: str) -> SheetParseResult:
             continue
         if idx == HEADER_ROW:
             headers = [_norm_header(c) for c in raw]
-            # Drop trailing empties
             while headers and headers[-1] == "":
                 headers.pop()
             if not any(headers):
                 return SheetParseResult(
                     sheet_name=name,
                     skipped=True,
-                    message="empty header row (row 5)",
+                    message="empty header row (row 4)",
                 )
             continue
         if idx < DATA_START_ROW:
@@ -214,14 +222,16 @@ def _parse_data_sheet(ws: Any, name: str) -> SheetParseResult:
             record[key] = val
 
         nk = NATURAL_KEYS.get(name)
-        if nk and not record.get(nk) and not record.get(nk.replace("_", "")):
-            # try common aliases
+        if nk and not record.get(nk):
             aliases = {
                 "product_id": ["product_code", "product_id", "sku"],
-                "mo_id": ["mo_id", "order_id", "manufacturing_order_id"],
+                "mo_id": ["mo_id", "mo_number", "order_id"],
                 "work_center_id": ["work_center_code", "work_center_id", "wc_code"],
                 "customer_id": ["customer_code", "customer_id"],
                 "supplier_id": ["supplier_code", "supplier_id"],
+                "material_id": ["material_code", "material_id"],
+                "plant_id": ["plant_code", "plant_id"],
+                "item_id": ["item_id", "material_id", "product_id"],
             }
             for alias in aliases.get(nk, []):
                 if record.get(alias):
@@ -264,6 +274,7 @@ def preview_counts(parsed: WorkbookParseResult) -> dict[str, Any]:
                     "fail": 0,
                     "skipped": True,
                     "message": r.message if r else "missing",
+                    "priority": name in PRIORITY_SHEETS,
                 }
             )
             continue
@@ -278,6 +289,7 @@ def preview_counts(parsed: WorkbookParseResult) -> dict[str, Any]:
                 "fail": fail,
                 "skipped": False,
                 "natural_key": NATURAL_KEYS.get(name),
+                "priority": name in PRIORITY_SHEETS,
             }
         )
     return {
@@ -286,4 +298,5 @@ def preview_counts(parsed: WorkbookParseResult) -> dict[str, Any]:
         "sheets": sheets,
         "sheets_missing": parsed.sheets_missing,
         "workbook_errors": parsed.errors,
+        "priority_sheets": PRIORITY_SHEETS,
     }

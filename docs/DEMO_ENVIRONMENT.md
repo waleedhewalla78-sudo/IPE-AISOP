@@ -6,6 +6,17 @@
 
 ---
 
+## Customer Excel template
+
+Canonical file: [`docs/demo-data/startrans/IPE_Data_Template_StarTrans_v1.xlsx`](./demo-data/startrans/IPE_Data_Template_StarTrans_v1.xlsx)  
+Customer email draft: [`docs/demo-data/startrans/CUSTOMER-EMAIL-DATA-TEMPLATE.md`](./demo-data/startrans/CUSTOMER-EMAIL-DATA-TEMPLATE.md)
+
+Priority sheets for Tuesday: Plants, Work Centers, Products, Materials, Customers, ManufacturingOrders.
+
+Upload UI: `http://localhost:8082/admin/data/upload`
+
+---
+
 ## Required environment
 
 | Item | Requirement |

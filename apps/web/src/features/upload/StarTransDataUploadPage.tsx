@@ -105,7 +105,7 @@ export function StarTransDataUploadPage() {
         <p className="mt-1 text-sm text-ipe-text-muted">
           {t(
             'upload.startrans.subtitle',
-            'Upload IPE_Data_Template_StarTrans_v1.xlsx (24 sheets). Preview rows, then confirm.',
+            'Upload IPE_Data_Template_StarTrans_v1.xlsx (24 sheets). Priority: Plants, Work Centers, Products, Materials, Customers, MOs. Preview rows, then confirm.',
           )}
         </p>
       </header>
