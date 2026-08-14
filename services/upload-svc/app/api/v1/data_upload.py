@@ -41,7 +41,12 @@ async def upload_startrans_workbook(
 
     for f in files:
         content = await f.read()
-        parsed = parse_workbook(content, f.filename or "workbook.xlsx")
+        name = f.filename or "workbook.xlsx"
+        if not name.lower().endswith((".xlsx", ".xlsm")):
+            raise HTTPException(status_code=400, detail=f"Unsupported file type: {name} (expect .xlsx)")
+        parsed = parse_workbook(content, name)
+        if not parsed.valid and parsed.errors and all("Unsupported" in e or "Cannot open" in e for e in parsed.errors):
+            raise HTTPException(status_code=400, detail="; ".join(parsed.errors))
         preview = preview_counts(parsed)
         upload_id = str(uuid4())
         _workbook_store[upload_id] = {
