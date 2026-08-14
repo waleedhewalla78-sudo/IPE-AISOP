@@ -10,10 +10,12 @@ import { SessionIdleGuard } from './SessionIdleGuard';
 import { ToastHost } from '@/components/ui/ToastHost';
 import { CopilotCommandPalette } from '@/features/copilot/components/CopilotCommandPalette';
 import { FeatureErrorBoundary } from '@/components/ui/FeatureErrorBoundary';
+import { FeasibilityDrawerProvider } from '@/components/planning/FeasibilityDrawerContext';
 
 export function MainLayout() {
   return (
     <CopilotCommandPalette>
+      <FeasibilityDrawerProvider>
       <div className="flex h-screen bg-ipe-surface font-sans text-ipe-text">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -34,6 +36,7 @@ export function MainLayout() {
         <ToastHost />
         <SessionIdleGuard />
       </div>
+      </FeasibilityDrawerProvider>
     </CopilotCommandPalette>
   );
 }

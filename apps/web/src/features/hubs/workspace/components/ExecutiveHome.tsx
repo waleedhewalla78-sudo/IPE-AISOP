@@ -12,6 +12,7 @@ import type { WorkspaceDashboard } from '@/features/hubs/workspace/types';
 import { ROUTES } from '@/lib/constants';
 import { t } from '@/lib/i18n';
 import { DateCell } from '@/components/ui/DateCell';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface Props {
   dashboard: WorkspaceDashboard;
@@ -80,10 +81,10 @@ export function ExecutiveHome({ dashboard }: Props) {
 
       {/* Row 2 — Copilot summary band */}
       <div
-        className="flex h-20 items-center gap-3 rounded-lg border border-ai-accent/30 bg-ai-accent/5 px-4"
+        className="flex h-20 items-center gap-3 rounded-lg border border-ai/30 bg-ai/5 px-4"
         data-testid="exec-copilot-band"
       >
-        <span className="text-[10px] font-bold uppercase tracking-widest text-ai-accent">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-ai">
           {t('home.exec.copilot', 'Copilot')}
         </span>
         <p className="line-clamp-2 text-sm text-ipe-text">{summary}</p>
@@ -100,9 +101,14 @@ export function ExecutiveHome({ dashboard }: Props) {
           </header>
           <div className="flex-1 overflow-auto">
             {risk.length === 0 ? (
-              <p className="p-4 text-sm text-ipe-text-muted">
-                {t('home.empty.risk', 'No orders at risk. Seed Star Trans data or open Control Tower.')}
-              </p>
+              <EmptyState
+                message={t(
+                  'home.empty.risk',
+                  'No orders at risk. Seed Star Trans data or open Control Tower.',
+                )}
+                actionLabel="Control Tower"
+                actionTo={ROUTES.PLANNING_CONTROL_TOWER}
+              />
             ) : (
               <table className="w-full text-left text-sm">
                 <thead className="sticky top-0 bg-ipe-surface-alt text-xs text-ipe-text-muted">
@@ -123,7 +129,13 @@ export function ExecutiveHome({ dashboard }: Props) {
                         <DateCell value={r.required_date} />
                       </td>
                       <td className="px-3 py-2">
-                        <FeasibilityBadge score={r.feasibility_score} size="sm" />
+                        <FeasibilityBadge
+                          score={r.feasibility_score}
+                          size="sm"
+                          moId={r.mo_id}
+                          productName={r.product_name}
+                          constraints={r.primary_constraint ? [r.primary_constraint] : []}
+                        />
                       </td>
                       <td className="px-3 py-2">
                         {r.primary_constraint ? (
@@ -146,9 +158,13 @@ export function ExecutiveHome({ dashboard }: Props) {
           </header>
           <div className="grid flex-1 grid-cols-2 gap-2 overflow-auto p-3 sm:grid-cols-3">
             {dashboard.capacity.length === 0 ? (
-              <p className="col-span-full text-sm text-ipe-text-muted">
-                {t('home.empty.capacity', 'No work center load yet.')}
-              </p>
+              <div className="col-span-full">
+                <EmptyState
+                  message={t('home.empty.capacity', 'No Work Center load yet.')}
+                  actionLabel="Detailed Schedule"
+                  actionTo={ROUTES.PLAN_DETAILED_SCHEDULE}
+                />
+              </div>
             ) : (
               dashboard.capacity.map((c) => {
                 const u = Math.round(c.utilisation);

@@ -1,12 +1,13 @@
 /**
  * FeasibilityBadge — score circle + band label (+ optional trend).
- * Wraps ScoreBadge / scoreVisuals for Streams 4–6.
+ * Click opens global FeasibilityDrawer unless onClick is provided.
  */
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { ScoreBadge } from '@/components/ScoreBadge';
 import { cn } from '@/lib/utils';
 import { t } from '@/lib/i18n';
 import { scoreBandLabel, scoreTextClass, scoreTier, scoreTierLabelKey } from '@/lib/scoreVisuals';
+import { useFeasibilityDrawer } from './FeasibilityDrawerContext';
 
 export type FeasibilityTrend = 'up' | 'down' | 'flat';
 
@@ -17,6 +18,9 @@ interface FeasibilityBadgeProps {
   size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
   className?: string;
+  moId?: string;
+  productName?: string;
+  constraints?: string[];
 }
 
 export function FeasibilityBadge({
@@ -26,7 +30,11 @@ export function FeasibilityBadge({
   size = 'md',
   onClick,
   className,
+  moId,
+  productName,
+  constraints,
 }: FeasibilityBadgeProps) {
+  const { openFeasibility } = useFeasibilityDrawer();
   const tier = scoreTier(score);
   const label =
     score == null
@@ -35,6 +43,19 @@ export function FeasibilityBadge({
   const n = score == null || Number.isNaN(score) ? null : Math.round(score);
 
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    openFeasibility({
+      moId,
+      productName,
+      score,
+      constraints,
+    });
+  };
 
   const body = (
     <>
@@ -70,30 +91,18 @@ export function FeasibilityBadge({
     </>
   );
 
-  if (onClick) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className={cn(
-          'inline-flex items-center gap-1.5 rounded-md text-start hover:bg-ipe-surface-alt/80',
-          className,
-        )}
-        data-testid="feasibility-badge"
-        data-tier={tier}
-      >
-        {body}
-      </button>
-    );
-  }
-
   return (
-    <span
-      className={cn('inline-flex items-center gap-1.5', className)}
+    <button
+      type="button"
+      onClick={handleClick}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-md text-start hover:bg-ipe-surface-alt/80',
+        className,
+      )}
       data-testid="feasibility-badge"
       data-tier={tier}
     >
       {body}
-    </span>
+    </button>
   );
 }

@@ -12,6 +12,7 @@ import type { WorkspaceDashboard } from '@/features/hubs/workspace/types';
 import { ROUTES } from '@/lib/constants';
 import { t } from '@/lib/i18n';
 import { scoreTier } from '@/lib/scoreVisuals';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface Props {
   dashboard: WorkspaceDashboard;
@@ -85,15 +86,14 @@ export function PlannerHome({ dashboard }: Props) {
           </Link>
         </header>
         {scored.length === 0 ? (
-          <p className="p-4 text-sm text-ipe-text-muted">
-            {t(
+          <EmptyState
+            message={t(
               'home.empty.queue',
               'No scored MOs yet. Run seed-startrans-demo.ps1 or upload Excel data.',
-            )}{' '}
-            <Link to={ROUTES.ADMIN_DATA_UPLOAD} className="text-ipe-primary">
-              Upload
-            </Link>
-          </p>
+            )}
+            actionLabel="Upload Excel"
+            actionTo={ROUTES.ADMIN_DATA_UPLOAD}
+          />
         ) : (
           <div className="max-h-80 overflow-auto">
             <table className="w-full text-left text-sm">
@@ -115,7 +115,13 @@ export function PlannerHome({ dashboard }: Props) {
                       <DateCell value={r.required_date} />
                     </td>
                     <td className="px-3 py-2">
-                      <FeasibilityBadge score={r.feasibility_score} size="sm" />
+                      <FeasibilityBadge
+                        score={r.feasibility_score}
+                        size="sm"
+                        moId={r.mo_id}
+                        productName={r.product_name}
+                        constraints={r.primary_constraint ? [r.primary_constraint] : []}
+                      />
                     </td>
                     <td className="px-3 py-2">
                       {r.primary_constraint ? <ConstraintChip type={r.primary_constraint} /> : '—'}
@@ -150,8 +156,8 @@ export function PlannerHome({ dashboard }: Props) {
             </ul>
           )}
         </section>
-        <section className="rounded-lg border border-ai-accent/30 bg-ai-accent/5 p-4">
-          <h2 className="mb-2 text-sm font-semibold text-ai-accent">
+        <section className="rounded-lg border border-ai/30 bg-ai/5 p-4">
+          <h2 className="mb-2 text-sm font-semibold text-ai">
             {t('home.planner.copilotPrompt', 'Copilot prompt')}
           </h2>
           <p className="text-sm text-ipe-text">

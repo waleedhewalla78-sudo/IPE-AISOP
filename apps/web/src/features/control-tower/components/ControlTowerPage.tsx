@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ControlTowerSkeleton } from '@/components/ui/Skeleton';
 import { FeatureErrorBoundary } from '@/components/ui/FeatureErrorBoundary';
 import { PlanPageHeader } from '@/components/planning/PlanPageHeader';
+import { FeasibilityBadge, ConstraintChip } from '@/components/planning';
 import { DateCell, isUnsetDate } from '@/components/ui/DateCell';
 import { TariffShockPanel } from '@/features/tariff/components/TariffShockPanel';
 import { SyncStatusBar } from './SyncStatusBar';
@@ -484,20 +485,18 @@ export function ControlTowerPage() {
                           {item.unscorable || (item.feasibility_score === null && item.data_quality_flags?.length) ? (
                             <Badge variant="warning">{t('controlTower.unscorable')}</Badge>
                           ) : (
-                            <span
-                              className={cn('text-sm font-bold tabular-nums', scoreTextClass(item.feasibility_score))}
-                              dir="ltr"
-                            >
-                              {item.feasibility_score !== null ? item.feasibility_score : '-'}
-                            </span>
+                            <FeasibilityBadge
+                              score={item.feasibility_score}
+                              size="sm"
+                              moId={item.mo_id}
+                              productName={item.product_name}
+                              constraints={item.primary_constraint ? [item.primary_constraint] : []}
+                            />
                           )}
                         </TableCell>
                         <TableCell>
                           {item.primary_constraint ? (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-ipe-surface-alt px-2 py-0.5 text-xs font-medium">
-                              <span aria-hidden>{constraintIcon(item.primary_constraint)}</span>
-                              {item.primary_constraint}
-                            </span>
+                            <ConstraintChip type={item.primary_constraint} />
                           ) : (
                             <span className="text-xs text-ipe-text-muted">{t('controlTower.none')}</span>
                           )}
