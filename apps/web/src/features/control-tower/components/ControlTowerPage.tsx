@@ -22,9 +22,7 @@ import { t } from '@/lib/i18n';
 import { showToast } from '@/lib/toast';
 import api from '@/lib/api';
 import {
-  scoreTextClass,
   scoreRowBg,
-  constraintIcon,
 } from '@/lib/scoreVisuals';
 import { MO_STATUS_META, moStatusFromScore } from '@/lib/moStatusBadge';
 import { fetchQueue, fetchKPIs, getMockBottlenecks } from '../api';
