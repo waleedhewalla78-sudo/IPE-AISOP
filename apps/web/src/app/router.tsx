@@ -28,6 +28,7 @@ import {
   OrderManagementPage,
   ProcurementDashboardPage,
   EquipmentHealthPage,
+  GovernanceOverviewPage,
   CopilotPanel,
   DesignAIPage,
   AITrustPage,
@@ -44,6 +45,8 @@ import {
   SOPReport,
   ShopFloorPage,
   UnifiedWorkspacePage,
+  WorkHub,
+  WorkModulePage,
   PredictiveViewPage,
   RootCauseExplorerPage,
   DataUploadCenterPage,
@@ -85,12 +88,31 @@ export function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to={ROUTES.WORKSPACE} replace />} />
+          <Route path="/home" element={<LegacyRedirect to={ROUTES.WORKSPACE} />} />
+          <Route path="/today" element={<LegacyRedirect to={ROUTES.WORKSPACE} />} />
 
           <Route path={ROUTES.WORKSPACE} element={<UnifiedWorkspacePage />} />
 
+          {/* Work OS hub — enterprise shell */}
+          <Route path={ROUTES.WORK} element={<WorkHub />}>
+            <Route index element={<Navigate to="projects" replace />} />
+            <Route path="projects" element={<WorkModulePage />} />
+            <Route path="tasks" element={<WorkModulePage />} />
+            <Route path="approvals" element={<WorkModulePage />} />
+            <Route path="meetings" element={<WorkModulePage />} />
+            <Route path="calendar" element={<WorkModulePage />} />
+            <Route path="documents" element={<WorkModulePage />} />
+            <Route path="knowledge" element={<WorkModulePage />} />
+            <Route path="objectives" element={<WorkModulePage />} />
+            <Route path="kpis" element={<WorkModulePage />} />
+            <Route path="teams" element={<WorkModulePage />} />
+            <Route path="automation" element={<WorkModulePage />} />
+            <Route path="reports" element={<WorkModulePage />} />
+          </Route>
+
           {/* Planning Hub */}
           <Route path={ROUTES.PLANNING} element={<PlanningHub />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route index element={<Navigate to="control-tower" replace />} />
             <Route path="dashboard" element={<PlanningDashboardPage />} />
             <Route path="cockpit" element={<PlanningCockpitPage />} />
             <Route path="horizons" element={<ThreeHorizonsPage />} />
@@ -153,7 +175,8 @@ export function AppRouter() {
 
           {/* AI & Governance */}
           <Route path={ROUTES.AI_GOVERNANCE} element={<AIGovernanceHub />}>
-            <Route index element={<Navigate to="copilot" replace />} />
+            <Route index element={<Navigate to="overview" replace />} />
+            <Route path="overview" element={<GovernanceOverviewPage />} />
             <Route path="copilot" element={<CopilotPanel />} />
             <Route path="meeting-prep" element={<MeetingPrepPage />} />
             <Route path="meeting-prep/:type" element={<MeetingPrepPage />} />
