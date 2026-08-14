@@ -1,4 +1,9 @@
-"""Demo CDM ingest for Star Trans workbook (simplified — no RLS/GIN)."""
+"""Demo CDM ingest for Star Trans workbook (STREAM-2.4).
+
+Maps each sheet to entity rows, validates FK references, collects all errors
+as a batch report, and upserts by natural key (mo_id, product_id, etc.).
+Simplified for demo — no RLS / deferred FKs / GIN.
+"""
 
 from __future__ import annotations
 
