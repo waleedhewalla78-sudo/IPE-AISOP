@@ -50,6 +50,7 @@ import {
   PredictiveViewPage,
   RootCauseExplorerPage,
   DataUploadCenterPage,
+  StarTransDataUploadPage,
   AgentDashboardPage,
   ExceptionManagerPage,
   SupplierScorecardPage,
@@ -88,10 +89,15 @@ export function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to={ROUTES.WORKSPACE} replace />} />
-          <Route path="/home" element={<LegacyRedirect to={ROUTES.WORKSPACE} />} />
-          <Route path="/today" element={<LegacyRedirect to={ROUTES.WORKSPACE} />} />
+          <Route path="/home" element={<UnifiedWorkspacePage />} />
+          <Route path="/today" element={<LegacyRedirect to={ROUTES.HOME} />} />
 
           <Route path={ROUTES.WORKSPACE} element={<UnifiedWorkspacePage />} />
+          <Route path="/admin/data/upload" element={<StarTransDataUploadPage />} />
+          <Route
+            path="/plan/detailed-schedule"
+            element={<LegacyRedirect to={ROUTES.PLANNING_SCHEDULE} />}
+          />
 
           {/* Work OS hub — enterprise shell */}
           <Route path={ROUTES.WORK} element={<WorkHub />}>
@@ -222,6 +228,7 @@ export function AppRouter() {
           <Route path="/sustainability" element={<LegacyRedirect to={ROUTES.AI_SUSTAINABILITY} />} />
           <Route path="/admin" element={<LegacyRedirect to={ROUTES.PLATFORM_ADMIN} />} />
           <Route path="/admin/upload" element={<LegacyRedirect to={ROUTES.PLATFORM_UPLOAD} />} />
+          <Route path="/admin/data" element={<LegacyRedirect to={ROUTES.ADMIN_DATA_UPLOAD} />} />
           <Route path="/material/suppliers" element={<LegacyRedirect to={ROUTES.SUPPLY_SUPPLIERS} />} />
           <Route path="/copilot/meeting/:type" element={<LegacyRedirect to={ROUTES.AI_MEETING_PREP} />} />
           <Route path="/onboarding" element={<LegacyRedirect to={ROUTES.PLATFORM_ONBOARDING} />} />

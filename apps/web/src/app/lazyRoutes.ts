@@ -28,6 +28,11 @@ export const UnifiedWorkspacePage = lazyNamed(
   () => import('@/features/hubs/workspace/UnifiedWorkspacePage'),
   'UnifiedWorkspacePage',
 );
+export const WorkHub = lazyNamed(() => import('@/features/hubs/work/WorkHub'), 'WorkHub');
+export const WorkModulePage = lazyNamed(
+  () => import('@/features/hubs/work/WorkModulePage'),
+  'WorkModulePage',
+);
 
 // Planning Hub tabs
 export const PlanningDashboardPage = lazyNamed(
@@ -62,6 +67,10 @@ export const RootCauseExplorerPage = lazyNamed(
 export const DataUploadCenterPage = lazyNamed(
   () => import('@/features/upload/DataUploadCenterPage'),
   'DataUploadCenterPage',
+);
+export const StarTransDataUploadPage = lazyNamed(
+  () => import('@/features/upload/StarTransDataUploadPage'),
+  'StarTransDataUploadPage',
 );
 export const AgentDashboardPage = lazyNamed(
   () => import('@/features/agents/AgentDashboardPage'),
@@ -200,6 +209,10 @@ export const EquipmentHealthPage = lazyNamed(
 );
 
 // AI & Governance tabs
+export const GovernanceOverviewPage = lazyNamed(
+  () => import('@/features/hubs/ai-governance/overview/GovernanceOverviewPage'),
+  'GovernanceOverviewPage',
+);
 export const CopilotPanel = lazyNamed(() => import('@/features/copilot/components/CopilotPanel'), 'CopilotPanel');
 export const DesignAIPage = lazyNamed(
   () => import('@/features/hubs/ai-governance/DesignAIPage'),

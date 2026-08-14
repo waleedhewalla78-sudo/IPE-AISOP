@@ -15,6 +15,21 @@ export const ROUTES = {
   SHOP_FLOOR: '/shop-floor',
   WORKSPACE: '/workspace',
 
+  // Work OS hub (enterprise shell)
+  WORK: '/work',
+  WORK_PROJECTS: '/work/projects',
+  WORK_TASKS: '/work/tasks',
+  WORK_APPROVALS: '/work/approvals',
+  WORK_MEETINGS: '/work/meetings',
+  WORK_CALENDAR: '/work/calendar',
+  WORK_DOCUMENTS: '/work/documents',
+  WORK_KNOWLEDGE: '/work/knowledge',
+  WORK_OBJECTIVES: '/work/objectives',
+  WORK_KPIS: '/work/kpis',
+  WORK_TEAMS: '/work/teams',
+  WORK_AUTOMATION: '/work/automation',
+  WORK_REPORTS: '/work/reports',
+
   // Planning Hub tabs
   PLANNING_DASHBOARD: '/planning/dashboard',
   PLANNING_CONTROL_TOWER: '/planning/control-tower',
@@ -67,6 +82,7 @@ export const ROUTES = {
   // Phase 3 also exposes /material/suppliers alias via hub tab
 
   // AI & Governance tabs
+  AI_OVERVIEW: '/ai-governance/overview',
   AI_COPILOT: '/ai-governance/copilot',
   AI_MEETING_PREP: '/ai-governance/meeting-prep',
   AI_DESIGN: '/ai-governance/design-ai',
@@ -87,6 +103,9 @@ export const ROUTES = {
   PLATFORM_OPS: '/platform/ops',
   // Spec aliases
   ADMIN_UPLOAD: '/admin/upload',
+  ADMIN_DATA_UPLOAD: '/admin/data/upload',
+  HOME: '/home',
+  PLAN_DETAILED_SCHEDULE: '/plan/detailed-schedule',
   MATERIAL_SUPPLIERS: '/material/suppliers',
 
   // Legacy aliases (redirects in router)
