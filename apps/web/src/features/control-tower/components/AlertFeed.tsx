@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { DateCell } from '@/components/ui/DateCell';
 import type { DelayAlert } from '../types';
 
 interface AlertFeedProps {
@@ -39,7 +40,7 @@ export function AlertFeed({ alerts }: AlertFeedProps) {
             </div>
             <div className="text-right text-xs text-ipe-text-muted">
               <p>+{a.delay_minutes}m</p>
-              <p>{new Date(a.created_at).toLocaleDateString()}</p>
+              <p><DateCell value={a.created_at} className="text-xs" /></p>
             </div>
           </div>
         ))}

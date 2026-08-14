@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/Card';
 import { Table, TableHead, TableRow, TableHeader, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
+import { DateCell } from '@/components/ui/DateCell';
 import type { DemandSummary } from '../types';
 
 interface DemandOverviewProps {
@@ -45,7 +46,7 @@ export function DemandOverview({ demands }: DemandOverviewProps) {
             <TableRow key={d.id}>
               <TableCell className="font-medium">{d.product_name}</TableCell>
               <TableCell>{d.quantity}</TableCell>
-              <TableCell>{new Date(d.required_date).toLocaleDateString()}</TableCell>
+              <TableCell><DateCell value={d.required_date} /></TableCell>
               <TableCell><Badge variant="default">{d.demand_type}</Badge></TableCell>
               <TableCell>{d.priority_score?.toFixed(2) ?? '-'}</TableCell>
               <TableCell><Badge variant={statusVariant(d.status)}>{d.status}</Badge></TableCell>
