@@ -1,10 +1,13 @@
 """Minimal unit test for Star Trans workbook sheet list."""
 
-from app.core.startrans_workbook import EXPECTED_SHEETS, preview_counts, parse_workbook
+from app.core.startrans_workbook import EXPECTED_SHEETS, PRIORITY_SHEETS, preview_counts, parse_workbook
 
 
 def test_expected_sheets_count():
     assert len(EXPECTED_SHEETS) == 24
+    assert EXPECTED_SHEETS[0] == "README"
+    assert "12_ManufacturingOrders" in EXPECTED_SHEETS
+    assert set(PRIORITY_SHEETS).issubset(set(EXPECTED_SHEETS))
 
 
 def test_parse_rejects_non_xlsx():
