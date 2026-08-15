@@ -1,8 +1,10 @@
 # IPE Platform — Open Topics Register
 
-**Compiled:** 2026-07-17 · **Updated:** 2026-07-18 (program finalize — all phases/waves)
+**Compiled:** 2026-07-17 · **Updated:** 2026-08-15 (Star Trans Batch0 ENG closed; T097 hard-stop locked; Vitest residuals closed; **COM still OPEN** — see `docs/qa/COM-BLOCKERS-REMAIN-OPEN-2026-08-15.md`)
 **Workspace:** `E:\AISOP\ipe` (canonical)
-**Authoritative finalize:** `docs/project/FINAL-PROGRAM-STATUS.md`
+**Authoritative full status (DETAILED closure playbooks):** `docs/project/FULL-PROJECT-STATUS-AND-ROADMAP-2026-07-31.md`  
+→ Use that file for step-by-step closure of every OPEN ID (C-*, INT-*, QA-*, 9A-OPS-*, REL-*, OPS-*). This register stays the short index.
+**Authoritative finalize (baseline):** `docs/project/FINAL-PROGRAM-STATUS.md`
 **GitHub repo:** `waleedhewalla78-sudo/IPE-AISOP`
 **Maintainer split:** Commercial/Human — Waleed / Star Trans; Engineering — Engineering Lead
 
@@ -10,19 +12,19 @@
 
 ## Executive summary
 
-Wave 1 engineering for Ops Blueprint Phases 3–7, Spec 029 productionization, and Spec 030 Phase 8 **8A** is **ENG COMPLETE**. R1 verdict: **ENG READY / COM CONDITIONAL**.
+Wave 1 engineering for Specs **022–032** and Phase **9A–9F** (Spec **033** / **033a–033f**) is **ENG COMPLETE** at **scaffold** depth (unit tests green; soft `live:false` badges; lab alembic **082**; 9B–9F soft DB persist; Kong/EventBus/RLS residuals closed 2026-08-01). R1/R2 verdict remains: **ENG READY / COM CONDITIONAL**. Production ML/SAP/OCR and COM gates are **not** claimed closed.
 
 | Category | Remaining OPEN | Notes |
 |----------|---------------:|-------|
 | 1. Commercial / Human | **8** | Never fake |
-| 2. Integrations (live) | **5** | Gated by PH1-02 (+ Keycloak on-demand) |
-| 3. Engineering / stack / QA | **6** | Validate, k6, flakes, RLS audit, Copilot, Kong smoke |
-| 4. Ops / support | **4** | VM, validate ops, monitoring, DR |
+| 2. Integrations (live) | **5** | INT-9A eng CLOSED (#154); PH1-02 live Odoo still OPEN |
+| 3. Engineering / stack / QA | **~2** | Playwright flakes; Copilot live; deferred ML/SAP |
+| 4. Ops / support | **3** | VM, monitoring, DR (validate DONE 2026-07-25) |
 | 5. Release / tagging | **2** | HOLD + stale-tag policy |
-| **Actionable total** | **≈25** | Excludes Wave 2 / 8B–8D roadmap |
-| Deferred roadmap | Wave 2 / 8B–8D / W2–W3 GH | Not R1 eng blockers |
+| **Actionable total** | **≈20** | Go-live still COM-blocked |
+| Deferred deeper | 9B–9F production depth · 8B–8D · Wave 2 UX | Scaffold ≠ production ML/SAP |
 
-**Closed eng (do not re-open):** INT-01 Kong `/api/v1/enterprise` (+ `/phase8`) route objects shipped; Specs 022–030 Wave 1 product scope; Spec 029 Andon/RLS/MPS/stage-gate; Spec 030 8A scaffold.
+**Closed eng (do not re-open):** INT-01 Kong `/api/v1/enterprise` (+ `/phase8`); Specs 022–030 W1; Spec 029 Andon/RLS/MPS; Spec 030 8A; **9A-OPS-1→082**; **T160 9B–9F persist**; **QA-06 Kong smoke 2026-08-01**; **QA-04 RLS lab 082**; **9A-OPS-2/3**; **T165 wave i18n keys**.
 
 Owner legend: **ENG** · **COM** · **OPS** · **CUST** · **HUMAN**.
 
@@ -64,14 +66,21 @@ Owner legend: **ENG** · **COM** · **OPS** · **CUST** · **HUMAN**.
 
 | ID | Topic | Needed action | Owner | Priority | Ref |
 |----|-------|---------------|-------|----------|-----|
-| ENG-01 | #70 seed demo MOs | Seed when R2 healthy | ENG | P1 | GH#70 |
-| ENG-02 | #72 star-trans-validate | Re-run after ENG-01 | ENG | P1 | GH#72 |
-| ENG-03 | #110/#120/#136 validate absorb | Close with #70/#72 when stack up | ENG | P1 | GH#110,#120,#136 |
-| QA-01 | k6 p95 under load | Profile + tune + re-run | ENG | P1 | Spec 029 notes |
+| ENG-03 | #70/#72/#110/#120/#136 validate absorb | Evidence commented; **leave OPEN** for human close | ENG | P1 | GH#110,#120,#136 |
 | QA-02 | Playwright flakes | Stabilize selectors/timeouts | ENG | P2 | Spec 029 notes |
-| QA-04 | RLS residual tables | Audit remaining after 068 | ENG | P1 | Campaign report |
 | QA-05 | Copilot live chat | Re-verify when LLM up | ENG | P2 | — |
-| QA-06 | Live Kong enterprise/phase8 smoke | Smoke when gateway healthy (routes exist) | ENG | P1 | — |
+
+### 3.1b Resolved on R2 (2026-07-25 / 2026-08-01) — do not auto-close GH without human review
+
+| ID | Topic | Resolution |
+|----|-------|------------|
+| ENG-01 / ENG-02 | #70/#72 star-trans-validate | **PASS** 17/0/1 SKIP (Odoo — PH1-02). Evidence: `docs/qa/STAR-TRANS-VALIDATE-2026-07-25.txt` |
+| QA-01 | k6 SLO p95 | **PASS** 2026-07-25 p95 **165ms**; re-run 2026-08-01 — see `docs/qa/K6-FINAL-RUN-REPORT.md` |
+| ~~QA-04~~ | RLS residual | **ENG CLOSED** lab 082 — 135 tenant tables / 0 gaps (`docs/qa/QA-04-RLS-AUDIT-2026-08-01.md`) |
+| ~~QA-06~~ | Kong enterprise/phase8 smoke | **PASS** 2026-08-01 (`docs/qa/KONG-SMOKE-2026-08-01.md`) |
+| 9A-OPS-2 | ATP/approvals DB persist | **ENG CLOSED** — `try_persist` + `test_phase9_persist.py` (5 passed) |
+| 9A-OPS-3 | Redis EventBus wire | **ENG CLOSED** — dpe/connector/upload + publish smoke (`docs/qa/EVENTBUS-SMOKE-2026-08-01.md`) |
+| T165 | Phase9 EN/AR wave labels | **ENG CLOSED** keys in `locales/en.json` + `ar.json` (#160 progress; ≠ G-R2-04) |
 
 ### 3.2 ~~CLOSED Wave 1 eng~~ (strikethrough — do not reopen)
 
@@ -110,7 +119,7 @@ Owner legend: **ENG** · **COM** · **OPS** · **CUST** · **HUMAN**.
 | ID | Topic | Needed action | Owner | Priority |
 |----|-------|---------------|-------|----------|
 | OPS-02 | Customer VM + champion | Provision 8GB VM + training champion | CUST / OPS | P1 |
-| OPS-03 | Live-stack validate re-run | `star-trans-validate.ps1 -DpePort 8020 -ConnectorPort 8016` | OPS / ENG | P1 |
+| OPS-03 | Live-stack validate re-run | **DONE 2026-07-25** PASS 17/0/1 SKIP — see `docs/qa/STAR-TRANS-VALIDATE-2026-07-25.txt` | OPS / ENG | P1 |
 | OPS-04 | Monitoring activation | Confirm dashboards/alerts in customer deploy | OPS | P2 |
 | OPS-05 | Backup / DR drill | Execute restore drill before go-live | OPS | P2 |
 
@@ -122,13 +131,13 @@ Owner legend: **ENG** · **COM** · **OPS** · **CUST** · **HUMAN**.
 2. **[CUST/OPS]** Provision live Odoo staging PH1-02 (C-03, GH#108)
 3. **[HUMAN]** G-R2-04 Arabic native sign-off → `v9.1.1-r2` (C-04, GH#109, REL-01)
 4. **[CUST]** Confirm Odoo 17 vs 19 OQ-1 (C-05, GH#107)
-5. **[ENG/OPS]** Bring R2 stack healthy → seed MOs → star-trans-validate → close #70/#72/#110/#120/#136 (ENG-01/02/03, OPS-03)
-6. **[ENG]** Tune k6 p95 under concurrent load (QA-01)
-7. **[ENG]** Live Kong smoke `/enterprise/*` + `/phase8/*` when gateway up (QA-06) — **routes already shipped; do not “add route”**
-8. **[ENG]** Close residual RLS gaps post-068 (QA-04)
-9. **[ENG]** Stabilize Playwright flakes (QA-02)
-10. **[OPS]** Backup/restore + DR drill + monitoring confirm (OPS-05, OPS-04)
+5. **[ENG]** Human-close GH #70/#72/#110/#120/#136 after reviewing validate PASS comments (ENG-03 — eng will not auto-close)
+6. **[ENG]** Keep k6 warm-up ≥90s for release gates (QA-01)
+7. **[ENG]** Stabilize Playwright flakes (QA-02)
+8. **[ENG]** Copilot live re-verify when LLM up (QA-05)
+9. **[OPS]** Backup/restore + DR drill + monitoring confirm (OPS-05, OPS-04)
+10. **[CUST/OPS]** PH1-02 live Odoo staging (C-03) — blocks live integrations
 
 ---
 
-*Honesty: COM/Human items are never marked resolved by engineering. Live Odoo and Arabic native sign-off are never faked. Docker was down on 2026-07-18 finalize — validate left OPEN. Sources: FINAL-PROGRAM-STATUS.md, PRODUCT-STATUS.md, OPEN-ITEMS.md, PHASE{3–8} reports, Spec 029/030, `gh issue list`.*
+*Honesty: COM/Human items are never marked resolved by engineering. Live Odoo and Arabic native sign-off are never faked. Sources: FINAL-PROGRAM-STATUS.md, PRODUCT-STATUS.md, OPEN-ITEMS.md, PHASE{3–8} reports, Spec 029/030/032, `gh issue list`.*

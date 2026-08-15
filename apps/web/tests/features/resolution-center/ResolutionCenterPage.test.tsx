@@ -1,6 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { ResolutionCenterPage } from '@/features/resolution-center/components/ResolutionCenterPage';
+
+function withRouter(node: ReactNode) {
+  return <MemoryRouter initialEntries={['/planning/resolution']}>{node}</MemoryRouter>;
+}
 
 const mockScenarios = [
   {
@@ -34,41 +40,57 @@ const mockScenarios = [
 
 vi.mock('@/lib/api', () => ({
   default: {
-    get: vi.fn((_url: string, config?: { params?: { mo_id?: string } }) => {
+    get: vi.fn((url: string, config?: { params?: { mo_id?: string } }) => {
+      if (url.includes('/feasibility/queue')) {
+        // Serve a matching feasibility queue so the page can construct its
+        // unresolved MO list; mo_ids intentionally match the mocked scenarios.
+        return Promise.resolve({
+          data: {
+            data: mockScenarios.map((s) => ({
+              mo_id: s.mo_id,
+              erp_mo_id: s.mo_id,
+              product_name: 'Widget',
+              feasibility_score: 65,
+              primary_constraint: 'material',
+            })),
+          },
+        });
+      }
       const moId = config?.params?.mo_id;
       const scenarios = moId
         ? mockScenarios.filter((s) => s.mo_id === moId)
         : mockScenarios;
       return Promise.resolve({ data: { data: { scenarios } } });
     }),
+    post: vi.fn(() => Promise.resolve({ data: { data: {} } })),
   },
 }));
 
 describe('ResolutionCenterPage', () => {
   it('renders the page title and unresolved MOs list', async () => {
-    render(<ResolutionCenterPage />);
+    render(withRouter(<ResolutionCenterPage />));
 
-    expect(await screen.findByText('Resolution Center')).toBeInTheDocument();
+    expect(await screen.findByText(/Resolution [Cc]enter/)).toBeInTheDocument();
     expect(screen.getByText((content) => content.startsWith('Unresolved MOs'))).toBeInTheDocument();
-    expect(screen.getByText('MO-1001')).toBeInTheDocument();
-    expect(screen.getByText('MO-1004')).toBeInTheDocument();
-    expect(screen.getByText('MO-1008')).toBeInTheDocument();
+    expect(screen.getAllByText(/MO-1001/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/MO-1004/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/MO-1008/).length).toBeGreaterThan(0);
   });
 
   it('shows select hint when no MO is selected', async () => {
-    render(<ResolutionCenterPage />);
+    render(withRouter(<ResolutionCenterPage />));
 
-    expect(await screen.findByText('Select an MO')).toBeInTheDocument();
+    expect(await screen.findByText(/Select an MO/)).toBeInTheDocument();
   });
 
   it('shows constraint and scenario panels when an MO is clicked', async () => {
-    render(<ResolutionCenterPage />);
+    render(withRouter(<ResolutionCenterPage />));
 
-    const moRow = await screen.findByText('MO-1001');
+    const moRow = (await screen.findAllByText(/MO-1001/))[0];
     moRow.click();
 
-    expect(await screen.findByText((content) => content.includes('Constraints'))).toBeInTheDocument();
-    expect(screen.getByText((content) => content.startsWith('Scenarios for'))).toBeInTheDocument();
-    expect(screen.getByText('Expedite supplier')).toBeInTheDocument();
+    // Spec 035: per-scenario option cards (no separate Constraints heading).
+    expect(await screen.findByText('Expedite supplier')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Approve this path/i })).toBeInTheDocument();
   });
 });

@@ -85,11 +85,11 @@ Legend: `[x]` done · `[ ]` open
 - [x] T092 Seed + purge on live DB
 - [x] T093 Walkthrough 8 steps PASS
 - [x] T094 Screenshot PNGs
-- [ ] T095 Send customer template email
-- [ ] T096 Sunday customer ingest (if file arrives)
-- [ ] T097 Hard stop discipline Sun 18:00 / Mon morning
-- [ ] T100 Playwright home role smoke (optional)
+- [ ] T095 Send customer template email — HUMAN (not Cursor)
+- [ ] T096 Sunday customer ingest (if file arrives) — HUMAN/OPS
+- [x] T097 Hard stop discipline Sun 18:00 / Mon morning — see `docs/qa/T097-HARD-STOP-DISCIPLINE-2026-08-15.md`
+- [x] T100 Playwright home role smoke — `e2e/home-role.spec.ts` desktop **3/3 PASS** (`docs/qa/T100-HOME-ROLE-SMOKE-2026-08-15.md`)
 - [ ] T101 BOM/routing line sheet upsert depth (optional)
 - [ ] T102 demo_* → CDM+RLS post-demo
 - [ ] T103 Supervisor/Buyer dedicated homes (optional)
-- [ ] T110–T113 COM blockers (see T080–T083)
+- [ ] T110–T113 COM blockers (see T080–T083) — **remain OPEN**; honesty lock `docs/qa/COM-BLOCKERS-REMAIN-OPEN-2026-08-15.md`

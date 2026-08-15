@@ -20,7 +20,7 @@
 |-------|--------|
 | `scripts/e2e/critical_path_test.py` | **5/5 PASS** |
 | Playwright desktop `login` + `critical-path` | **8/8 PASS** (after `playwright install chromium`) |
-| Vitest unit | 151 pass / 9 fail (pre-existing Sidebar/planningLabels/RC) — non-blocking for demo |
+| Vitest unit | **160/160 PASS** (Sidebar/nav/RC/planningLabels/Copilot aligned) |
 
 ## k6
 
@@ -37,12 +37,20 @@
 5. Rebuilt **upload-svc** + **web-ui** images for live stack  
 6. Reject non-xlsx with HTTP 400 in data upload API  
 
+## Closed in follow-up (2026-08-15)
+
+| Topic | Verdict | Evidence |
+|-------|---------|----------|
+| Vitest 9 fails | **CLOSED** | Tests aligned to Home/Plan/Execute/… nav + Copilot Router + utilBarColor SPC; suite green |
+| T097 hard-stop | **CLOSED** | `docs/qa/T097-HARD-STOP-DISCIPLINE-2026-08-15.md` |
+| COM blockers | **remain OPEN** (honesty) | `docs/qa/COM-BLOCKERS-REMAIN-OPEN-2026-08-15.md` — do not fake-close |
+
 ## Remaining (honest)
 
-- Vitest 9 failures (Sidebar/nav/ResolutionCenter/planningLabels) — cleanup post-demo  
+- T095 customer email / T096 Sunday ingest — human  
 - Kong JWT not enforced on `/api/v1/data` in this lab compose (YELLOW)  
-- COM blockers unchanged OPEN (OQ-7, PH1-02, G-R2-04)  
+- C-01…C-08 / OQ-7 / PH1-02 / G-R2-04 — **OPEN** (human)
 
 ## OVERALL VERDICT
 
-**DEMO READY (ENG+OPS)** with lab caveats above. Stack left UP for Monday practice.
+**DEMO READY (ENG+OPS)**. COM CONDITIONAL. Stack left UP for practice; hard-stop discipline locked for Sun 18:00 Cairo.

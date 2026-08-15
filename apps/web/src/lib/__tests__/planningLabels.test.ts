@@ -77,9 +77,10 @@ describe('planningLabels.shortEntityName', () => {
 
 describe('planningLabels utilisation & status helpers', () => {
   it('utilBarColor thresholds', () => {
+    // SPC-aligned: green ≤85, amber >85 and ≤90, red >90
     expect(utilBarColor(97)).toBe('#d03b3b');
-    expect(utilBarColor(85)).toBe('#eda100');
-    expect(utilBarColor(80)).toBe('#eda100');
+    expect(utilBarColor(86)).toBe('#eda100');
+    expect(utilBarColor(85)).toBe('#0ca30c');
     expect(utilBarColor(50)).toBe('#0ca30c');
   });
 

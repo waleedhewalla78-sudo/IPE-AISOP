@@ -1,0 +1,744 @@
+{
+  "catalog": [
+    {
+      "id": "00-login",
+      "label": "Login",
+      "route": "/login",
+      "file": "00-login.png",
+      "bytes": 24818,
+      "ok": true
+    },
+    {
+      "id": "m01-menu-home",
+      "label": "Menu · Home rail",
+      "route": "/home",
+      "file": "m01-menu-home.png",
+      "bytes": 8390,
+      "ok": true
+    },
+    {
+      "id": "m02-menu-plan",
+      "label": "Menu · Plan sidebar",
+      "route": "/planning/control-tower",
+      "file": "m02-menu-plan.png",
+      "bytes": 39533,
+      "ok": true
+    },
+    {
+      "id": "m03-menu-execute",
+      "label": "Menu · Execute sidebar",
+      "route": "/shop-floor",
+      "file": "m03-menu-execute.png",
+      "bytes": 48758,
+      "ok": true
+    },
+    {
+      "id": "m04-menu-supply",
+      "label": "Menu · Supply sidebar",
+      "route": "/supply-chain/supply-planning",
+      "file": "m04-menu-supply.png",
+      "bytes": 24592,
+      "ok": true
+    },
+    {
+      "id": "m05-menu-analyze",
+      "label": "Menu · Analyze sidebar",
+      "route": "/command-center/dashboard",
+      "file": "m05-menu-analyze.png",
+      "bytes": 34777,
+      "ok": true
+    },
+    {
+      "id": "m06-menu-copilot",
+      "label": "Menu · Copilot agents",
+      "route": "/ai-governance/copilot",
+      "file": "m06-menu-copilot.png",
+      "bytes": 80968,
+      "ok": true
+    },
+    {
+      "id": "m07-menu-admin",
+      "label": "Menu · Admin sidebar",
+      "route": "/platform/admin",
+      "file": "m07-menu-admin.png",
+      "bytes": 35840,
+      "ok": true
+    },
+    {
+      "id": "01-home-executive",
+      "label": "Home — Executive",
+      "route": "/home",
+      "file": "01-home-executive.png",
+      "bytes": 166399,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "02-home-planner",
+      "label": "Home — Planner",
+      "route": "/home",
+      "file": "02-home-planner.png",
+      "bytes": 209953,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "03-workspace",
+      "label": "Workspace (Today)",
+      "route": "/workspace",
+      "file": "03-workspace.png",
+      "bytes": 209953,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "10-plan-control-tower",
+      "label": "Plan · Control Tower",
+      "route": "/planning/control-tower",
+      "file": "10-plan-control-tower.png",
+      "bytes": 242333,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "11-plan-demand",
+      "label": "Plan · Demand Intelligence",
+      "route": "/planning/demand",
+      "file": "11-plan-demand.png",
+      "bytes": 9800,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "12-plan-resolution",
+      "label": "Plan · Resolution Center",
+      "route": "/planning/resolution",
+      "file": "12-plan-resolution.png",
+      "bytes": 147591,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "13-plan-schedule",
+      "label": "Plan · Production Schedule",
+      "route": "/planning/schedule",
+      "file": "13-plan-schedule.png",
+      "bytes": 158449,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "14-plan-detailed-schedule",
+      "label": "Plan · Detailed Schedule",
+      "route": "/plan/detailed-schedule",
+      "file": "14-plan-detailed-schedule.png",
+      "bytes": 116320,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "15-plan-scenarios",
+      "label": "Plan · Scenario Workbench",
+      "route": "/planning/scenarios",
+      "file": "15-plan-scenarios.png",
+      "bytes": 110389,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "16-plan-predictions",
+      "label": "Plan · Predictive Risk",
+      "route": "/planning/predictions",
+      "file": "16-plan-predictions.png",
+      "bytes": 113317,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "17-plan-overview",
+      "label": "Plan · Overview",
+      "route": "/planning/dashboard",
+      "file": "17-plan-overview.png",
+      "bytes": 164064,
+      "ok": true,
+      "menu": "plan"
+    },
+    {
+      "id": "18-plan-root-cause",
+      "label": "Plan · Root Cause",
+      "route": "/planning/root-cause",
+      "file": "18-plan-root-cause.png",
+      "bytes": 99277,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "19-plan-cockpit",
+      "label": "Plan · Cockpit",
+      "route": "/planning/cockpit",
+      "file": "19-plan-cockpit.png",
+      "bytes": 160501,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "1a-plan-horizons",
+      "label": "Plan · Three Horizons",
+      "route": "/planning/horizons",
+      "file": "1a-plan-horizons.png",
+      "bytes": 142651,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "20-execute-shop-floor",
+      "label": "Execute · Shop Floor",
+      "route": "/shop-floor",
+      "file": "20-execute-shop-floor.png",
+      "bytes": 171255,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "21-execute-equipment",
+      "label": "Execute · Equipment",
+      "route": "/command-center/equipment",
+      "file": "21-execute-equipment.png",
+      "bytes": 113194,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "22-execute-projects",
+      "label": "Execute · Projects",
+      "route": "/work/projects",
+      "file": "22-execute-projects.png",
+      "bytes": 132885,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "23-execute-tasks",
+      "label": "Execute · Tasks",
+      "route": "/work/tasks",
+      "file": "23-execute-tasks.png",
+      "bytes": 132420,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "24-execute-approvals",
+      "label": "Execute · Approvals",
+      "route": "/work/approvals",
+      "file": "24-execute-approvals.png",
+      "bytes": 131630,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "25-execute-meetings",
+      "label": "Execute · Meetings",
+      "route": "/work/meetings",
+      "file": "25-execute-meetings.png",
+      "bytes": 126492,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "26-execute-calendar",
+      "label": "Execute · Calendar",
+      "route": "/work/calendar",
+      "file": "26-execute-calendar.png",
+      "bytes": 120513,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "27-execute-documents",
+      "label": "Execute · Documents",
+      "route": "/work/documents",
+      "file": "27-execute-documents.png",
+      "bytes": 120413,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "28-execute-knowledge",
+      "label": "Execute · Knowledge",
+      "route": "/work/knowledge",
+      "file": "28-execute-knowledge.png",
+      "bytes": 124401,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "29-execute-objectives",
+      "label": "Execute · Objectives",
+      "route": "/work/objectives",
+      "file": "29-execute-objectives.png",
+      "bytes": 125396,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "2a-execute-kpis",
+      "label": "Execute · KPIs",
+      "route": "/work/kpis",
+      "file": "2a-execute-kpis.png",
+      "bytes": 124490,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "2b-execute-teams",
+      "label": "Execute · Teams",
+      "route": "/work/teams",
+      "file": "2b-execute-teams.png",
+      "bytes": 120208,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "2c-execute-automation",
+      "label": "Execute · Automation",
+      "route": "/work/automation",
+      "file": "2c-execute-automation.png",
+      "bytes": 124005,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "2d-execute-reports",
+      "label": "Execute · Reports",
+      "route": "/work/reports",
+      "file": "2d-execute-reports.png",
+      "bytes": 125351,
+      "ok": true,
+      "menu": "execute"
+    },
+    {
+      "id": "30-supply-planning",
+      "label": "Supply · Planning",
+      "route": "/supply-chain/supply-planning",
+      "file": "30-supply-planning.png",
+      "bytes": 84609,
+      "ok": true,
+      "menu": "supply"
+    },
+    {
+      "id": "31-supply-inventory",
+      "label": "Supply · Inventory",
+      "route": "/supply-chain/inventory",
+      "file": "31-supply-inventory.png",
+      "bytes": 140923,
+      "ok": true,
+      "menu": "supply"
+    },
+    {
+      "id": "32-supply-procurement",
+      "label": "Supply · Procurement",
+      "route": "/supply-chain/procurement",
+      "file": "32-supply-procurement.png",
+      "bytes": 91802,
+      "ok": true,
+      "menu": "supply"
+    },
+    {
+      "id": "33-supply-suppliers",
+      "label": "Supply · Suppliers",
+      "route": "/supply-chain/suppliers",
+      "file": "33-supply-suppliers.png",
+      "bytes": 88095,
+      "ok": true,
+      "menu": "supply"
+    },
+    {
+      "id": "34-supply-orders",
+      "label": "Supply · Orders",
+      "route": "/supply-chain/orders",
+      "file": "34-supply-orders.png",
+      "bytes": 85901,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "35-supply-tariff",
+      "label": "Supply · Tariff",
+      "route": "/supply-chain/tariff",
+      "file": "35-supply-tariff.png",
+      "bytes": 99946,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "36-supply-scn",
+      "label": "Supply · SCN Portal",
+      "route": "/supply-chain/scn-portal",
+      "file": "36-supply-scn.png",
+      "bytes": 111825,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "40-analyze-outcomes",
+      "label": "Analyze · Outcomes & Risk",
+      "route": "/command-center/dashboard",
+      "file": "40-analyze-outcomes.png",
+      "bytes": 183835,
+      "ok": true,
+      "menu": "analyze"
+    },
+    {
+      "id": "41-analyze-war-room",
+      "label": "Analyze · War Room",
+      "route": "/command-center/war-room",
+      "file": "41-analyze-war-room.png",
+      "bytes": 106616,
+      "ok": true,
+      "menu": "analyze"
+    },
+    {
+      "id": "42-analyze-cost-of-chaos",
+      "label": "Analyze · Cost of Chaos",
+      "route": "/command-center/cost-of-chaos",
+      "file": "42-analyze-cost-of-chaos.png",
+      "bytes": 123959,
+      "ok": true,
+      "menu": "analyze"
+    },
+    {
+      "id": "43-analyze-executive",
+      "label": "Analyze · Executive",
+      "route": "/command-center/executive",
+      "file": "43-analyze-executive.png",
+      "bytes": 84048,
+      "ok": true,
+      "menu": "analyze"
+    },
+    {
+      "id": "44-analyze-otd",
+      "label": "Analyze · OTD Analytics",
+      "route": "/command-center/otd-analytics",
+      "file": "44-analyze-otd.png",
+      "bytes": 82932,
+      "ok": true,
+      "menu": "analyze"
+    },
+    {
+      "id": "45-analyze-ops-live",
+      "label": "Analyze · Ops Live",
+      "route": "/command-center/ops-live",
+      "file": "45-analyze-ops-live.png",
+      "bytes": 147162,
+      "ok": true,
+      "menu": "analyze"
+    },
+    {
+      "id": "46-analyze-outcomes-page",
+      "label": "Analyze · Outcomes",
+      "route": "/command-center/outcomes",
+      "file": "46-analyze-outcomes-page.png",
+      "bytes": 104456,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "47-analyze-sop",
+      "label": "Analyze · S&OP Report",
+      "route": "/command-center/sop-report",
+      "file": "47-analyze-sop.png",
+      "bytes": 108342,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "48-analyze-ops-deep",
+      "label": "Analyze · Operations Deep",
+      "route": "/command-center/operations-deep",
+      "file": "48-analyze-ops-deep.png",
+      "bytes": 110992,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "49-analyze-intelligence",
+      "label": "Analyze · Intelligence",
+      "route": "/intelligence",
+      "file": "49-analyze-intelligence.png",
+      "bytes": 231825,
+      "ok": true,
+      "menu": "analyze"
+    },
+    {
+      "id": "50-intel-pulse",
+      "label": "Intelligence · Pulse",
+      "route": "/intelligence/pulse",
+      "file": "50-intel-pulse.png",
+      "bytes": 231898,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "51-intel-demand",
+      "label": "Intelligence · Demand",
+      "route": "/intelligence/demand",
+      "file": "51-intel-demand.png",
+      "bytes": 125488,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "52-intel-production",
+      "label": "Intelligence · Production",
+      "route": "/intelligence/production",
+      "file": "52-intel-production.png",
+      "bytes": 127910,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "53-intel-supply",
+      "label": "Intelligence · Supply",
+      "route": "/intelligence/supply",
+      "file": "53-intel-supply.png",
+      "bytes": 126168,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "54-intel-quality",
+      "label": "Intelligence · Quality",
+      "route": "/intelligence/quality",
+      "file": "54-intel-quality.png",
+      "bytes": 123748,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "55-intel-finance",
+      "label": "Intelligence · Finance",
+      "route": "/intelligence/finance",
+      "file": "55-intel-finance.png",
+      "bytes": 124285,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "56-intel-customer",
+      "label": "Intelligence · Customer",
+      "route": "/intelligence/customer",
+      "file": "56-intel-customer.png",
+      "bytes": 126657,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "57-intel-analytics",
+      "label": "Intelligence · Analytics",
+      "route": "/intelligence/analytics",
+      "file": "57-intel-analytics.png",
+      "bytes": 210266,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "58-intel-commercial",
+      "label": "Intelligence · Commercial",
+      "route": "/intelligence/commercial",
+      "file": "58-intel-commercial.png",
+      "bytes": 144322,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "59-intel-procurement",
+      "label": "Intelligence · Procurement",
+      "route": "/intelligence/procurement",
+      "file": "59-intel-procurement.png",
+      "bytes": 131008,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "60-copilot",
+      "label": "Copilot · Chat",
+      "route": "/ai-governance/copilot",
+      "file": "60-copilot.png",
+      "bytes": 224894,
+      "ok": true,
+      "menu": "copilot"
+    },
+    {
+      "id": "61-copilot-agents",
+      "label": "Copilot · Agents",
+      "route": "/platform/agents",
+      "file": "61-copilot-agents.png",
+      "bytes": 254168,
+      "ok": true,
+      "menu": "copilot"
+    },
+    {
+      "id": "62-copilot-meeting-prep",
+      "label": "Copilot · Meeting Prep",
+      "route": "/ai-governance/meeting-prep",
+      "file": "62-copilot-meeting-prep.png",
+      "bytes": 139375,
+      "ok": true,
+      "menu": "copilot"
+    },
+    {
+      "id": "63-copilot-design-ai",
+      "label": "Copilot · Design AI",
+      "route": "/ai-governance/design-ai",
+      "file": "63-copilot-design-ai.png",
+      "bytes": 159233,
+      "ok": true,
+      "menu": "copilot"
+    },
+    {
+      "id": "70-admin-gov-overview",
+      "label": "Admin · Governance Overview",
+      "route": "/ai-governance/overview",
+      "file": "70-admin-gov-overview.png",
+      "bytes": 181318,
+      "ok": true,
+      "menu": "admin"
+    },
+    {
+      "id": "71-admin-ai-trust",
+      "label": "Admin · AI Trust",
+      "route": "/ai-governance/ai-trust",
+      "file": "71-admin-ai-trust.png",
+      "bytes": 158914,
+      "ok": true,
+      "menu": "admin"
+    },
+    {
+      "id": "72-admin-compliance",
+      "label": "Admin · Compliance",
+      "route": "/ai-governance/compliance",
+      "file": "72-admin-compliance.png",
+      "bytes": 201126,
+      "ok": true,
+      "menu": "admin"
+    },
+    {
+      "id": "73-admin-quality",
+      "label": "Admin · Quality",
+      "route": "/ai-governance/quality",
+      "file": "73-admin-quality.png",
+      "bytes": 109796,
+      "ok": true,
+      "menu": "admin"
+    },
+    {
+      "id": "74-admin-mdr",
+      "label": "Admin · MDR Gate",
+      "route": "/ai-governance/mdr",
+      "file": "74-admin-mdr.png",
+      "bytes": 100014,
+      "ok": true,
+      "menu": "admin"
+    },
+    {
+      "id": "75-admin-sustainability",
+      "label": "Admin · Sustainability",
+      "route": "/ai-governance/sustainability",
+      "file": "75-admin-sustainability.png",
+      "bytes": 108167,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "76-admin-platform",
+      "label": "Admin · Platform",
+      "route": "/platform/admin",
+      "file": "76-admin-platform.png",
+      "bytes": 110439,
+      "ok": true,
+      "menu": "admin"
+    },
+    {
+      "id": "77-admin-upload",
+      "label": "Admin · Data Upload",
+      "route": "/platform/upload",
+      "file": "77-admin-upload.png",
+      "bytes": 132319,
+      "ok": true,
+      "menu": "admin"
+    },
+    {
+      "id": "78-admin-startrans-upload",
+      "label": "Admin · Star Trans Upload",
+      "route": "/admin/data/upload",
+      "file": "78-admin-startrans-upload.png",
+      "bytes": 83461,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "79-admin-odoo",
+      "label": "Admin · Odoo Config",
+      "route": "/platform/odoo-config",
+      "file": "79-admin-odoo.png",
+      "bytes": 116137,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "7a-admin-onboarding",
+      "label": "Admin · Onboarding",
+      "route": "/platform/onboarding",
+      "file": "7a-admin-onboarding.png",
+      "bytes": 110228,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "7b-admin-mlops",
+      "label": "Admin · ML Ops",
+      "route": "/platform/ml-ops",
+      "file": "7b-admin-mlops.png",
+      "bytes": 102044,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "7c-admin-ops",
+      "label": "Admin · Ops",
+      "route": "/platform/ops",
+      "file": "7c-admin-ops.png",
+      "bytes": 112356,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "7d-admin-exceptions",
+      "label": "Admin · Exceptions",
+      "route": "/platform/exceptions",
+      "file": "7d-admin-exceptions.png",
+      "bytes": 92198,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "7e-customer-portal",
+      "label": "Customer Portal",
+      "route": "/customer-portal",
+      "file": "7e-customer-portal.png",
+      "bytes": 104222,
+      "ok": true,
+      "menu": null
+    },
+    {
+      "id": "1b-plan-feasibility-drawer",
+      "label": "Plan · Feasibility Drawer",
+      "route": "/planning/control-tower",
+      "file": "1b-plan-feasibility-drawer.png",
+      "bytes": 249146,
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "base": "http://localhost:8082"
+}
