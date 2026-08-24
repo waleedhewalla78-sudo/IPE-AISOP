@@ -69,7 +69,7 @@ Legend: `[x]` done · `[ ]` open
 - [x] T071 Point `.specify/feature.json` → 040
 - [x] T071a `scripts/verify-startrans-template.ps1` PASS on canonical xlsx
 - [ ] T072 Sync root constitution pointer if Speckit run from AISOP root (N/A — no root memory path)
-- [ ] T073 Close or defer Spec 040 after demo with evidence link
+- [x] T073 Defer Spec 040 COM after demo — ENG+OPS: `docs/qa/BATCH0-FINALIZE-2026-08-15.md` + `docs/qa/BATCH0-CONTINUATION-2026-08-24.md`; COM stays OPEN (`docs/qa/COM-BLOCKERS-REMAIN-OPEN-2026-08-15.md`)
 
 ## Phase I — Explicitly NOT eng tasks (COM)
 
@@ -86,7 +86,7 @@ Legend: `[x]` done · `[ ]` open
 - [x] T093 Walkthrough 8 steps PASS
 - [x] T094 Screenshot PNGs
 - [ ] T095 Send customer template email — HUMAN (not Cursor)
-- [ ] T096 Sunday customer ingest (if file arrives) — HUMAN/OPS
+- [x] T096 Sunday customer ingest — N/A 2026-08-24 (no customer workbook; seed fallback) — `docs/qa/T096-CUSTOMER-INGEST-2026-08-24.md`
 - [x] T097 Hard stop discipline Sun 18:00 / Mon morning — see `docs/qa/T097-HARD-STOP-DISCIPLINE-2026-08-15.md`
 - [x] T100 Playwright home role smoke — `e2e/home-role.spec.ts` desktop **3/3 PASS** (`docs/qa/T100-HOME-ROLE-SMOKE-2026-08-15.md`)
 - [ ] T101 BOM/routing line sheet upsert depth (optional)

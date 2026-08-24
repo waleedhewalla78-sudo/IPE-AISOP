@@ -21,3 +21,8 @@
 ## If no reply by Sun EOD
 
 Use template sample rows already in the workbook; demo seed (20 MOs) remains valid fallback.
+
+## Continuation (2026-08-24)
+
+- Send timestamp still blank — T095 remains **HUMAN / OPEN**.
+- T096: no filled workbook found in Downloads or repo → N/A; seed fallback used (`docs/qa/T096-CUSTOMER-INGEST-2026-08-24.md`).
