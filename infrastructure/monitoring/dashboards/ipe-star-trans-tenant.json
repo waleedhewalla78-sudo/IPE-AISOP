@@ -1,0 +1,37 @@
+{
+  "title": "IPE Star Trans Tenant",
+  "uid": "ipe-star-trans-tenant",
+  "version": 1,
+  "tags": ["ipe", "star-trans", "tenant"],
+  "schemaVersion": 38,
+  "timezone": "Africa/Cairo",
+  "editable": true,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Health (shared stack)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "targets": [{ "expr": "up", "legendFormat": "{{ job }}" }]
+    },
+    {
+      "title": "DQ score (when scraped)",
+      "type": "gauge",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "targets": [{ "expr": "ipe_dq_score{tenant_slug=\"star-trans\"}" }]
+    },
+    {
+      "title": "Copilot latency p95",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(ipe_http_request_duration_seconds_bucket{api=\"copilot\"}[5m])) by (le))"
+        }
+      ]
+    }
+  ]
+}

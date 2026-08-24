@@ -1,0 +1,10 @@
+# Star Trans Kong extras (BATCH2-1)
+# Lab uses infrastructure/docker/kong.release2.yml. This file is additive for
+# a dedicated production gateway. No JWT secrets here.
+
+_format_version: "3.0"
+_comment: "Placeholder — no Star Trans-only routes required on shared lab Kong."
+
+services: []
+plugins: []
+consumers: []

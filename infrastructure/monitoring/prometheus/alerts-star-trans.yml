@@ -1,0 +1,36 @@
+groups:
+  - name: ipe_star_trans_tenant
+    rules:
+      - alert: StarTransDataQualityLow
+        expr: ipe_dq_score{tenant_slug="star-trans"} < 70
+        for: 15m
+        labels:
+          severity: warning
+          tenant: star-trans
+        annotations:
+          summary: "Star Trans DQ score below 70"
+          description: "Score {{ $value }}. Metric may be absent on lab until DQ cron exists."
+
+      - alert: StarTransFeasibilitySlow
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(ipe_http_request_duration_seconds_bucket{api="feasibility"}[5m])) by (le)
+          ) > 30
+        for: 10m
+        labels:
+          severity: warning
+          tenant: star-trans
+        annotations:
+          summary: "Feasibility P95 > 30s"
+
+      - alert: StarTransCopilotSlow
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(ipe_http_request_duration_seconds_bucket{api="copilot"}[5m])) by (le)
+          ) > 8
+        for: 10m
+        labels:
+          severity: warning
+          tenant: star-trans
+        annotations:
+          summary: "Copilot P95 > 8s"
