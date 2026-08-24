@@ -9,8 +9,8 @@ param(
     [string]$Profile = "default"
 )
 
-$HeroProductA = if ($Profile -eq "startrans") { "Distribution Transformer" } else { "Widget A" }
-$HeroProductB = if ($Profile -eq "startrans") { "Pad-Mount" } else { "Gadget B" }
+$HeroProductA = if ($Profile -eq "startrans") { "Distribution Transformer" } else { "Distribution Transformer" }
+$HeroProductB = if ($Profile -eq "startrans") { "Pad-Mount" } else { "Pad-Mount" }
 $MoPrefix = if ($Profile -eq "startrans") { "MO-ST" } else { "MO-DEMO" }
 
 $ErrorActionPreference = "Continue"
@@ -120,7 +120,7 @@ Test-Checkpoint "4. Schedule - OR-Tools Gantt data" {
     if ($Profile -eq "startrans") {
         "$ops scheduled operations across Core & Coil, Winding, Test Bay"
     } else {
-        "$ops scheduled operations across Assembly, Machining, Packaging"
+    "$ops scheduled operations across Assembly, Machining, Packaging"
     }
 } -UiPath "/planning/schedule"
 
@@ -164,7 +164,7 @@ Test-Checkpoint "10. Copilot - FG stock query" {
     $q = if ($Profile -eq "startrans") {
         '{"query":"What is the current FG stock for Distribution Transformer 500 kVA and Pad-Mount Transformer 250 kVA?","stream":false}'
     } else {
-        '{"query":"What is the current FG stock for Widget A and Gadget B?","stream":false}'
+        '{"query":"What is the current FG stock for Distribution Transformer and Pad-Mount?","stream":false}'
     }
     $r = Invoke-RestMethod -Uri "$Base/api/v1/copilot/query" -Headers $h -Method POST -ContentType "application/json" -Body $q -TimeoutSec 180
     if ($r.data.intent -ne "material_status") { return $false }

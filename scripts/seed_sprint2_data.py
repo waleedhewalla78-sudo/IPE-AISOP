@@ -45,16 +45,23 @@ async def seed():
             {"id": user_id, "tid": tenant_id},
         )
 
+        product_names = [
+            "Distribution Transformer 500 kVA",
+            "Pad-Mount Transformer 250 kVA",
+            "Copper Winding Wire",
+            "Power Transformer 50 MVA Core-Coil",
+            "CRGO Electrical Steel",
+        ]
         product_ids = []
-        for name in ["Widget A", "Gadget B", "Component C", "Assembly D", "Substrate E"]:
+        for idx, name in enumerate(product_names, start=1):
             pid = uuid.uuid4()
             await session.execute(
                 text("""
                     INSERT INTO cdm_product (id, tenant_id, erp_source_id, name, source_type, lead_time_days)
                     VALUES (:id, :tid, :eid, :name, 'manufactured', 5.0)
-                    ON CONFLICT (tenant_id, erp_source_id) DO NOTHING
+                    ON CONFLICT (tenant_id, erp_source_id) DO UPDATE SET name = EXCLUDED.name
                 """),
-                {"id": pid, "tid": tenant_id, "eid": f"PROD-{name[0]}", "name": name},
+                {"id": pid, "tid": tenant_id, "eid": f"PROD{idx:03d}", "name": name},
             )
             product_ids.append(pid)
 

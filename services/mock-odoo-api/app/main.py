@@ -155,7 +155,35 @@ def _execute_kw(model: str, method: str, args: list, kwargs: dict):
                     "scheduled_date": "2026-06-15 00:00:00",
                 }
             ]
-        if model in ("res.partner", "purchase.order", "mrp.bom.line", "mrp.routing.workcenter"):
+        if model == "stock.warehouse":
+            return [{"id": 1, "name": "Mock WH", "code": "WH01", "company_id": [1, "IPE Mock"]}]
+        if model == "product.template":
+            return [
+                {
+                    "id": 1,
+                    "default_code": "WGT-A",
+                    "name": "Widget A",
+                    "type": "product",
+                    "uom_id": [1, "Units"],
+                },
+                {
+                    "id": 3,
+                    "default_code": "RAW-1",
+                    "name": "Raw Input",
+                    "type": "consu",
+                    "uom_id": [1, "kg"],
+                },
+            ]
+        if model == "resource.calendar":
+            return [{"id": 1, "name": "Standard Calendar"}]
+        if model == "hr.employee":
+            return [{"id": 1, "name": "Mock Operator", "barcode": "E001", "department_id": [1, "Shop"]}]
+        if model == "res.partner":
+            return [
+                {"id": 1, "name": "Acme Corp", "supplier_rank": 0, "customer_rank": 1, "email": "a@x"},
+                {"id": 2, "name": "Copper Co", "supplier_rank": 1, "customer_rank": 0, "email": "c@x"},
+            ]
+        if model in ("purchase.order", "mrp.bom.line", "mrp.routing.workcenter"):
             return []
         return []
     if method == "read":

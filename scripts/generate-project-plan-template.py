@@ -20,11 +20,11 @@ ROWS = [
         "STATUS",
         "NOTES",
     ],
-    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-001", 10, "Machine Widget Housing", "WC002", 0, 1.5, "planned", "Op 10"],
-    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-001", 20, "Assemble Widget A", "WC001", 1.5, 2, "planned", "Op 20"],
-    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-001", 30, "Pack Widget A", "WC003", 3.5, 0.75, "planned", "Op 30"],
-    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-005", 10, "Fabricate Gadget B", "WC002", 2.5, 2.5, "frozen", "Frozen op"],
-    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-005", 20, "QC Gadget B", "WC003", 5, 1, "planned", "QC"],
+    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-001", 10, "Wind LV/HV Coils", "WC002", 0, 1.5, "planned", "Op 10"],
+    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-001", 20, "Core & Coil Assembly", "WC001", 1.5, 2, "planned", "Op 20"],
+    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-001", 30, "Tank Fit-Up & Vacuum Test", "WC003", 3.5, 0.75, "planned", "Op 30"],
+    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-005", 10, "Wind Pad-Mount Coils", "WC002", 2.5, 2.5, "frozen", "Frozen op"],
+    ["PLAN-DEMO-Q3", "Q3 Demo Production Plan", "MO-DEMO-005", 20, "Pad-Mount Final Test", "WC003", 5, 1, "planned", "QC"],
 ]
 
 

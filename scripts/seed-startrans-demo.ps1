@@ -1,10 +1,12 @@
-# Load Star Trans demo branding (base demo graph + industry overlay)
+# Excel ingest (BATCH1-1) writes RLS-scoped cdm_ingest_* tables, not demo_*.
+# This seed still populates operational CDM (cdm_manufacturing_order, etc.).
 # Usage: .\scripts\seed-startrans-demo.ps1
 # Requires: docker-db-1 running, migrations applied, base seed loaded
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 $OverlaySql = Join-Path $Root "scripts\seed-startrans-overlay.sql"
+$Mos20Sql = Join-Path $Root "scripts\seed-startrans-20-mos.sql"
 $MdrBoostSql = Join-Path $Root "scripts\seed-startrans-mdr-boost.sql"
 $Container = "docker-db-1"
 $DbName = "ipe_test"
@@ -49,15 +51,19 @@ if ([int]$moCount -ge 10) {
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
-Write-Host "[2/3] Applying Star Trans industry overlay..." -ForegroundColor Yellow
+Write-Host "[2/4] Applying Star Trans industry overlay..." -ForegroundColor Yellow
 Get-Content $OverlaySql -Raw | docker exec -i $Container psql -U $DbUser -d $DbName -v ON_ERROR_STOP=1 2>&1
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-Write-Host "[3/3] Applying MDR boost (BOMs, routing, inventory for schedule gate)..." -ForegroundColor Yellow
+Write-Host "[3/4] Seeding 20 MOs with feasibility bands..." -ForegroundColor Yellow
+Get-Content $Mos20Sql -Raw | docker exec -i $Container psql -U $DbUser -d $DbName -v ON_ERROR_STOP=1 2>&1
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+Write-Host "[4/4] Applying MDR boost (BOMs, routing, inventory for schedule gate)..." -ForegroundColor Yellow
 Get-Content $MdrBoostSql -Raw | docker exec -i $Container psql -U $DbUser -d $DbName -v ON_ERROR_STOP=1 2>&1
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-Write-Host "Star Trans demo data ready." -ForegroundColor Green
+Write-Host "Star Trans demo data ready (20 MOs)." -ForegroundColor Green
 Write-Host "  Tenant: Star Trans - Electrical Transformer Technology" -ForegroundColor DarkGray
 Write-Host "  MOs: MO-ST-001 through MO-ST-010 (10 orders, 3 at-risk)" -ForegroundColor DarkGray
 Write-Host "  Hero MO: MO-ST-001 - copper winding delay (score ~52)" -ForegroundColor DarkGray

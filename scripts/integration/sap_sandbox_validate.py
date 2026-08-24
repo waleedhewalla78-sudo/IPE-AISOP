@@ -54,7 +54,7 @@ def validate_mappers(lines: list[str]) -> bool:
         {"AUFNR": "MO-SAP-001", "MATNR": "FG-001", "GAMNG": 50, "GSTRP": "2026-06-01", "GLTRP": "2026-06-15"}
     )
     supply = map_purchase_order_to_supply({"EBELN": "PO-001", "LIFNR": "V001", "MATNR": "RM-001", "MENGE": 100})
-    product = map_material_to_product({"MATNR": "FG-001", "MAKTX": "Widget", "MTART": "FERT", "MEINS": "EA"})
+    product = map_material_to_product({"MATNR": "FG-001", "MAKTX": "Distribution Transformer", "MTART": "FERT", "MEINS": "EA"})
 
     checks = [
         demand["source"] == "sap" and demand["order_id"] == "SO-SAP-001",

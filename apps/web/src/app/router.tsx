@@ -13,6 +13,7 @@ import {
   ControlTowerPage,
   ResolutionCenterPage,
   SchedulePage,
+  DetailedSchedulePage,
   DemandForecastPage,
   ScenarioWorkbenchPage,
   CommandCenterDashboardPage,
@@ -28,6 +29,7 @@ import {
   OrderManagementPage,
   ProcurementDashboardPage,
   EquipmentHealthPage,
+  GovernanceOverviewPage,
   CopilotPanel,
   DesignAIPage,
   AITrustPage,
@@ -44,9 +46,12 @@ import {
   SOPReport,
   ShopFloorPage,
   UnifiedWorkspacePage,
+  WorkHub,
+  WorkModulePage,
   PredictiveViewPage,
   RootCauseExplorerPage,
   DataUploadCenterPage,
+  StarTransDataUploadPage,
   AgentDashboardPage,
   ExceptionManagerPage,
   SupplierScorecardPage,
@@ -85,12 +90,34 @@ export function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to={ROUTES.WORKSPACE} replace />} />
+          <Route path="/home" element={<UnifiedWorkspacePage />} />
+          <Route path="/today" element={<LegacyRedirect to={ROUTES.HOME} />} />
 
           <Route path={ROUTES.WORKSPACE} element={<UnifiedWorkspacePage />} />
+          <Route path="/admin/data/upload" element={<StarTransDataUploadPage />} />
+          <Route path="/plan/detailed-schedule" element={<DetailedSchedulePage />} />
+          <Route path={ROUTES.PLAN_DETAILED_SCHEDULE} element={<DetailedSchedulePage />} />
+
+          {/* Work OS hub — enterprise shell */}
+          <Route path={ROUTES.WORK} element={<WorkHub />}>
+            <Route index element={<Navigate to="projects" replace />} />
+            <Route path="projects" element={<WorkModulePage />} />
+            <Route path="tasks" element={<WorkModulePage />} />
+            <Route path="approvals" element={<WorkModulePage />} />
+            <Route path="meetings" element={<WorkModulePage />} />
+            <Route path="calendar" element={<WorkModulePage />} />
+            <Route path="documents" element={<WorkModulePage />} />
+            <Route path="knowledge" element={<WorkModulePage />} />
+            <Route path="objectives" element={<WorkModulePage />} />
+            <Route path="kpis" element={<WorkModulePage />} />
+            <Route path="teams" element={<WorkModulePage />} />
+            <Route path="automation" element={<WorkModulePage />} />
+            <Route path="reports" element={<WorkModulePage />} />
+          </Route>
 
           {/* Planning Hub */}
           <Route path={ROUTES.PLANNING} element={<PlanningHub />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route index element={<Navigate to="control-tower" replace />} />
             <Route path="dashboard" element={<PlanningDashboardPage />} />
             <Route path="cockpit" element={<PlanningCockpitPage />} />
             <Route path="horizons" element={<ThreeHorizonsPage />} />
@@ -153,7 +180,8 @@ export function AppRouter() {
 
           {/* AI & Governance */}
           <Route path={ROUTES.AI_GOVERNANCE} element={<AIGovernanceHub />}>
-            <Route index element={<Navigate to="copilot" replace />} />
+            <Route index element={<Navigate to="overview" replace />} />
+            <Route path="overview" element={<GovernanceOverviewPage />} />
             <Route path="copilot" element={<CopilotPanel />} />
             <Route path="meeting-prep" element={<MeetingPrepPage />} />
             <Route path="meeting-prep/:type" element={<MeetingPrepPage />} />
@@ -199,6 +227,7 @@ export function AppRouter() {
           <Route path="/sustainability" element={<LegacyRedirect to={ROUTES.AI_SUSTAINABILITY} />} />
           <Route path="/admin" element={<LegacyRedirect to={ROUTES.PLATFORM_ADMIN} />} />
           <Route path="/admin/upload" element={<LegacyRedirect to={ROUTES.PLATFORM_UPLOAD} />} />
+          <Route path="/admin/data" element={<LegacyRedirect to={ROUTES.ADMIN_DATA_UPLOAD} />} />
           <Route path="/material/suppliers" element={<LegacyRedirect to={ROUTES.SUPPLY_SUPPLIERS} />} />
           <Route path="/copilot/meeting/:type" element={<LegacyRedirect to={ROUTES.AI_MEETING_PREP} />} />
           <Route path="/onboarding" element={<LegacyRedirect to={ROUTES.PLATFORM_ONBOARDING} />} />
