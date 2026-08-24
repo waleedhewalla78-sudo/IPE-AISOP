@@ -1,0 +1,44 @@
+# Star Trans production tenant configuration (BATCH2-1)
+# Spec: IPE-BATCH2-STARTRANS-ONBOARDING.md Prompt 1
+# Environment: LAB until Hetzner production is confirmed. Contract dates NULL until SOW scan.
+
+tenant:
+  name: "Star Trans"
+  slug: star-trans
+  display_name_ar: "ستار ترانس"
+  # Canonical uuid5(NAMESPACE_URL, "ipe://tenant/star-trans") — future Hetzner identity
+  canonical_uuid: "6a7281ee-62cb-5a72-8162-d3c573e54877"
+  # Lab operational tenant (seed + 28 MOs). Do not replace on lab.
+  lab_tenant_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+  tier_badge: reference_customer
+  license_tier: enterprise
+  support_tier: phase1_business_hours
+  contract_start: null  # from signed SOW — not in repo
+  contract_end: null    # 12 months from start
+  hosting: diligent-hetzner
+  data_residency: hetzner-eu-east  # Nuremberg or Falkenstein
+  timezone: Africa/Cairo
+  locale_primary: en-EG
+  locale_fallback: ar-EG
+  currency: EGP
+  currency_reference: USD
+
+features:
+  copilot_audit: true
+  data_quality_dashboard: true
+  dq_overnight_cron: true  # not scheduled in lab cluster yet
+
+secrets:
+  copilot_hmac_ref: "hetzner-secrets://ipe/tenants/star-trans/copilot-hmac"
+  jwt_ref: "hetzner-secrets://ipe/tenants/star-trans/jwt"
+  db_url_ref: "hetzner-secrets://ipe/tenants/star-trans/database-url"
+
+storage:
+  namespace: "s3://ipe-tenant-star-trans"
+  excel_prefix: incoming/
+  reports_prefix: reports/
+
+notes:
+  - Do not commit production secrets.
+  - Do not use Star Trans production Odoo credentials.
+  - Lab apply of migration 087 binds slug to existing seed tenant.
