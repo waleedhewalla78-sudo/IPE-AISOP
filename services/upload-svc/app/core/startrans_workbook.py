@@ -50,32 +50,60 @@ PRIORITY_SHEETS: list[str] = [
     "12_ManufacturingOrders",
 ]
 
-# Natural key per sheet for upsert preview
+# Natural key per sheet for upsert preview (synthetic keys composed from Excel cols)
 NATURAL_KEYS: dict[str, str] = {
     "01_Plants": "plant_id",
     "02_WorkCenters": "work_center_id",
     "03a_Calendars": "calendar_id",
-    "03b_CalendarShifts": "calendar_id",  # composite with day/shift handled in ingest
-    "03c_CalendarExceptions": "calendar_id",
+    "03b_CalendarShifts": "shift_id",
+    "03c_CalendarExceptions": "exception_id",
     "04_Products": "product_id",
     "05_Materials": "material_id",
     "06a_BOMHeaders": "bom_id",
-    "06b_BOMLines": "bom_id",
+    "06b_BOMLines": "bom_component_id",
     "07a_RoutingHeaders": "routing_id",
     "07b_RoutingOperations": "operation_id",
     "08_Suppliers": "supplier_id",
     "09_Customers": "customer_id",
     "10a_Employees": "employee_id",
-    "10b_EmployeeSkills": "employee_id",
+    "10b_EmployeeSkills": "employee_skill_id",
     "11a_SalesOrderHeaders": "sales_order_id",
-    "11b_SalesOrderLines": "sales_order_id",
+    "11b_SalesOrderLines": "so_line_id",
     "12_ManufacturingOrders": "mo_id",
     "13a_PurchaseOrderHeaders": "purchase_order_id",
-    "13b_PurchaseOrderLines": "purchase_order_id",
+    "13b_PurchaseOrderLines": "po_line_id",
     "14_Inventory": "item_id",
     "15_Forecasts": "forecast_id",
-    "16_ExecutionEvents": "mo_id",
+    "16_ExecutionEvents": "event_id",
 }
+
+# Sheets whose Excel row is not a single-column PK — join these fields with ":"
+_COMPOSITE_PARTS: dict[str, tuple[str, ...]] = {
+    "03b_CalendarShifts": ("calendar_id", "day_of_week", "shift_number"),
+    "03c_CalendarExceptions": ("calendar_id", "exception_date_start", "exception_type"),
+    "06b_BOMLines": ("bom_id", "line_number"),
+    "10b_EmployeeSkills": ("employee_id", "skill_code"),
+    "11b_SalesOrderLines": ("sales_order_id", "line_number"),
+    "13b_PurchaseOrderLines": ("purchase_order_id", "line_number"),
+    "16_ExecutionEvents": ("event_type", "event_datetime", "mo_id", "operation_id"),
+}
+
+
+def compose_natural_key(sheet: str, record: dict[str, Any]) -> str | None:
+    """Fill/return the unique key for a sheet row (composite sheets included)."""
+    nk = NATURAL_KEYS.get(sheet)
+    parts = _COMPOSITE_PARTS.get(sheet)
+    if parts:
+        if record.get(parts[0]) is None or str(record.get(parts[0])).strip() == "":
+            return None
+        key = ":".join("" if record.get(p) is None else str(record.get(p)) for p in parts)
+        if nk:
+            record[nk] = key
+        return key
+    if not nk:
+        return None
+    val = record.get(nk)
+    return str(val) if val is not None and str(val).strip() != "" else None
 
 HEADER_ROW = 4  # 1-indexed column names
 DATA_START_ROW = 5  # first data row
@@ -222,6 +250,7 @@ def _parse_data_sheet(ws: Any, name: str) -> SheetParseResult:
             record[key] = val
 
         nk = NATURAL_KEYS.get(name)
+        compose_natural_key(name, record)
         if nk and not record.get(nk):
             aliases = {
                 "product_id": ["product_code", "product_id", "sku"],
@@ -232,11 +261,13 @@ def _parse_data_sheet(ws: Any, name: str) -> SheetParseResult:
                 "material_id": ["material_code", "material_id"],
                 "plant_id": ["plant_code", "plant_id"],
                 "item_id": ["item_id", "material_id", "product_id"],
+                "employee_id": ["employee_code", "employee_id"],
             }
             for alias in aliases.get(nk, []):
                 if record.get(alias):
                     record[nk] = record[alias]
                     break
+            compose_natural_key(name, record)
             if nk and not record.get(nk):
                 row_errors.append(
                     {

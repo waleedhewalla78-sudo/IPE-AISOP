@@ -1,4 +1,5 @@
-# Load Star Trans demo branding (base demo graph + industry overlay)
+# Excel ingest (BATCH1-1) writes RLS-scoped cdm_ingest_* tables, not demo_*.
+# This seed still populates operational CDM (cdm_manufacturing_order, etc.).
 # Usage: .\scripts\seed-startrans-demo.ps1
 # Requires: docker-db-1 running, migrations applied, base seed loaded
 

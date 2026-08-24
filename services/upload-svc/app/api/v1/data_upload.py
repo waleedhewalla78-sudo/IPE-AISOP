@@ -97,7 +97,7 @@ async def commit_startrans_workbook(
         raise HTTPException(status_code=400, detail="upload_id does not belong to this tenant")
 
     parsed = stored["parsed"]
-    result = await ingest_workbook(session, parsed, dry_run=body.dry_run)
+    result = await ingest_workbook(session, parsed, dry_run=body.dry_run, tenant_id=tenant)
     return {
         "upload_id": body.upload_id,
         "file_name": stored.get("file_name"),
