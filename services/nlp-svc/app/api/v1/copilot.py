@@ -318,6 +318,23 @@ async def copilot_query(
     result["agent_role"] = agent.role
     result["follow_up_suggestions"] = list(agent.follow_up_suggestions)
 
+    try:
+        from app.audit_middleware import write_copilot_audit
+
+        await write_copilot_audit(
+            db,
+            tenant_id=tenant_id,
+            query_text=req.query,
+            response_text=str(result.get("response") or ""),
+            query_mode="ask",
+            user_id=getattr(current_user, "sub", None) or getattr(current_user, "user_id", None),
+            session_id=req.session_id,
+            query_context={"intent": result.get("intent"), "role": req.role},
+            llm_provider=str(result.get("provider") or result.get("llm_provider") or ""),
+        )
+    except Exception:
+        logger.exception("copilot audit skipped")
+
     return APIResponse(success=True, data=result, error=None)
 
 
