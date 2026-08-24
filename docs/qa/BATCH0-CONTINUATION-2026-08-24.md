@@ -78,8 +78,20 @@ COM C-01…C-08 / OQ-7 / PH1-02 / G-R2-04 remain **OPEN**. Not fake-closed.
 
 ---
 
+## 6. Continuation after port 5433 freed (same day)
+
+User authorized stop of `al-azhar-girls-faculty-portal-db-1`. T090 refresh + T091 re-verify executed.
+
+| Item | Result |
+|------|--------|
+| T090 2026-08-24 | **YELLOW** — stack UP; alembic **082**; connector cold flake then healthy |
+| T091 2026-08-24 | **YELLOW** — Kong preview **24 sheets / 69 rows**; unauth still 200 |
+| Seed volume | `cdm_manufacturing_order` **28** rows (not re-seeded) |
+
+Reports: `T090-R2-STACK-HEALTH-2026-08-24.md`, `T091-KONG-UPLOAD-LIVE-2026-08-24.md`.
+
+UI: http://localhost:8082 — stack left **UP**.
+
 ## VERDICT
 
-**YELLOW** — Batch 0 engineering/ops evidence from 2026-08-15 still stands; live stack is **down** behind a non-IPE bind on **:5433**; T095 human; T096 N/A; POST-DEMO outcomes unfilled.
-
-Recommended next Cursor action after port 5433 is freed: T090 bring-up only (do not skip health verify).
+**YELLOW** — Batch 0 prompts 0–5 evidence stands; live R2 is **UP** after connector warm; T091 JWT still not enforced; T095 human; T096 N/A; POST-DEMO outcomes unfilled.
